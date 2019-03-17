@@ -1,0 +1,60 @@
+get:
+  summary: "Elastigroup Azure - List"
+  description: >
+    List all Elastigroup Azures for a Spotinst Account
+  operationId: "elastigroupAzureListAll"
+  tags:
+  - "Elastigroup Azure"
+  parameters:
+    - $ref: "../../../../commons/parameters/accountId.yaml"
+  responses:
+    200:
+      $ref: "../responses/elastigroup.yaml"
+    400:
+      description: "Bad Request"
+
+post:
+  summary: "Elastigroup Azure - Create"
+  description:
+    Create a new Elastigroup Azure
+  operationId: "elastigroupAzureCreate"
+  tags:
+  - "Elastigroup Azure"
+  parameters:
+    - $ref: "../../../../commons/parameters/accountId.yaml"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          allOf:
+          - $ref: "../schemas/elastigroup.yaml"
+          - type: "object"
+            properties:
+              group:
+                type: object
+                required:
+                - name
+                - region
+                - resourceGroupName
+                - capacity
+                - strategy
+                - compute
+                properties:
+                  compute:
+                    type: object
+                    required:
+                      - vmSizes
+                      - product
+                    properties:
+                      vmSizes:
+                        type: object
+                        required:
+                          - odSizes
+                          - lowPrioritySizes
+
+  responses:
+    200:
+      $ref: "../responses/elastigroup.yaml"
+    400:
+      description: "Bad Request"

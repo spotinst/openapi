@@ -1,0 +1,63 @@
+put:
+  summary: "Elastigroup Azure - Detach Instances"
+  description: >
+    Detach one or more instances from an Azure Elastigroup
+  operationId: "elastigroupAzureDetachInstances"
+  tags:
+    - Elastigroup Azure
+  parameters:
+    - $ref: "../../../../commons/parameters/accountId.yaml"
+    - $ref: "../../commons/parameters/groupId.yaml"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            instancesToDetach:
+              type: array
+              items:
+                type: string
+            shouldDecrementTargetCapacity:
+              type: boolean
+              example: true
+            drainingTimeout:
+              type: integer
+              example: 300
+
+  responses:
+    200:
+      $ref: "#/components/responses/groupStatus"
+    400:
+      description: "Bad Request"
+components:
+  responses:
+    groupStatus:
+      description: Elastigroup Response
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "../../../../commons/schemas/spotinstResponseItemWrapper.yaml"
+              - type: "object"
+                properties:
+                  response:
+                    type: "object"
+                    properties:
+                      items:
+                        type: "array"
+                        items:
+                          $ref: "#/components/schemas/detachResponse"
+  schemas:
+    detachResponse:
+      type: object
+      properties:
+        detachedOd:
+          type: array
+          items:
+            type: string
+        detachedLowPriority:
+          type: array
+          items:
+            type: string
