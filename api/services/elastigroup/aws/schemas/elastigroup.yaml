@@ -1,0 +1,613 @@
+type: object
+required:
+  - group
+properties:
+  group: 
+    type: object
+    title: AWS Elastigroup
+    required:
+      - name
+      - region
+    properties:
+      id:
+        type: "string"
+        example: "sig-123456789"
+        readOnly: true
+        description: >
+          Azure Elastigroup ID
+      name:
+        type: string
+        example: "First Elastigroup"
+        description: >
+          The name of the Elastigroup
+      description:
+        type: string
+        example: "This is the first Spotinst Elastigroup of many"
+        description: >
+          The detailed purpose for this Elastigroup 
+      region:
+        type: string
+        example: "us-east-1"
+        description: >
+          The AWS Region the Elastigroup will manage instances 
+      capacity:
+        type: object
+        title: Capacity Units
+        required:
+          - target
+        properties:
+          minimum:
+            type: integer              
+            example: 1
+            description: >
+              The minimum number of units Elastigroup will scale down to        
+          maximum: 
+            type: integer              
+            example: 10
+            description: >
+              The maximum number of units Elastigroup will scale up to
+          target:
+            type: integer              
+            example: 5
+            description: >
+              Number of units Elastigroup will start with
+          unit:
+            type: string
+            example: instance
+            default: instance
+            enum: [weight, instance]
+            description: >
+              Defines how Elastigroup scales. Either by number of instances or by instance weights.
+              If `weight` is used then `weightedCapacity` is required to be set for all instance types used
+              for this Elastigroup.
+        strategy:
+          type: object
+          title: Elastigroup Strategy
+          properties:
+            risk:
+              type: integer
+              minimum: 0
+              maximum: 100
+              example: 100
+              default: 0
+              description: >
+                The percentage of Elastigroup that will run with spot market capacity
+            utilizeReservedInstances:
+              type: boolean
+              default: false
+              example: true
+              description: >
+                Whether the Elastigroup will use Reserved Instance capacity before launching instances in the spot market
+            fallbackToOd:
+              type: boolean
+              default: false
+              example: true
+              description: >
+                When set to `true` Elastigroup will launch On Demand instances if no spot market is available
+            onDemandCount:
+              type: integer
+              minimum: 0
+              example: 0
+              description: >
+                Minimum number of instances that will always be on-demand
+            availabilityVsCost:
+              type: string
+              enum:
+                - availabilityOriented
+                  equalAzDistribution
+                  costOriented
+                  cheapest
+                  balanced
+              default: balanced
+              description: >
+                How Elastigroup determines which instances to add and replace
+            drainingTimeout:
+              type: integer
+              example: 180
+              description: >
+                The time in seconds to allow the instance be drained from incoming TCP connections and detached from ELB before terminating it, during a scale down operation         
+            spinUpTime:
+              type: integer
+              deprecated: true
+            lifetimePeriod:
+              type: integer
+              deprecated: true
+          signals:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                  enum: [INSTANCE_READY, INSTANCE_READY_TO_SHUTDOWN]
+                  example: INSTANCE_READY
+                  description: >
+                    Custom reporting of respective instance signal
+                timeout:
+                  type: integer
+                  minimum: 60
+                  example: 600
+                  description: >
+                    Maximum time in seconds that Elastigroup should wait to receive the signal.
+
+
+
+
+          #   scalingStrategy:          utils.joi.object().keys({
+          #     terminateAtEndOfBillingHour: utils.joi.boolean().allow(null),
+          #     terminationPolicy:           utils.joi.string().valid(Object.values(constants.SCALE_DOWN_TERMINATION_POLICY_TYPES)).allow(null)
+          #   }).allow(null),
+          #   persistence:              utils.joi.object().keys({
+          #     shouldPersistBlockDevices: utils.joi.boolean().allow(null),
+          #     shouldPersistRootDevice:   utils.joi.boolean().allow(null),
+          #     shouldPersistPrivateIp:    utils.joi.boolean().allow(null),
+          #     blockDevicesMode:          utils.joi.string().valid(constants.PERSISTENCE_DEVICES_MODE).allow(null)
+          #   }).allow(null),
+          #   revertToSpot:             utils.joi.object().keys({
+          #     performAt:   utils.joi.string().valid(Object.values(constants.REVERT_TO_SPOT_TYPE)).required(),
+          #     timeWindows: utils.joi.when(utils.joi.ref('$revertToSpotPerformAt'), {
+          #       is:        constants.REVERT_TO_SPOT_TYPE.TIME_WINDOW,
+          #       then:      utils.joi.array().items(utils.joi.string().regex(TIME_WINDOW_REGEX)).min(1).required(),
+          #       otherwise: utils.joi.array().items(utils.joi.string().regex(TIME_WINDOW_REGEX)).min(1).allow(null)
+          #     }),
+          #   }).allow(null),
+          # }).required().or('risk', 'onDemandCount'),
+
+
+
+
+
+    #       scaling:                 utils.joi.object().keys({
+    #         up:     utils.joi.array().items(utils.joi.object().keys({
+    #           policyName:        utils.joi.string(),
+    #           namespace:         utils.joi.string().required(),
+    #           source:            utils.joi.string().valid(constants.SCALING_POLICY_SOURCES).allow(null),
+    #           metricName:        utils.joi.string().required(),
+    #           dimensions:        utils.joi.array().items(utils.joi.object().keys({
+    #             name:  utils.joi.string().required(),
+    #             value: utils.joi.string().allow(null)
+    #           })).min(1).allow(null),
+    #           statistic:         utils.joi.string()
+    #                                .default(utils._(constants.AWS_CLOUDWATCH_STATISTICS).where({default: true}).pluck('name').pop())
+    #                                .valid(utils._(constants.AWS_CLOUDWATCH_STATISTICS).pluck('name').value()),
+    #           extendedStatistic: utils.joi.string().regex(/^p[0-9]{1,3}(\.[0-9]{1,2}$)?/, 'extendedStatistic'),
+    #           unit:              utils.joi.string()
+    #                                .default(utils._(constants.AWS_CLOUDWATCH_UNITS).where({default: true}).pluck('name').pop())
+    #                                .valid(utils._(constants.AWS_CLOUDWATCH_UNITS).pluck('name').value()),
+    #           threshold:         utils.joi.number().required(),
+    #           adjustment:        utils.joi.number().min(0).allow(null),
+    #           minTargetCapacity: utils.joi.number().min(0).allow(null),
+    #           period:            utils.joi.number().multiple(60).min(0).default(300),
+    #           evaluationPeriods: utils.joi.number().integer().min(1).default(1),
+    #           cooldown:          utils.joi.number().multiple(60).min(0).default(300),
+    #           action:            utils.joi.object().keys({
+    #             type:              utils.joi.string().valid(constants.SCALE_UP_ACTION_TYPE).required(),
+    #             adjustment:        utils.joi.allow(null),
+    #             minTargetCapacity: utils.joi.allow(null),
+    #             target:            utils.joi.allow(null),
+    #             minimum:           utils.joi.allow(null),
+    #             maximum:           utils.joi.allow(null)
+    #           }),
+    #           operator:          utils.joi.string().valid(scalingOperators).default(constants.SCALING_OPERATORS.GREATER_THAN_EQUAL.keyword),
+    #           isEnabled:         utils.joi.boolean().allow(null)
+    #         }).xor('adjustment', 'minTargetCapacity', 'action')).allow(null),
+    #         down:   utils.joi.array().items(utils.joi.object().keys({
+    #           policyName:        utils.joi.string(),
+    #           namespace:         utils.joi.string().required(),
+    #           source:            utils.joi.string().valid(constants.SCALING_POLICY_SOURCES).allow(null),
+    #           metricName:        utils.joi.string().required(),
+    #           dimensions:        utils.joi.array().items(utils.joi.object().keys({
+    #             name:  utils.joi.string().required(),
+    #             value: utils.joi.string().allow(null)
+    #           })).min(1).allow(null),
+    #           statistic:         utils.joi.string()
+    #                                .default(utils._(constants.AWS_CLOUDWATCH_STATISTICS).where({default: true}).pluck('name').pop())
+    #                                .valid(utils._(constants.AWS_CLOUDWATCH_STATISTICS).pluck('name').value()),
+    #           extendedStatistic: utils.joi.string().regex(/^p[0-9]{1,3}(\.[0-9]{1,2}$)?/, 'extendedStatistic'),
+    #           unit:              utils.joi.string()
+    #                                .default(utils._(constants.AWS_CLOUDWATCH_UNITS).where({default: true}).pluck('name').pop())
+    #                                .valid(utils._(constants.AWS_CLOUDWATCH_UNITS).pluck('name').value()),
+    #           threshold:         utils.joi.number().required(),
+    #           adjustment:        utils.joi.number().min(0).allow(null),
+    #           maxTargetCapacity: utils.joi.number().min(0).allow(null),
+    #           period:            utils.joi.number().multiple(60).min(0).default(300),
+    #           evaluationPeriods: utils.joi.number().integer().min(1).default(1),
+    #           cooldown:          utils.joi.number().multiple(60).min(0).default(300),
+    #           action:            utils.joi.object().keys({
+    #             type:              utils.joi.string().valid(constants.SCALE_DOWN_ACTION_TYPE).required(),
+    #             adjustment:        utils.joi.allow(null),
+    #             maxTargetCapacity: utils.joi.allow(null),
+    #             target:            utils.joi.allow(null),
+    #             minimum:           utils.joi.allow(null),
+    #             maximum:           utils.joi.allow(null)
+    #           }),
+    #           operator:          utils.joi.string().valid(scalingOperators).default(constants.SCALING_OPERATORS.LESS_THAN_EQUAL.keyword),
+    #           isEnabled:         utils.joi.boolean().allow(null)
+    #         }).xor('adjustment', 'maxTargetCapacity', 'action')).allow(null),
+    #         target: utils.joi.array().items(utils.joi.object().keys({
+    #           policyName: utils.joi.string().required(),
+    #           namespace:  utils.joi.string().required(),
+    #           source:     utils.joi.string().valid(constants.SCALING_POLICY_SOURCES).allow(null),
+    #           metricName: utils.joi.string().required(),
+    #           dimensions: utils.joi.array().items(utils.joi.object().keys({
+    #             name:  utils.joi.string().required(),
+    #             value: utils.joi.string().allow(null)
+    #           })).min(1).allow(null),
+    #           statistic:  utils.joi.string()
+    #                         .default(utils._(constants.AWS_CLOUDWATCH_STATISTICS).where({default: true}).pluck('name').pop())
+    #                         .valid(utils._(constants.AWS_CLOUDWATCH_STATISTICS).pluck('name').value()),
+    #           unit:       utils.joi.string()
+    #                         .default(utils._(constants.AWS_CLOUDWATCH_UNITS).where({default: true}).pluck('name').pop())
+    #                         .valid(utils._(constants.AWS_CLOUDWATCH_UNITS).pluck('name').value()),
+    #           cooldown:   utils.joi.number().multiple(60).min(0).default(300),
+    #           target:     utils.joi.number().required(),
+    #           predictive: utils.joi.object().keys({
+    #             mode: utils.joi.string().valid(utils._.values(constants.PREDICTIVE_MODE_TYPE)).required()
+    #           }).allow(null)
+    #         })).allow(null)
+    #       }).allow(null),
+    #       scheduling:              utils.joi.object().keys({
+    #         tasks: utils.joi.array().items(utils.joi.object().keys({
+    #             isEnabled:            utils.joi.boolean().default(true),
+    #             frequency:            utils.joi.string().valid(constants.RECURRENCT_FREQUENCY),
+    #             startTime:            utils.joi.string().regex(ISO_8601_REGEX),
+    #             cronExpression:       utils.joi.string(),
+    #             taskType:             utils.joi.string().valid(constants.SCHEDULED_TASK_TYPES).required(),
+    #             scaleTargetCapacity:  utils.joi.number().integer().min(0).allow(null),
+    #             scaleMinCapacity:     utils.joi.number().integer().min(0).allow(null),
+    #             scaleMaxCapacity:     utils.joi.number().integer().min(0).allow(null),
+    #             batchSizePercentage:  utils.joi.number().integer().min(1).allow(null),
+    #             gracePeriod:          utils.joi.number().integer().min(1).allow(null),
+    #             adjustment:           utils.joi.number().integer().min(1).allow(null),
+    #             adjustmentPercentage: utils.joi.number().integer().min(1).allow(null),
+    #             targetCapacity:       utils.joi.number().integer().min(0).allow(null),
+    #             minCapacity:          utils.joi.number().integer().min(0).allow(null),
+    #             maxCapacity:          utils.joi.number().integer().min(0).allow(null)
+    #           }).or('frequency', 'cronExpression', 'startTime')
+    #         ).min(1).unique().allow(null)
+    #       }),
+    #       multai:                  utils.joi.object().keys({ //deprecated
+    #         token:     utils.joi.string().allow(null),
+    #         balancers: utils.joi.array().items(utils.joi.object().keys({
+    #           projectId:   utils.joi.string().required(),
+    #           balancerId:  utils.joi.string().required(),
+    #           targetSetId: utils.joi.string().required(),
+    #           azAwareness: utils.joi.boolean().default(true),
+    #           autoWeight:  utils.joi.boolean().default(false)
+    #         })).min(1).unique().allow(null)
+    #       }).allow(null),
+    #       thirdPartiesIntegration: utils.joi.object().keys({
+    #         rancher:          utils.joi.object().keys({
+    #           version:    utils.joi.string()
+    #                         .valid(utils._.values(RANCHER_INTEGRATION_VERSIONS))
+    #                         .default(RANCHER_INTEGRATION_VERSIONS.VERSION_1),
+    #           accessKey:  utils.joi.string().required(),
+    #           secretKey:  utils.joi.string().required(),
+    #           masterHost: utils.joi.string().required()
+    #         }).allow(null),
+    #         mesosphere:       utils.joi.object().keys({
+    #           apiServer: utils.joi.string().required()
+    #         }).allow(null),
+    #         elasticBeanstalk: utils.joi.object().keys({
+    #           environmentId:         utils.joi.string().required(),
+    #           deploymentPreferences: utils.joi.object().keys({
+    #             automaticRoll:       utils.joi.boolean().required(),
+    #             batchSizePercentage: utils.joi.number().integer().min(1).max(100).allow(null),
+    #             gracePeriod:         utils.joi.number().integer().min(0).allow(null),
+    #             strategy:            utils.joi.object().keys({
+    #               action:               utils.joi.string().valid(constants.ROLL_STRATEGY_ACTION).required(),
+    #               shouldDrainInstances: utils.joi.boolean().default(true)
+    #             }).allow(null)
+    #           }).allow(null),
+    #           managedActions:        utils.joi.object().keys({
+    #             platformUpdate: utils.joi.object().keys({
+    #               performAt:              utils.joi.string().valid(Object.values(constants.BEANSTALK_PLATFORM_UPDATE_TIME_WINDOW_TYPE)).required(),
+    #               timeWindow:             utils.joi.when(utils.joi.ref('performAt'), {
+    #                 is:   constants.BEANSTALK_PLATFORM_UPDATE_TIME_WINDOW_TYPE.TIME_WINDOW,
+    #                 then: utils.joi.string().regex(TIME_WINDOW_REGEX).required()
+    #               }),
+    #               updateLevel:            utils.joi.string().valid(Object.values(constants.BEANSTALK_PLATFORM_UPDATE_UPDATE_LEVEL_TYPE)).required(),
+    #               instanceRefreshEnabled: utils.joi.boolean().allow(null)
+    #             }).required()
+    #           }).allow(null)
+    #         }).allow(null),
+    #         ecs:              utils.joi.object().keys({
+    #           clusterName:    utils.joi.string().required(),
+    #           autoScale:      utils.joi.object().keys({
+    #             shouldScaleDownNonServiceTasks: utils.joi.boolean().default(false).allow(null),
+    #             isEnabled:                      utils.joi.boolean().default(false),
+    #             isAutoConfig:                   utils.joi.boolean().default(false),
+    #             cooldown:                       utils.joi.number().multiple(60).min(180).default(300).allow(null),
+    #             headroom:                       utils.joi.object().keys({
+    #               cpuPerUnit:    utils.joi.number().min(0).default(0),
+    #               memoryPerUnit: utils.joi.number().min(0).default(0),
+    #               numOfUnits:    utils.joi.number().min(0).default(0)
+    #             }).allow(null),
+    #             attributes:                     utils.joi.array().items(utils.joi.object().keys({
+    #               key:   utils.joi.string().required(),
+    #               value: utils.joi.string().required()
+    #             })).min(1).max(30).unique().allow(null),
+    #             down:                           utils.joi.object().keys({
+    #               evaluationPeriods:      utils.joi.number().integer().min(3).default(5),
+    #               maxScaleDownPercentage: utils.joi.number().integer().min(1).max(100).allow(null)
+    #             }).allow(null)
+    #           }).allow(null),
+    #           optimizeImages: utils.joi.object().keys({
+    #             performAt:            utils.joi.string().valid(Object.values(constants.MAINTENANCE_WINDOW_TYPE)).required(),
+    #             timeWindows:          utils.joi.when(utils.joi.ref('performAt'), {
+    #               is:        constants.MAINTENANCE_WINDOW_TYPE.TIME_WINDOW,
+    #               then:      utils.joi.array().items(utils.joi.string().regex(TIME_WINDOW_REGEX)).min(1).required(),
+    #               otherwise: utils.joi.array().items(utils.joi.string().regex(TIME_WINDOW_REGEX)).min(1).allow(null)
+    #             }),
+    #             shouldOptimizeEcsAmi: utils.joi.boolean().allow(null)
+    #           }).allow(null),
+    #           batch:          utils.joi.object().keys({
+    #             jobQueueNames: utils.joi.array().items(utils.joi.string()).min(1).allow(null)
+    #           }).allow(null)
+    #         }).allow(null),
+    #         mlbRuntime:       utils.joi.object().keys({
+    #           deploymentId: utils.joi.string().required()
+    #         }).allow(null),
+    #         kubernetes:       utils.joi.object().keys({
+    #           integrationMode:   utils.joi.string()
+    #                                .valid(utils._(constants.KUBERNETES_INTEGRATION_MODE).pluck('name').value())
+    #                                .default(utils._(constants.KUBERNETES_INTEGRATION_MODE).where({default: true}).pluck('name').pop()),
+    #           clusterIdentifier: utils.joi.string().when('integrationMode', {
+    #             is:   'pod',
+    #             then: utils.joi.required()
+    #           }),
+    #           apiServer:         utils.joi.string().when('integrationMode', {
+    #             is:   'saas',
+    #             then: utils.joi.required()
+    #           }),
+    #           token:             utils.joi.string().when('integrationMode', {
+    #             is:   'saas',
+    #             then: utils.joi.required()
+    #           }),
+    #           autoScale:         utils.joi.object().keys({
+    #             isEnabled:      utils.joi.boolean().default(false),
+    #             isAutoConfig:   utils.joi.boolean().default(false),
+    #             cooldown:       utils.joi.number().multiple(60).min(180).default(300).allow(null),
+    #             headroom:       utils.joi.object().keys({
+    #               cpuPerUnit:    utils.joi.number().min(0).default(0),
+    #               memoryPerUnit: utils.joi.number().min(0).default(0),
+    #               gpuPerUnit:    utils.joi.number().integer().min(0),
+    #               numOfUnits:    utils.joi.number().min(0).default(0)
+    #             }).allow(null),
+    #             resourceLimits: utils.joi.object().keys({
+    #               maxVCpu:      utils.joi.number().min(1).allow(null),
+    #               maxMemoryGib: utils.joi.number().min(1).allow(null)
+    #             }).allow(null),
+    #             labels:         utils.joi.array().items(utils.joi.object().keys({
+    #               key:   utils.joi.string().required(),
+    #               value: utils.joi.string().required()
+    #             })).min(1).max(30).unique().allow(null),
+    #             down:           utils.joi.object().keys({
+    #               evaluationPeriods:      utils.joi.number().integer().min(3).default(5),
+    #               maxScaleDownPercentage: utils.joi.number().integer().min(1).max(100).allow(null)
+    #             }).allow(null)
+    #           }).allow(null)
+    #         }).xor('clusterIdentifier', 'apiServer').xor('clusterIdentifier', 'token').allow(null),
+    #         rightScale:       utils.joi.object().keys({
+    #           accountId:    utils.joi.string().required(),
+    #           refreshToken: utils.joi.string().required(),
+    #           region:       utils.joi.string()
+    #         }).allow(null),
+    #         opsWorks:         utils.joi.object().keys({
+    #           layerId:   utils.joi.string().required(),
+    #           stackType: utils.joi.string().valid(constants.OPSWORKS_STACK_TYPE).required()
+    #         }).allow(null),
+    #         codeDeploy:       utils.joi.object().keys({
+    #           deploymentGroups:           utils.joi.array().items(utils.joi.object().keys({
+    #             applicationName:     utils.joi.string().required(),
+    #             deploymentGroupName: utils.joi.string().required()
+    #           })).min(1).unique().required(),
+    #           cleanUpOnFailure:           utils.joi.boolean().required(),
+    #           terminateInstanceOnFailure: utils.joi.boolean().required()
+    #         }).allow(null),
+    #         chef:             utils.joi.object().keys({
+    #           chefServer:   utils.joi.string().required(),
+    #           organization: utils.joi.string().required(),
+    #           user:         utils.joi.string().required(),
+    #           pemKey:       utils.joi.string().required(),
+    #           chefVersion:  utils.joi.string().required(),
+    #         }).allow(null),
+    #         nomad:            utils.joi.object().keys({
+    #           masterHost: utils.joi.string().required(),
+    #           masterPort: utils.joi.number().required(),
+    #           aclToken:   utils.joi.string(),
+    #           autoScale:  utils.joi.object().keys({
+    #             isEnabled:   utils.joi.boolean().default(false),
+    #             cooldown:    utils.joi.number().multiple(60).min(180).default(300),
+    #             headroom:    utils.joi.object().keys({
+    #               cpuPerUnit:    utils.joi.number().min(0).default(0),
+    #               memoryPerUnit: utils.joi.number().min(0).default(0),
+    #               numOfUnits:    utils.joi.number().min(0).default(0)
+    #             }).allow(null),
+    #             constraints: utils.joi.array().items(utils.joi.object().keys({
+    #               key:   utils.joi.string().regex(NOMAD_CONSTRAINT_KEY_REGEX).required(),
+    #               value: utils.joi.string().required()
+    #             })).min(1).max(30).unique().allow(null),
+    #             down:        utils.joi.object().keys({
+    #               evaluationPeriods: utils.joi.number().integer().min(3).default(5)
+    #             }).allow(null)
+    #           }).allow(null)
+    #         }).allow(null),
+    #         dockerSwarm:      utils.joi.object().keys({
+    #           masterHost: utils.joi.string().required(),
+    #           masterPort: utils.joi.number().required(),
+    #           autoScale:  utils.joi.object().keys({
+    #             isEnabled: utils.joi.boolean().default(false),
+    #             cooldown:  utils.joi.number().multiple(60).min(180).default(300),
+    #             headroom:  utils.joi.object().keys({
+    #               cpuPerUnit:    utils.joi.number().min(0).default(0),
+    #               memoryPerUnit: utils.joi.number().min(0).default(0),
+    #               numOfUnits:    utils.joi.number().min(0).default(0)
+    #             }).allow(null),
+    #             labels:         utils.joi.array().items(utils.joi.object().keys({
+    #                 key:   utils.joi.string().required(),
+    #                 value: utils.joi.string().required()
+    #             })).min(1).max(30).unique().allow(null),
+    #             down:      utils.joi.object().keys({
+    #               evaluationPeriods: utils.joi.number().integer().min(3).default(5)
+    #             }).allow(null)
+    #           }).allow(null),
+    #           tlsConfig:  utils.joi.object().keys({
+    #             tlsEnabled: utils.joi.boolean().required(),
+    #             certificate:  utils.joi.string().required(),
+    #             privateKey:  utils.joi.string().required()
+    #           }).allow(null)
+    #         }).allow(null),
+    #         route53:          utils.joi.object().keys({
+    #           domains: utils.joi.array().items(utils.joi.object().keys({
+    #             hostedZoneId:      utils.joi.string().required(),
+    #             spotinstAccountId: utils.joi.string().allow(null),
+    #             recordSets:        utils.joi.array().items(utils.joi.object().keys({
+    #               name:        utils.joi.string().required(),
+    #               usePublicIp: utils.joi.boolean().default(false)
+    #             })).min(1).unique().required()
+    #           })).min(1).unique().required()
+    #         }).allow(null),
+    #         gitlab:           utils.joi.object().keys({
+    #           runner: utils.joi.object().keys({
+    #             isEnabled: utils.joi.boolean().allow(null)
+    #           }).allow(null)
+    #         }).allow(null)
+    #       }),
+    #       compute:                 utils.joi.object().keys({
+    #         elasticIps:                 utils.joi.array().items(utils.joi.string()).min(1).allow(null).unique(),
+    #         privateIps:                 utils.joi.when(utils.joi.ref('$shouldPersistPrivateIp'), {
+    #           is:        true,
+    #           then:      utils.joi.array().items(utils.joi.string()).min(1).allow(null).unique(),
+    #           otherwise: utils.joi.valid(null)
+    #         }),
+    #         instanceTypes:              utils.joi.object().keys({
+    #           ondemand:      utils.joi.string().valid(constants.AWS_INSTANCE_TYPES).required(),
+    #           spot:          utils.joi.array().items(utils.joi.string().valid(constants.AWS_SPOTABLE_INSTANCE_TYPES)).min(1).unique().required(),
+    #           weights:       utils.joi.when(utils.joi.ref('$capacityUnit'), {
+    #             is:        constants.CAPACITY_UNITS.WEIGHT,
+    #             then:      utils.joi.array().items(utils.joi.object().keys({
+    #               instanceType:     utils.joi.string().valid(constants.AWS_INSTANCE_TYPES).required(),
+    #               weightedCapacity: utils.joi.number().integer().min(1).required()
+    #             })).unique().allow(null),
+    #             otherwise: utils.joi.valid(null)
+    #           }),
+    #           preferredSpot: utils.joi.array().items(utils.joi.string().valid(constants.AWS_SPOTABLE_INSTANCE_TYPES)).allow(null)
+    #         }).required(),
+    #         availabilityZones:          utils.joi.array().items(utils.joi.object().keys({
+    #           name:               utils.joi.string().valid(constants.AWS_AVAILABILITY_ZONES).required(),
+    #           subnetId:           utils.joi.string().allow(null),
+    #           subnetIds:          utils.joi.array().items(utils.joi.string()).min(1).allow(null),
+    #           placementGroupName: utils.joi.string().allow(null)
+    #         }).nand('subnetId', 'subnetIds')).min(1).unique().required().when(utils.joi.ref('$computeSubnetIds'), {
+    #           is:   utils.joi.exist(),
+    #           then: utils.joi.optional()
+    #         }),
+    #         subnetIds:                  utils.joi.array().items(utils.joi.string()).min(1).allow(null).unique(),
+    #         preferredAvailabilityZones: utils.joi.array().items(utils.joi.string().valid(constants.AWS_AVAILABILITY_ZONES)).allow(null).unique(),
+    #         product:                    utils.joi.string().valid(constants.AWS_EC2_PRODUCTS).required(),
+    #         ebsVolumePool:              utils.joi.array().items(utils.joi.object().keys({
+    #           deviceName: utils.joi.string().required(),
+    #           volumeIds:  utils.joi.array().items(utils.joi.string()).min(1).required()
+    #         })).allow(null),
+    #         launchSpecification:        utils.joi.object().keys({
+    #           loadBalancerName:                              utils.joi.string(), // deprecated
+    #           loadBalancerNames:                             utils.joi.array().items(utils.joi.string()).min(1).allow(null).unique(),
+    #           loadBalancersConfig:                           utils.joi.object().keys({
+    #             loadBalancers: utils.joi.array().items(utils.joi.object().keys({
+    #               name:        utils.joi.when('type', {
+    #                 is:        constants.GROUP_ELB_TYPES.TARGET_GROUP,
+    #                 then:      utils.joi.string().allow(null),
+    #                 otherwise: utils.joi.when('type', {
+    #                   is:        constants.GROUP_ELB_TYPES.CLASSIC,
+    #                   then:      utils.joi.string().required(),
+    #                   otherwise: utils.joi.valid(null)
+    #                 })
+    #               }),
+    #               arn:         utils.joi.when('type', {
+    #                 is:        constants.GROUP_ELB_TYPES.TARGET_GROUP,
+    #                 then:      utils.joi.string().regex(constants.LB_TARGET_GROUP_ARN_REGEX).required(),
+    #                 otherwise: utils.joi.string().allow(null)
+    #               }),
+    #               balancerId:  utils.joi.when('type', {
+    #                 is:        constants.GROUP_ELB_TYPES.MULTAI_TARGET_SET,
+    #                 then:      utils.joi.string().required(),
+    #                 otherwise: utils.joi.valid(null)
+    #               }),
+    #               targetSetId: utils.joi.when('type', {
+    #                 is:        constants.GROUP_ELB_TYPES.MULTAI_TARGET_SET,
+    #                 then:      utils.joi.string().required(),
+    #                 otherwise: utils.joi.valid(null)
+    #               }),
+    #               azAwareness: utils.joi.when('type', {
+    #                 is:        constants.GROUP_ELB_TYPES.MULTAI_TARGET_SET,
+    #                 then:      utils.joi.boolean().default(true),
+    #                 otherwise: utils.joi.valid(null)
+    #               }),
+    #               autoWeight:  utils.joi.when('type', {
+    #                 is:        constants.GROUP_ELB_TYPES.MULTAI_TARGET_SET,
+    #                 then:      utils.joi.boolean().default(false),
+    #                 otherwise: utils.joi.valid(null)
+    #               }),
+    #               type:        utils.joi.string().valid(Object.values(constants.GROUP_ELB_TYPES)).required(),
+    #             })).min(1).allow(null)
+    #           }).allow(null),
+    #           healthCheckType:                               utils.joi.string().valid(constants.HEALTH_CHECK_TYPE).allow(null),
+    #           healthCheckGracePeriod:                        utils.joi.number().integer().min(0).allow(null),
+    #           healthCheckUnhealthyDurationBeforeReplacement: utils.joi.number().integer().multiple(60).min(60).allow(null),
+    #           securityGroupIds:                              utils.joi.array().items(utils.joi.string()).min(1).unique(),
+    #           monitoring:                                    utils.joi.boolean().required(),
+    #           ebsOptimized:                                  utils.joi.boolean(),
+    #           imageId:                                       utils.joi.string().required(),
+    #           tenancy:                                       utils.joi.string().valid(utils._(constants.AWS_TENANCY).pluck('name').value()),
+    #           iamRole:                                       utils.joi.object().keys({
+    #             name: utils.joi.string().allow(null),
+    #             arn:  utils.joi.string().allow(null)
+    #           }).or('name', 'arn').allow(null),
+    #           creditSpecification:                           utils.joi.object().keys({
+    #             cpuCredits: utils.joi.string().valid(Object.values(constants.AWS_CREDIT_SPECIFICATION_OPTIONS)).required()
+    #           }).allow(null),
+    #           keyPair:                                       utils.joi.string().allow(null),
+    #           userData:                                      utils.joi.string().regex(BASH_REGEX, 'base64').allow(null),
+    #           shutdownScript:                                utils.joi.string().regex(BASH_REGEX, 'base64').allow(null),
+    #           blockDeviceMappings:                           utils.joi.array().items(utils.joi.object().keys({
+    #             deviceName:  utils.joi.string(),
+    #             ebs:         utils.joi.object().keys({
+    #               deleteOnTermination: utils.joi.boolean(),
+    #               encrypted:           utils.joi.boolean(),
+    #               iops:                utils.joi.number().min(0),
+    #               kmsKeyId:            utils.joi.string(),
+    #               snapshotId:          utils.joi.string(),
+    #               volumeSize:          utils.joi.any(),
+    #               volumeType:          utils.joi.string()
+    #                                      .default(utils._(constants.AWS_VOLUME_TYPES).where({default: true}).pluck('name').pop())
+    #                                      .valid(utils._(constants.AWS_VOLUME_TYPES).pluck('name').value())
+    #             }),
+    #             noDevice:    utils.joi.string().allow(''),
+    #             virtualName: utils.joi.string(),
+    #           })).min(1).allow(null),
+    #           networkInterfaces:                             utils.joi.array().items(utils.joi.object().keys({
+    #             description:                    utils.joi.string(),
+    #             deviceIndex:                    utils.joi.number().integer().min(0),
+    #             secondaryPrivateIpAddressCount: utils.joi.number().integer().min(0),
+    #             associatePublicIpAddress:       utils.joi.boolean(),
+    #             deleteOnTermination:            utils.joi.boolean(),
+    #             groups:                         utils.joi.array().items(utils.joi.string()).min(1),
+    #             networkInterfaceId:             utils.joi.string(),
+    #             privateIpAddress:               utils.joi.string(),
+    #             privateIpAddresses:             utils.joi.array().items(utils.joi.object().keys({
+    #               privateIpAddress: utils.joi.string().required(),
+    #               primary:          utils.joi.boolean()
+    #             })).min(1),
+    #             subnetId:                       utils.joi.string(),
+    #             associateIpv6Address:           utils.joi.boolean()
+    #           })).min(1).allow(null),
+    #           tags:                                          utils.joi.array().items(utils.joi.object().keys({
+    #             tagKey:   utils.joi.string().regex(/^(?!aws:).*/, `naming (prefix "aws:" is reserved for AWS use)`),
+    #             tagValue: utils.joi.string().allow('')
+    #           }).and('tagKey', 'tagValue')).min(constants.ELASTIGROUP_TAGS_RANGE.min).max(constants.ELASTIGROUP_TAGS_RANGE.max).allow(null).unique()
+    #         }).required()
+    #       }).required()
+    #     }).required()
+    #   })
+    # }

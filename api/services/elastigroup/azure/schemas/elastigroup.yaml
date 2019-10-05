@@ -277,4 +277,51 @@ properties:
                   Must mastch the clusterIdentifier that was sent when
                    the [Spotinst Controller](https://api.spotinst.com/container-management/kubernetes/kubernetes-tutorials/installing-kubernetes-controller/)
                    was installed.
+          hpcGridEngine:
+            type: "object"
+            required:
+              - clusterId
+            properties:
+              clusterId:
+                type: string
+                example: "spotinst-uge-cluster"
+                description: >
+                  Must match the clusterId used by the [controller](https://api.spotinst.com/elastigroup-for-azure/hpc/introduction/)
+              queues:
+                type: array
+                description: >
+                  If defined the autoscaler will only match this Elastigroup to jobs associated with the queues listed here. If empty or null, then all queues will be monitored.
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: "burst.q"
+                      description: >
+                        The name of the queue to monitor
+              distribution:
+                type: string
+                enum:
+                  - sge
+                  - uge
+                description: >
+                  The specific distribution of grid engine. Defaults to `sge`
+                properties:
+                  name:
+                    type: string
+              tortuga:
+                type: object
+                description: >
+                  Optional configuration for `uge` distribution managed with Tortuga
+                properties:
+                  softwareProfile:
+                    type: string
+                    example: "execd"
+                    description: >
+                      An existing Tortuga software profile
+                  hardwareProfile:
+                    type: string
+                    example: "execd-elastigroup"
+                    description: >
+                      An existing Torguga hardware profile that is configured for remote nodes and dynamic hostnames
 
