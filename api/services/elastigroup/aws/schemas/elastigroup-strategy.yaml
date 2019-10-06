@@ -1,0 +1,222 @@
+type: object
+title: Elastigroup Strategy
+properties:
+  risk:
+    type: integer
+    minimum: 0
+    maximum: 100
+    example: 100
+    default: 0
+    description: >
+      The percentage of Elastigroup that will run with spot market capacity
+  utilizeReservedInstances:
+    type: boolean
+    default: false
+    example: true
+    description: >
+      Whether the Elastigroup will use Reserved Instance capacity before launching instances in the spot market
+  fallbackToOd:
+    type: boolean
+    default: false
+    example: true
+    description: >
+      When set to `true` Elastigroup will launch On Demand instances if no spot market is available
+  onDemandCount:
+    type: integer
+    minimum: 0
+    example: 0
+    description: >
+      Minimum number of instances that will always be on-demand
+  availabilityVsCost:
+    type: string
+    enum:
+      - availabilityOriented
+        equalAzDistribution
+        costOriented
+        cheapest
+        balanced
+    default: balanced
+    description: >
+      How Elastigroup determines which instances to add and replace
+  drainingTimeout:
+    type: integer
+    example: 180
+    description: >
+      The time in seconds to allow the instance be drained from incoming TCP connections and detached from ELB before terminating it, during a scale down operation         
+  spinUpTime:
+    type: integer
+    deprecated: true
+  lifetimePeriod:
+    type: integer
+    deprecated: true
+  signals:
+    type: array
+    items:
+      type: object
+      properties:
+        name:
+          type: string
+          enum: [INSTANCE_READY, INSTANCE_READY_TO_SHUTDOWN]
+          example: INSTANCE_READY
+          description: >
+            Custom reporting of respective instance signal
+        timeout:
+          type: integer
+          minimum: 60
+          example: 600
+          description: >
+            Maximum time in seconds that Elastigroup should wait to receive the signal.
+  scalingStrategy:          
+    type: object
+    properties:
+      terminateAtEndOfBillingHour:
+        type: boolean
+        deprecated: true
+        terminationPolicy:
+          type: string
+          enum:
+            - default
+              newestInstance
+          example: default
+          default: default
+          description: >
+            Which instances are chosen for termination first
+  persistence:
+    type: object
+    properties:
+      shouldPersistBlockDevices:
+        type: boolean
+        example: false
+        default: null
+        description: >
+          If `true` Elastigroup will track and persist attached block storage
+      shouldPersistRootDevice:
+        type: boolean
+        example: false
+        default: null
+        description: >
+          If `true` Elastigroup will take snapshots and persist the root device
+      shouldPersistPrivateIp:
+        type: boolean
+        example: false
+        default: null
+        description:
+          If `true` Elastigroup will maintin the private IP of the instance
+      blockDevicesMode:
+        type: string
+        enum: [onLaunch, reattach]
+        example: onLaunch
+        default: onLaunch
+        description: >
+          Determine the way we attach the data volumes to the data devices, Possible values: ‘reattach’ and ‘onLaunch’
+  revertToSpot:
+    type: object
+    title: When Elastigroup moves from OnDemand back to Spot capacity
+    properties:
+      performAt:
+        type: string
+        example: always
+        enum: [never, always, timeWindow]
+      timeWindows: 
+        type: array
+        items:
+          type: string
+        example: [Mon:03:00-Wed:02:30]
+        description: >
+            If `preformAt` is set to `timeWindow` then `timeWindows` must be set 
+            as a list where each string is in the format of - ddd:hh:mm-ddd:hh:mm 
+            ddd = day of week = Sun | Mon | Tue | Wed | Thu | Fri | Sat 
+            hh = hour 24 = 0 -23
+            mm = minute = 0 - 59
+
+
+
+    #       scaling:                 utils.joi.object().keys({
+    #         up:     utils.joi.array().items(utils.joi.object().keys({
+    #           policyName:        utils.joi.string(),
+    #           namespace:         utils.joi.string().required(),
+    #           source:            utils.joi.string().valid(constants.SCALING_POLICY_SOURCES).allow(null),
+    #           metricName:        utils.joi.string().required(),
+    #           dimensions:        utils.joi.array().items(utils.joi.object().keys({
+    #             name:  utils.joi.string().required(),
+    #             value: utils.joi.string().allow(null)
+    #           })).min(1).allow(null),
+    #           statistic:         utils.joi.string()
+    #                                .default(utils._(constants.AWS_CLOUDWATCH_STATISTICS).where({default: true}).pluck('name').pop())
+    #                                .valid(utils._(constants.AWS_CLOUDWATCH_STATISTICS).pluck('name').value()),
+    #           extendedStatistic: utils.joi.string().regex(/^p[0-9]{1,3}(\.[0-9]{1,2}$)?/, 'extendedStatistic'),
+    #           unit:              utils.joi.string()
+    #                                .default(utils._(constants.AWS_CLOUDWATCH_UNITS).where({default: true}).pluck('name').pop())
+    #                                .valid(utils._(constants.AWS_CLOUDWATCH_UNITS).pluck('name').value()),
+    #           threshold:         utils.joi.number().required(),
+    #           adjustment:        utils.joi.number().min(0).allow(null),
+    #           minTargetCapacity: utils.joi.number().min(0).allow(null),
+    #           period:            utils.joi.number().multiple(60).min(0).default(300),
+    #           evaluationPeriods: utils.joi.number().integer().min(1).default(1),
+    #           cooldown:          utils.joi.number().multiple(60).min(0).default(300),
+    #           action:            utils.joi.object().keys({
+    #             type:              utils.joi.string().valid(constants.SCALE_UP_ACTION_TYPE).required(),
+    #             adjustment:        utils.joi.allow(null),
+    #             minTargetCapacity: utils.joi.allow(null),
+    #             target:            utils.joi.allow(null),
+    #             minimum:           utils.joi.allow(null),
+    #             maximum:           utils.joi.allow(null)
+    #           }),
+    #           operator:          utils.joi.string().valid(scalingOperators).default(constants.SCALING_OPERATORS.GREATER_THAN_EQUAL.keyword),
+    #           isEnabled:         utils.joi.boolean().allow(null)
+    #         }).xor('adjustment', 'minTargetCapacity', 'action')).allow(null),
+    #         down:   utils.joi.array().items(utils.joi.object().keys({
+    #           policyName:        utils.joi.string(),
+    #           namespace:         utils.joi.string().required(),
+    #           source:            utils.joi.string().valid(constants.SCALING_POLICY_SOURCES).allow(null),
+    #           metricName:        utils.joi.string().required(),
+    #           dimensions:        utils.joi.array().items(utils.joi.object().keys({
+    #             name:  utils.joi.string().required(),
+    #             value: utils.joi.string().allow(null)
+    #           })).min(1).allow(null),
+    #           statistic:         utils.joi.string()
+    #                                .default(utils._(constants.AWS_CLOUDWATCH_STATISTICS).where({default: true}).pluck('name').pop())
+    #                                .valid(utils._(constants.AWS_CLOUDWATCH_STATISTICS).pluck('name').value()),
+    #           extendedStatistic: utils.joi.string().regex(/^p[0-9]{1,3}(\.[0-9]{1,2}$)?/, 'extendedStatistic'),
+    #           unit:              utils.joi.string()
+    #                                .default(utils._(constants.AWS_CLOUDWATCH_UNITS).where({default: true}).pluck('name').pop())
+    #                                .valid(utils._(constants.AWS_CLOUDWATCH_UNITS).pluck('name').value()),
+    #           threshold:         utils.joi.number().required(),
+    #           adjustment:        utils.joi.number().min(0).allow(null),
+    #           maxTargetCapacity: utils.joi.number().min(0).allow(null),
+    #           period:            utils.joi.number().multiple(60).min(0).default(300),
+    #           evaluationPeriods: utils.joi.number().integer().min(1).default(1),
+    #           cooldown:          utils.joi.number().multiple(60).min(0).default(300),
+    #           action:            utils.joi.object().keys({
+    #             type:              utils.joi.string().valid(constants.SCALE_DOWN_ACTION_TYPE).required(),
+    #             adjustment:        utils.joi.allow(null),
+    #             maxTargetCapacity: utils.joi.allow(null),
+    #             target:            utils.joi.allow(null),
+    #             minimum:           utils.joi.allow(null),
+    #             maximum:           utils.joi.allow(null)
+    #           }),
+    #           operator:          utils.joi.string().valid(scalingOperators).default(constants.SCALING_OPERATORS.LESS_THAN_EQUAL.keyword),
+    #           isEnabled:         utils.joi.boolean().allow(null)
+    #         }).xor('adjustment', 'maxTargetCapacity', 'action')).allow(null),
+    #         target: utils.joi.array().items(utils.joi.object().keys({
+    #           policyName: utils.joi.string().required(),
+    #           namespace:  utils.joi.string().required(),
+    #           source:     utils.joi.string().valid(constants.SCALING_POLICY_SOURCES).allow(null),
+    #           metricName: utils.joi.string().required(),
+    #           dimensions: utils.joi.array().items(utils.joi.object().keys({
+    #             name:  utils.joi.string().required(),
+    #             value: utils.joi.string().allow(null)
+    #           })).min(1).allow(null),
+    #           statistic:  utils.joi.string()
+    #                         .default(utils._(constants.AWS_CLOUDWATCH_STATISTICS).where({default: true}).pluck('name').pop())
+    #                         .valid(utils._(constants.AWS_CLOUDWATCH_STATISTICS).pluck('name').value()),
+    #           unit:       utils.joi.string()
+    #                         .default(utils._(constants.AWS_CLOUDWATCH_UNITS).where({default: true}).pluck('name').pop())
+    #                         .valid(utils._(constants.AWS_CLOUDWATCH_UNITS).pluck('name').value()),
+    #           cooldown:   utils.joi.number().multiple(60).min(0).default(300),
+    #           target:     utils.joi.number().required(),
+    #           predictive: utils.joi.object().keys({
+    #             mode: utils.joi.string().valid(utils._.values(constants.PREDICTIVE_MODE_TYPE)).required()
+    #           }).allow(null)
+    #         })).allow(null)
+    #       }).allow(null),

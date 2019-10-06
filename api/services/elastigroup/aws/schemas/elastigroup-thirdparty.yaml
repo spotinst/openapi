@@ -1,0 +1,200 @@
+type: object
+title: Elastigroup Third Party Integrations
+#       thirdPartiesIntegration: utils.joi.object().keys({
+    #         rancher:          utils.joi.object().keys({
+    #           version:    utils.joi.string()
+    #                         .valid(utils._.values(RANCHER_INTEGRATION_VERSIONS))
+    #                         .default(RANCHER_INTEGRATION_VERSIONS.VERSION_1),
+    #           accessKey:  utils.joi.string().required(),
+    #           secretKey:  utils.joi.string().required(),
+    #           masterHost: utils.joi.string().required()
+    #         }).allow(null),
+    #         mesosphere:       utils.joi.object().keys({
+    #           apiServer: utils.joi.string().required()
+    #         }).allow(null),
+    #         elasticBeanstalk: utils.joi.object().keys({
+    #           environmentId:         utils.joi.string().required(),
+    #           deploymentPreferences: utils.joi.object().keys({
+    #             automaticRoll:       utils.joi.boolean().required(),
+    #             batchSizePercentage: utils.joi.number().integer().min(1).max(100).allow(null),
+    #             gracePeriod:         utils.joi.number().integer().min(0).allow(null),
+    #             strategy:            utils.joi.object().keys({
+    #               action:               utils.joi.string().valid(constants.ROLL_STRATEGY_ACTION).required(),
+    #               shouldDrainInstances: utils.joi.boolean().default(true)
+    #             }).allow(null)
+    #           }).allow(null),
+    #           managedActions:        utils.joi.object().keys({
+    #             platformUpdate: utils.joi.object().keys({
+    #               performAt:              utils.joi.string().valid(Object.values(constants.BEANSTALK_PLATFORM_UPDATE_TIME_WINDOW_TYPE)).required(),
+    #               timeWindow:             utils.joi.when(utils.joi.ref('performAt'), {
+    #                 is:   constants.BEANSTALK_PLATFORM_UPDATE_TIME_WINDOW_TYPE.TIME_WINDOW,
+    #                 then: utils.joi.string().regex(TIME_WINDOW_REGEX).required()
+    #               }),
+    #               updateLevel:            utils.joi.string().valid(Object.values(constants.BEANSTALK_PLATFORM_UPDATE_UPDATE_LEVEL_TYPE)).required(),
+    #               instanceRefreshEnabled: utils.joi.boolean().allow(null)
+    #             }).required()
+    #           }).allow(null)
+    #         }).allow(null),
+    #         ecs:              utils.joi.object().keys({
+    #           clusterName:    utils.joi.string().required(),
+    #           autoScale:      utils.joi.object().keys({
+    #             shouldScaleDownNonServiceTasks: utils.joi.boolean().default(false).allow(null),
+    #             isEnabled:                      utils.joi.boolean().default(false),
+    #             isAutoConfig:                   utils.joi.boolean().default(false),
+    #             cooldown:                       utils.joi.number().multiple(60).min(180).default(300).allow(null),
+    #             headroom:                       utils.joi.object().keys({
+    #               cpuPerUnit:    utils.joi.number().min(0).default(0),
+    #               memoryPerUnit: utils.joi.number().min(0).default(0),
+    #               numOfUnits:    utils.joi.number().min(0).default(0)
+    #             }).allow(null),
+    #             attributes:                     utils.joi.array().items(utils.joi.object().keys({
+    #               key:   utils.joi.string().required(),
+    #               value: utils.joi.string().required()
+    #             })).min(1).max(30).unique().allow(null),
+    #             down:                           utils.joi.object().keys({
+    #               evaluationPeriods:      utils.joi.number().integer().min(3).default(5),
+    #               maxScaleDownPercentage: utils.joi.number().integer().min(1).max(100).allow(null)
+    #             }).allow(null)
+    #           }).allow(null),
+    #           optimizeImages: utils.joi.object().keys({
+    #             performAt:            utils.joi.string().valid(Object.values(constants.MAINTENANCE_WINDOW_TYPE)).required(),
+    #             timeWindows:          utils.joi.when(utils.joi.ref('performAt'), {
+    #               is:        constants.MAINTENANCE_WINDOW_TYPE.TIME_WINDOW,
+    #               then:      utils.joi.array().items(utils.joi.string().regex(TIME_WINDOW_REGEX)).min(1).required(),
+    #               otherwise: utils.joi.array().items(utils.joi.string().regex(TIME_WINDOW_REGEX)).min(1).allow(null)
+    #             }),
+    #             shouldOptimizeEcsAmi: utils.joi.boolean().allow(null)
+    #           }).allow(null),
+    #           batch:          utils.joi.object().keys({
+    #             jobQueueNames: utils.joi.array().items(utils.joi.string()).min(1).allow(null)
+    #           }).allow(null)
+    #         }).allow(null),
+    #         mlbRuntime:       utils.joi.object().keys({
+    #           deploymentId: utils.joi.string().required()
+    #         }).allow(null),
+    #         kubernetes:       utils.joi.object().keys({
+    #           integrationMode:   utils.joi.string()
+    #                                .valid(utils._(constants.KUBERNETES_INTEGRATION_MODE).pluck('name').value())
+    #                                .default(utils._(constants.KUBERNETES_INTEGRATION_MODE).where({default: true}).pluck('name').pop()),
+    #           clusterIdentifier: utils.joi.string().when('integrationMode', {
+    #             is:   'pod',
+    #             then: utils.joi.required()
+    #           }),
+    #           apiServer:         utils.joi.string().when('integrationMode', {
+    #             is:   'saas',
+    #             then: utils.joi.required()
+    #           }),
+    #           token:             utils.joi.string().when('integrationMode', {
+    #             is:   'saas',
+    #             then: utils.joi.required()
+    #           }),
+    #           autoScale:         utils.joi.object().keys({
+    #             isEnabled:      utils.joi.boolean().default(false),
+    #             isAutoConfig:   utils.joi.boolean().default(false),
+    #             cooldown:       utils.joi.number().multiple(60).min(180).default(300).allow(null),
+    #             headroom:       utils.joi.object().keys({
+    #               cpuPerUnit:    utils.joi.number().min(0).default(0),
+    #               memoryPerUnit: utils.joi.number().min(0).default(0),
+    #               gpuPerUnit:    utils.joi.number().integer().min(0),
+    #               numOfUnits:    utils.joi.number().min(0).default(0)
+    #             }).allow(null),
+    #             resourceLimits: utils.joi.object().keys({
+    #               maxVCpu:      utils.joi.number().min(1).allow(null),
+    #               maxMemoryGib: utils.joi.number().min(1).allow(null)
+    #             }).allow(null),
+    #             labels:         utils.joi.array().items(utils.joi.object().keys({
+    #               key:   utils.joi.string().required(),
+    #               value: utils.joi.string().required()
+    #             })).min(1).max(30).unique().allow(null),
+    #             down:           utils.joi.object().keys({
+    #               evaluationPeriods:      utils.joi.number().integer().min(3).default(5),
+    #               maxScaleDownPercentage: utils.joi.number().integer().min(1).max(100).allow(null)
+    #             }).allow(null)
+    #           }).allow(null)
+    #         }).xor('clusterIdentifier', 'apiServer').xor('clusterIdentifier', 'token').allow(null),
+    #         rightScale:       utils.joi.object().keys({
+    #           accountId:    utils.joi.string().required(),
+    #           refreshToken: utils.joi.string().required(),
+    #           region:       utils.joi.string()
+    #         }).allow(null),
+    #         opsWorks:         utils.joi.object().keys({
+    #           layerId:   utils.joi.string().required(),
+    #           stackType: utils.joi.string().valid(constants.OPSWORKS_STACK_TYPE).required()
+    #         }).allow(null),
+    #         codeDeploy:       utils.joi.object().keys({
+    #           deploymentGroups:           utils.joi.array().items(utils.joi.object().keys({
+    #             applicationName:     utils.joi.string().required(),
+    #             deploymentGroupName: utils.joi.string().required()
+    #           })).min(1).unique().required(),
+    #           cleanUpOnFailure:           utils.joi.boolean().required(),
+    #           terminateInstanceOnFailure: utils.joi.boolean().required()
+    #         }).allow(null),
+    #         chef:             utils.joi.object().keys({
+    #           chefServer:   utils.joi.string().required(),
+    #           organization: utils.joi.string().required(),
+    #           user:         utils.joi.string().required(),
+    #           pemKey:       utils.joi.string().required(),
+    #           chefVersion:  utils.joi.string().required(),
+    #         }).allow(null),
+    #         nomad:            utils.joi.object().keys({
+    #           masterHost: utils.joi.string().required(),
+    #           masterPort: utils.joi.number().required(),
+    #           aclToken:   utils.joi.string(),
+    #           autoScale:  utils.joi.object().keys({
+    #             isEnabled:   utils.joi.boolean().default(false),
+    #             cooldown:    utils.joi.number().multiple(60).min(180).default(300),
+    #             headroom:    utils.joi.object().keys({
+    #               cpuPerUnit:    utils.joi.number().min(0).default(0),
+    #               memoryPerUnit: utils.joi.number().min(0).default(0),
+    #               numOfUnits:    utils.joi.number().min(0).default(0)
+    #             }).allow(null),
+    #             constraints: utils.joi.array().items(utils.joi.object().keys({
+    #               key:   utils.joi.string().regex(NOMAD_CONSTRAINT_KEY_REGEX).required(),
+    #               value: utils.joi.string().required()
+    #             })).min(1).max(30).unique().allow(null),
+    #             down:        utils.joi.object().keys({
+    #               evaluationPeriods: utils.joi.number().integer().min(3).default(5)
+    #             }).allow(null)
+    #           }).allow(null)
+    #         }).allow(null),
+    #         dockerSwarm:      utils.joi.object().keys({
+    #           masterHost: utils.joi.string().required(),
+    #           masterPort: utils.joi.number().required(),
+    #           autoScale:  utils.joi.object().keys({
+    #             isEnabled: utils.joi.boolean().default(false),
+    #             cooldown:  utils.joi.number().multiple(60).min(180).default(300),
+    #             headroom:  utils.joi.object().keys({
+    #               cpuPerUnit:    utils.joi.number().min(0).default(0),
+    #               memoryPerUnit: utils.joi.number().min(0).default(0),
+    #               numOfUnits:    utils.joi.number().min(0).default(0)
+    #             }).allow(null),
+    #             labels:         utils.joi.array().items(utils.joi.object().keys({
+    #                 key:   utils.joi.string().required(),
+    #                 value: utils.joi.string().required()
+    #             })).min(1).max(30).unique().allow(null),
+    #             down:      utils.joi.object().keys({
+    #               evaluationPeriods: utils.joi.number().integer().min(3).default(5)
+    #             }).allow(null)
+    #           }).allow(null),
+    #           tlsConfig:  utils.joi.object().keys({
+    #             tlsEnabled: utils.joi.boolean().required(),
+    #             certificate:  utils.joi.string().required(),
+    #             privateKey:  utils.joi.string().required()
+    #           }).allow(null)
+    #         }).allow(null),
+    #         route53:          utils.joi.object().keys({
+    #           domains: utils.joi.array().items(utils.joi.object().keys({
+    #             hostedZoneId:      utils.joi.string().required(),
+    #             spotinstAccountId: utils.joi.string().allow(null),
+    #             recordSets:        utils.joi.array().items(utils.joi.object().keys({
+    #               name:        utils.joi.string().required(),
+    #               usePublicIp: utils.joi.boolean().default(false)
+    #             })).min(1).unique().required()
+    #           })).min(1).unique().required()
+    #         }).allow(null),
+    #         gitlab:           utils.joi.object().keys({
+    #           runner: utils.joi.object().keys({
+    #             isEnabled: utils.joi.boolean().allow(null)
+    #           }).allow(null)
+    #         }).allow(null)
+    #       }),
