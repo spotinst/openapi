@@ -1,22 +1,100 @@
- type: object
- title: Elastigroup Scheduling
- #       scheduling:              utils.joi.object().keys({
-    #         tasks: utils.joi.array().items(utils.joi.object().keys({
-    #             isEnabled:            utils.joi.boolean().default(true),
-    #             frequency:            utils.joi.string().valid(constants.RECURRENCT_FREQUENCY),
-    #             startTime:            utils.joi.string().regex(ISO_8601_REGEX),
-    #             cronExpression:       utils.joi.string(),
-    #             taskType:             utils.joi.string().valid(constants.SCHEDULED_TASK_TYPES).required(),
-    #             scaleTargetCapacity:  utils.joi.number().integer().min(0).allow(null),
-    #             scaleMinCapacity:     utils.joi.number().integer().min(0).allow(null),
-    #             scaleMaxCapacity:     utils.joi.number().integer().min(0).allow(null),
-    #             batchSizePercentage:  utils.joi.number().integer().min(1).allow(null),
-    #             gracePeriod:          utils.joi.number().integer().min(1).allow(null),
-    #             adjustment:           utils.joi.number().integer().min(1).allow(null),
-    #             adjustmentPercentage: utils.joi.number().integer().min(1).allow(null),
-    #             targetCapacity:       utils.joi.number().integer().min(0).allow(null),
-    #             minCapacity:          utils.joi.number().integer().min(0).allow(null),
-    #             maxCapacity:          utils.joi.number().integer().min(0).allow(null)
-    #           }).or('frequency', 'cronExpression', 'startTime')
-    #         ).min(1).unique().allow(null)
-    #       }),
+type: object
+title: Elastigroup Scheduling
+properties:
+  tasks:
+    type: array
+    items:
+      type: object
+      title: Task Definition
+      properties:
+        isEnabled:
+          type: boolean
+          default: true
+          example: true
+          description: >
+            Describes whether the task is enabled. When true the task should run when false it should not run. 
+        frequency:
+          type: string
+          enum: [hourly, daily, weekly]
+          description: >
+            The recurrence frequency to run this task. Only one of `frequency` or `cronExpression` should be used at a time
+        startTime:
+          type: string
+          example: 2018-05-23T10:55:09Z
+          description: >
+            DATETIME in ISO-8601 format. Sets a start time for scheduled actions. If `frequency` or `cronExpression` are not used - the task will run only once at the start time and will then be deleted from the group configuration
+        cronExpression:       
+          type: string
+          example: 0 1 * * *
+          description: >
+            A valid cron expression. 
+            For example : " * * * * * ". 
+            The cron is running in UTC time zone and is in Unix cron format Cron Expression Validator Script. 
+            Only one of ‘frequency’ or ‘cronExpression’ should be used at a time.
+        taskType:
+          type: string
+          example: scale
+          enum: [backup_ami, scale, scaleUp, roll, statefulUpdateCapacity, statefulRecycle]
+          description: >
+            The task type to run.
+        scaleTargetCapacity:
+          type: integer
+          minimum: 0
+          default: null
+          description: >  
+            The target capacity of the group. Should be used when choosing `taskType` of `scale`.
+        scaleMinCapacity:
+          type: integer
+          minimum: 0
+          default: null
+          description: >  
+            The min capacity of the group. Should be used when choosing `taskType` of `scale`.
+        scaleMaxCapacity:
+          type: integer
+          minimum: 0
+          default: null
+          description: >  
+            The max capacity of the group. Required when `taskType` is `scale`.
+        batchSizePercentage: 
+          type: integer
+          minimum: 1
+          default: null
+          description: >  
+            The percentage size of each batch in the scheduled deployment roll.
+            Required when the `taskType` is `roll`.
+        gracePeriod:
+          type: integer
+          minimum: 1
+          default: null
+          description: >  
+        adjustment: 
+          type: integer
+          minimum: 1
+          default: null
+          description: >  
+        adjustmentPercentage:
+          type: integer
+          minimum: 1
+          default: null
+          description: >  
+        targetCapacity:
+          type: integer
+          minimum: 0
+          default: null
+          description: >  
+            Set a new target capacity for the Elastigroup.
+            Required when `taskType` is `statefulUpdateCapacity`.
+        minCapacity:
+          type: integer
+          minimum: 0
+          default: null
+          description: >  
+            Set a new minimum capacity for the Elastigroup.
+            Required when `taskType` is `statefulUpdateCapacity`.
+        maxCapacity:
+          type: integer
+          minimum: 0
+          default: null
+          description: >  
+            Set a new maximum capacity for the Elastigroup.
+            Required when `taskType` is `statefulUpdateCapacity`.
