@@ -8,4 +8,4 @@ redoc-static: ## Make a static html file with redoc
 
 .PHONY: bundle-json 
 bundle-json: ## Make a sinlge JSON bundle of the OpenAPI Spec
-	docker run -v $(PWD):/code -it --rm node npx swagger-cli bundle -o /code/spotinst-all.json /code/api/spotinst.yaml
+	docker run -v $(PWD):/code -it --rm node npx swagger-cli bundle -o /code/spot-all.json /code/api/spotinst.yaml
