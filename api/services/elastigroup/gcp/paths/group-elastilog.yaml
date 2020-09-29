@@ -1,0 +1,36 @@
+get:
+  summary: "Elastigroup GCP - Fetch Elastilog"
+  description: Fetch a group’s Elastilog
+  operationId: "elastigroupGcpFetchGroupElastilog"
+  tags:
+    - Elastigroup GCP
+  parameters:
+    - $ref: "../../../../commons/parameters/accountId.yaml"
+    - $ref: "../../commons/parameters/groupId.yaml"
+    - $ref: "../../../../commons/parameters/fromDateUnixEnabled.yaml"
+    - $ref: "../../../../commons/parameters/toDateUnixEnabled.yaml"
+    - $ref: "../parameters/ElastilogLimit.yaml"
+  responses:
+    200:
+      $ref: "#/components/responses/groupElastilog"
+    400:
+      description: "Bad Request"
+
+components:
+  responses:
+    groupElastilog:
+      description: Elastigroup Response
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "../../../../commons/schemas/spotinstResponseItemWrapper.yaml"
+              - type: object
+                properties:
+                  response:
+                    type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: "../schemas/elastilog/elastilog.yaml"
