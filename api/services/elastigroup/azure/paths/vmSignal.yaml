@@ -1,0 +1,52 @@
+post:
+  summary: "Elastigroup Azure - Create VM Signal"
+  description:
+    CThe VM signal API is used for notifying Spot about the VM state so that Spot can act accordingly. Supported signals are
+
+      vmReady – Whenever this signal is sent, Spot will register the instance to the relevant Load Balancer and Application Gateway.
+
+      vmReadyToShutdown – When this signal is received after a vm is detached; we will immediately terminate the vm.
+
+      You must define the expected signals for your Elastigroup in the group configuration.
+  operationId: "elastigroupAzureSpotVmsCreateVMSignal"
+  tags:
+  - "Elastigroup Azure"
+  parameters:
+    - $ref: "../../../../commons/parameters/accountId.yaml"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          allOf:
+            - type: "object"
+              properties:
+                signal:
+                  type: object
+                  required:
+                    - vmName
+                    - signalType
+                  properties:
+                    vmName:
+                      type: string
+                      example: vm-123456
+                      description: >
+                        The virtual machine ID the signal refers to.
+                    signalType:
+                      type: String
+                      enum:
+                        - vmReady
+                        - vmReadyToShutdown
+                      example: vmReady
+                      description: >
+                        The specific signal you want to trigger.
+  responses:
+    200:
+      description: Elastigroup Response
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "../../../../commons/schemas/spotinstResponseWrapper.yaml"
+    400:
+      description: "Bad Request"
