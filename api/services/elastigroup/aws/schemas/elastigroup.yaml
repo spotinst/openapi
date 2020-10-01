@@ -2,93 +2,250 @@ type: object
 required:
   - group
 properties:
-  group: 
+  group:
     type: object
-    title: AWS Elastigroup
-    required:
-      - name
-      - region
+    description: Group
     properties:
-      id:
-        type: "string"
-        example: "sig-123456789"
-        readOnly: true
-        description: >
-          Azure Elastigroup ID
       name:
         type: string
-        example: "First Elastigroup"
-        description: >
-          The name of the Elastigroup
-      description:
-        type: string
-        example: "This is the first Spotinst Elastigroup of many"
-        description: >
-          The detailed purpose for this Elastigroup 
-      region:
-        type: string
-        example: "us-east-1"
-        description: >
-          The AWS Region the Elastigroup will manage instances 
+        title: Elastigroup Name
+        description: Elastigroup Name
+        example: Elastigroup name
+      strategy:
+        type: object
+        title: Strategy object
+        description: Strategy object
+        properties:
+          risk:
+            type: integer
+            title: Risk Indicator
+            description: Risk Indicator
+            example: 100
+          onDemandCount:
+            type: string
+            title: On Demand Count Indicator
+            description: On Demand Count Indicator
+            example: null
+          availabilityVsCost:
+            type: string
+            title: Availability VS Cost Indicator
+            description: Availability VS Cost Indicator
+            example: balanced
+          drainingTimeout:
+            type: integer
+            title: Draining Timeout Indicator
+            description: Draining Timeout Indicator
+            example: 120
+          fallbackToOd:
+            type: boolean
+            title: Fallback To On Demand Indicator
+            description: Fallback To On Demand Indicator
+            example: true
+          scalingStrategy:
+            type: object
+            title: Scaling Strategy Indicator
+            description: Scaling Strategy Indicator
+          lifetimePeriod:
+            type: string
+            title: Lifetime Period Indicator
+            description: Lifetime Period Indicator
+            example: days
+          revertToSpot:
+            type: object
+            title: Revert To Spot Object
+            description: Revert To Spot Object
+            properties:
+              performAt:
+                type: string
+                title: Perform At Indicator
+                description: Perform At Indicator
+                example: always
+          persistence:
+            type: object
+            title: Persistence Indicator
+            description: Persistence Indicator
       capacity:
         type: object
-        title: Capacity Units
-        required:
-          - target
+        title: Capacity Object
+        description: Capacity Object
         properties:
-          minimum:
-            type: integer              
-            example: 1
-            description: >
-              The minimum number of units Elastigroup will scale down to        
-          maximum: 
-            type: integer              
-            example: 10
-            description: >
-              The maximum number of units Elastigroup will scale up to
           target:
-            type: integer              
+            type: integer
+            title: Target Indicator
+            description: Target Indicator
+            example: 1
+          minimum:
+            type: integer
+            title: Minimum Indicator
+            description: Minimum Indicator
+            example: 0
+          maximum:
+            type: integer
+            title: Maximum Indicator
+            description: Maximum Indicator
             example: 5
-            description: >
-              Number of units Elastigroup will start with
           unit:
-            type: string
+            type: integer
+            title: Unit Indicator
+            description: Unit Indicator
             example: instance
-            default: instance
-            enum: [weight, instance]
-            description: >
-              Defines how Elastigroup scales. Either by number of instances or by instance weights.
-              If `weight` is used then `weightedCapacity` is required to be set for all instance types used
-              for this Elastigroup.
-      strategy:
-        $ref: "../schemas/elastigroup-strategy.yaml"
-      scheduling:
-        $ref: "../schemas/elastigroup-scheduling.yaml"
-      multai:
-        $ref: "../schemas/elastigroup-multai.yaml"
-      thirdPartiesIntegration:
-        $ref: "../schemas/elastigroup-thirdparty.yaml"
+      scaling:
+        type: object
+        title: Scaling Object
+        description: Scaling Object
+        properties:
+          up:
+            type: string
+            title: Up Indicator
+            description: Up Indicator
+            example: null
+          down:
+            type: string
+            title: Down Indicator
+            description: Down Indicator
+            example: null
       compute:
-        $ref: "../schemas/elastigroup-compute.yaml"
-        
-
-
-
-
-
-
-
-
-
-
-   
-
-
-
-    
-
-
-    
-
-
-    
+        type: object
+        title: Compute Object
+        description: Compute Object
+        properties:
+          instanceTypes:
+            type: object
+            title: Instance Types Object
+            description: Instance Types Object
+            properties:
+              ondemand:
+                type: string
+                title: On Demand Indicator
+                description: On Demand Indicator
+                example: t3.nano
+              spot:
+                type: string
+                title: Spot Indicator
+                description: Spot Indicator
+                example:
+                  - t3.nano
+          availabilityZones:
+            type: array
+            title: Availability Zone Array
+            description: Availability Zone Array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                  title: Name Indicator
+                  description: Name Indicator
+                  example: us-west-2a
+                subnetIds:
+                  type: string
+                  title: Subnet IDs Indicator
+                  description: Subnet IDs Indicator
+                  example:
+                    - subnet-4333093a
+          product:
+            type: string
+            title: Operating System Indicator
+            description: Operating System Indicator
+            example: Linux/UNIX
+          launchSpecification:
+            type: object
+            title: Launch Specification Object
+            description: Launch Specification Object
+            properties:
+              securityGroupIds:
+                type: string
+                title: Security Group IDs Indicator
+                description: Security Group IDs Indicator
+                example:
+                  - sg-a22000e8
+              monitoring:
+                type: boolean
+                title: Monitoring Indicator
+                description: Monitoring Indicator
+                example: false
+              ebsOptimized:
+                type: boolean
+                title: EBS Oprimized Indicator
+                description: EBS Optimized Indicator
+                example: false
+              imageId:
+                type: string
+                title: Image ID
+                description: Image ID Indicator
+                example: ami-082b5a644766e0e6f Indicator
+              keyPair:
+                type: string
+                title: Key Pair Indicator
+                description: Key Pair Indicator
+                example: KeyPair
+              tags:
+                type: array
+                title: Tags Array
+                description: Tags Array
+                items:
+                  type: object
+                  properties:
+                    tagKey:
+                      type: string
+                      title: Key Value Indicator
+                      description: Key Value Indicator
+                      example: Creator
+                    tagValue:
+                      type: string
+                      title: Tag Value Indicator
+                      description: Tag Value Indicator
+                      example: name@mail.com
+              healthCheckType:
+                type: string
+                title: Health Check Type Indicator
+                description: Health Check Type Indicator
+                example: null
+              tenancy:
+                type: string
+                title: Tenancy Indicator
+                description: Tenancy Indicator
+                example: default
+              userData:
+                type: string
+                title: User Data Indicator
+                description: User Data Indicator
+                example: null
+              shutdownScript:
+                type: string
+                title: Shut Down Script Indicator
+                description: Shut Down Script Indicator
+                example: null
+          elasticIps:
+            type: string
+            title: Elastic IPs Indicator
+            description: Elastic IPs Indicator
+            example: null
+          preferredAvailabilityZones:
+            type: string
+            title: Preffered Availability Zone Indicator
+            description: Preffered Availability Zone Indicator
+            example: null
+      multai:
+        type: string
+        title: Multai Indicator
+        description: Mulati Indicator
+        example: null
+      scheduling:
+        type: object
+        title: Scheduling Object
+        description: Scheduling Object
+      thirdPartiesIntegration:
+        type: object
+        title: Third Parties Integration Object
+        description: Third Parties Integration Object
+      createdAt:
+        type: string
+        title: Creation Time Indicator
+        description: Creation Time Indicator
+        example: 2020-10-01T05:23:59.302Z
+      updatedAt:
+        type: string
+        title: Update Time Indicator
+        description: Update Time Indicator
+        example: 2020-10-01T05:23:59.302Z
