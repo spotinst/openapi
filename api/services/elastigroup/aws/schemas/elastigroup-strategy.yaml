@@ -9,18 +9,6 @@ properties:
     default: 0
     description: >
       The percentage of Elastigroup that will run with spot market capacity
-  utilizeReservedInstances:
-    type: boolean
-    default: false
-    example: true
-    description: >
-      Whether the Elastigroup will use Reserved Instance capacity before launching instances in the spot market
-  fallbackToOd:
-    type: boolean
-    default: false
-    example: true
-    description: >
-      When set to `true` Elastigroup will launch On Demand instances if no spot market is available
   onDemandCount:
     type: integer
     minimum: 0
@@ -40,75 +28,20 @@ properties:
       How Elastigroup determines which instances to add and replace
   drainingTimeout:
     type: integer
-    example: 180
+    example: 120
     description: >
-      The time in seconds to allow the instance be drained from incoming TCP connections and detached from ELB before terminating it, during a scale down operation         
-  spinUpTime:
-    type: integer
-    deprecated: true
+      The time in seconds to allow the instance be drained from incoming TCP connections and detached from ELB before terminating it, during a scale down operation
+  fallbackToOd:
+    type: boolean
+    default: false
+    example: true
+    description: >
+      When set to `true` Elastigroup will launch On Demand instances if no spot market is available
+  scalingStrategy:
+    type: object
   lifetimePeriod:
-    type: integer
-    deprecated: true
-  signals:
-    type: array
-    items:
-      type: object
-      properties:
-        name:
-          type: string
-          enum: [INSTANCE_READY, INSTANCE_READY_TO_SHUTDOWN]
-          example: INSTANCE_READY
-          description: >
-            Custom reporting of respective instance signal
-        timeout:
-          type: integer
-          minimum: 60
-          example: 600
-          description: >
-            Maximum time in seconds that Elastigroup should wait to receive the signal.
-  scalingStrategy:          
-    type: object
-    properties:
-      terminateAtEndOfBillingHour:
-        type: boolean
-        deprecated: true
-      terminationPolicy:
-        type: string
-        enum:
-          - default
-            newestInstance
-        example: default
-        default: default
-        description: >
-          Which instances are chosen for termination first
-  persistence:
-    type: object
-    properties:
-      shouldPersistBlockDevices:
-        type: boolean
-        example: false
-        default: null
-        description: >
-          If `true` Elastigroup will track and persist attached block storage
-      shouldPersistRootDevice:
-        type: boolean
-        example: false
-        default: null
-        description: >
-          If `true` Elastigroup will take snapshots and persist the root device
-      shouldPersistPrivateIp:
-        type: boolean
-        example: false
-        default: null
-        description:
-          If `true` Elastigroup will maintin the private IP of the instance
-      blockDevicesMode:
-        type: string
-        enum: [onLaunch, reattach]
-        example: onLaunch
-        default: onLaunch
-        description: >
-          Determine the way we attach the data volumes to the data devices, Possible values: ‘reattach’ and ‘onLaunch’
+    type: string
+    example: days
   revertToSpot:
     type: object
     title: When Elastigroup moves from OnDemand back to Spot capacity
@@ -116,20 +49,9 @@ properties:
       performAt:
         type: string
         example: always
-        enum: [never, always, timeWindow]
-      timeWindows: 
-        type: array
-        items:
-          type: string
-        example: [Mon:03:00-Wed:02:30]
-        description: >
-            If `preformAt` is set to `timeWindow` then `timeWindows` must be set 
-            as a list where each string is in the format of - ddd:hh:mm-ddd:hh:mm 
-            ddd = day of week = Sun | Mon | Tue | Wed | Thu | Fri | Sat 
-            hh = hour 24 = 0 -23
-            mm = minute = 0 - 59
-
-
+        enum: [ never, always, timeWindow ]
+  persistence:
+    type: object
 
     #       scaling:                 utils.joi.object().keys({
     #         up:     utils.joi.array().items(utils.joi.object().keys({
