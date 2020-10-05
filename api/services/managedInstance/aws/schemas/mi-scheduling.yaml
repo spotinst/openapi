@@ -1,0 +1,39 @@
+type: object
+title: MI Scheduling
+properties:
+  tasks:
+    type: array
+    items:
+      type: object
+      title: Task Definition
+      properties:
+        taskType:
+          type: string
+          example: scale
+          enum: [backup_ami, scale, scaleUp, roll, statefulUpdateCapacity, statefulRecycle]
+          description: >
+            The task type to run.
+        startTime:
+          type: string
+          example: 2018-05-23T10:55:09Z
+          description: >
+            DATETIME in ISO-8601 format. Sets a start time for scheduled actions. If `frequency` or `cronExpression` are not used - the task will run only once at the start time and will then be deleted from the group configuration
+        cronExpression:
+          type: string
+          example: 0 1 * * *
+          description: >
+            A valid cron expression.
+            For example : " * * * * * ".
+            The cron is running in UTC time zone and is in Unix cron format Cron Expression Validator Script.
+            Only one of ‘frequency’ or ‘cronExpression’ should be used at a time.
+        isEnabled:
+          type: boolean
+          default: true
+          example: true
+          description: >
+            Describes whether the task is enabled. When true the task should run when false it should not run.
+        frequency:
+          type: string
+          enum: [hourly, daily, weekly]
+          description: >
+            The recurrence frequency to run this task. Only one of `frequency` or `cronExpression` should be used at a time

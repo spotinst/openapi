@@ -1,3 +1,43 @@
+put:
+  summary: "Elastigroup AWS - Update"
+  description: >
+    Describe a specific Elastigroup JSON
+  operationId: "elastigroupAwsDescribeSpecificElastigroup"
+  tags:
+    - "Elastigroup AWS"
+  parameters:
+    - $ref: "../../../../commons/parameters/groupId.yaml"
+    - $ref: "../../../../commons/parameters/accountId.yaml"
+    - in: "query"
+      name: "autoApplyTags"
+      example: "true"
+      description: >
+        Optionally update Elastigroup instance tags on the fly, without rolling the Elastigroup.
+      schema:
+        type: "boolean"
+  requestBody:
+    description: API call accept several bodies, please choose
+    name: "Request - Example 1 - Update Capacity Attribute"
+
+    required: true
+    content:
+      application/json:
+        schema:
+          oneOf:
+            - $ref: "../schemas/elastigroup-capacity.yaml"
+            - $ref: "../schemas/elastigroup-ami.yaml"
+            - $ref: "../schemas/elastigroup-sg.yaml"
+            - $ref: "../schemas/elastigroup-signals.yaml"
+            - $ref: "../schemas/elastigroup-instancetypeselection.yaml"
+            - $ref: "../schemas/elastigroup-metadata.yaml"
+            - $ref: "../schemas/elastigroup-kubernethes-integration.yaml"
+
+  responses:
+    200:
+      $ref: "../responses/update.yaml"
+    400:
+      description: "Bad Request"
+
 delete:
   summary: "Elastigroup AWS - Delete"
   description: >
@@ -6,68 +46,48 @@ delete:
   tags:
   - "Elastigroup AWS"
   parameters:
-    - $ref: "../../../../commons/parameters/accountId.yaml"
-    - $ref: "../../commons/parameters/groupId.yaml"
-  requestBody:
-    required: false
-    content:
-      application/json:
-        schema:
-          allOf:
-          - $ref: "../schemas/elastigroup-delete.yaml"
-
-  responses:
-    200:
-      $ref: "../../../../commons/responses/spotinstResponseWrapper.yaml"
-    400:
-      description: "Bad Request"
-
-get:
-  summary: "Elastigroup AWS - Describe"
-  description: >
-    List all properties for single AWS Elastigroup
-  operationId: "elastigroupAwsDescribe"
-  tags:
-  - "Elastigroup AWS"
-  parameters:
-    - $ref: "../../../../commons/parameters/accountId.yaml"
-    - $ref: "../../commons/parameters/groupId.yaml"
-  responses:
-    200:
-      $ref: "../responses/elastigroup.yaml"
-    400:
-      description: "Bad Request"
-
-put:
-  summary: "Elastigroup AWS - Update"
-  description: >
-    Update an AWS Elastigroup
-  operationId: "elastigroupAwsUpdate"
-  tags:
-  - "Elastigroup AWS"
-  parameters:
-    - $ref: "../../../../commons/parameters/accountId.yaml"
-    - in: query
-      name: autoApplyTags
-      example: "true"
+    - $ref: "../../../../commons/parameters/groupId.yaml"
+    - in: "query"
+      name: "accountId"
+      example: "act-123456789"
       description: >
-        Optionally update Elastigroup instance tags on the fly, without rolling the Elastigroup.
+        Your Spot accountId associated with your token
       schema:
         type: "string"
+      required: false
   requestBody:
     required: true
     content:
       application/json:
         schema:
           allOf:
-          - $ref: "../schemas/elastigroup.yaml"
-          - type: "object"
-            properties:
-              group:
-                type: object
+          - $ref: "../schemas/elastigroup-delete.yaml"
   responses:
     200:
-      $ref: "../responses/elastigroup.yaml"
+      $ref: "../responses/list-group.yaml"
+    400:
+      description: "Bad Request"
+
+get:
+  summary: "Elastigroup AWS - List Group"
+  description: >
+    Describe a specific Elastigroup JSON
+  operationId: "elastigroupAwsListElastigroup"
+  tags:
+    - "Elastigroup AWS"
+  parameters:
+    - $ref: "../../../../commons/parameters/groupId.yaml"
+    - in: "query"
+      name: "accountId"
+      example: "act-123456789"
+      description: >
+        Your Spot accountId associated with your token
+      schema:
+        type: "string"
+      required: false
+  responses:
+    200:
+      $ref: "../responses/delete.yaml"
     400:
       description: "Bad Request"
 
@@ -90,7 +110,7 @@ post:
       application/json:
         schema:
           allOf:
-            - $ref: "../schemas/ec2group.yaml"
+            - $ref: "../schemas/ec2Group.yaml"
             - type: "object"
               properties:
                 group:
