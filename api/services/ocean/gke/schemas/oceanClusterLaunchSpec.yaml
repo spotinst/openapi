@@ -1,0 +1,230 @@
+type: object
+properties:
+  launchSpec:
+    type: object
+    title: AWS Cluster
+    required:
+      - oceanId
+    properties:
+      oceanId:
+        type: string
+        example: "o-123"
+        description: >
+          The Ocean cluster ID. required for launchSpec create.
+      name:
+        type: string
+        example: "specialty.nodes.spotk8s.com"
+        description: >
+          Set Launch Specification name
+      imageId:
+        type: string
+        example: "ami-ID"
+        description: >
+          Set image ID. Can be null
+      userData:
+        type: string
+        example: "dsa89d7uosduxq98sau9s8aux9s8aux09q0qu09axsuix0s9qas09xz"
+        description: >
+          Set user data script in Base64-encoded MIME
+      iamInstanceProfile:
+        type: object
+        title: auto-scaler
+        description: The instance profile iamRole object
+        properties:
+          arn:
+            type: string
+            example: "arn:aws:iam::123456781234:instance-profile/EKS-nodes-test-NodeInstanceProfile-ABCDEFGH123"
+            descritpion: The iamRole arn. If set - do not set launchSpec.iamInstanceProfile.name
+          name:
+            type: string
+            description: The iamRole name. If set - do not set launchSpec.iamInstanceProfile.arn
+            example: EKS-nodes-test
+      securityGroupIds:
+        type: array of string
+        description: Set security groups. Each element in array should be security group ID
+        example:
+          - "sg-0ded3a2980208c30c"
+          - "sg-0ded3a2980208c30d"
+      instanceTypes:
+        type: array
+        description: A list of instance types allowed to be provisioned for pods pending for the launch specification. The list overrides the list defined for the Ocean cluster. Can be null.
+        example:
+          - "c3.2xlarge"
+          - "c4.2xlarge"
+      rootVolumeSize:
+        type: integer
+        description: Set root volume size (in GB). This field and blockDeviceMappings cannot be used in the same spec.
+        example: 8
+      labels:
+        type: object
+        description: Add labels to cluster
+        properties:
+          - type: object
+            properties:
+              key:
+                type: string
+                description: Set label key
+                example: env
+              value:
+                type: string
+                description: Set label value
+                example: test
+          - type: object
+            properties:
+              key:
+                type: string
+                example: env
+              value:
+                type: string
+                example: test
+      taints:
+        type: object
+        description: Add taints to cluster
+        properties:
+          key:
+            type: string
+            description: Set taints key
+            example: taintKey
+          value:
+            type: string
+            description: Set taints value
+            example: taintValue
+          effect:
+            type: string
+            description: Set taints effect
+            example: NoSchedule
+      subnetIds:
+        type: array of string
+        description: Set subnets in launchSpec. Each element in array should be subnet ID
+        example:
+          - subnet-123
+          - subnet-456
+      elasticIpPool:
+        type: object
+        description: Assign an Elastic IP to the instances spun by the launch spec. Can be null.
+        properties:
+          tagSelector:
+            type: object
+            description: >
+              Key-value object, which defines an Elastic IP from the customer pool. Can be null.
+            properties:
+              tagKey:
+                type: string
+                description: >
+                  Elastic IP tag key. The launch spec will consider all elastic IPs tagged with this tag as a part of the elastic IP pool to use.
+                example: color
+              tagValue:
+                type: string
+                description: >
+                  Elastic IP tag value. Can be null.
+                example: orange
+      autoScale:
+        type: object
+        properties:
+          headroom:
+            type: object
+            description: >
+              Set custom headroom per launch spec. provide list of launchSpec.autoscale.headrooms object
+            properties:
+              cpuPerUnit:
+                type: integer
+                description: >
+                  configure the number of CPUs to allocate the headroom. CPUs are denoted in millicores, where 1000 millicores = 1 vCPU
+                example: 1000
+              memoryPerUnit:
+                type: integer
+                description: >
+                  Configure the amount of memory (MiB) to allocate the headroom.
+                example: 2048
+              gpuPerUnit:
+                type: integer
+                description: >
+                  How much GPU allocate for headroom unit
+                example: 0
+              numOfUnits:
+                type: integer
+                description: >
+                  The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.
+                example: 3
+      tags:
+        type: object
+        description: List of kay-value pairs of tags
+        properties:
+          - type: object
+            properties:
+              tagKey:
+                type: string
+                description: Set the tag key
+                example: Creator
+              tagValue:
+                type: string
+                description: Set the tag value
+                example: John Doe
+      blockDeviceMappings:
+        type: object
+        description: >
+          Block devices that are exposed to the instance. You can specify virtual devices and EBS volumes.
+          This parameter and rootVolumeSize cannot be in the spec at the same time.
+          This parameter can be null, but if not null, it must contain at least one block device.
+        properties:
+          deviceName:
+            description: >
+              Set device name.
+            type: string
+            example: /dev/xvda
+          ebs:
+            type: object
+            description: Set EBS properties.
+            properties:
+              deleteOnTermination:
+                type: boolean
+                description: >
+                  Flag to delete the EBS on instance termination.
+                example: false
+              encrypted:
+                type: boolean
+                example: false
+              iops:
+                type: integer
+                description: Must be greater than or equal to 0.
+                example: 1
+              kmsKeyId:
+                type: string
+                example: "alias/aws/ebs"
+              snapshotId:
+                type: string
+                example: "snap-abcdefghi111110"
+              dynamicVolumeSize:
+                type: object
+                description: >
+                  Set dynamic volume size properties. When using this object, you cannot use volumeSize.
+                  You must use one or the other.
+                properties:
+                  baseSize:
+                    description: Initial size for volume.
+                    type: integer
+                    example: 10
+                  resource:
+                    description: >
+                      Valid values: "CPU"
+                    type: string
+                    example: CPU
+                  sizePerResourceUnit:
+                    type: integer
+                    description: >
+                      Additional size per resource unit (in GB).
+                      For example: if baseSize=50, and sizePerResourceUnit=20, and an instance with 2 CPU is launched - its disk size will be: 90GB
+                    example: 1
+              volumeType:
+                description: Set volume type.
+                type: string
+                example: standard
+      resourceLimits:
+        type: object
+        properties:
+          maxInstanceCount:
+            description: >
+              Option to set a maximum number of instances per launch specification.
+              Can be null. If set, value must be greater than or equal to 0.
+            type: integer
+            example: 5
