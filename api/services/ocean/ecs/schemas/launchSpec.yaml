@@ -1,0 +1,139 @@
+type: object
+required: true
+properties:
+  launchSpec:
+    type: object
+    properties:
+      id:
+        type: string
+        readOnly: true
+        example: "ols-1234abcd"
+      oceanId:
+        type: string
+        required: true
+        description: >
+          The Ocean cluster ID. required for launchSpec create.
+        example: "o-1234abcd"
+      name:
+        type: string
+        required: true
+        description: >
+          Set launch specifications name
+        example: "mySpecLauncher"
+      imageId:
+        type: string
+        required: true
+        description: >
+          Set image ID. Can be null
+        example: "img2"
+      userData:
+        type: string
+        format: byte
+        description: >
+          Base64-encoded MIME user data to make available to the instances.
+        example: "dXNlcmJhc2g2NGVuY29kZWQ="
+      securityGroupIds:
+        type: array
+        description: >
+          Set security groups. Each element in array should be security group ID
+        items:
+          type: string
+          example: "sg1, sg3"
+      subnetIds:
+        type: array
+        description: >
+          Set subnets in launchSpec. Each element in the array should be a subnet ID.
+        items:
+          type: string
+          example: "subnet-01234566789abcdef, subnet-9876543210ghijkl"
+      iamInstanceProfile:
+        type: array
+        description: >
+          The instance profile iamRole object
+        items:
+          oneOf:
+            - arn:
+              title: 'arn'
+              type: string
+              description: >
+                The iamRole arn. If set - do not set launchSpec.iamInstanceProfile.name
+              example: "arn:aws:iam::123456789123:instance-profile"
+            - name:
+              title: 'name'
+              type: string
+              description: >
+                The iamRole name. If set - do not set launchSpec.iamInstanceProfile.arn
+              example: 'my-iamInstance-Ptofile'
+      attributes:
+        description: >
+          Add attributes to cluster
+        type: array
+        items:
+          type: object
+          properties:
+            key:
+              description: >
+                Set attribute's key.
+              required: true
+              type: string
+              example: "key1"
+            value:
+              description: >
+                Set attribute's value.
+              required: true
+              type: string
+              example: "value1"
+      autoScale:
+        type: object
+        properties:
+          headrooms:
+            description: >
+              Set custom headroom per launch spec. provide list of launchSpec.autoscale.headrooms object
+            type: array
+            items:
+              type: object
+              properties:
+                cpuPerUnit:
+                  description: >
+                    Configure the number of CPUs to allocate the headroom. CPUs are denoted in millicores, where 1000 millicores = 1 vCPU
+                  type: integer
+                  example: 1024
+                memoryPerUnit:
+                  description: >
+                    Configure the amount of memory (MiB) to allocate the headroom.
+                  type: integer
+                  example: 512
+                numOfUnits:
+                  description: >
+                    The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.
+                  type: integer
+                  example: 2
+      tags:
+        description: >
+          List of kay-value pairs of tags
+        type: array
+        items:
+          type: object
+          properties:
+            tagKey:
+              type: string
+              description: >
+                Set the tag key
+              example: "Creator"
+            tagValue:
+              type: string
+              description: >
+                Set the tag value
+              example: "John Doe"
+      $ref: "../schemas/launchSpec-blockDeviceMappings.yaml"
+      createdAt:
+        type: string
+        readOnly: true
+        format: date-time
+        example: "2019-06-03T08:13:08.000Z"
+      updatedAt:
+        type: string
+        readOnly: true
+        format: date-time
+        example: "2019-06-10T15:06:13.000Z"
+
