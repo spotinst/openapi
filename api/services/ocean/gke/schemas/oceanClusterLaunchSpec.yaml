@@ -1,0 +1,123 @@
+type: object
+properties:
+  launchSpec:
+    type: object
+    title: GKE Cluster
+    required:
+      - oceanId
+      - sourceImage
+    properties:
+      oceanId:
+        type: string
+        example: "o-1fff54ed"
+        description: >
+          The Ocean cluster ID. required for launchSpec create.
+      name:
+        type: string
+        example: "lp_name"
+        description: >
+          Set name for the launch spec
+      sourceImage:
+        type: string
+        example: "https://www.googleapis.com/compute/v1/projects/gke-node-images/global/images/container-v1-3-v20160517"
+        description: >
+          Set image URL. Can be null
+      rootVolumeSize:
+        type: integer
+        description: Set root volume size (in GB)
+        example: 8
+      metadata:
+        type: array of object
+        required:
+          - key
+          - value
+        description: >
+          Add metadata to cluster
+        items:
+          - type: object
+            properties:
+              key:
+                type: string
+                description: Set metadata's key. Required on launchSpec.metadata
+                example: "key1"
+              value:
+                type: string
+                description: Set metadata's name. Required on launchSpec.metadata
+                example: "value1"
+          - type: object
+            properties:
+              key:
+                type: string
+                example: "key2"
+              value:
+                type: string
+                example: "value2"
+      taints:
+        type: object
+        description: Add taints to cluster
+        properties:
+          key:
+            type: string
+            description: taint's key
+            example: test
+          value:
+            type: string
+            description: taint's value
+            example: test
+          effect:
+            type: string
+            description: taint's effect
+            example: NoExecute
+      labels:
+        type: object
+        description: Add labels to cluster
+        properties:
+          - type: object
+            properties:
+              key:
+                type: string
+                description: Set label key
+                example: test
+              value:
+                type: string
+                description: Set label value
+                example: test
+      autoScale:
+        type: object
+        properties:
+          headroom:
+            type: object
+            description: >
+              Set custom headroom per launch spec. provide list of launchSpec.autoScale.headrooms object
+            properties:
+              cpuPerUnit:
+                type: integer
+                description: >
+                  configure the number of CPUs to allocate the headroom.
+                  CPUs are denoted in millicores, where 1000 millicores = 1 vCPU
+                example: 1000
+              memoryPerUnit:
+                type: integer
+                description: >
+                  Configure the amount of memory (MiB) to allocate the headroom.
+                example: 2048
+              gpuPerUnit:
+                type: integer
+                description: >
+                  How much GPU allocate for headroom unit
+                example: 0
+              numOfUnits:
+                type: integer
+                description: >
+                  The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.
+                example: 3
+      resourceLimits:
+        type: object
+        properties:
+          maxInstanceCount:
+            description: >
+              Option to set a maximum number of instances per launch specification.
+              Can be null.
+              If set, value must be greater than or equal to 0.
+            type: integer
+            example: 5
