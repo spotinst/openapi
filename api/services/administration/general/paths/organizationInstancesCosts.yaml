@@ -1,0 +1,38 @@
+post:
+  summary: "Notifications Service - Organization Instances Costs"
+  description: |
+    Get a summary of your instances costs by given time filter.
+
+    The request will result in CSV format on your instances from all given accounts.
+
+    Notice that the date range can be up to 180 days.
+
+    Response fields are detailed in the response
+  operationId: "insightsServiceOrganizationInstancesCosts"
+  tags:
+    - "Insights Service"
+  requestBody:
+    required: false
+    content:
+      application/json:
+        schema:
+          allOf:
+            - $ref: "../schemas/organizationInstancesRequestSchema.yaml"
+
+  responses:
+    200:
+      description: "response fileds:"
+      content:
+        application/csv:
+          schema:
+            allOf:
+              - $ref: "../schemas/organizationInstancesResponseSchema.yaml"
+          type: string
+          format: binary
+          example: id,accountId,accountName,resourceId,cloudProvider,instanceId,instanceType,region,useCase,lifeCycle,product,launchTime,terminationTime,runningHours,odHourlyPrice,odCost,actualCost,savings,reservationId
+            2439,act-abc12345,Demo,oesg-cc4740e1,AWS,i-00d67d5efc69e938d,r4.large,us-west-2,K8S,EXCESS,LINUX,2019-10-05T02:59:40.000Z,2019-10-05T03:15:12.000Z,1,0.133,0.133,0.0337,0.0993,
+            2576,act-abc12345,Demo,oesg-5feb10ab,AWS,i-01086811aefdc4959,c4.large,us-west-2,K8S,EXCESS,LINUX,2019-10-06T10:13:03.000Z,2019-10-06T19:07:05.000Z,9,0.1,0.9,0.279,0.621,
+            1760,act-abc12345,Demo,oesg-cc4740e1,AWS,i-01797b0ac578198fa,c3.large,us-west-2,K8S,EXCESS,LINUX,2019-08-27T06:41:14.000Z,2019-10-05T02:57:30.000Z,23.9997,0.105,2.52,0.7008,1.8192,
+            1761,act-abc12345,Demo,oesg-cc4740e1,AWS,i-02e460584769b3c28,r4.large,us-west-2,K8S,EXCESS,LINUX,2019-08-20T22:23:54.000Z,,23.9997,0.133,3.192,0.8088,2.3832,
+    400:
+      description: "Bad Request"
