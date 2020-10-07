@@ -1,176 +1,85 @@
 type: object
 title: Elastigroup Third Party Integrations
+description: |
+  All definitions for using third-party Integrations
+properties:
+  rancher:
+    type: object
+    description: |
+      All definitions for using Rancher Labs integration.
+    properties:
+      masterHost:
+        type: string
+        description: |
+          Rancher master url
+        example: "http://myRancher.com:8080/v1"
+      accessKey:
+        type: string
+        description: |
+          Rancher version
+        example: "1"
+        default: "1"
+  route53:
+    type: object
+    description: |
+      Route53 integration object.
+    properties:
+      domains:
+        type: array
+        description: |
+          Route53 domain configurations.
+        items:
+          type: object
+          properties:
+            hostedZoneId:
+              type: string
+              description: |
+                The Route53 Hosted Zone ID for the registered domain.
+              example: "Z3UFMBCGJMYLUT"
+            spotinstAccountId:
+              type: string
+              description: |
+                The Spot account ID that is linked to the AWS account that holds the Route53 hosted Zone ID.
+                The default is the user Spot account provided as a URL parameter.
+              example: "act-1234abcd"
+            recordSetType:
+              type: string
+              description: |
+                Set the type of recordSet to update.
+                Valid values:
+                * "a" - means register and de-register of instances done by IP address (IPv4).
+                When it is "a" you should also specify usePublicIp.
+                * "cname" - register and de-register of instances done by CNAME. When it is "cname", you should also specify usePublicDns.
+              enum: [a,cname]
+              example: "a"
+              default: "a"
+            recordSets:
+              type: array
+              description: |
+                List of record sets.
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: |
+                      Name of the recordSet.
+                    example: testcname.spot.io.
+                  usePublicIp:
+                    type: boolean
+                    description: |
+                      Defines whether to use public or private IP. Relevant only when recordSetType=a.
+                    example: true
+                    default: false
+                  usePublicDns:
+                    type: boolean
+                    description: |
+                      Defines whether to use a public DNS or private DNS in the instance registration process.
+                      Relevant only when recordSetType=cname.
+                      * False=Create a new weighted CNAME recordset with same name and the instance Private DNS.
+                      * True=instances should be registered with public DNS.
+                    example: true
+                    default: false
 
 
-    # ecs:              utils.joi.object().keys({
-    #   clusterName:    utils.joi.string().required(),
-    #   autoScale:      utils.joi.object().keys({
-    #     shouldScaleDownNonServiceTasks: utils.joi.boolean().default(false).allow(null),
-    #     isEnabled:                      utils.joi.boolean().default(false),
-    #     isAutoConfig:                   utils.joi.boolean().default(false),
-    #     cooldown:                       utils.joi.number().multiple(60).min(180).default(300).allow(null),
-    #     headroom:                       utils.joi.object().keys({
-    #       cpuPerUnit:    utils.joi.number().min(0).default(0),
-    #       memoryPerUnit: utils.joi.number().min(0).default(0),
-    #       numOfUnits:    utils.joi.number().min(0).default(0)
-    #     }).allow(null),
-    #     attributes:                     utils.joi.array().items(utils.joi.object().keys({
-    #       key:   utils.joi.string().required(),
-    #       value: utils.joi.string().required()
-    #     })).min(1).max(30).unique().allow(null),
-    #     down:                           utils.joi.object().keys({
-    #       evaluationPeriods:      utils.joi.number().integer().min(3).default(5),
-    #       maxScaleDownPercentage: utils.joi.number().integer().min(1).max(100).allow(null)
-    #     }).allow(null)
-    #   }).allow(null),
-    #   optimizeImages: utils.joi.object().keys({
-    #     performAt:            utils.joi.string().valid(Object.values(constants.MAINTENANCE_WINDOW_TYPE)).required(),
-    #     timeWindows:          utils.joi.when(utils.joi.ref('performAt'), {
-    #       is:        constants.MAINTENANCE_WINDOW_TYPE.TIME_WINDOW,
-    #       then:      utils.joi.array().items(utils.joi.string().regex(TIME_WINDOW_REGEX)).min(1).required(),
-    #       otherwise: utils.joi.array().items(utils.joi.string().regex(TIME_WINDOW_REGEX)).min(1).allow(null)
-    #     }),
-    #     shouldOptimizeEcsAmi: utils.joi.boolean().allow(null)
-    #   }).allow(null),
-    #   batch:          utils.joi.object().keys({
-    #     jobQueueNames: utils.joi.array().items(utils.joi.string()).min(1).allow(null)
-
-
-
-    # mlbRuntime:       utils.joi.object().keys({
-    #   deploymentId: utils.joi.string().required()
-
-
-    # kubernetes:       utils.joi.object().keys({
-    #   integrationMode:   utils.joi.string()
-    #                         .valid(utils._(constants.KUBERNETES_INTEGRATION_MODE).pluck('name').value())
-    #                         .default(utils._(constants.KUBERNETES_INTEGRATION_MODE).where({default: true}).pluck('name').pop()),
-    #   clusterIdentifier: utils.joi.string().when('integrationMode', {
-    #     is:   'pod',
-    #     then: utils.joi.required()
-    #   }),
-    #   apiServer:         utils.joi.string().when('integrationMode', {
-    #     is:   'saas',
-    #     then: utils.joi.required()
-    #   }),
-    #   token:             utils.joi.string().when('integrationMode', {
-    #     is:   'saas',
-    #     then: utils.joi.required()
-    #   }),
-    #   autoScale:         utils.joi.object().keys({
-    #     isEnabled:      utils.joi.boolean().default(false),
-    #     isAutoConfig:   utils.joi.boolean().default(false),
-    #     cooldown:       utils.joi.number().multiple(60).min(180).default(300).allow(null),
-    #     headroom:       utils.joi.object().keys({
-    #       cpuPerUnit:    utils.joi.number().min(0).default(0),
-    #       memoryPerUnit: utils.joi.number().min(0).default(0),
-    #       gpuPerUnit:    utils.joi.number().integer().min(0),
-    #       numOfUnits:    utils.joi.number().min(0).default(0)
-    #     }).allow(null),
-    #     resourceLimits: utils.joi.object().keys({
-    #       maxVCpu:      utils.joi.number().min(1).allow(null),
-    #       maxMemoryGib: utils.joi.number().min(1).allow(null)
-    #     }).allow(null),
-    #     labels:         utils.joi.array().items(utils.joi.object().keys({
-    #       key:   utils.joi.string().required(),
-    #       value: utils.joi.string().required()
-    #     })).min(1).max(30).unique().allow(null),
-    #     down:           utils.joi.object().keys({
-    #       evaluationPeriods:      utils.joi.number().integer().min(3).default(5),
-    #       maxScaleDownPercentage: utils.joi.number().integer().min(1).max(100).allow(null)
-    #     }).allow(null)
-    #   }).allow(null)
-    # }).xor('clusterIdentifier', 'apiServer').xor('clusterIdentifier', 'token').allow(null),
-
-
-    # rightScale:       utils.joi.object().keys({
-    #   accountId:    utils.joi.string().required(),
-    #   refreshToken: utils.joi.string().required(),
-    #   region:       utils.joi.string()
-    # }).allow(null),
-    # opsWorks:         utils.joi.object().keys({
-    #   layerId:   utils.joi.string().required(),
-    #   stackType: utils.joi.string().valid(constants.OPSWORKS_STACK_TYPE).required()
-    # }).allow(null),
-
-
-    # codeDeploy:       utils.joi.object().keys({
-    #   deploymentGroups:           utils.joi.array().items(utils.joi.object().keys({
-    #     applicationName:     utils.joi.string().required(),
-    #     deploymentGroupName: utils.joi.string().required()
-    #   })).min(1).unique().required(),
-    #   cleanUpOnFailure:           utils.joi.boolean().required(),
-    #   terminateInstanceOnFailure: utils.joi.boolean().required()
-
-
-    # chef:             utils.joi.object().keys({
-    #   chefServer:   utils.joi.string().required(),
-    #   organization: utils.joi.string().required(),
-    #   user:         utils.joi.string().required(),
-    #   pemKey:       utils.joi.string().required(),
-    #   chefVersion:  utils.joi.string().required(),
-
-
-    # nomad:            utils.joi.object().keys({
-    #   masterHost: utils.joi.string().required(),
-    #   masterPort: utils.joi.number().required(),
-    #   aclToken:   utils.joi.string(),
-    #   autoScale:  utils.joi.object().keys({
-    #     isEnabled:   utils.joi.boolean().default(false),
-    #     cooldown:    utils.joi.number().multiple(60).min(180).default(300),
-    #     headroom:    utils.joi.object().keys({
-    #       cpuPerUnit:    utils.joi.number().min(0).default(0),
-    #       memoryPerUnit: utils.joi.number().min(0).default(0),
-    #       numOfUnits:    utils.joi.number().min(0).default(0)
-    #     }).allow(null),
-    #     constraints: utils.joi.array().items(utils.joi.object().keys({
-    #       key:   utils.joi.string().regex(NOMAD_CONSTRAINT_KEY_REGEX).required(),
-    #       value: utils.joi.string().required()
-    #     })).min(1).max(30).unique().allow(null),
-    #     down:        utils.joi.object().keys({
-    #       evaluationPeriods: utils.joi.number().integer().min(3).default(5)
-    #     }).allow(null)
-    #   }).allow(null)
-
-
-    # dockerSwarm:      utils.joi.object().keys({
-    #   masterHost: utils.joi.string().required(),
-    #   masterPort: utils.joi.number().required(),
-    #   autoScale:  utils.joi.object().keys({
-    #     isEnabled: utils.joi.boolean().default(false),
-    #     cooldown:  utils.joi.number().multiple(60).min(180).default(300),
-    #     headroom:  utils.joi.object().keys({
-    #       cpuPerUnit:    utils.joi.number().min(0).default(0),
-    #       memoryPerUnit: utils.joi.number().min(0).default(0),
-    #       numOfUnits:    utils.joi.number().min(0).default(0)
-    #     }).allow(null),
-    #     labels:         utils.joi.array().items(utils.joi.object().keys({
-    #         key:   utils.joi.string().required(),
-    #         value: utils.joi.string().required()
-    #     })).min(1).max(30).unique().allow(null),
-    #     down:      utils.joi.object().keys({
-    #       evaluationPeriods: utils.joi.number().integer().min(3).default(5)
-    #     }).allow(null)
-    #   }).allow(null),
-    #   tlsConfig:  utils.joi.object().keys({
-    #     tlsEnabled: utils.joi.boolean().required(),
-    #     certificate:  utils.joi.string().required(),
-    #     privateKey:  utils.joi.string().required()
-    #   }).allow(null)
-
-
-    # route53:          utils.joi.object().keys({
-    #   domains: utils.joi.array().items(utils.joi.object().keys({
-    #     hostedZoneId:      utils.joi.string().required(),
-    #     spotinstAccountId: utils.joi.string().allow(null),
-    #     recordSets:        utils.joi.array().items(utils.joi.object().keys({
-    #       name:        utils.joi.string().required(),
-    #       usePublicIp: utils.joi.boolean().default(false)
-    #     })).min(1).unique().required()
-    #   })).min(1).unique().required()
-
-
-    # gitlab:           utils.joi.object().keys({
-    #   runner: utils.joi.object().keys({
-    #     isEnabled: utils.joi.boolean().allow(null)
 
