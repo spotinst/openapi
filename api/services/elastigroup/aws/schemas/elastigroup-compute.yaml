@@ -1,209 +1,371 @@
 type: object
 title: Elastigroup Compute
 properties:
+  product:
+    type: string
+    description: |
+      Operation system type.
+    enum: [Linux/UNIX (Amazon VPC), SUSE Linux (Amazon VPC), Windows (Amazon VPC), Red Hat Enterprise Linux (Amazon VPC)]
+    example: "Linux/UNIX"
+  elasticIps:
+    type: array
+    description: |
+      List of ElasticIPs Allocation Ids to associate to the group instances
+    items:
+      type: string
+      example: "eipalloc-9d4e16f8"
+  privateIps:
+    type: array
+    description: |
+      List of Private IPs to associate to the group instances.
+      Please note: This setting will only apply if rategy.persistence.shouldPersistPrivateIp is set to true.
+    items:
+      type: string
+      default: "172.1.1.0"
   instanceTypes:
     type: object
-    description: >
+    description: |
       Instance Types
     properties:
       ondemand:
         type: string
-        example: eipalloc-9d4e16f8
+        description: |
+          Available Instance types
+        example: "m3.medium"
       spot:
-        type: string
-        example:
-          - t3.nano
+        type: array
+        description: |
+          Available Spot Instance types
+        example: ["c3.large", "c4.large", "m3.large", "r3.large"]
+      preferredSpot:
+        type: array
+        description: |
+          Prioritize a subset of spot instance types. Must be a subset of the selected spot instance types.
+        example: ["c4.large"]
+      weights:
+        type: array
+        description: |
+          Custom weight for each instance type (only valid in weight capacity unit)
+        items:
+          type: object
+          properties:
+            instanceType:
+              type: string
+              description: |
+                The instance type to customize its weight
+              example: "c4.large"
+            weightedCapacity:
+              type: integer
+              description: |
+                The weight
+              exmample: 8
+  subnetIds:
+    type: array
+    description: |
+      A comma-separated list of subnet identifiers for your group.
+      When this parameter is set, compute.availabilityZones should be left unused.
+    example: ["subnet-4c1d1538", "subnet-2791bb61", "subnet-703a6f58", "subnet-c62846fc"]
   availabilityZones:
     type: array
+    description: |
+      One or more availability Zones for the group.
+      When this parameter is set, compute.subnetIds should be left unused.
     items:
       type: object
       properties:
         name:
           type: string
-          description: Name
-          example: us-west-2a
+          description: |
+            The Availability Zone name
+          example: "us-west-2a"
         subnetIds:
+          type: array
+          description: |
+            A comma-separated list of subnet identifiers for your group.
+          example: ["subnet-4333093a"]
+        placementGroupName:
           type: string
-          example:
-            - subnet-4333093a
-  product:
-    type: string
-    example: "Linux/UNIX"
-    description: >
-      Operating System
+          description: |
+            specify a Placement Group name, the instances will be launched in the Placement Group for the AZ.
+
+  preferredAvailabilityZones:
+    type: array
+    description: |
+      The AZs to prioritize when launching Spot instances.
+      If no markets are available in the Preferred AZs, Spot instances are launched in the non-preferred AZs.
+      * Must be a sublist of compute.AvailabilityZones
+      * strategy.availabilityVsCost must not be equalAzDistribution
+    example: ["us-east-1a","us-east-1b"]
   launchSpecification:
     type: object
     properties:
-      securityGroupIds:
+      creditSpecification:
+        type: object
+        description: |
+          creditSpecification is a parameter that indicates in what mode t2/t3 instances will be launched with. It consists of one key: cpuCredits (String)
+        properties:
+          cpuCredits:
+            type: string
+            enum: [unlimited, standard]
+            example: "unlimited"
+      loadBalancersConfig:
+        type: object
+        description: |
+          Elastic Load Balancers configurations
+        properties:
+          loadBalancers:
+            type: array
+            description: |
+              List of classic load balancers and/or application load balancer target groups and/or Multai load balancer target sets
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: |
+                    The AWS resource name. Required for Classic Load Balancer. Optional for Application Load Balancer.
+                  example: "MyTargetGroup"
+                arn:
+                  type: string
+                  description: |
+                    The AWS resource ARN (Required only for ALB target groups)
+                  example: "arn:aws:elasticloadbalancing:us-west-2:922761411234:targetgroup/MyTargetGroup/1fe63217f8ff1234"
+                type:
+                  type: string
+                  description: |
+                    The resource type.
+                  enum: [CLASSIC, TARGET_GROUP, MULTAI_TARGET_SET]
+                  example: "TARGET_GROUP"
+                balancerId:
+                  type: string
+                  description: |
+                    The Multai load balancer ID
+                  example: "lb-123456789"
+                targetSetId:
+                  description: |
+                    The Multai load target set ID
+                  type: string
+                  example: "ts-123456789"
+                azAwerness:
+                  description: |
+                    “AZ Awareness” will ensure that instances within the same AZ are using the corresponding MLB runtime instance in the same AZ. This feature reduces multi-zone data transfer fees
+                  type: boolean
+                  example: false
+                autoWeight:
+                  description: |
+                    “Auto Weight” will automatically provide a higher weight for instances that are larger as appropriate. For example, if you have configured your Elastigroup with m4.large and m4.xlarge instances the m4.large will have half the weight of an m4.xlarge. This ensures that larger instances receive a higher number of MLB requests
+                  type: boolean
+                  example: true
+      healthCheckType:
         type: string
-        example:
-          - sg-a22000e8
+        description: |
+          The service to use for the health check.
+        enum: [ELB, HCS, TARGET_GROUP, MLB, ECS_CLUSTER_INSTANCE, EC2, OPSWORKS, MULTAI_TARGET_SET, K8S_NODE, NOMAD_NODE]
+        example: "EC2"
+      healthCheckGracePeriod:
+        type: integer
+        description: |
+          The amount of time, in seconds, after the instance has launched to starts and check its health.
+        default: 300
+        example: 600
+      healthCheckUnhealthyDurationBeforeReplacement:
+        type: integer
+        description: |
+          The amount of time, in seconds, an existing instance should remain active after becoming unhealthy.
+          After the set time out the instance will be replaced
+        example: 60
+      securityGroupIds:
+        type: array
+        description: |
+          One or more security group IDs. In case of update it will override the existing Security Group with the new given array
+        items:
+          type: string
+          example: ["sg-0dfc2c8760df6fec7"]
       monitoring:
         type: boolean
+        description: |
+          Describes whether instance Enhanced Monitoring is enabled
         example: false
       ebsOptimized:
         type: boolean
+        description: |
+          Enable EBS optimization for supported instance which is not enabled by default.
+          Note - additional charges will be applied.
         example: false
       imageId:
         type: string
-        example: ami-082b5a644766e0e6f
+        description: |
+          The ID of the image used to launch the instance.
+          * The following instance types are supported by HVM image: M3, M4, C3, C4, D2, G2, R3, CC2, CC1, CG1, CR1.
+          * The following instance types are supported by PV image: M1, M2, M3, C1, C3.
+          * In case of conflict between Instance type to image type, an error message will be returned
+        example: "ami-01e24be29428c15b2"
       keyPair:
         type: string
-        example: KeyPair
+        description: |
+          Specify a Key Pair to attach to the instances
+        example: "labs-oregon"
+      blockDeviceMappings:
+        type: array
+        description: |
+          Array list of block devices that are exposed to the instance, You can specify virtual devices and EBS volumes.
+        items:
+          type: object
+          properties:
+            deviceName:
+              type: string
+              description: |
+                Set device name
+              example: "/dev/xvdcz"
+            ebs:
+              type: object
+              description: |
+                Set EBS properties
+              properties:
+                volumeType:
+                  type: string
+                  description: |
+                    Set volume type
+                  example: "gp2"
+                deleteOnTermination:
+                  type: boolean
+                  description: |
+                    Flag to delete the EBS on instance termination
+                  example: true
+                volumeSize:
+                  type: integer
+                  description: |
+                    Set volume size (in GB). When using this property - don't use dynamicVolumeSize.
+                    Volume size should be greater or equal than the size configured in the AMI
+                  example: 12
+                dynamicVolumeSize:
+                  type: object
+                  description: >
+                    Set dynamic volume size properties. When using this object, you cannot use volumeSize. You must use one or the other.
+                  properties:
+                    baseSize:
+                      type: integer
+                      description: |
+                        Initial size for volume
+                      example: 50
+                    resource:
+                      type: string
+                      example: "CPU"
+                    sizePerResourceUnit:
+                      type: integer
+                      description: >
+                        Additional size per resource unit (in GB).
+                        For example: if baseSize=50, and sizePerResourceUnit=20, and an instance with 2 CPU is launched - its disk size will be: 90GB
+                      example: 20
+      networkInterfaces:
+        type: array
+        description: |
+          List of network interfaces in an EC2 instance.
+          If you define network interface, please pay attention to omit these properties from other sections in this JSON and set them here: subnetId - compute.availabilityZones
+        items:
+          type: object
+          properties:
+            description:
+              type: string
+              description: |
+                The description of the network interface. Applies only if creating a network interface when launching an instance.
+            deviceIndex:
+              type: integer
+              description: |
+                The position of the network interface in the attachment order.
+                A primary network interface has a device index of 0.
+                If you specify a network interface when launching an instance, you must specify the device index.
+              example: 0
+            secondaryPrivateIpAddressCount:
+              type: integer
+              description: |
+                The number of secondary private IPv4 addresses to assign to a network interface.
+                When you specify a number of secondary IPv4 addresses, Amazon EC2 selects these IP addresses within the subnet's IPv4 CIDR range.
+                You can't specify this option and specify more than one private IP address using privateIpAddresses.
+                The number of IP addresses you can assign to a network interface varies by instance type.
+                For more information, see IP Addresses Per ENI Per Instance Type in the Amazon Virtual Private Cloud User Guide.
+            associatePublicIpAddress:
+              type: boolean
+              description: |
+                Indicates whether to assign a public IPv4 address to an instance you launch in a VPC.
+                The public IP address can only be assigned to a network interface for eth0, and can only be assigned to a new network interface, not an existing one.
+                You cannot specify more than one network interface in the request.
+                If launching into a default subnet, the default value is true.
+              example: true
+            deleteOnTermination:
+              type: boolean
+              description: |
+                If set to true, the interface is deleted when the instance is terminated.
+                You can specify true only if creating a new network interface when launching an instance.
+            networkInterfaceId:
+              type: string
+              description: |
+                The ID of the network interface. Used to attach the specified network interface to the instance.
+
+
+            privateIpAddresses:
+              type: array
+              description: |
+                One or more private IPv4 addresses to assign to the network interface.
+                Only one private IPv4 address can be designated as primary.
+                You cannot specify this option if you're launching more than one instance in a RunInstances request.
+              items:
+                type: object
+                properties:
+                  privateIpAddress:
+                    type: string
+                    description: |
+                      The private IPv4 address.
+                  primary:
+                    type: boolean
+                    description: |
+                      Indicates whether the private IPv4 address is the primary private IPv4 address. Only one IPv4 address can be designated as primary.
+
+            subnetId:
+              type: string
+              description: |
+                The ID of the subnet to associate with the network interface.
+                Required when creating a new Network Interface, and not attaching an existing one via networkInterfaceId.
+
+            associateIpv6Address:
+              type: boolean
+              description: |
+                Indicates whether to assign an IPv6 address. Amazon EC2 chooses the IPv6 addresses from the range of the subnet.
+
+      iamRole:
+        type: object
+        description: |
+          The instance profile iamRole
+        properties:
+          name:
+            type: string
+            description: |
+              The iamRole name
+            example: "my-iamRole"
+      userData:
+        type: string
+        format: byte
+        description: |
+          The Base64-encoded MIME user data to make available to the instances
+        example: "dXNlcmJhc2g2NGVuY29kZWQ="
+      shutdownScript:
+        type: string
+        format: byte
+        description: |
+          The Base64-encoded shutdown script to execute prior to instance termination. For more information please see: [Shutdown Script](https://help.spot.io/integration-docs/elastigroup/concepts/compute-concepts/shutdown-scripts/)
+        example: "dXNlcmJhc2g2NGVuY29kZWQ="
       tags:
         type: array
         items:
+          type: object
           properties:
             tagKey:
               type: string
-              example: Creator
+              description: |
+                The tag’s key
+              example: "Creator"
             tagValue:
               type: string
-              example: user@mail.com
-      healthCheckType:
-        type: string
-        example: null
-      tenancy:
-        type: string
-        example: default
-      shutdownScript:
-        type: string
-        example: null
-    elasticIps:
-      type: string
-      example: null
-    preferredAvailabilityZones:
-      type: string
-      example: null
-        
-    #         privateIps:                 utils.joi.when(utils.joi.ref('$shouldPersistPrivateIp'), {
-    #           is:        true,
-    #           then:      utils.joi.array().items(utils.joi.string()).min(1).allow(null).unique(),
-    #           otherwise: utils.joi.valid(null)
-    #         }),
-    #         instanceTypes:              utils.joi.object().keys({
-    #           ondemand:      utils.joi.string().valid(constants.AWS_INSTANCE_TYPES).required(),
-    #           spot:          utils.joi.array().items(utils.joi.string().valid(constants.AWS_SPOTABLE_INSTANCE_TYPES)).min(1).unique().required(),
-    #           weights:       utils.joi.when(utils.joi.ref('$capacityUnit'), {
-    #             is:        constants.CAPACITY_UNITS.WEIGHT,
-    #             then:      utils.joi.array().items(utils.joi.object().keys({
-    #               instanceType:     utils.joi.string().valid(constants.AWS_INSTANCE_TYPES).required(),
-    #               weightedCapacity: utils.joi.number().integer().min(1).required()
-    #             })).unique().allow(null),
-    #             otherwise: utils.joi.valid(null)
-    #           }),
-    #           preferredSpot: utils.joi.array().items(utils.joi.string().valid(constants.AWS_SPOTABLE_INSTANCE_TYPES)).allow(null)
-    #         }).required(),
-    #         availabilityZones:          utils.joi.array().items(utils.joi.object().keys({
-    #           name:               utils.joi.string().valid(constants.AWS_AVAILABILITY_ZONES).required(),
-    #           subnetId:           utils.joi.string().allow(null),
-    #           subnetIds:          utils.joi.array().items(utils.joi.string()).min(1).allow(null),
-    #           placementGroupName: utils.joi.string().allow(null)
-    #         }).nand('subnetId', 'subnetIds')).min(1).unique().required().when(utils.joi.ref('$computeSubnetIds'), {
-    #           is:   utils.joi.exist(),
-    #           then: utils.joi.optional()
-    #         }),
-    #         subnetIds:                  utils.joi.array().items(utils.joi.string()).min(1).allow(null).unique(),
-    #         preferredAvailabilityZones: utils.joi.array().items(utils.joi.string().valid(constants.AWS_AVAILABILITY_ZONES)).allow(null).unique(),
-    #         product:                    utils.joi.string().valid(constants.AWS_EC2_PRODUCTS).required(),
-    #         ebsVolumePool:              utils.joi.array().items(utils.joi.object().keys({
-    #           deviceName: utils.joi.string().required(),
-    #           volumeIds:  utils.joi.array().items(utils.joi.string()).min(1).required()
-    #         })).allow(null),
-    #         launchSpecification:        utils.joi.object().keys({
-    #           loadBalancerName:                              utils.joi.string(), // deprecated
-    #           loadBalancerNames:                             utils.joi.array().items(utils.joi.string()).min(1).allow(null).unique(),
-    #           loadBalancersConfig:                           utils.joi.object().keys({
-    #             loadBalancers: utils.joi.array().items(utils.joi.object().keys({
-    #               name:        utils.joi.when('type', {
-    #                 is:        constants.GROUP_ELB_TYPES.TARGET_GROUP,
-    #                 then:      utils.joi.string().allow(null),
-    #                 otherwise: utils.joi.when('type', {
-    #                   is:        constants.GROUP_ELB_TYPES.CLASSIC,
-    #                   then:      utils.joi.string().required(),
-    #                   otherwise: utils.joi.valid(null)
-    #                 })
-    #               }),
-    #               arn:         utils.joi.when('type', {
-    #                 is:        constants.GROUP_ELB_TYPES.TARGET_GROUP,
-    #                 then:      utils.joi.string().regex(constants.LB_TARGET_GROUP_ARN_REGEX).required(),
-    #                 otherwise: utils.joi.string().allow(null)
-    #               }),
-    #               balancerId:  utils.joi.when('type', {
-    #                 is:        constants.GROUP_ELB_TYPES.MULTAI_TARGET_SET,
-    #                 then:      utils.joi.string().required(),
-    #                 otherwise: utils.joi.valid(null)
-    #               }),
-    #               targetSetId: utils.joi.when('type', {
-    #                 is:        constants.GROUP_ELB_TYPES.MULTAI_TARGET_SET,
-    #                 then:      utils.joi.string().required(),
-    #                 otherwise: utils.joi.valid(null)
-    #               }),
-    #               azAwareness: utils.joi.when('type', {
-    #                 is:        constants.GROUP_ELB_TYPES.MULTAI_TARGET_SET,
-    #                 then:      utils.joi.boolean().default(true),
-    #                 otherwise: utils.joi.valid(null)
-    #               }),
-    #               autoWeight:  utils.joi.when('type', {
-    #                 is:        constants.GROUP_ELB_TYPES.MULTAI_TARGET_SET,
-    #                 then:      utils.joi.boolean().default(false),
-    #                 otherwise: utils.joi.valid(null)
-    #               }),
-    #               type:        utils.joi.string().valid(Object.values(constants.GROUP_ELB_TYPES)).required(),
-    #             })).min(1).allow(null)
-    #           }).allow(null),
-    #           healthCheckType:                               utils.joi.string().valid(constants.HEALTH_CHECK_TYPE).allow(null),
-    #           healthCheckGracePeriod:                        utils.joi.number().integer().min(0).allow(null),
-    #           healthCheckUnhealthyDurationBeforeReplacement: utils.joi.number().integer().multiple(60).min(60).allow(null),
-    #           securityGroupIds:                              utils.joi.array().items(utils.joi.string()).min(1).unique(),
-    #           monitoring:                                    utils.joi.boolean().required(),
-    #           ebsOptimized:                                  utils.joi.boolean(),
-    #           imageId:                                       utils.joi.string().required(),
-    #           tenancy:                                       utils.joi.string().valid(utils._(constants.AWS_TENANCY).pluck('name').value()),
-    #           iamRole:                                       utils.joi.object().keys({
-    #             name: utils.joi.string().allow(null),
-    #             arn:  utils.joi.string().allow(null)
-    #           }).or('name', 'arn').allow(null),
-    #           creditSpecification:                           utils.joi.object().keys({
-    #             cpuCredits: utils.joi.string().valid(Object.values(constants.AWS_CREDIT_SPECIFICATION_OPTIONS)).required()
-    #           }).allow(null),
-    #           keyPair:                                       utils.joi.string().allow(null),
-    #           userData:                                      utils.joi.string().regex(BASH_REGEX, 'base64').allow(null),
-    #           shutdownScript:                                utils.joi.string().regex(BASH_REGEX, 'base64').allow(null),
-    #           blockDeviceMappings:                           utils.joi.array().items(utils.joi.object().keys({
-    #             deviceName:  utils.joi.string(),
-    #             ebs:         utils.joi.object().keys({
-    #               deleteOnTermination: utils.joi.boolean(),
-    #               encrypted:           utils.joi.boolean(),
-    #               iops:                utils.joi.number().min(0),
-    #               kmsKeyId:            utils.joi.string(),
-    #               snapshotId:          utils.joi.string(),
-    #               volumeSize:          utils.joi.any(),
-    #               volumeType:          utils.joi.string()
-    #                                      .default(utils._(constants.AWS_VOLUME_TYPES).where({default: true}).pluck('name').pop())
-    #                                      .valid(utils._(constants.AWS_VOLUME_TYPES).pluck('name').value())
-    #             }),
-    #             noDevice:    utils.joi.string().allow(''),
-    #             virtualName: utils.joi.string(),
-    #           })).min(1).allow(null),
-    #           networkInterfaces:                             utils.joi.array().items(utils.joi.object().keys({
-    #             description:                    utils.joi.string(),
-    #             deviceIndex:                    utils.joi.number().integer().min(0),
-    #             secondaryPrivateIpAddressCount: utils.joi.number().integer().min(0),
-    #             associatePublicIpAddress:       utils.joi.boolean(),
-    #             deleteOnTermination:            utils.joi.boolean(),
-    #             groups:                         utils.joi.array().items(utils.joi.string()).min(1),
-    #             networkInterfaceId:             utils.joi.string(),
-    #             privateIpAddress:               utils.joi.string(),
-    #             privateIpAddresses:             utils.joi.array().items(utils.joi.object().keys({
-    #               privateIpAddress: utils.joi.string().required(),
-    #               primary:          utils.joi.boolean()
-    #             })).min(1),
-    #             subnetId:                       utils.joi.string(),
-    #             associateIpv6Address:           utils.joi.boolean()
-    #           })).min(1).allow(null),
-    #           tags:                                          utils.joi.array().items(utils.joi.object().keys({
-    #             tagKey:   utils.joi.string().regex(/^(?!aws:).*/, `naming (prefix "aws:" is reserved for AWS use)`),
-    #             tagValue: utils.joi.string().allow('')
-    #           }).and('tagKey', 'tagValue')).min(constants.ELASTIGROUP_TAGS_RANGE.min).max(constants.ELASTIGROUP_TAGS_RANGE.max).allow(null).unique()
-   
+              description: |
+                The tag’s value
+              example: "John Doe"
