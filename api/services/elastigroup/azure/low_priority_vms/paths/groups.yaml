@@ -1,0 +1,60 @@
+get:
+  summary: "Elastigroup Azure Scale Sets - List"
+  description: >
+    List all Azure Elastigroups for a Spot Account
+  operationId: "elastigroupAzureListAll"
+  tags:
+    - Elastigroup Azure Low Priority VMs
+  parameters:
+    - $ref: "../../../../../commons/parameters/accountId.yaml"
+  responses:
+    200:
+      $ref: "../responses/elastigroup.yaml"
+    400:
+      description: "Bad Request"
+
+post:
+  summary: "Elastigroup Azure Scale Sets - Create"
+  description:
+    Create a new Azure Elastigroup
+  operationId: "elastigroupAzureCreate"
+  tags:
+    - Elastigroup Azure Low Priority VMs
+  parameters:
+    - $ref: "../../../../../commons/parameters/accountId.yaml"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          allOf:
+          - $ref: "../schemas/elastigroup.yaml"
+          - type: "object"
+            properties:
+              group:
+                type: object
+                required:
+                - name
+                - region
+                - resourceGroupName
+                - capacity
+                - strategy
+                - compute
+                properties:
+                  compute:
+                    type: object
+                    required:
+                      - vmSizes
+                      - product
+                    properties:
+                      vmSizes:
+                        type: object
+                        required:
+                          - odSizes
+                          - lowPrioritySizes
+
+  responses:
+    200:
+      $ref: "../responses/elastigroup.yaml"
+    400:
+      description: "Bad Request"
