@@ -1,0 +1,79 @@
+get:
+  summary: "Elastigroup Azure Scale Sets - Get Status"
+  description:
+    Get the status for all instances that are memebers of the Elastigroup
+  operationId: "elastigroupAzureGetStatus"
+  tags:
+    - Elastigroup Azure Scale Set VMs
+  parameters:
+    - $ref: "../../../../../commons/parameters/accountId.yaml"
+    - $ref: "../../../commons/parameters/groupId.yaml"
+  responses:
+    200:
+      $ref: "#/components/responses/groupStatus"
+    400:
+      description: "Bad Request"
+components:
+  responses:
+    groupStatus:
+      description: Elastigroup Response
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "../../../../../commons/schemas/spotinstResponseItemWrapper.yaml"
+              - type: "object"
+                properties:
+                  response:
+                    type: "object"
+                    properties:
+                      items:
+                        type: "array"
+                        items:
+                          $ref: "#/components/schemas/groupStatus"
+  schemas:
+    groupStatus:
+      type: object
+      properties:
+        instanceId:
+          type: string
+          example: ec5410ea-fec7-4a03-a989-3b27b7ee2ed5
+        region:
+          type: string
+          example: eastus
+        vmSize:
+          type: string
+          example: standard_a1_v2
+        lifeCycle:
+          type: string
+          example: low-priority
+          enum:
+            - low-priority
+            - regular
+        privateIp:
+          type: string
+          example: 10.0.0.8
+        publicIp:
+          type: string
+          example: 168.62.168.93
+        state:
+          type: string
+          example: running
+          enum:
+            - running
+            - reimaging
+            - creating
+            - starting
+        createdAt:
+          type: string
+          example: "2018-06-20T11:16:32.000Z"
+  parameters:
+    groupId:
+      in: path
+      name: groupId
+      schema:
+        type: string
+      required: true
+      description: >
+        Elastigroup Azure ID
+
