@@ -1,0 +1,69 @@
+type: object
+title: Elastigroup Strategy
+description: |
+  Strategy for Elastigroup.
+properties:
+  spotPercentage:
+    type: integer
+    example: 50
+    default: 100
+    description: |
+      Percentage of Spot-VMs to maintain.\
+      Required if odCount isn't specified.
+  onDemandCount:
+    type: integer
+    description: |
+      Percentage of Spot-VMs to maintain.\
+      Required if spotPercentage isn't specified.
+    writeOnly: true
+  drainingTimeout:
+    type: integer
+    example: 30
+    default: 120
+    description: |
+      Time (in seconds) to allow the VM be drained from incoming TCP connections and detached from MLB before terminating it during a scale down operation.
+  fallbackToOd:
+    type: Boolean
+    description: |
+      In case of no spots available, Elastigroup will launch an On-demand instance instead
+    example: true
+  revertToSpot:
+    description: |
+      Hold settings for strategy correction - replacing On-Demand for Spot VMs
+    type: object
+    properties:
+      performAt:
+        type: string
+        description: |
+          Settings for maintenance strategy.
+        enum: [timeWindow, never, always]
+        example: "timeWindow"
+        default: "always"
+  optimizationWindows:
+    type: array
+    description: |
+      valid format: "ddd:hh:mm-ddd:hh:mm (day:hour(0-23):minute(0-59))", not empty if revertToSpot.performAt = timeWindow
+    example:
+      - "Mon:03:00-Wed:02:30"
+  signals:
+    type: array
+    description: |
+      The signals defined for this group.
+    items:
+      type: object
+      properties:
+        type:
+          type: string
+          description: |
+            The type of the signal defined for the group.
+          enum: [vmReady, vmReadyToShutdown]
+          example: "vmReady"
+        timeout:
+          type: integer
+          description: |
+            The timeout in seconds to hold the vm until a signal is sent.\
+            If no signal is sent the vm will be replaced (vmReady) or we will terminate the vm (vmReadyToShutdown) after the timeout.
+          example: 180
+          default: 1800
+          minimum: 60
+          maximum: 1800

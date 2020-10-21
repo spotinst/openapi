@@ -1,0 +1,93 @@
+type: object
+required:
+  - statefulMigrationGroup
+properties:
+  statefulMigrationGroup:
+    type: object
+    required:
+      - shouldKeepPrivateIp
+      - originalInstanceId
+      - originalInstanceId
+      - name
+    properties:
+      shouldKeepPrivateIp:
+        type: Boolean
+        example: "false"
+        readOnly: true
+        description: >
+          Setting this value to true will maintain the initial instance private IP. This will also require that the original instance be terminated in the import process incurring maintenance time.
+          Note: This value must be false if you would like to configure availability zones and subnet ids.
+      originalInstanceId:
+        type: string
+        example: "i-123c53d9f152a1234"
+        description: >
+          The originating Instance ID. This instance will be imported along with its State.
+      name:
+        type: string
+        example: "MyNewElastigroup"
+        description: >
+          Specify the new Elastigroup name.
+      region:
+        type: string
+        example: "us-west-2"
+        description: >
+          Specify the AWS Region the instance is running in and the new Elastigroup will be created in.
+      shouldTerminateInstance:
+        type: Boolean
+        description: >
+          Decide if the instance termination should be automatic or manual. True = automatic termination. False = manual termination.
+      product:
+        type: string
+        example: "Linux/UNIX (Amazon VPC)"
+        description: >
+          Operation system type. Possible values: Linux/UNIX | SUSE | Linux Windows | Linux/UNIX (Amazon VPC) | SUSE Linux (Amazon VPC) | Windows (Amazon VPC).
+      spotInstanceTypes:
+        type: array
+        description: >
+          An Array holding the types of instances to be used in the Elastigroup.
+        items:
+          type: string
+          example: m3.large
+      availabilityZones:
+        type: array
+        description: >
+          An Array holding an object of availabilityZones, this configures the availability zones the group may launch instances in. If this is not passed, the availability zone configuration is taken from the imported instance.
+          Note: This field must be null if statefulMigrationGroup.shouldKeepPrivateIp is true, and must have a minimum of one availability zone.
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+              example: "us-west-2b"
+              description: >
+                This is the name of the Availability Zone, must be a valid availability zone name.
+            subnetIds:
+              type: array
+              description: >
+                This is the ids of the subnets, if this is not defined, then the default subnet for the availability zone is used.
+                                Note: This field must be a valid subnet id, this field may be null.
+              items:
+                type: string
+                example: subnet-12345678
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

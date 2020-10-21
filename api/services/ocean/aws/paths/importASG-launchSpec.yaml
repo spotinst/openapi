@@ -1,0 +1,50 @@
+summary: Ocean for AWS
+delete:
+  summary: "Import ASG To Ocean Cluster Launch Specification"
+  description: >
+    This API creates an Ocean cluster launch specification configuration according to an AWS autoscaling group (ASG) configuration.
+
+    By using the API, Create Launch Specification, you can then use the returned launch specification to create an actual Ocean launch specification.
+
+    This API fetches an AWS ASG and converts it to a launch specification template.
+
+    The response returned is an `imported` launch specification from the ASG in the required JSON format which you can then use in the Create Launch Specification API.
+  operationId: "oceanAwsImportAsgToLaunchSpec"
+  tags:
+    - "Ocean AWS"
+  parameters:
+    - $ref: "../../../../commons/parameters/accountId.yaml"
+    - $ref: "../../commons/parameters/oceanId.yaml"
+    - $ref: "../../commons/parameters/autoScalingGroupName.yaml"
+  responses:
+    200:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              oceanId:
+                type: string
+                example: o-500a5d5a
+              name:
+                type: string
+                example: TestTeam1
+              imageId:
+                type: string
+                example: ami-0ce21b51cb55a48b8
+              securityGroupIds:
+                type: array of string
+                example:
+                  - "subnet-00cab2dd9f40a9883"
+                  - "subnet-0df9d512c7cbbd9e1"
+              tags:
+                type: object
+                properties:
+                  tagKey:
+                    type: string
+                    example: AmazonECSManaged
+                  tagValue:
+                    type: string
+                    example: ""
+    400:
+      description: "Bad Request"

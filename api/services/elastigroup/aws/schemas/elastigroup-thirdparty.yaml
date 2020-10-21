@@ -1,0 +1,85 @@
+type: object
+title: Elastigroup Third Party Integrations
+description: |
+  All definitions for using third-party Integrations
+properties:
+  rancher:
+    type: object
+    description: |
+      All definitions for using Rancher Labs integration.
+    properties:
+      masterHost:
+        type: string
+        description: |
+          Rancher master url
+        example: "http://myRancher.com:8080/v1"
+      accessKey:
+        type: string
+        description: |
+          Rancher version
+        example: "1"
+        default: "1"
+  route53:
+    type: object
+    description: |
+      Route53 integration object.
+    properties:
+      domains:
+        type: array
+        description: |
+          Route53 domain configurations.
+        items:
+          type: object
+          properties:
+            hostedZoneId:
+              type: string
+              description: |
+                The Route53 Hosted Zone ID for the registered domain.
+              example: "Z3UFMBCGJMYLUT"
+            spotinstAccountId:
+              type: string
+              description: |
+                The Spot account ID that is linked to the AWS account that holds the Route53 hosted Zone ID.
+                The default is the user Spot account provided as a URL parameter.
+              example: "act-1234abcd"
+            recordSetType:
+              type: string
+              description: |
+                Set the type of recordSet to update.
+                Valid values:
+                * "a" - means register and de-register of instances done by IP address (IPv4).
+                When it is "a" you should also specify usePublicIp.
+                * "cname" - register and de-register of instances done by CNAME. When it is "cname", you should also specify usePublicDns.
+              enum: [a,cname]
+              example: "a"
+              default: "a"
+            recordSets:
+              type: array
+              description: |
+                List of record sets.
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: |
+                      Name of the recordSet.
+                    example: testcname.spot.io.
+                  usePublicIp:
+                    type: boolean
+                    description: |
+                      Defines whether to use public or private IP. Relevant only when recordSetType=a.
+                    example: true
+                    default: false
+                  usePublicDns:
+                    type: boolean
+                    description: |
+                      Defines whether to use a public DNS or private DNS in the instance registration process.
+                      Relevant only when recordSetType=cname.
+                      * False=Create a new weighted CNAME recordset with same name and the instance Private DNS.
+                      * True=instances should be registered with public DNS.
+                    example: true
+                    default: false
+
+
+

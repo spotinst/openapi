@@ -1,0 +1,141 @@
+type: object
+title: Ocean Compute
+required:
+  - subnetname
+  - launchSpecification
+  - networkInterfaces
+properties:
+  networkInterfaces:
+    type: object
+    description: >
+      Settings for network interfaces
+    required:
+      - accessConfig
+      - network
+    properties:
+      network:
+        type: string
+        example: default
+      projectId:
+        type: string
+        description: >
+          Use network resource from different project. set project ID to use it's network resource.
+          This parameter relevant only If the network resource is in different project
+        example: test-project
+      accessConfigs:
+        type: object
+        required:
+          - name
+          - type
+        properties:
+          name:
+            type: string
+            example: external-nat
+          type:
+            type: string
+            description: >
+              Possible values: ONE_TO_ONE_NAT
+            example: ONE_TO_ONE_NAT
+      aliasIpRanges:
+        type: object
+        required:
+          - ipCidrRange
+          - subnetworkRangeName
+        properties:
+          ipCidrRange:
+            type: string
+            description: >
+              Required on cluster.compute.networkInterfaces.aliasIpRanges object.
+            example: "/24"
+          subnetworkRangeName:
+            type: string
+            description: >
+              Required on cluster.compute.networkInterfaces.aliasIpRanges object.
+            example: gke-test-native-vpc-pods-5cb557f7
+  backendServices:
+    type: object
+    description: Settings for backend services
+    required:
+      - backendServiceName
+    properties:
+      backendServiceName:
+        type: string
+        description: Required on cluster.compute.backendServices object.
+        example: test-global-tcp
+      locationType:
+        type: string
+        example: global
+  subnetName:
+    type: string
+    description: Subnet identifier for the Ocean cluster
+    example: default
+  instanceTypes:
+    type: object
+    description: The type of instances that may or may not be a part of the Ocean cluster.
+    properties:
+      whitelist:
+        type: array of string
+        description: >
+          Instance types allowed in the Ocean cluster.
+        example:
+          - "n1-standard-2"
+  launchSpecification:
+    type: object
+    required:
+      - sourceImage
+      - tags
+      - metadata
+      - serviceAccount
+    properties:
+      sourceImage:
+        type: string
+        description: URL of the image used to launch the instances
+        example: https://www.googleapis.com/compute/v1/projects/gke-node-images/global/images/gke-1117-gke12-cos-69-10895-138-0-v190225-pre
+      metadata:
+        type: object
+        descritpion: >
+          Set array of cluster metadata
+        properties:
+          key:
+            type: string
+            description: >
+              Key of metadata key-pair
+            example: example_key1
+          value:
+            type: string
+            description: >
+              Value of metadata key-pair
+            example : exmample_value1
+      tags:
+        type: array of string
+        description: Array of tags to instances launched in Ocean cluster
+        example:
+          - gke-test-native-vpc-5cb557f7-node
+      ipForwarding:
+        type: boolean
+        example: true
+      minCpuPlatform:
+        type: string
+        description: >
+          Set instance CPU platform
+        example: Intel Sandy Bridge
+      serviceAccount:
+        type: string
+        example: 265168459660-compute@developer.gserviceaccount.com
+      labels:
+        type: array of object
+        description: >
+          Set labels on cluster. Can set up to 60 labels
+        items:
+          type: object
+          properties:
+            key:
+              type: string
+              example: spotinst-gke-original-node-pool
+            value:
+              type: string
+              example: test-native-vpc__default-pool
+      rootVolumeSizeInGb:
+        type: integer
+        description: Optionally set root size (GB). Value should be >= 100
+        example: 100

@@ -1,0 +1,122 @@
+type: object
+title: Elastigroup Strategy
+properties:
+  risk:
+    type: integer
+    minimum: 0
+    maximum: 100
+    example: 100
+    default: 0
+    description: >
+      The percentage of Elastigroup that will run with spot market capacity
+  onDemandCount:
+    type: integer
+    minimum: 0
+    example: 0
+    description: >
+      Minimum number of instances that will always be on-demand
+  availabilityVsCost:
+      type: string
+      enum: [costOriented, availabilityOriented, balanced, cheapest, equalAzDistribution]
+      default: balanced
+      description: |
+        How Elastigroup determines which instances to add and replace.
+        (please read this article before using [Equal AZ Instance Distribution](https://docs.spot.io/elastigroup-for-aws/concepts/general-concepts/equal-az-distribution))
+  fallbackToOd:
+    type: boolean
+    default: false
+    example: true
+    description: |
+      When set to `true` Elastigroup will launch On Demand instances if no spot market is available
+  utilizeReservedInstances:
+    type: boolean
+    description: |
+      In case of any available Reserved Instances, Elastigroup will utilize them before purchasing Spot instances
+    example: false
+  drainingTimeout:
+    type: integer
+    example: 120
+    description: >
+      The time in seconds to allow the instance be drained from incoming TCP connections and detached from ELB before terminating it, during a scale down operation
+  signals:
+    type: array
+    description: |
+      The signals defined for this group. For more information refer the below article: [Signals](https://docs.spot.io/elastigroup-for-aws/concepts/compute-concepts/using-signals-in-elastigroups)
+    items:
+      type: object
+      properties:
+        name:
+          type: string
+          description: |
+            The name of the signal defined for the group.
+          enum: [INSTANCE_READY, INSTANCE_READY_TO_SHUTDOWN]
+        timeout:
+          type: integer
+          minimum: 60
+          maximum: 1800
+          description: |
+            The timeout in seconds to hold the instance until a signal is sent.
+            If no signal is sent the instance will be replaced (INSTANCE_READY) or we will terminate the instance (INSTANCE_READY_TO_SHUTDOWN) after the timeout.
+          default: 1800
+          example: 120
+  persistence:
+    type: array
+    description: |
+      You can register persistence (Stateful) recovery arguments
+    items:
+      type: object
+      properties:
+        shouldPersistPrivateIp:
+          item: boolean
+          description: |
+            Should the instance maintain its private IP
+          example: true
+        shouldPersistRootDevice:
+          item: boolean
+          description: |
+            Should the instance maintain its root device volumes
+          example: true
+        shouldPersistBlockDevices:
+          item: boolean
+          description: |
+            Should the instance maintain its Data volumes
+          example: true
+        blockDevicesMode:
+          item: string
+          description: |
+            Determine the way we attach the data volumes to the data devices
+          enum: [reattach, onLaunch]
+          example: "reattach"
+  revertToSpot:
+    type: object
+    description: |
+      Hold settings for strategy correction - replacing On-Demand for Spot instances
+    properties:
+      performAt:
+        type: string
+        description: |
+          Settings for maintenance strategy - possible values: timeWindow, never, always.
+          performAt of type: 'never' OR 'timeWindow' can only be applied to groups with "availabilityOriented" OR groups with "persistence",
+          other groups allow either 'always' type or nothing which also means always.
+        enum: [never, always, timeWindow]
+        example: "timeWindow"
+        default: "always"
+      timeWindows:
+        type: array
+        description: |
+          When performAt is 'timeWindow': must specify a list of 'timeWindows' with at least one time window Each string is in the format of - ddd:hh:mm-ddd:hh:mm
+          ddd = day of week = Sun | Mon | Tue | Wed | Thu | Fri | Sat
+          hh = hour 24 = 0 -23
+          mm = minute = 0 - 59
+        items:
+          type: string
+          example: "Mon:03:00-Wed:02:30"
+  scalingStrategy:
+    type: object
+    description: |
+      Set termination policy
+    properties:
+      terminationPolicy:
+        type: string
+        enum: [default, newestInstance]
+        example: "default"

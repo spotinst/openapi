@@ -1,0 +1,78 @@
+summary: Ocean for GKE
+post:
+  summary: "Initiate Roll"
+  description: >
+    Roll an entire Ocean cluster or roll subsets of the cluster by specifying launchSpecIds or instanceNames.
+    Performing this request will start the roll immediately, by defined batches.
+    <br />
+    <br />
+    Note that the first response for a successful request will notify for starting a roll.
+    In order to check the status of a roll, you can use the GET Cluster Roll API using the roll ID.
+  operationId: "oceanGkeRollInit"
+  tags:
+    - "Ocean GKE"
+  parameters:
+    - $ref: "../../../../commons/parameters/accountId.yaml"
+    - $ref: "../../commons/parameters/oceanId.yaml"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            roll:
+              type: object
+              description: >
+                Settings for roll operation
+              properties:
+               batchSizePercentage:
+                 type: integer
+                 description: >
+                   Value in % to set size of batch in roll. Valid values are 0-100
+                 example: 20
+               comment:
+                 description: >
+                   Add a comment description for the roll. comment should be limit to 256 chars.
+                 type: string
+                 example: "This is why I deployed my cluster."
+               launchSpecIds:
+                 type: array of string
+                 description: >
+                   List of launch specification IDs to be rolled.
+                   Each ID is a string. launchSpecIds can be null.
+                   Cannot be used together with instanceName.
+                 example:
+                   - ols-76694a7d
+                   - ols-56694a76
+               instanceNames:
+                 type: array of string
+                 description: >
+                   List of instance names to be rolled.
+                   Each name is a string.
+                   instanceNames can be null.
+                   Cannot be used together with launchSpecId
+                 example:
+                   - i-0003a99ffb566f039
+                   - i-0567a99ffb566f765
+  responses:
+    200:
+      $ref: "../responses/initiate-clusterRoll.yaml"
+    400:
+      description: "Bad Request"
+
+get:
+  summary: "List Rolls"
+  description: >
+    Get status for all rolls of an Ocean cluster.
+  operationId: "oceanGkeRollList"
+  tags:
+    - "Ocean GKE"
+  parameters:
+    - $ref: "../../../../commons/parameters/accountId.yaml"
+    - $ref: "../../commons/parameters/oceanId.yaml"
+  responses:
+    200:
+      $ref: "../responses/clusterRollGetAllResponse.yaml"
+    400:
+      description: "Bad Request"
