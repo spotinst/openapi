@@ -1,0 +1,46 @@
+get:
+  summary: "Organization & Accounts - Get Account Users"
+  description: >
+    Get all users in the organization, their details, and mapped accounts.
+    Providing the optional account ID parameter will filter out all users not mapped to that account.
+  operationId: "OrganizaionAndAccountGetAccountUsers"
+  tags:
+    - "Organization & Accounts"
+  parameters:
+    - in: "query"
+      name: "accountId"
+      example: act-123abc
+      description: >
+        The Spot accountId of the account to be updated
+      required: false
+  responses:
+    200:
+      $ref: "../responses/getAccountUsers.yaml"
+    400:
+      description: "Bad Request"
+
+post:
+  summary: "Organization & Accounts - Create User"
+  description: Create a new user and link it to the creator’s organization (the organization ID from the personal token attached to the API call).
+    If the role is a viewer, the user is also linked to the default account for the organization.
+  operationId: "OrganizaionAndAccountCreateUser"
+  tags:
+    - "Organization & Accounts"
+  parameters:
+    - in: "query"
+      name: "generateToken"
+      example: true
+      type: boolean
+      description: If True, then the Response will include”personalAccessToken” string
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          allOf:
+            - $ref: "../schemas/createUser.yaml"
+  responses:
+    200:
+      $ref: "../responses/createUser.yaml"
+    400:
+      description: "Bad Request"

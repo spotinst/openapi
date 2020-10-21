@@ -1,0 +1,45 @@
+post:
+  summary: "AWS Elastigroup - Create Instance Signal"
+  description:
+    The instance signal API is used for notifying Spot about the instance state, so Spot can act accordingly. Supported signals are - INSTANCE_READY – Whenever this signal is sent, Spot will register the instance to the ELB INSTANCE_READY_TO_SHUTDOWN – Whenever this signal is sent, Spot will terminate the instance after it was marked for termination. Important - You need to define the expected signals for your Elastigroup in the group configuration.
+  operationId: "elastigroupAwsCreateInstanceSignal"
+  tags:
+    - "Elastigroup AWS"
+  parameters:
+    - in: "path"
+      name: "insatnceId"
+      example: "i-123456"
+      description: >
+        The instance ID you want to query
+      schema:
+        type: "string"
+      required: true
+    - in: "path"
+      name: "signal"
+      example: "INSTANCE_READY"
+      description: >
+        The specific signal you want to trigger. Valid Values: INSTANCE_READY, INSTANCE_READY_TO_SHUTDOWN
+      schema:
+        type: "string"
+      required: true
+    - in: "query"
+      name: "accountId"
+      example: "act-123abc"
+      description: >
+        Your Spot accountId associated with your token
+      schema:
+        type: "string"
+      required: false
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          allOf:
+            - $ref: "../schemas/create-instance-signal.yaml"
+  responses:
+    200:
+      $ref: "../responses/create-instance-signal.yaml"
+    400:
+      description: "Bad Request"
+

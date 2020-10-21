@@ -1,0 +1,128 @@
+put:
+  summary: "Elastigroup AWS - Update"
+  description: >
+    Describe a specific Elastigroup JSON
+  operationId: "elastigroupAwsUpdate"
+  tags:
+    - "Elastigroup AWS"
+  parameters:
+    - $ref: "../../../../commons/parameters/groupId.yaml"
+    - $ref: "../../../../commons/parameters/accountId.yaml"
+    - $ref: "../../../../commons/parameters/autoApplyTags.yaml"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../schemas/elastigroup.yaml"
+  responses:
+    200:
+      $ref: "../responses/elastigroup.yaml"
+    400:
+      description: "Bad Request"
+
+delete:
+  summary: "Elastigroup AWS - Delete"
+  description: >
+    Delete an Elastigroup AWS
+  operationId: "elastigroupAwsDelete"
+  tags:
+  - "Elastigroup AWS"
+  parameters:
+    - $ref: "../../../../commons/parameters/groupId.yaml"
+    - in: "query"
+      name: "accountId"
+      example: "act-123456789"
+      description: >
+        Your Spot accountId associated with your token
+      schema:
+        type: "string"
+      required: false
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          allOf:
+          - $ref: "../schemas/elastigroup-delete.yaml"
+  responses:
+    200:
+      $ref: "../responses/list-group.yaml"
+    400:
+      description: "Bad Request"
+
+get:
+  summary: "Elastigroup AWS - List Group"
+  description: >
+    Describe a specific Elastigroup JSON
+  operationId: "elastigroupAwsListElastigroup"
+  tags:
+    - "Elastigroup AWS"
+  parameters:
+    - $ref: "../../../../commons/parameters/groupId.yaml"
+    - in: "query"
+      name: "accountId"
+      example: "act-123456789"
+      description: >
+        Your Spot accountId associated with your token
+      schema:
+        type: "string"
+      required: false
+  responses:
+    200:
+      $ref: "../responses/delete.yaml"
+    400:
+      description: "Bad Request"
+
+post:
+  summary: "Elastigroup AWS - Create Beanstalk Elastigroup"
+  description: >
+    Create a beanstalk elastigroup with the following steps:<ul>
+
+    <li>Get the beanstalk configuration to JSON format</li>
+    <li>Modify required parameters and post the JSON as a body to create a new elastigroup</li>
+    <ul>
+  operationId: "elastigroupAwsCreateBeanstalkElastigroup"
+  tags:
+    - "Elastigroup AWS"
+  parameters:
+    - $ref: "../../../../commons/parameters/accountId.yaml"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          allOf:
+            - $ref: "../schemas/ec2Group.yaml"
+            - type: "object"
+              properties:
+                group:
+                  type: object
+                  properties:
+                    compute:
+                      type: object
+                      properties:
+                        instanceTypes:
+                          type: object
+                          properties:
+                            ondemand:
+                              type: string
+                              example: t2.micro
+                            spot:
+                              type: array
+                              description: >
+                                Your spot types
+                              items:
+                                type: string
+                                example: t2.micro
+                        product:
+                          type: string
+                          example: Linux/UNIX
+                          description: >
+                            Operation system type.
+                            Example: Linux/UNIX, SUSE Linux, Windows, Linux/UNIX (Amazon VPC), SUSE Linux (Amazon VPC), Windows (Amazon VPC)
+  responses:
+    200:
+      $ref: "../../../../commons/responses/spotinstResponseWrapper.yaml"
+    400:
+      description: "Bad Request"

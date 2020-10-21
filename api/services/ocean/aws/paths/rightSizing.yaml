@@ -1,0 +1,55 @@
+post:
+  summary: "Ocean AWS - Filter Right-Sizing Recommendations"
+  description: >
+    Get right-sizing recommendations for an Ocean cluster and filter them according to namespace or label.
+  operationId: "oceanAwsFilterRightSizing"
+  tags:
+  - "Ocean AWS"
+  parameters:
+  - $ref: "../../../../commons/parameters/accountId.yaml"
+  - $ref: "../../commons/parameters/oceanId.yaml"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            filter:
+              type: object
+              description: An object enabling filtering of right-size recommendations. Optional; may be null.
+              properties:
+                namespaces:
+                  type: array of string
+                  description: A list of Kubernetes namespaces to filter by. Optional; may be null. If it exists, must contain at least one item.
+                  example:
+                    - sparkSpace
+                    - kube-system
+                attribute:
+                  type: object
+                  desctription: >
+                    Object for filtering by label or annotation. Optional; may be null. When both namespace and attribute are used, the route should filter only suggestions relevant to k8s controllers containing that label/annotation key (and optionally value) by the selected operator and belong to the specified namespace(s).
+                  properties:
+                    type:
+                      type: string
+                      description: Describes type of attribute. Valid vales are "label" and "annotation". Required if the attribute filter is used.
+                      example: label
+                    key:
+                      type: string
+                      description: The key of the attribute. Required if the attribute filter is used. Can be any string valid as label/annotation key. Should not be empty.
+                      example: app
+                    operator:
+                      type: string
+                      description: >
+                        Operator that applies logic to the attribute filter. Valid values are: “equals”, “notEquals”, “exists”, “doesNotExist”. default value is : “equals”
+                      default: equals
+                      example: exists
+                    value:
+                      type: string
+                      description: This is required whenever the operator is “equals” or ”notEquals”. Can be any string valid as label/annotation value.
+                      example: redis
+  responses:
+    200:
+      $ref: "../responses/rightSizingResponse.yaml"
+    400:
+      description: "Bad Request"
