@@ -1,0 +1,81 @@
+type: object
+title: Ocean AutoScaler
+description: >
+  The Ocean Kubernetes Autoscaler.
+required:
+  - isEnabled
+properties:
+  isEnabled:
+    type: boolean
+    description: >
+      Enable the Ocean Kubernetes Autoscaler.
+    example: true
+  cooldown:
+    type: integer
+    description: >
+      Cooldown period between scaling actions. Value should be cooldown period in seconds, greater than 180
+    example: 300
+  resourceLimits:
+    type: object
+    description: >
+      Optionally set upper and lower bounds on the resource usage of the cluster.
+    properties:
+      maxMemoryGib:
+        type: integer
+        description: >
+          The maximum memory in GiB units that can be allocated to the cluster. minimum value: 1.
+        example: 1
+      maxVcpu:
+        type: integer
+        description: >
+          The maximum cpu in vCpu units that can be allocated to the cluster. minimum value: 1.
+        example: 1
+  down:
+    type: object
+    description: >
+      Auto Scaling scale down operations.
+    properties:
+        evaluationPeriods:
+          type: integer
+          example: 4
+        maxScaleDownPercentage:
+          type: integer
+          description: >
+            Would represent the maximum % to scale-down. Number between 1-100
+          example: 20
+  headroom:
+    type: object
+    description: >
+      Spare resource capacity management enabling fast assignment of Pods without waiting for new resources to launch.
+    properties:
+      cpuPerUnit:
+        type: integer
+        description: >
+          Optionally configure the number of CPUs to allocate per headroom unit. CPUs are denoted in CPU units, where 1024 units = 1 vCPU.
+        example: 2048
+      memoryPerUnit:
+        type: integer
+        description: >
+          Optionally configure the amount of memory (MiB) to allocate per headroom unit.
+        example: 3
+      numOfUnits:
+        type: integer
+        description: >
+          The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.
+        example: 2
+  isAutoConfig:
+    type: boolean
+    description: >
+      Use automatic headroom. When set to true, the values under cluster.autoScaler.headroom are not effective, as Ocean configures and optimizes headroom automatically.
+    example: false
+  autoHeadroomPercentage:
+    type: integer
+    description: >
+      Optionally set the auto-headroom percentage. Set a number between 0-200 to control the headroom % of the cluster. Relevant when isAutoConfig=true.
+    example: 20
+  shouldScaleDownNonServiceTasks:
+    type: boolean
+    description: >
+      Option to scale down non-service tasks. If not set, Ocean does not scale down standalone tasks.
+    default: false
+    example: true

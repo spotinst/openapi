@@ -1,0 +1,50 @@
+post:
+  summary: "Initiate Roll"
+  description: >
+    Roll an entire Ocean cluster or roll subsets of the cluster by specifying launchSpecIds or instanceIds. Performing this request will start the roll immediately, by defined batches.
+    Note that the first response for a successful request will notify for starting a roll. In order to check the status of a roll, you can use the [GET Roll API](https://docs.spot.io/api//#operation/oceanEcsRollGetSingleRoll) using the roll ID.
+  operationId: "oceanEcsRollInit"
+  tags:
+    - "Ocean ECS"
+  parameters:
+    - $ref: "../../../../commons/parameters/accountId.yaml"
+    - $ref: "../../commons/parameters/oceanClusterId.yaml"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          oneOf:
+            - allOf:
+                - $ref: "../schemas/roll-batchSizePercentage.yaml"
+                - $ref: "../schemas/roll-comment.yaml"
+            - allOf:
+                - $ref: "../schemas/roll-batchSizePercentage.yaml"
+                - $ref: "../schemas/roll-comment.yaml"
+                - $ref: "../schemas/roll-instanceIds.yaml"
+            - allOf:
+                - $ref: "../schemas/roll-batchSizePercentage.yaml"
+                - $ref: "../schemas/roll-comment.yaml"
+                - $ref: "../schemas/roll-launchSpecIds.yaml"
+  responses:
+    200:
+      $ref: "../responses/roll.yaml"
+    400:
+      description: "Bad Request"
+
+get:
+  summary: "List Rolls"
+  description: >
+    List rolls of an Ocean cluster.
+  operationId: "oceanEcsRollListRolls"
+  tags:
+    - "Ocean ECS"
+  parameters:
+    - $ref: "../../../../commons/parameters/accountId.yaml"
+    - $ref: "../../commons/parameters/oceanClusterId.yaml"
+
+  responses:
+    200:
+      $ref: "../responses/roll.yaml"
+    400:
+      description: "Bad Request"

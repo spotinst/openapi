@@ -1,0 +1,78 @@
+type: object
+title: Elastigroup Scheduling
+description: |
+  Schedule tasks to execute, using CRON expressions.
+properties:
+  tasks:
+    type: array
+    description: |
+      The scheduling tasks for the group.
+    items:
+      type: object
+      properties:
+        isEnabled:
+          type: boolean
+          description: |
+            Describes whether the task is enabled. When true the task should run when false it should not run.
+          example: true
+        startTime:
+          type: string
+          description: |
+            DATETIME in ISO-8601 format and is in UTC time. Sets a start time for scheduled actions.
+            If "frequency" or "cronExpression" are not used - the task will run only once at the start time and will then be deleted from the group configuration.
+          example: "2018-05-23T10:55:09Z"
+        frequency:
+          type: string
+          description: |
+            The recurrence frequency to run this task.
+            Only one of ‘frequency' or ‘cronExpression' should be used at a time
+          enum: [hourly, daily, weekly]
+          example: hourly
+        cronExpression:
+          type: string
+          description: |
+            A valid cron expression.
+            The cron is running in UTC time zone and is in Unix cron format Cron Expression Validator Script.
+            Only one of ‘frequency' or ‘cronExpression' should be used at a time.
+          example: "0 1 * * *"
+        taskType:
+          type: string
+          description: |
+            The task type to run.
+          enum: [backup_ami, scale, scaleUp, roll, statefulUpdateCapacity, statefulRecycle,clusterRoll (For ECS Integration)]
+          example: scale
+        scaleTargetCapacity:
+          type: integer
+          description: |
+            The target capacity of the group.
+            Should be used when choosing ‘taskType' of ‘scale'.
+        scaleMinCapacity:
+          type: integer
+          description: |
+            The min capacity of the group.
+            Should be used when choosing ‘taskType' of ‘scale'.
+        scaleMaxCapacity:
+          type: integer
+          description: |
+            The max capacity of the group.
+            Required when ‘taskType' is ‘scale'.
+        targetCapacity:
+          type: integer
+          description: |
+            Set a new target capacity for the Elastigroup.
+            Required when ‘taskType' is ‘statefulUpdateCapacity'.
+        MinCapacity:
+          type: integer
+          description: |
+            Set a new minimum capacity for the Elastigroup.
+            Required when ‘taskType' is ‘statefulUpdateCapacity'.
+        MaxCapacity:
+          type: integer
+          description: |
+            Set a new maximum capacity for the Elastigroup.
+            Required when ‘taskType' is ‘statefulUpdateCapacity'.
+        batchSizePercentage:
+          type: integer
+          description: |
+            The percentage size of each batch in the scheduled deployment roll.
+            Required when the taskType is roll.

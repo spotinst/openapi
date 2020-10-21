@@ -1,0 +1,59 @@
+type: object
+title: Ocean GKE Scheduling
+description: Set scheduling object
+properties:
+  shutdownHours:
+    type: object
+    description: >
+      Set shutdown hours for cluster object
+    required:
+      - timeWindows
+    properties:
+      isEnabled:
+        type: boolaen
+        description: >
+          Flag to enable / disable the shutdown hours mechanism.
+          When turned to false, the mechanism is deactivated and the cluster remains in its current state.
+        example: true
+      timeWindows:
+        type: array of string
+        description: >
+          Set time windows for shutdown hours. specify a list of 'timeWindows' with at least one time window Each string is in the format of - ddd:hh:mm-ddd:hh:mm ddd = day of week = Sun | Mon | Tue | Wed | Thu | Fri | Sat hh = hour 24 = 0 -23 mm = minute = 0 - 59.
+          Time windows should not overlap. required on cluster.scheduling.isEnabled = True.
+        example:
+          - Fri:15:30-Wed:14:30
+          - Wed:15:30-Thu:18:30
+  tasks:
+    type: array
+    items:
+      type: object
+      title: Task Definition
+      required:
+        - isEnabled
+        - cronExpression
+        - taskType
+      properties:
+        isEnabled:
+          type: boolean
+          example: true
+          description: >
+            Describes whether the task is enabled. When true the task should run when false it should not run.
+            Required for cluster.scheduling.tasks object
+        cronExpression:
+          type: string
+          example: 0 1 * * *
+          description: >
+            A valid cron expression.
+            For example : " * * * * * ".
+            The cron is running in UTC time zone and is in Unix cron format [Cron Expression Validator Script](http://www.unix.com/man-page/linux/5/crontab/).
+            Only one of ‘frequency' or ‘cronExpression' should be used at a time.
+        taskType:
+          type: string
+          example: clusterRoll
+          description: >
+            Valid values: "clusterRoll". Required for cluster.scheduling.tasks object
+        batchSizePercentage:
+          type: integer
+          description: >
+            Value in % to set size of batch in roll. Valid values are 0-100
+          example: 20
