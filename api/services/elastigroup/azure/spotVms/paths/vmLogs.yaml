@@ -1,0 +1,56 @@
+get:
+  summary: "Get Elastilog"
+  description:
+    You can fetch a Elastigroup's elastilog via the Spot API, in order to be able to consume elastilog from various tools used for log storing and analyzing.
+    Logs have retention of 3 months back, so minimal fromDate should be up to 3 months back at runtime.
+  operationId: "elastigroupAzureSpotVmsGetElastigroupLogEntries"
+  tags:
+    - Elastigroup Azure Spot VMs
+  parameters:
+    - $ref: "../../../../../commons/parameters/accountId.yaml"
+    - $ref: "../../../../../commons/parameters/groupId.yaml"
+    - in: query
+      name: FROM_DATE
+      example: 1540036800000
+      description: >
+        Epoch number that represents the date from which to collect the log (millisecond format)
+      schema:
+        type: string
+      required: true
+    - in: query
+      name: TO_DATE
+      example: 1542715200000
+      description: >
+        Epoch number that represents the date until which log is collected (millisecond format)
+      schema:
+        type: string
+      required: true
+    - in: query
+      name: SEVERITY
+      example: ALL
+      description: >
+        Severity of log entries to extract.
+        Valid Values: ALL, INFO,DEBUG,WARN
+        Default: ALL
+      schema:
+        type: string
+    - in: query
+      name: RESOURCE_ID
+      example: vm-12345678
+      description: >
+        Filter log extracted entires related to a specific resource id
+        Default: Null
+      schema:
+        type: string
+    - in: query
+      name: LIMIT
+      example: 500
+      description: >
+        Maximum number of lines to extract in a response. Max value allowed - 1000.
+      schema:
+        type: string
+  responses:
+    200:
+      $ref: "../responses/vmLogs.yaml"
+    400:
+      description: "Bad Request"

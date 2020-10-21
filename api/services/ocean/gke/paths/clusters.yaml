@@ -1,0 +1,65 @@
+summary: Ocean for GKE
+post:
+  summary: "Create Cluster"
+  description: >
+    ## Prerequisites:
+      The Spot Controller is used to monitor the cluster resources and report back to Ocean.|
+      To install the Spot Controller, complete and run the following script on a machine with kubectl command line tool installed and configured:
+
+    ```
+      #!/usr/bin/env bash
+      curl -fsSL http://spotinst-public.s3.amazonaws.com/integrations/kubernetes/cluster-controller/scripts/init.sh | \
+      SPOTINST_TOKEN=<ENTER YOUR TOKEN HERE> \
+      SPOTINST_ACCOUNT=<ENTER YOUR SPOTINST ACCOUNT ID HERE> \
+      SPOTINST_CLUSTER_IDENTIFIER=<ENTER YOUR CLUSTER IDENTIFIER HERE> \
+      bash
+    ```
+
+    You may need Kubernetes admin privileges for this script to work. To assign yourself with admin privileges, run the following command:
+
+    ```
+      kubectl create clusterrolebinding <clusterName> --clusterrole=cluster-admin --user=<userEmail>
+    ```
+
+    For detailed guide please refer to our [controller installation guides](https://docs.spot.io/container-management/kubernetes/kubernetes-tutorials/spotinst-kubernetes-controller/installing-kubernetes-controller/).
+    Install can be made by kubectl or Helm.
+
+    For more on the Spot controller and Ocean's anatomy see the documentation [here](https://docs.spot.io/ocean-aws/kubernetes/concepts/ocean-cloud/introduction/#ocean-anatomy).
+  operationId: "OceanGKEClusterCreate"
+  tags:
+    - "Ocean GKE"
+  parameters:
+    - $ref: "../../../../commons/parameters/accountId.yaml"
+  requestBody:
+    required: false
+    content:
+      application/json:
+        schema:
+          allOf:
+            - $ref:  "../schemas/oceanCluster.yaml"
+            - type: "object"
+              properties:
+                cluster:
+                  type: object
+                  required:
+                    - name
+  responses:
+    200:
+      $ref: "../responses/ocean.yaml"
+    400:
+      description: "Bad Request"
+
+get:
+  summary: "List Clusters"
+  description: >
+    List the configurations for all Ocean cluster in the specified account.
+  operationId: "OceanGKEClusterList"
+  tags:
+    - "Ocean GKE"
+  parameters:
+    - $ref: "../../../../commons/parameters/accountId.yaml"
+  responses:
+    200:
+      $ref: "../responses/oceanGkeList.yaml"
+    400:
+      description: "Bad Request"

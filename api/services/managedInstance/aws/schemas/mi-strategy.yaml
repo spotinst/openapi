@@ -1,0 +1,55 @@
+type: object
+title: MI Strategy
+properties:
+  lifeCycle:
+    type: string
+    example: spot
+    required: false
+    description: >
+      Set lifecycle, valid values: `spot`, `on_demand`
+      Default: spot
+  orientation:
+    type: string
+    example: availabilityOriented
+    required: false
+    description: >
+      The strategy orientation. valid values: `costOriented`, `availabilityOriented`, `balanced`, `cheapest`
+      Default: availabilityOriented
+  drainingTimeout:
+    type: integer
+    required: false
+    description: >
+      The time in seconds to allow the instance be drained from incoming TCP connections and detached from ELB before terminating it, during a scale down operation
+  fallbackToOd:
+    type: boolean
+    example: true
+    required: false
+    description: >
+      In case of no spots available, Managed Instance will launch an On-demand instance instead
+      Default: true
+  utilizeReservedInstances:
+    type: boolean
+    default: false
+    example: true
+    description: >
+      In case of any available Reserved Instances, Managed Instance will utilize them before purchasing Spot instances
+      Default: false
+  optimizationWindows:
+    type: array
+    description: >
+      When performAt is 'timeWindow': must specify a list of 'timeWindows' with at least one time window Each string is in the format of - ddd:hh:mm-ddd:hh:mm ddd = day of week = Sun | Mon | Tue | Wed | Thu | Fri | Sat hh = hour 24 = 0 -23 mm = minute = 0 - 59
+    items:
+      type: string
+      example: Mon:03:00-Wed:02:30
+  revertToSpot:
+    type: object
+    title: When Elastigroup moves from OnDemand back to Spot capacity
+    properties:
+      performAt:
+        type: string
+        example: timeWindow
+        enum: [never, always, timeWindow]
+        description: >
+          Valid values: `always`, `never`, "timeWindow"
+          Example: never
+          Default: never
