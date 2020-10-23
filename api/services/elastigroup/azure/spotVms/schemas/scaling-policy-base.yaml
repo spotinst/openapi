@@ -1,0 +1,196 @@
+type: object
+properties:
+  policyName:
+    type: string
+    description: |
+      Name of scaling policy.
+    example: "cpuScale"
+  metricName:
+    type: string
+    description: |
+      Metric to monitor by Azure metric display name
+    example: "Percentage CPU"
+  statistic:
+    type: string
+    description: |
+      Statistic by which to evaluate the selected metric.
+    example: "Average"
+    enum: [Average, total, minimum, maximum, count]
+  unit:
+    type: string
+    description: |
+      Unit to measure to evaluate the selected metric
+    enum: [percent, seconds, microseconds, milliseconds, bytes, kilobytes, megabytes, gigabytes, terabytes, bits, kilobits, megabits, gigabits, terabits, count, bytes/second, kilobytes/second, megabytes/second, gigabytes/second, terabytes/second, bits/second, kilobits/second, megabits/second, gigabits/second, terabits/second, count/second, none]
+  threshold:
+    type: float
+    description: |
+      The value at which the scaling action is triggered.
+    example: 0.75
+  namespace:
+    type: string
+    description: |
+      Should be one of the namespaces:
+      * Microsoft.AnalysisServices/servers
+      * Microsoft.ApiManagement/service
+      * Microsoft.Automation/automationAccounts
+      * Microsoft.Batch/batchAccounts
+      * Microsoft.Cache/redis
+      * Microsoft.Compute
+      * Microsoft.CognitiveServices/accounts
+      * Microsoft.ContainerInstance/containerGroups
+      * Microsoft.ContainerService/managedClusters
+      * Microsoft.CustomerInsights/hubs
+      * Microsoft.DataFactory/datafactories
+      * Microsoft.DataFactory/factories
+      * Microsoft.DataLakeAnalytics/accounts
+      * Microsoft.DataLakeStore/accounts
+      * Microsoft.DBforMariaDB/servers
+      * Microsoft.DBforMySQL/servers
+      * Microsoft.DBforPostgreSQL/servers
+      * Microsoft.Devices/IotHubs
+      * Microsoft.Devices/provisioningServices
+      * Microsoft.DocumentDB/databaseAccounts
+      * Microsoft.EventGrid/topics
+      * Microsoft.EventGrid/eventSubscriptions
+      * Microsoft.EventGrid/extensionTopics
+      * Microsoft.EventHub/namespaces
+      * Microsoft.EventHub/clusters
+      * Microsoft.HDInsight/clusters
+      * Microsoft.Insights/AutoscaleSettings
+      * Microsoft.Insights/Components
+      * Microsoft.KeyVault/vaults
+      * Microsoft.Kusto/Clusters
+      * Microsoft.LocationBasedServices/accounts
+      * Microsoft.Logic/workflows
+      * Microsoft.NetApp/netAppAccounts/capacityPools/Volumes
+      * Microsoft.NetApp/netAppAccounts/capacityPools
+      * Microsoft.Network/networkInterfaces
+      * Microsoft.Network/loadBalancers
+      * Microsoft.Network/dnszones
+      * Microsoft.Network/publicIPAddresses
+      * Microsoft.Network/applicationGateways
+      * Microsoft.Network/virtualNetworkGateways
+      * Microsoft.Network/expressRouteCircuits
+      * Microsoft.Network/expressRouteCircuits/peerings
+      * Microsoft.Network/connections
+      * Microsoft.Network/trafficManagerProfiles
+      * Microsoft.Network/networkWatchers/connectionMonitors
+      * Microsoft.Network/frontdoors
+      * Microsoft.NotificationHubs/Namespaces/NotificationHubs
+      * Microsoft.OperationalInsights/workspaces
+      * Microsoft.PowerBIDedicated/capacities
+      * Microsoft.Relay/namespaces
+      * Microsoft.Search/searchServices
+      * Microsoft.ServiceBus/namespaces
+      * Microsoft.SignalRService/SignalR
+      * Microsoft.Sql/servers/databases
+      * Microsoft.Sql/servers/elasticPools
+      * Microsoft.Sql/managedInstances
+      * Microsoft.Storage/storageAccounts
+      * Microsoft.Storage/storageAccounts/blobServices
+      * Microsoft.Storage/storageAccounts/fileServices
+      * Microsoft.Storage/storageAccounts/queueServices
+      * Microsoft.Storage/storageAccounts/tableServices
+      * Microsoft.StreamAnalytics/streamingjobs
+      * Microsoft.TimeSeriesInsights/environments
+      * Microsoft.TimeSeriesInsights/environments/eventsources
+      * Microsoft.Web/serverfarms
+      * Microsoft.Web/sites (excluding functions)
+      * Microsoft.Web/sites (functions)
+      * Microsoft.Web/sites/slots
+      * Microsoft.Web/hostingEnvironments/multiRolePools
+      * Microsoft.Web/hostingEnvironments/workerPools
+    default: "Microsoft.Compute"
+    example: "Microsoft.Network/applicationGateways"
+  period:
+    type: integer
+    description: |
+      Amount of time (seconds) for which the threshold must be met in order to trigger the scaling action.
+    enum: [60, 300, 900, 1800, 3600, 7200]
+    example: 60
+  evaluationPeriods:
+    type: integer
+    description: |
+      Number of consecutive periods in which the threshold must be met in order to trigger the scaling action.
+    minimum: 1
+    example: 3
+  cooldown:
+    type: integer
+    description: |
+      Time (seconds) to wait after a scaling action before resuming monitoring.\
+      multiple of 60.
+    minimum: 0
+    example: 300
+  dimenstions:
+    type: array
+    description: |
+      Required if scaling.up.namespace is different from "Microsoft.Compute".\
+      2 dimensions are required.
+    items:
+      - type: object
+        properties:
+          name:
+            type: string
+            example: "resourceName"
+          value:
+            type: string
+            example: "testApplicationGateway"
+      - type: object
+        properties:
+          name:
+            type: string
+            example: "resourceGroupName"
+          value:
+            type: string
+            example: "testResourceGroup"
+  operator:
+    type: string
+    description: |
+      The operator used to evaluate the threshold against the current metric value.\
+      Valid Values:
+      * "gt" (Greater Than)
+      * "gte" (Greater Than or Equal)
+      * "lt" (Less Than)
+      * "lte" (Less Than or Equal)
+    example: "gte"
+    enum:
+      - gt
+      - gte
+      - lt
+      - lte
+  action:
+    type: object
+    description: |
+      Scaling action to take when the policy is triggered.
+    properties:
+      type:
+        type: string
+        description: |
+          Type of scaling action to take when the scaling policy is triggered.
+        enum: [adjustment, updateCapacity]
+        example: adjustment
+      adjustment:
+        type: string
+        description: |
+          Value to which the action type will be adjusted.\
+          Required if using "adjustment" action type.
+        example: "2"
+      target:
+        type: integer
+        description: |
+          Value to update the group target capacity to.\
+          Required if using “updateCapacity” as action type\
+          and “minimum” and “maximum” are undefined.
+      minimum:
+        type: integer
+        description: |
+          Value to update the group mimimum capacity to.\
+          Required if using “updateCapacity” as action type\
+          and “target” and“maximum” are undefined.
+      maximum:
+        type: integer
+        description: |
+          Value to update the group mimimum capacity to.\
+          Required if using “updateCapacity” as action type\
+          and “target” and “minimum” are undefined.
+
