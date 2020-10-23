@@ -27,44 +27,34 @@ properties:
           Azure Elastigroup Name
       region:
         type: "string"
-        example: "eastus"
-        description: >
-          Valid Azure region the Elastigroup is managed in
+        example: "westus2"
+        description: |
+          The Azure region your Elastigroup will be created in.
       resourceGroupName:
         type: string
         example: spotinst-azure
         description: >
-          The Azure resource group to associate the Elastigroup with
+          Name of the Resource Group for Elastigroup.
       capacity:
-        type: "object"
+        type: object
+        description: |
+          Capacity of Elastigroup.
         properties:
           target:
-            type: "integer"
+            type: integer
+            description: |
+              Desired number of VMs for Elastigroup to maintain.
             example: 8
-            description:
-              Current scale the Elastigroup will conform to
           minimum:
-            type: "integer"
+            type: integer
             example: 2
             description: >
-              The Elastigroup will not set a target below this value
+              Minimum number of VMs.
           maximum:
             type: "integer"
             example: 10
             description: >
-              The Elastigroup will not set a target greater than this value
-      scaling:
-        type: object
-        title: Azure Scaling
-        properties:
-          up:
-            type: array
-            items:
-              $ref: "../../scaleSetVms/schemas/scaling-policy-up.yaml"
-          down:
-            type: array
-            items:
-              $ref: "../../scaleSetVms/schemas/scaling-policy-down.yaml"
+              Maximum number of VMs.
       strategy:
         type: "object"
         title: Scaling Strategy
@@ -72,12 +62,81 @@ properties:
           spotPercentage:
             type: integer
             example: 50
+            default: 100
+            description: |
+              * Percentage of Spot-VMs to maintain.
+              * Required if odCount isn't specified.
+          onDemandCount:
+            type: integer
+            description: |
+              * Percentage of Spot-VMs to maintain.
+              * Required if spotPercentage isn't specified.
+            writeOnly: true
           drainingTimeout:
             type: integer
             example: 30
+            default: 120
+            description: |
+              Time (seconds) to allow the VM be drained from incoming TCP connections and detached from MLB before terminating it during a scale down operation.
           fallbackToOd:
             type: Boolean
             example: true
+          revertToSpot:
+            description: |
+              Hold settings for strategy correction - replacing On-Demand for Spot VMs
+            type: object
+            properties:
+              performAt:
+                type: string
+                description: |
+                  Settings for maintenance strategy.
+                enum: [timeWindow, never, always]
+                example: "timeWindow"
+                default: "always"
+          optimizationWindows:
+            type: array
+            description: |
+              valid format: "ddd:hh:mm-ddd:hh:mm (day:hour(0-23):minute(0-59))", not empty if revertToSpot.performAt = timeWindow
+            example:
+              - "Mon:03:00-Wed:02:30"
+          signals:
+            type: array
+            description: |
+              The signals defined for this group.
+            items:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    description: |
+                      The type of the signal defined for the group.
+                    enum: [vmReady, vmReadyToShutdown]
+                    example: "vmReady"
+                  timeout:
+                    type: integer
+                    description: |
+                      *The timeout in seconds to hold the vm until a signal is sent.
+                      *If no signal is sent the vm will be replaced (vmReady) or we will terminate the vm (vmReadyToShutdown) after the timeout.
+                      *(Maximum is 1800 seconds, Minimum is 60 seconds)
+                    example: 180
+                    default: 1800
+                    minimum: 60
+                    maximum: 1800
+      scaling:
+        type: object
+        description: |
+          Scaling Policies for Elastigroup.
+        properties:
+          up:
+            type: array
+            description: |
+              Defines scaling up policy.
+            items:
+              $ref: "../../scaleSetVms/schemas/scaling-policy-up.yaml"
+          down:
+            type: array
+            items:
+              $ref: "../../scaleSetVms/schemas/scaling-policy-down.yaml"
       compute:
         required:
           - vmSizes
@@ -86,195 +145,394 @@ properties:
         type: "object"
         properties:
           vmSizes:
-            type: "object"
+            type: object
+            description: |
+              amount of time to be unhealthy before a replacement is triggered
             properties:
               odSizes:
                 type: array
+                description: |
+                  Available On-Demand sizes.
                 items:
                   type: string
                   example: standard_a1_v1
-              lowPrioritySizes:
-                type: array
+              spotSizes:
+                type: string
+                description: |
+                  Available Spot-VM sizes.
                 items:
                   type: string
-                  example: standard_a2_v2
+                  example: "standard_a2_v2"
           os:
             type: sting
             example: Linux
+            description: |
+              Type of operating system.
             enum:
               - Linux
               - Windows
           launchSpecification:
             type: object
             properties:
+              customData:
+                type: string
+                format: byte
+                description: |
+                  This value will hold the YML in base64 and will be added to the scaleSets
+                example: ""
               image:
                 type: object
+                description: |
+                  *Image of VM. An image is a template for creating new VMs.
+                  *Choose from Azure image catalogue (marketplace) or use a custom image.
                 properties:
                   marketplace:
                     type: object
-                    description:
-                      Azure Marketplace VM Image. Cannot be used with `custom`
+                    description: |
+                      * Select an image from Azure's Marketplace image catalogue
+                      * Required if custom image isn't specified.
                     properties:
                       publisher:
                         type: string
+                        description: |
+                          *Image publisher.
+                          *Required if marketplace image is specified.
                         example: "OpenLogic"
                       offer:
                         type: string
+                        description: |
+                          *Name of image to use.
+                          *Required if marketplace image is specified.
                         example: "CentOS"
                       sku:
                         type: string
+                        description: |
+                          *Image's Stock Keeping Unit, which is the specific version of the image.
+                          *Required if marketplace image is specified.
                         example: "7.3"
                       version:
                         type: string
+                        description: |
+                          Image's version. if version not provided we use "latest"
+                        default: "lastest"
                         example: "7.3-1611"
-                  shutdownScript:
-                    type: string
-                    example: "IyEvdXNyL2Jpbi9lbnYgYmFzaAoiR29vZGJ5ZSBvbGQgaW5zdGFuY2Ui"
                   custom:
                     type: object
+                    writeOnly: true
                     description: >
-                      Custom VM image.  Cannot be used with `marketplace`
+                      *Custom image to launch Elastigroup with.
+                      *Required if marketplace image isn't specified.
                     properties:
                       resourceGroupName:
                         type: string
+                        description: |
+                          *Name of Resource Group for custom image.
+                          *Required if custom image is specified.
                         example: "spotinst-azure"
-                      imageName:
+                      name:
                         type: string
+                        description: |
+                          * Name of the custom image.
+                          * Required if custom image is specified.
                         example: "custom-image-name"
+              network:
+                type: object
+                description: |
+                  Define the Virtual Network and Subnet for your Elastigroup.
+                properties:
+                  virtualNetworkName:
+                    type: string
+                    description: |
+                      Name of Vnet.
+                    example: "vname"
+                  resourceGroupName:
+                    type: string
+                    description: |
+                      Vnet Resource Group Name
+                    example: "subnetResourceGroup"
+                  networkInterfaces:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        isPrimary:
+                          type: boolean
+                          description: |
+                            Defines whether the network interface is primary or not.
+                          example: true
+                        subnetName:
+                          type: string
+                          description: |
+                            Subnet name
+                          example: "my-subnet-name"
+                        assignPublicIp:
+                          type: boolean
+                          description: |
+                            Assign public IP
+                          example: true
+                        publicIpSku:
+                          type: string
+                          description: |
+                            required if "assignPublicIp":"true".
+                          enum: [STANDARD, BASIC]
+                          example: "STANDARD"
+                        securityGroup:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              description: |
+                                requires valid security group name. Required if security group is specified.
+                              example: "testSecurityGroup"
+                            resourceGroupName:
+                              type: string
+                              description: |
+                                requires valid resource group name. Required if security group is specified.
+                              example: "testResourceGroup"
+                        enableIPForwarding:
+                          type: boolean
+                          description: |
+                            Enable IP Forwarding
+                          example: true
+                        additionalIpConfigurations:
+                          type: array
+                          description: |
+                            Additional configuration of network interface
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                                description: |
+                                  required if additionalConfiguration has been specified.
+                                example: "TestIbSecodary"
+                              privateIpAddressVersion:
+                                type: string
+                                enum: [IPv4, IPv6]
+                                example: "IPv4"
+                                default: "IPv4"
+              login:
+                type: object
+                description: |
+                  Set admin access for accessing your VMs. Password/SSH is required for Linux.
+                properties:
+                  userName:
+                    type: string
+                    description: |
+                      user name for admin access to VMs.\
+                      Login can be set:
+                      * for windows: compute.launchSpecification.login.password
+                      * for linux: compute.launchSpecification.login.sshPublicKey
+
+                      Just user name, without pwd or SSH key
+                    example: "spotinst"
+                  sshPublicKey:
+                    type: string
+                    description: |
+                      SSH for admin access to Linux VMs.\
+                      Optional for Linux.
+                    example: "ssh-rsa"
+                  password:
+                    type: string
+                    writeOnly: true
+                    description: |
+                      Password for admin access to Windows VMs.\
+                      Required for Windows.
               loadBalancersConfig:
                 type: object
+                description: |
+                  Configure a Load Balancer.
                 properties:
                   loadBalancers:
                     type: array
+                    description: |
+                      Add a load balancer. For Azure Gateway, each Backend Pool is a separate load balancer.
                     items:
-                      anyOf:
-                        - type: object
-                          title: MULTAI_TARGET_SET
-                          properties:
-                            type:
-                              type: string
-                              example: MULTAI_TARGET_SET
-                              enum:
-                                - MULTAI_TARGET_SET
-                            balancerId:
-                              type: string
-                              example: lb-1ee2e3q
-                            targetSetId:
-                              type: string
-                              example: ts-3eq
-                            autoWeight:
-                              type: boolean
-                              example: true
-                        - type: object
-                          title: APPLICATION_GATEWAY
-                          properties:
-                            type:
-                              type: string
-                              example: APPLICATION_GATEWAY
-                              enum:
-                                - APPLICATION_GATEWAY
-                            resourceGroupName:
-                              type: string
-                              example: azureResourceGroup
-                            applicationGatewayName:
-                              type: string
-                              example: appGateway
-                            backendPoolName:
-                              type: string
-                              example: backendpool490822
-              userData:
-                type: string
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          description: |
+                            The type of load balancer.
+                          enum: [loadBalancer, applicationGateway]
+                          example: "loadBalancer"
+                        resourceGroupName:
+                          type: string
+                          description: |
+                            The Resource Group name of the Load Balancer.
+                          example: "testResourceGroup"
+                        name:
+                          type: string
+                          description: |
+                            Name of the Application Gateway/Load Balancer
+                          example: "testLoadBalancer"
+                        sku:
+                          type: string
+                          description: |
+                            *if type is LoadBalancer then possible values are “Standard/Basic”;
+                            *if ApplicationGateway then possible values are “Standard_Large”,“Standard_Medium”,“Standard_Small”,“Standard_v2”,“WAF_Large”,“WAF_Medium”,“WAF_v2"
+                          example: "Standard"
+                        backendPoolNames:
+                          type: array
+                          description: |
+                            Name of the Backend Pool to register the Elastigroup VMs to. Each Backend Pool is a separate load balancer.\
+                            Required if Type is APPLICATION_GATEWAY.
+                          example:
+                            - "testBackendPool1"
+                            - "testBackendPool2"
               managedServiceIdentities:
                 type: array
+                writeOnly: true
+                description: |
+                  Add a user-assigned managed identity to the VMs in the cluster.
                 items:
                   type: object
                   properties:
                     name: string
-                    example: mySI2
+                    description: |
+                      name of the managed identity
+                    example: "mySI2"
                   resourceGroupName:
-                    resourceGroupName: string
+                    type: string
+                    description: |
+                      The Resource Group that the user-assigned managed identity resides in.
                     example: myResourceGroup
+              shutdownScript:
+                type: string
+                format: byte
+                writeOnly: true
+                example: "IyEvdXNyL2Jpbi9lbnYgYmFzaAoiR29vZGJ5ZSBvbGQgaW5zdGFuY2Ui"
+                description: |
+                  shutdown script for the group. Value should be passed as a string encoded at Base64 only
               tags:
                 type: array
+                description: |
+                  Key-Value pairs for VMs in the Elastigroup.
                 items:
                   type: object
                   properties:
                     tagKey:
                       type: string
-                      example: env
+                      description: |
+                        Tag Key for Vms in Elastigroup.
+                      example: "env"
                     tagValue:
                       type: string
-                      example: staging
-              network:
-                type: object
-                properties:
-                  virtualNetworkName:
-                    type: string
-                    example: vname
-                  subnetName:
-                    type: string
-                    example: my-subnet-name
-                  resourceGroupName:
-                    type: string
-                    example: subnetResourceGroup
-                  assignPublicIp: true
-                  additionalIpConfigurations:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        name:
-                          type: string
-                          example: config1
-                        privateIpAddressVersion:
-                          type: string
-                          example: IPv4
+                      description: |
+                        Tag Value for VMs in Elastigroup.
+                      example: "staging"
               extensions:
                 type: array
+                description: |
+                  List of objects for azure extensions
                 items:
                   type: object
                   properties:
-                    autoUpgradeMinorVersion:
-                      type: boolean
-                      example: true
                     name:
                       type: string
-                      example: "k8s-agentpool1-38611891-vmss-computeAksLinuxBilling"
+                      required: true
+                      example: "extensionName"
                     protectedSettings:
-                      type: string
-                      example: null
+                      type: object
+                      description: |
+                        Object for protected settings
+                      properties:
+                        script:
+                          type: string
+                          example: "IyEvYmluL2Jhc2gKZWNobyAibmlyIiA+IC9ob21lL25pci9uaXIudHh0Cg=="
                     publisher:
                       type: string
-                      example: "Microsoft.AKS"
+                      description: |
+                        Required on compute.launchSpecification.extensions object
+                      required: true
+                      example: "MMicrosoft.Azure.Extensions"
                     type:
                       type: string
-                      example: "Compute.AKS-Engine.Linux.Billing"
+                      required: true
+                      description: |
+                        Required on compute.launchSpecification.extensions object
+                      example: "customScript"
+                    apiVersion:
+                      type: string
+                      description: |
+                        The API version of the extension. Required if extension specified.
+                      example: "2.0"
+                    autoUpgradeMinorVersion:
+                      type: boolean
+                      required: true
+                      description: |
+                        Required on compute.launchSpecification.extensions object
+                      example: true
                     typeHandlerVersion:
                       type: string
                       example: "1.0"
-              customData:
-                type: string
-              login:
+              dataDisks:
+                type: array
+                description: |
+                  list of data disks to be attached to the vms in the group.
+                items:
+                  type: object
+                  properties:
+                    size:
+                      type: integer
+                      description: |
+                        The size of the data disk in GB, Required if dataDisks is specified.
+                      minimum: 1
+                      maximum: 1023
+                      example: 1
+                    lun:
+                      type: integer
+                      description: |
+                        The lun of the data disk, Required if dataDisks is specified.
+                      example: 1
+                    type:
+                      type: string
+                      description: |
+                        The type of the data disk
+                      enum: [Standard_LRS, Premium_LRS, StandardSSD_LRS]
+                      example: "Standard_LRS"
+              osDisk:
                 type: object
+                description: |
+                  Specify OS disk specification other than default.
                 properties:
-                  userName:
+                  type:
                     type: string
-                    example: spotinst
-                  sshPublicKey:
-                    type: string
-                  password:
-                    type: string
+                    description: |
+                      The type of the OS disk,
+                    enum: [Standard_LRS, Premium_LRS, StandardSSD_LRS]
+                    example: "Standard_LRS"
+                  size:
+                    type: integer
+                    description: |
+                      The size of the data disk in GB, Required if dataDisks is specified.
+                    minimum: 1
+                    maximum: 1023
+                    example: 30
       health:
         type: object
+        description: |
+          Autohealing of unhealthy VMs.
         properties:
+          healthCheckTypes:
+            type: array
+            description: |
+              Healthcheck to use to validate VM health.
+            enum: [vmState, applicationGateway]
+            example: ["vmState"]
+          gracePeriod:
+            type: integer
+            description: |
+              Period of time to wait for VM to reach healthiness before monitoring for unhealthiness.
+            example: 120
           autoHealing:
             type: boolean
             example: true
-          healthCheckType:
-            type: string
-            example: INSTANCE_STATE
-            enum:
-              - INSTANCE_STATE
-          gracePeriod:
+            description: |
+              Enable Autohealing of unhealthy VMs.
+
+          unhealthyDuration:
             type: integer
-            example: 120
+            description: |
+              amount of time to be unhealthy before a replacement is triggered
+            example: 360
