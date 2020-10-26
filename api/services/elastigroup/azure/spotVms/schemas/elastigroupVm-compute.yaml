@@ -1,0 +1,386 @@
+type: object
+title: "Elastigroup Compute"
+description: |
+  Compute settings for Elastigroup.
+required:
+  - vmSizes
+  - os
+  - launchSpecification
+properties:
+  vmSizes:
+    type: object
+    description: |
+      amount of time to be unhealthy before a replacement is triggered
+    properties:
+      odSizes:
+        type: array
+        description: |
+          Available On-Demand sizes.
+        items:
+          type: string
+          example: "standard_a1_v1"
+      spotSizes:
+        type: string
+        description: |
+          Available Spot-VM sizes.
+        items:
+          type: string
+          example: "standard_a2_v2"
+  os:
+    type: sting
+    example: Linux
+    description: |
+      Type of operating system.
+    enum:
+      - Linux
+      - Windows
+  launchSpecification:
+    type: object
+    properties:
+      customData:
+        type: string
+        format: byte
+        description: |
+          This value will hold the YML in base64 and will be added to the scaleSets
+        example: ""
+      image:
+        type: object
+        description: |
+          Image of VM. An image is a template for creating new VMs.\
+          Choose from Azure image catalogue (marketplace) or use a custom image.
+        properties:
+          marketplace:
+            type: object
+            description: |
+              Select an image from Azure's Marketplace image catalogue\
+              Required if custom image isn't specified.
+            properties:
+              publisher:
+                type: string
+                description: |
+                  Image publisher.\
+                  Required if marketplace image is specified.
+                example: "OpenLogic"
+              offer:
+                type: string
+                description: |
+                  Name of image to use.\
+                  Required if marketplace image is specified.
+                example: "CentOS"
+              sku:
+                type: string
+                description: |
+                  Image's Stock Keeping Unit, which is the specific version of the image.\
+                  Required if marketplace image is specified.
+                example: "7.3"
+              version:
+                type: string
+                description: |
+                  Image's version. if version not provided we use "latest"
+                default: "lastest"
+                example: "7.3-1611"
+          custom:
+            type: object
+            writeOnly: true
+            description: |
+              Custom image to launch Elastigroup with.\
+              Required if marketplace image isn't specified.
+            properties:
+              resourceGroupName:
+                type: string
+                description: |
+                  Name of Resource Group for custom image.\
+                  Required if custom image is specified.
+                example: "spotinst-azure"
+              name:
+                type: string
+                description: |
+                  Name of the custom image.\
+                  Required if custom image is specified.
+                example: "custom-image-name"
+      network:
+        type: object
+        description: |
+          Define the Virtual Network and Subnet for your Elastigroup.
+        properties:
+          virtualNetworkName:
+            type: string
+            description: |
+              Name of Vnet.
+            example: "vname"
+          resourceGroupName:
+            type: string
+            description: |
+              Vnet Resource Group Name
+            example: "subnetResourceGroup"
+          networkInterfaces:
+            type: array
+            items:
+              type: object
+              properties:
+                isPrimary:
+                  type: boolean
+                  description: |
+                    Defines whether the network interface is primary or not.
+                  example: true
+                subnetName:
+                  type: string
+                  description: |
+                    Subnet name
+                  example: "my-subnet-name"
+                assignPublicIp:
+                  type: boolean
+                  description: |
+                    Assign public IP
+                  example: true
+                publicIpSku:
+                  type: string
+                  description: |
+                    required if "assignPublicIp":"true".
+                  enum: [STANDARD, BASIC]
+                  example: "STANDARD"
+                securityGroup:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: |
+                        requires valid security group name.\
+                        Required if security group is specified.
+                      example: "testSecurityGroup"
+                    resourceGroupName:
+                      type: string
+                      description: |
+                        requires valid resource group name.\
+                        Required if security group is specified.
+                      example: "testResourceGroup"
+                enableIPForwarding:
+                  type: boolean
+                  description: |
+                    Enable IP Forwarding
+                  example: true
+                additionalIpConfigurations:
+                  type: array
+                  description: |
+                    Additional configuration of network interface
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        description: |
+                          required if additionalConfiguration has been specified.
+                        example: "TestIbSecodary"
+                      privateIpAddressVersion:
+                        type: string
+                        enum: [IPv4, IPv6]
+                        example: "IPv4"
+                        default: "IPv4"
+      login:
+        type: object
+        description: |
+          Set admin access for accessing your VMs. Password/SSH is required for Linux.
+        properties:
+          userName:
+            type: string
+            description: |
+              user name for admin access to VMs.\
+              Login can be set:
+              * for windows: compute.launchSpecification.login.password
+              * for linux: compute.launchSpecification.login.sshPublicKey
+
+              Just user name, without pwd or SSH key
+            example: "spotinst"
+          sshPublicKey:
+            type: string
+            description: |
+              SSH for admin access to Linux VMs.\
+              Optional for Linux.
+            example: "ssh-rsa"
+          password:
+            type: string
+            writeOnly: true
+            description: |
+              Password for admin access to Windows VMs.\
+              Required for Windows.
+      loadBalancersConfig:
+        type: object
+        description: |
+          Configure a Load Balancer.
+        properties:
+          loadBalancers:
+            type: array
+            description: |
+              Add a load balancer. For Azure Gateway, each Backend Pool is a separate load balancer.
+            items:
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: |
+                    The type of load balancer.
+                  enum: [loadBalancer, applicationGateway]
+                  example: "loadBalancer"
+                resourceGroupName:
+                  type: string
+                  description: |
+                    The Resource Group name of the Load Balancer.
+                  example: "testResourceGroup"
+                name:
+                  type: string
+                  description: |
+                    Name of the Application Gateway/Load Balancer
+                  example: "testLoadBalancer"
+                sku:
+                  type: string
+                  description: |
+                    * if type is LoadBalancer then possible values are:
+                     * “Standard"
+                     * Basic”
+                    * if ApplicationGateway then possible values are:
+                     * “Standard_Large”
+                     * “Standard_Medium”
+                     * “Standard_Small”
+                     * “Standard_v2
+                     * “WAF_Large”
+                     * “WAF_Medium"
+                     * “WAF_v2"
+                  example: "Standard"
+                backendPoolNames:
+                  type: array
+                  description: |
+                    Name of the Backend Pool to register the Elastigroup VMs to.\
+                    Each Backend Pool is a separate load balancer.\
+                    Required if Type is APPLICATION_GATEWAY.
+                  example:
+                    - "testBackendPool1"
+                    - "testBackendPool2"
+      managedServiceIdentities:
+        type: array
+        writeOnly: true
+        description: |
+          Add a user-assigned managed identity to the VMs in the cluster.
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+              description: |
+                name of the managed identity
+              example: "mySI2"
+            resourceGroupName:
+              type: string
+              description: |
+                The Resource Group that the user-assigned managed identity resides in.
+              example: myResourceGroup
+      shutdownScript:
+        type: string
+        format: byte
+        writeOnly: true
+        example: "IyEvdXNyL2Jpbi9lbnYgYmFzaAoiR29vZGJ5ZSBvbGQgaW5zdGFuY2Ui"
+        description: |
+          shutdown script for the group. Value should be passed as a string encoded at Base64 only
+      tags:
+        type: array
+        description: |
+          Key-Value pairs for VMs in the Elastigroup.
+        items:
+          type: object
+          properties:
+            tagKey:
+              type: string
+              description: |
+                Tag Key for Vms in Elastigroup.
+              example: "env"
+            tagValue:
+              type: string
+              description: |
+                Tag Value for VMs in Elastigroup.
+              example: "staging"
+      extensions:
+        type: array
+        description: |
+          List of objects for azure extensions
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+              description: |
+                Required on compute.launchSpecification.extensions object
+              required: true
+              example: "extensionName"
+            type:
+              type: string
+              required: true
+              description: |
+                Required on compute.launchSpecification.extensions object
+              example: "customScript"
+            publisher:
+              type: string
+              description: |
+                Required on compute.launchSpecification.extensions object
+              required: true
+              example: "MMicrosoft.Azure.Extensions"
+            apiVersion:
+              type: string
+              description: |
+                The API version of the extension. Required if extension specified.
+              example: "2.0"
+            minorVersionAutoUpgrade:
+              type: boolean
+              required: true
+              description: |
+                Required on compute.launchSpecification.extensions object
+              example: true
+            publicSettings:
+              type: object
+              description: |
+                Object for public settings
+            protectedSettings:
+              type: object
+              description: |
+                Object for protected settings
+      dataDisks:
+        type: array
+        description: |
+          list of data disks to be attached to the vms in the group.
+        items:
+          type: object
+          properties:
+            sizeGB:
+              type: integer
+              description: |
+                The size of the data disk in GB, Required if dataDisks is specified.
+              minimum: 1
+              maximum: 1023
+              example: 1
+            lun:
+              type: integer
+              description: |
+                The lun of the data disk, Required if dataDisks is specified.
+              example: 1
+            type:
+              type: string
+              description: |
+                The type of the data disk
+              enum: [Standard_LRS, Premium_LRS, StandardSSD_LRS]
+              example: "Standard_LRS"
+      osDisk:
+        type: object
+        description: |
+          Specify OS disk specification other than default.
+        properties:
+          type:
+            type: string
+            description: |
+              The type of the OS disk,
+            enum: [Standard_LRS, Premium_LRS, StandardSSD_LRS]
+            example: "Standard_LRS"
+          sizeGB:
+            type: integer
+            description: |
+              The size of the data disk in GB, Required if dataDisks is specified.
+            minimum: 1
+            maximum: 1023
+            example: 30
