@@ -14325,7 +14325,443 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/paths/~1azure~1compute~1group/post/requestBody/content/application~1json/schema/allOf/0"
+                    "type": "object",
+                    "title": "Update Elasitgroup Azure Spot VMs - Request Available fields",
+                    "required": [
+                      "group"
+                    ],
+                    "properties": {
+                      "group": {
+                        "type": "object",
+                        "title": "Azure Elastigroup",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "example": "spotinst-group",
+                            "description": "Azure Elastigroup Name\n"
+                          },
+                          "capacity": {
+                            "$ref": "#/paths/~1azure~1compute~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/capacity"
+                          },
+                          "strategy": {
+                            "$ref": "#/paths/~1azure~1compute~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/strategy"
+                          },
+                          "scaling": {
+                            "$ref": "#/paths/~1azure~1compute~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/scaling"
+                          },
+                          "compute": {
+                            "type": "object",
+                            "title": "Elastigroup Compute Update",
+                            "description": "Compute settings for Elastigroup.\n",
+                            "properties": {
+                              "vmSizes": {
+                                "type": "object",
+                                "description": "amount of time to be unhealthy before a replacement is triggered\n",
+                                "properties": {
+                                  "odSizes": {
+                                    "type": "array",
+                                    "description": "Available On-Demand sizes.\n",
+                                    "items": {
+                                      "type": "string",
+                                      "example": "standard_a1_v1"
+                                    }
+                                  },
+                                  "spotSizes": {
+                                    "type": "string",
+                                    "description": "Available Spot-VM sizes.\n",
+                                    "items": {
+                                      "type": "string",
+                                      "example": "standard_a2_v2"
+                                    }
+                                  }
+                                }
+                              },
+                              "launchSpecification": {
+                                "type": "object",
+                                "properties": {
+                                  "customData": {
+                                    "type": "string",
+                                    "format": "byte",
+                                    "description": "This value will hold the YML in base64 and will be added to the scaleSets\n",
+                                    "example": ""
+                                  },
+                                  "image": {
+                                    "type": "object",
+                                    "description": "Image of VM. An image is a template for creating new VMs.\\\nChoose from Azure image catalogue (marketplace) or use a custom image.\n",
+                                    "properties": {
+                                      "marketplace": {
+                                        "type": "object",
+                                        "description": "* Select an image from Azure's Marketplace image catalogue\n* Required if custom image isn't specified.\n",
+                                        "properties": {
+                                          "publisher": {
+                                            "type": "string",
+                                            "description": "*Image publisher.\n*Required if marketplace image is specified.\n",
+                                            "example": "OpenLogic"
+                                          },
+                                          "offer": {
+                                            "type": "string",
+                                            "description": "*Name of image to use.\n*Required if marketplace image is specified.\n",
+                                            "example": "CentOS"
+                                          },
+                                          "sku": {
+                                            "type": "string",
+                                            "description": "*Image's Stock Keeping Unit, which is the specific version of the image.\n*Required if marketplace image is specified.\n",
+                                            "example": "7.3"
+                                          },
+                                          "version": {
+                                            "type": "string",
+                                            "description": "Image's version. if version not provided we use \"latest\"\n",
+                                            "default": "lastest",
+                                            "example": "7.3-1611"
+                                          }
+                                        }
+                                      },
+                                      "custom": {
+                                        "type": "object",
+                                        "writeOnly": true,
+                                        "description": "*Custom image to launch Elastigroup with. *Required if marketplace image isn't specified.\n",
+                                        "properties": {
+                                          "resourceGroupName": {
+                                            "type": "string",
+                                            "description": "*Name of Resource Group for custom image.\n*Required if custom image is specified.\n",
+                                            "example": "spotinst-azure"
+                                          },
+                                          "name": {
+                                            "type": "string",
+                                            "description": "* Name of the custom image.\n* Required if custom image is specified.\n",
+                                            "example": "custom-image-name"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "network": {
+                                    "type": "object",
+                                    "description": "Define the Virtual Network and Subnet for your Elastigroup.\n",
+                                    "properties": {
+                                      "virtualNetworkName": {
+                                        "type": "string",
+                                        "description": "Name of Vnet.\n",
+                                        "example": "vname"
+                                      },
+                                      "resourceGroupName": {
+                                        "type": "string",
+                                        "description": "Vnet Resource Group Name\n",
+                                        "example": "subnetResourceGroup"
+                                      },
+                                      "networkInterfaces": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "object",
+                                          "properties": {
+                                            "isPrimary": {
+                                              "type": "boolean",
+                                              "description": "Defines whether the network interface is primary or not.\n",
+                                              "example": true
+                                            },
+                                            "subnetName": {
+                                              "type": "string",
+                                              "description": "Subnet name\n",
+                                              "example": "my-subnet-name"
+                                            },
+                                            "assignPublicIp": {
+                                              "type": "boolean",
+                                              "description": "Assign public IP\n",
+                                              "example": true
+                                            },
+                                            "publicIpSku": {
+                                              "type": "string",
+                                              "description": "required if \"assignPublicIp\":\"true\".\n",
+                                              "enum": [
+                                                "STANDARD",
+                                                "BASIC"
+                                              ],
+                                              "example": "STANDARD"
+                                            },
+                                            "securityGroup": {
+                                              "type": "object",
+                                              "properties": {
+                                                "name": {
+                                                  "type": "string",
+                                                  "description": "requires valid security group name. Required if security group is specified.\n",
+                                                  "example": "testSecurityGroup"
+                                                },
+                                                "resourceGroupName": {
+                                                  "type": "string",
+                                                  "description": "requires valid resource group name. Required if security group is specified.\n",
+                                                  "example": "testResourceGroup"
+                                                }
+                                              }
+                                            },
+                                            "enableIPForwarding": {
+                                              "type": "boolean",
+                                              "description": "Enable IP Forwarding\n",
+                                              "example": true
+                                            },
+                                            "additionalIpConfigurations": {
+                                              "type": "array",
+                                              "description": "Additional configuration of network interface\n",
+                                              "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                  "name": {
+                                                    "type": "string",
+                                                    "description": "required if additionalConfiguration has been specified.\n",
+                                                    "example": "TestIbSecodary"
+                                                  },
+                                                  "privateIpAddressVersion": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                      "IPv4",
+                                                      "IPv6"
+                                                    ],
+                                                    "example": "IPv4",
+                                                    "default": "IPv4"
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "login": {
+                                    "type": "object",
+                                    "description": "Set admin access for accessing your VMs. Password/SSH is required for Linux.\n",
+                                    "properties": {
+                                      "userName": {
+                                        "type": "string",
+                                        "description": "user name for admin access to VMs.\\\nLogin can be set:\n* for windows: compute.launchSpecification.login.password\n* for linux: compute.launchSpecification.login.sshPublicKey\n\nJust user name, without pwd or SSH key\n",
+                                        "example": "spotinst"
+                                      },
+                                      "sshPublicKey": {
+                                        "type": "string",
+                                        "description": "SSH for admin access to Linux VMs.\\\nOptional for Linux.\n",
+                                        "example": "ssh-rsa"
+                                      },
+                                      "password": {
+                                        "type": "string",
+                                        "writeOnly": true,
+                                        "description": "Password for admin access to Windows VMs.\\\nRequired for Windows.\n"
+                                      }
+                                    }
+                                  },
+                                  "loadBalancersConfig": {
+                                    "type": "object",
+                                    "description": "Configure a Load Balancer.\n",
+                                    "properties": {
+                                      "loadBalancers": {
+                                        "type": "array",
+                                        "description": "Add a load balancer. For Azure Gateway, each Backend Pool is a separate load balancer.\n",
+                                        "items": {
+                                          "type": "object",
+                                          "properties": {
+                                            "type": {
+                                              "type": "string",
+                                              "description": "The type of load balancer.\n",
+                                              "enum": [
+                                                "loadBalancer",
+                                                "applicationGateway"
+                                              ],
+                                              "example": "loadBalancer"
+                                            },
+                                            "resourceGroupName": {
+                                              "type": "string",
+                                              "description": "The Resource Group name of the Load Balancer.\n",
+                                              "example": "testResourceGroup"
+                                            },
+                                            "name": {
+                                              "type": "string",
+                                              "description": "Name of the Application Gateway/Load Balancer\n",
+                                              "example": "testLoadBalancer"
+                                            },
+                                            "sku": {
+                                              "type": "string",
+                                              "description": "*if type is LoadBalancer then possible values are “Standard/Basic”;\n*if ApplicationGateway then possible values are “Standard_Large”,“Standard_Medium”,“Standard_Small”,“Standard_v2”,“WAF_Large”,“WAF_Medium”,“WAF_v2\"\n",
+                                              "example": "Standard"
+                                            },
+                                            "backendPoolNames": {
+                                              "type": "array",
+                                              "description": "Name of the Backend Pool to register the Elastigroup VMs to. Each Backend Pool is a separate load balancer.\\\nRequired if Type is APPLICATION_GATEWAY.\n",
+                                              "example": [
+                                                "testBackendPool1",
+                                                "testBackendPool2"
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "managedServiceIdentities": {
+                                    "type": "array",
+                                    "writeOnly": true,
+                                    "description": "Add a user-assigned managed identity to the VMs in the cluster.\n",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "name": {
+                                          "type": "string",
+                                          "description": "name of the managed identity\n",
+                                          "example": "mySI2"
+                                        },
+                                        "resourceGroupName": {
+                                          "type": "string",
+                                          "description": "The Resource Group that the user-assigned managed identity resides in.\n",
+                                          "example": "myResourceGroup"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "shutdownScript": {
+                                    "type": "string",
+                                    "format": "byte",
+                                    "writeOnly": true,
+                                    "example": "IyEvdXNyL2Jpbi9lbnYgYmFzaAoiR29vZGJ5ZSBvbGQgaW5zdGFuY2Ui",
+                                    "description": "shutdown script for the group. Value should be passed as a string encoded at Base64 only\n"
+                                  },
+                                  "tags": {
+                                    "type": "array",
+                                    "description": "Key-Value pairs for VMs in the Elastigroup.\n",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "tagKey": {
+                                          "type": "string",
+                                          "description": "Tag Key for Vms in Elastigroup.\n",
+                                          "example": "env"
+                                        },
+                                        "tagValue": {
+                                          "type": "string",
+                                          "description": "Tag Value for VMs in Elastigroup.\n",
+                                          "example": "staging"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "extensions": {
+                                    "type": "array",
+                                    "description": "List of objects for azure extensions\n",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "name": {
+                                          "type": "string",
+                                          "description": "Required on compute.launchSpecification.extensions object\n",
+                                          "required": true,
+                                          "example": "extensionName"
+                                        },
+                                        "type": {
+                                          "type": "string",
+                                          "required": true,
+                                          "description": "Required on compute.launchSpecification.extensions object\n",
+                                          "example": "customScript"
+                                        },
+                                        "publisher": {
+                                          "type": "string",
+                                          "description": "Required on compute.launchSpecification.extensions object\n",
+                                          "required": true,
+                                          "example": "MMicrosoft.Azure.Extensions"
+                                        },
+                                        "apiVersion": {
+                                          "type": "string",
+                                          "description": "The API version of the extension. Required if extension specified.\n",
+                                          "example": "2.0"
+                                        },
+                                        "minorVersionAutoUpgrade": {
+                                          "type": "boolean",
+                                          "required": true,
+                                          "description": "Required on compute.launchSpecification.extensions object\n",
+                                          "example": true
+                                        },
+                                        "publicSettings": {
+                                          "type": "object",
+                                          "description": "Object for public settings\n"
+                                        },
+                                        "protectedSettings": {
+                                          "type": "object",
+                                          "description": "Object for protected settings\n"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "dataDisks": {
+                                    "type": "array",
+                                    "description": "list of data disks to be attached to the vms in the group.\n",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "sizeGB": {
+                                          "type": "integer",
+                                          "description": "The size of the data disk in GB, Required if dataDisks is specified.\n",
+                                          "minimum": 1,
+                                          "maximum": 1023,
+                                          "example": 1
+                                        },
+                                        "lun": {
+                                          "type": "integer",
+                                          "description": "The lun of the data disk, Required if dataDisks is specified.\n",
+                                          "example": 1
+                                        },
+                                        "type": {
+                                          "type": "string",
+                                          "description": "The type of the data disk\n",
+                                          "enum": [
+                                            "Standard_LRS",
+                                            "Premium_LRS",
+                                            "StandardSSD_LRS"
+                                          ],
+                                          "example": "Standard_LRS"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "osDisk": {
+                                    "type": "object",
+                                    "description": "Specify OS disk specification other than default.\n",
+                                    "properties": {
+                                      "type": {
+                                        "type": "string",
+                                        "description": "The type of the OS disk,\n",
+                                        "enum": [
+                                          "Standard_LRS",
+                                          "Premium_LRS",
+                                          "StandardSSD_LRS"
+                                        ],
+                                        "example": "Standard_LRS"
+                                      },
+                                      "sizeGB": {
+                                        "type": "integer",
+                                        "description": "The size of the data disk in GB, Required if dataDisks is specified.\n",
+                                        "minimum": 1,
+                                        "maximum": 1023,
+                                        "example": 30
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "health": {
+                            "$ref": "#/paths/~1azure~1compute~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/health"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "readOnly": true,
+                            "format": "date-time",
+                            "example": "2018-10-10T10:50:29.000+0000"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "readOnly": true,
+                            "format": "date-time",
+                            "example": "2018-11-01T10:50:29.000+0000"
+                          }
+                        }
+                      }
+                    }
                   },
                   {
                     "type": "object",
@@ -14419,7 +14855,7 @@
                 "allOf": [
                   {
                     "type": "object",
-                    "title": "Elastigroup Wrapper",
+                    "title": "Create Elasitgroup Azure Spot VMs",
                     "required": [
                       "group"
                     ],
@@ -14449,90 +14885,391 @@
                           },
                           "region": {
                             "type": "string",
-                            "example": "eastus",
-                            "description": "Valid Azure region the Elastigroup is managed in\n"
+                            "example": "westus2",
+                            "description": "The Azure region your Elastigroup will be created in.\n"
                           },
                           "resourceGroupName": {
                             "type": "string",
                             "example": "spotinst-azure",
-                            "description": "The Azure resource group to associate the Elastigroup with\n"
+                            "description": "Name of the Resource Group for Elastigroup.\n"
                           },
                           "capacity": {
                             "type": "object",
+                            "title": "Elastigroup Capacity",
+                            "description": "Capacity of Elastigroup.\n",
                             "properties": {
                               "target": {
                                 "type": "integer",
-                                "example": 8,
-                                "description": "Current scale the Elastigroup will conform to"
+                                "description": "Desired number of VMs for Elastigroup to maintain.\n",
+                                "example": 8
                               },
                               "minimum": {
                                 "type": "integer",
                                 "example": 2,
-                                "description": "The Elastigroup will not set a target below this value\n"
+                                "description": "Minimum number of VMs.\n"
                               },
                               "maximum": {
                                 "type": "integer",
                                 "example": 10,
-                                "description": "The Elastigroup will not set a target greater than this value\n"
-                              }
-                            }
-                          },
-                          "scaling": {
-                            "type": "object",
-                            "title": "Azure Scaling",
-                            "properties": {
-                              "up": {
-                                "type": "array",
-                                "items": {
-                                  "$ref": "#/paths/~1compute~1azure~1task/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/scaling/properties/up/items"
-                                }
-                              },
-                              "down": {
-                                "type": "array",
-                                "items": {
-                                  "$ref": "#/paths/~1compute~1azure~1task/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/scaling/properties/down/items"
-                                }
+                                "description": "Maximum number of VMs.\n"
                               }
                             }
                           },
                           "strategy": {
                             "type": "object",
-                            "title": "Scaling Strategy",
+                            "title": "Elastigroup Strategy",
+                            "description": "Strategy for Elastigroup.\n",
                             "properties": {
                               "spotPercentage": {
                                 "type": "integer",
-                                "example": 50
+                                "example": 50,
+                                "default": 100,
+                                "description": "Percentage of Spot-VMs to maintain.\\\nRequired if odCount isn't specified.\n"
+                              },
+                              "onDemandCount": {
+                                "type": "integer",
+                                "description": "Percentage of Spot-VMs to maintain.\\\nRequired if spotPercentage isn't specified.\n",
+                                "writeOnly": true
                               },
                               "drainingTimeout": {
                                 "type": "integer",
-                                "example": 30
+                                "example": 30,
+                                "default": 120,
+                                "description": "Time (in seconds) to allow the VM be drained from incoming TCP connections and detached from MLB before terminating it during a scale down operation.\n"
                               },
                               "fallbackToOd": {
                                 "type": "Boolean",
+                                "description": "In case of no spots available, Elastigroup will launch an On-demand instance instead\n",
                                 "example": true
+                              },
+                              "revertToSpot": {
+                                "description": "Hold settings for strategy correction - replacing On-Demand for Spot VMs\n",
+                                "type": "object",
+                                "properties": {
+                                  "performAt": {
+                                    "type": "string",
+                                    "description": "Settings for maintenance strategy.\n",
+                                    "enum": [
+                                      "timeWindow",
+                                      "never",
+                                      "always"
+                                    ],
+                                    "example": "timeWindow",
+                                    "default": "always"
+                                  }
+                                }
+                              },
+                              "optimizationWindows": {
+                                "type": "array",
+                                "description": "valid format: \"ddd:hh:mm-ddd:hh:mm (day:hour(0-23):minute(0-59))\", not empty if revertToSpot.performAt = timeWindow\n",
+                                "example": [
+                                  "Mon:03:00-Wed:02:30"
+                                ]
+                              },
+                              "signals": {
+                                "type": "array",
+                                "description": "The signals defined for this group.\n",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "type": {
+                                      "type": "string",
+                                      "description": "The type of the signal defined for the group.\n",
+                                      "enum": [
+                                        "vmReady",
+                                        "vmReadyToShutdown"
+                                      ],
+                                      "example": "vmReady"
+                                    },
+                                    "timeout": {
+                                      "type": "integer",
+                                      "description": "The timeout in seconds to hold the vm until a signal is sent.\\\nIf no signal is sent the vm will be replaced (vmReady) or we will terminate the vm (vmReadyToShutdown) after the timeout.\n",
+                                      "example": 180,
+                                      "default": 1800,
+                                      "minimum": 60,
+                                      "maximum": 1800
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "scaling": {
+                            "type": "object",
+                            "title": "Elastigroup Scaling",
+                            "description": "Scaling Policies for Elastigroup.\n",
+                            "properties": {
+                              "up": {
+                                "type": "array",
+                                "description": "Defines scaling up policy.\n",
+                                "items": {
+                                  "allOf": [
+                                    {
+                                      "type": "object",
+                                      "properties": {
+                                        "policyName": {
+                                          "type": "string",
+                                          "description": "Name of scaling policy.\n",
+                                          "example": "cpuScale"
+                                        },
+                                        "metricName": {
+                                          "type": "string",
+                                          "description": "Metric to monitor by Azure metric display name\n",
+                                          "example": "Percentage CPU"
+                                        },
+                                        "statistic": {
+                                          "type": "string",
+                                          "description": "Statistic by which to evaluate the selected metric.\n",
+                                          "example": "Average",
+                                          "enum": [
+                                            "Average",
+                                            "total",
+                                            "minimum",
+                                            "maximum",
+                                            "count"
+                                          ]
+                                        },
+                                        "unit": {
+                                          "type": "string",
+                                          "description": "Unit to measure to evaluate the selected metric\n",
+                                          "enum": [
+                                            "percent",
+                                            "seconds",
+                                            "microseconds",
+                                            "milliseconds",
+                                            "bytes",
+                                            "kilobytes",
+                                            "megabytes",
+                                            "gigabytes",
+                                            "terabytes",
+                                            "bits",
+                                            "kilobits",
+                                            "megabits",
+                                            "gigabits",
+                                            "terabits",
+                                            "count",
+                                            "bytes/second",
+                                            "kilobytes/second",
+                                            "megabytes/second",
+                                            "gigabytes/second",
+                                            "terabytes/second",
+                                            "bits/second",
+                                            "kilobits/second",
+                                            "megabits/second",
+                                            "gigabits/second",
+                                            "terabits/second",
+                                            "count/second",
+                                            "none"
+                                          ]
+                                        },
+                                        "threshold": {
+                                          "type": "float",
+                                          "description": "The value at which the scaling action is triggered.\n",
+                                          "example": 0.75
+                                        },
+                                        "namespace": {
+                                          "type": "string",
+                                          "description": "Should be one of the namespaces:\n* Microsoft.AnalysisServices/servers\n* Microsoft.ApiManagement/service\n* Microsoft.Automation/automationAccounts\n* Microsoft.Batch/batchAccounts\n* Microsoft.Cache/redis\n* Microsoft.Compute\n* Microsoft.CognitiveServices/accounts\n* Microsoft.ContainerInstance/containerGroups\n* Microsoft.ContainerService/managedClusters\n* Microsoft.CustomerInsights/hubs\n* Microsoft.DataFactory/datafactories\n* Microsoft.DataFactory/factories\n* Microsoft.DataLakeAnalytics/accounts\n* Microsoft.DataLakeStore/accounts\n* Microsoft.DBforMariaDB/servers\n* Microsoft.DBforMySQL/servers\n* Microsoft.DBforPostgreSQL/servers\n* Microsoft.Devices/IotHubs\n* Microsoft.Devices/provisioningServices\n* Microsoft.DocumentDB/databaseAccounts\n* Microsoft.EventGrid/topics\n* Microsoft.EventGrid/eventSubscriptions\n* Microsoft.EventGrid/extensionTopics\n* Microsoft.EventHub/namespaces\n* Microsoft.EventHub/clusters\n* Microsoft.HDInsight/clusters\n* Microsoft.Insights/AutoscaleSettings\n* Microsoft.Insights/Components\n* Microsoft.KeyVault/vaults\n* Microsoft.Kusto/Clusters\n* Microsoft.LocationBasedServices/accounts\n* Microsoft.Logic/workflows\n* Microsoft.NetApp/netAppAccounts/capacityPools/Volumes\n* Microsoft.NetApp/netAppAccounts/capacityPools\n* Microsoft.Network/networkInterfaces\n* Microsoft.Network/loadBalancers\n* Microsoft.Network/dnszones\n* Microsoft.Network/publicIPAddresses\n* Microsoft.Network/applicationGateways\n* Microsoft.Network/virtualNetworkGateways\n* Microsoft.Network/expressRouteCircuits\n* Microsoft.Network/expressRouteCircuits/peerings\n* Microsoft.Network/connections\n* Microsoft.Network/trafficManagerProfiles\n* Microsoft.Network/networkWatchers/connectionMonitors\n* Microsoft.Network/frontdoors\n* Microsoft.NotificationHubs/Namespaces/NotificationHubs\n* Microsoft.OperationalInsights/workspaces\n* Microsoft.PowerBIDedicated/capacities\n* Microsoft.Relay/namespaces\n* Microsoft.Search/searchServices\n* Microsoft.ServiceBus/namespaces\n* Microsoft.SignalRService/SignalR\n* Microsoft.Sql/servers/databases\n* Microsoft.Sql/servers/elasticPools\n* Microsoft.Sql/managedInstances\n* Microsoft.Storage/storageAccounts\n* Microsoft.Storage/storageAccounts/blobServices\n* Microsoft.Storage/storageAccounts/fileServices\n* Microsoft.Storage/storageAccounts/queueServices\n* Microsoft.Storage/storageAccounts/tableServices\n* Microsoft.StreamAnalytics/streamingjobs\n* Microsoft.TimeSeriesInsights/environments\n* Microsoft.TimeSeriesInsights/environments/eventsources\n* Microsoft.Web/serverfarms\n* Microsoft.Web/sites (excluding functions)\n* Microsoft.Web/sites (functions)\n* Microsoft.Web/sites/slots\n* Microsoft.Web/hostingEnvironments/multiRolePools\n* Microsoft.Web/hostingEnvironments/workerPools\n",
+                                          "default": "Microsoft.Compute",
+                                          "example": "Microsoft.Network/applicationGateways"
+                                        },
+                                        "period": {
+                                          "type": "integer",
+                                          "description": "Amount of time (seconds) for which the threshold must be met in order to trigger the scaling action.\n",
+                                          "enum": [
+                                            60,
+                                            300,
+                                            900,
+                                            1800,
+                                            3600,
+                                            7200
+                                          ],
+                                          "example": 60
+                                        },
+                                        "evaluationPeriods": {
+                                          "type": "integer",
+                                          "description": "Number of consecutive periods in which the threshold must be met in order to trigger the scaling action.\n",
+                                          "minimum": 1,
+                                          "example": 3
+                                        },
+                                        "cooldown": {
+                                          "type": "integer",
+                                          "description": "Time (seconds) to wait after a scaling action before resuming monitoring.\\\nmultiple of 60.\n",
+                                          "minimum": 0,
+                                          "example": 300
+                                        },
+                                        "dimenstions": {
+                                          "type": "array",
+                                          "description": "Required if scaling.up.namespace is different from \"Microsoft.Compute\".\\\n2 dimensions are required.\n",
+                                          "items": [
+                                            {
+                                              "type": "object",
+                                              "properties": {
+                                                "name": {
+                                                  "type": "string",
+                                                  "example": "resourceName"
+                                                },
+                                                "value": {
+                                                  "type": "string",
+                                                  "example": "testApplicationGateway"
+                                                }
+                                              }
+                                            },
+                                            {
+                                              "type": "object",
+                                              "properties": {
+                                                "name": {
+                                                  "type": "string",
+                                                  "example": "resourceGroupName"
+                                                },
+                                                "value": {
+                                                  "type": "string",
+                                                  "example": "testResourceGroup"
+                                                }
+                                              }
+                                            }
+                                          ]
+                                        },
+                                        "operator": {
+                                          "type": "string",
+                                          "description": "The operator used to evaluate the threshold against the current metric value.\\\nValid Values:\n* \"gt\" (Greater Than)\n* \"gte\" (Greater Than or Equal)\n* \"lt\" (Less Than)\n* \"lte\" (Less Than or Equal)\n",
+                                          "example": "gte",
+                                          "enum": [
+                                            "gt",
+                                            "gte",
+                                            "lt",
+                                            "lte"
+                                          ]
+                                        },
+                                        "action": {
+                                          "type": "object",
+                                          "description": "Scaling action to take when the policy is triggered.\n",
+                                          "properties": {
+                                            "type": {
+                                              "type": "string",
+                                              "description": "Type of scaling action to take when the scaling policy is triggered.\n",
+                                              "enum": [
+                                                "adjustment",
+                                                "updateCapacity"
+                                              ],
+                                              "example": "adjustment"
+                                            },
+                                            "adjustment": {
+                                              "type": "string",
+                                              "description": "Value to which the action type will be adjusted.\\\nRequired if using \"adjustment\" action type.\n",
+                                              "example": "2"
+                                            },
+                                            "target": {
+                                              "type": "integer",
+                                              "description": "Value to update the group target capacity to.\\\nRequired if using “updateCapacity” as action type\\\nand “minimum” and “maximum” are undefined.\n"
+                                            },
+                                            "minimum": {
+                                              "type": "integer",
+                                              "description": "Value to update the group mimimum capacity to.\\\nRequired if using “updateCapacity” as action type\\\nand “target” and“maximum” are undefined.\n"
+                                            },
+                                            "maximum": {
+                                              "type": "integer",
+                                              "description": "Value to update the group mimimum capacity to.\\\nRequired if using “updateCapacity” as action type\\\nand “target” and “minimum” are undefined.\n"
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "type": "object",
+                                      "properties": {
+                                        "policyName": {
+                                          "example": "cpuScaleUp"
+                                        },
+                                        "threshold": {
+                                          "example": 0.75
+                                        },
+                                        "operator": {
+                                          "example": "gte"
+                                        },
+                                        "action": {
+                                          "type": "object",
+                                          "properties": {
+                                            "type": {
+                                              "type": "string",
+                                              "example": "adjustment",
+                                              "enum": [
+                                                "adjustment",
+                                                "updateCapacity"
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              "down": {
+                                "type": "array",
+                                "description": "Defines scaling down policy.\n",
+                                "items": {
+                                  "allOf": [
+                                    {
+                                      "$ref": "#/paths/~1azure~1compute~1group/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/group/properties/scaling/properties/up/items/allOf/0"
+                                    },
+                                    {
+                                      "type": "object",
+                                      "properties": {
+                                        "policyName": {
+                                          "example": "cpuScaleDown"
+                                        },
+                                        "threshold": {
+                                          "example": 0.25
+                                        },
+                                        "operator": {
+                                          "example": "lte"
+                                        },
+                                        "action": {
+                                          "type": "object",
+                                          "properties": {
+                                            "type": {
+                                              "type": "string",
+                                              "example": "adjustment",
+                                              "enum": [
+                                                "adjustment",
+                                                "updateCapacity"
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
                               }
                             }
                           },
                           "compute": {
+                            "type": "object",
+                            "title": "Elastigroup Compute",
+                            "description": "Compute settings for Elastigroup.\n",
                             "required": [
                               "vmSizes",
                               "os",
                               "launchSpecification"
                             ],
-                            "type": "object",
                             "properties": {
                               "vmSizes": {
                                 "type": "object",
+                                "description": "amount of time to be unhealthy before a replacement is triggered\n",
                                 "properties": {
                                   "odSizes": {
                                     "type": "array",
+                                    "description": "Available On-Demand sizes.\n",
                                     "items": {
                                       "type": "string",
                                       "example": "standard_a1_v1"
                                     }
                                   },
-                                  "lowPrioritySizes": {
-                                    "type": "array",
+                                  "spotSizes": {
+                                    "type": "string",
+                                    "description": "Available Spot-VM sizes.\n",
                                     "items": {
                                       "type": "string",
                                       "example": "standard_a2_v2"
@@ -14543,6 +15280,7 @@
                               "os": {
                                 "type": "sting",
                                 "example": "Linux",
+                                "description": "Type of operating system.\n",
                                 "enum": [
                                   "Linux",
                                   "Windows"
@@ -14551,227 +15289,364 @@
                               "launchSpecification": {
                                 "type": "object",
                                 "properties": {
+                                  "customData": {
+                                    "type": "string",
+                                    "format": "byte",
+                                    "description": "This value will hold the YML in base64 and will be added to the scaleSets\n",
+                                    "example": ""
+                                  },
                                   "image": {
                                     "type": "object",
+                                    "description": "Image of VM. An image is a template for creating new VMs.\\\nChoose from Azure image catalogue (marketplace) or use a custom image.\n",
                                     "properties": {
                                       "marketplace": {
                                         "type": "object",
-                                        "description": "Azure Marketplace VM Image. Cannot be used with `custom`",
+                                        "description": "Select an image from Azure's Marketplace image catalogue\\\nRequired if custom image isn't specified.\n",
                                         "properties": {
                                           "publisher": {
                                             "type": "string",
+                                            "description": "Image publisher.\\\nRequired if marketplace image is specified.\n",
                                             "example": "OpenLogic"
                                           },
                                           "offer": {
                                             "type": "string",
+                                            "description": "Name of image to use.\\\nRequired if marketplace image is specified.\n",
                                             "example": "CentOS"
                                           },
                                           "sku": {
                                             "type": "string",
+                                            "description": "Image's Stock Keeping Unit, which is the specific version of the image.\\\nRequired if marketplace image is specified.\n",
                                             "example": "7.3"
                                           },
                                           "version": {
                                             "type": "string",
+                                            "description": "Image's version. if version not provided we use \"latest\"\n",
+                                            "default": "lastest",
                                             "example": "7.3-1611"
                                           }
                                         }
                                       },
-                                      "shutdownScript": {
-                                        "type": "string",
-                                        "example": "IyEvdXNyL2Jpbi9lbnYgYmFzaAoiR29vZGJ5ZSBvbGQgaW5zdGFuY2Ui"
-                                      },
                                       "custom": {
                                         "type": "object",
-                                        "description": "Custom VM image.  Cannot be used with `marketplace`\n",
+                                        "writeOnly": true,
+                                        "description": "Custom image to launch Elastigroup with.\\\nRequired if marketplace image isn't specified.\n",
                                         "properties": {
                                           "resourceGroupName": {
                                             "type": "string",
+                                            "description": "Name of Resource Group for custom image.\\\nRequired if custom image is specified.\n",
                                             "example": "spotinst-azure"
                                           },
-                                          "imageName": {
+                                          "name": {
                                             "type": "string",
+                                            "description": "Name of the custom image.\\\nRequired if custom image is specified.\n",
                                             "example": "custom-image-name"
                                           }
                                         }
                                       }
                                     }
                                   },
-                                  "loadBalancersConfig": {
-                                    "type": "object",
-                                    "properties": {
-                                      "loadBalancers": {
-                                        "type": "array",
-                                        "items": {
-                                          "anyOf": [
-                                            {
-                                              "type": "object",
-                                              "title": "MULTAI_TARGET_SET",
-                                              "properties": {
-                                                "type": {
-                                                  "type": "string",
-                                                  "example": "MULTAI_TARGET_SET",
-                                                  "enum": [
-                                                    "MULTAI_TARGET_SET"
-                                                  ]
-                                                },
-                                                "balancerId": {
-                                                  "type": "string",
-                                                  "example": "lb-1ee2e3q"
-                                                },
-                                                "targetSetId": {
-                                                  "type": "string",
-                                                  "example": "ts-3eq"
-                                                },
-                                                "autoWeight": {
-                                                  "type": "boolean",
-                                                  "example": true
-                                                }
-                                              }
-                                            },
-                                            {
-                                              "type": "object",
-                                              "title": "APPLICATION_GATEWAY",
-                                              "properties": {
-                                                "type": {
-                                                  "type": "string",
-                                                  "example": "APPLICATION_GATEWAY",
-                                                  "enum": [
-                                                    "APPLICATION_GATEWAY"
-                                                  ]
-                                                },
-                                                "resourceGroupName": {
-                                                  "type": "string",
-                                                  "example": "azureResourceGroup"
-                                                },
-                                                "applicationGatewayName": {
-                                                  "type": "string",
-                                                  "example": "appGateway"
-                                                },
-                                                "backendPoolName": {
-                                                  "type": "string",
-                                                  "example": "backendpool490822"
-                                                }
-                                              }
-                                            }
-                                          ]
-                                        }
-                                      }
-                                    }
-                                  },
-                                  "userData": {
-                                    "type": "string"
-                                  },
-                                  "managedServiceIdentities": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "object",
-                                      "properties": {
-                                        "name": "string",
-                                        "example": "mySI2"
-                                      },
-                                      "resourceGroupName": {
-                                        "resourceGroupName": "string",
-                                        "example": "myResourceGroup"
-                                      }
-                                    }
-                                  },
-                                  "tags": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "object",
-                                      "properties": {
-                                        "tagKey": {
-                                          "type": "string",
-                                          "example": "env"
-                                        },
-                                        "tagValue": {
-                                          "type": "string",
-                                          "example": "staging"
-                                        }
-                                      }
-                                    }
-                                  },
                                   "network": {
                                     "type": "object",
+                                    "description": "Define the Virtual Network and Subnet for your Elastigroup.\n",
                                     "properties": {
                                       "virtualNetworkName": {
                                         "type": "string",
+                                        "description": "Name of Vnet.\n",
                                         "example": "vname"
-                                      },
-                                      "subnetName": {
-                                        "type": "string",
-                                        "example": "my-subnet-name"
                                       },
                                       "resourceGroupName": {
                                         "type": "string",
+                                        "description": "Vnet Resource Group Name\n",
                                         "example": "subnetResourceGroup"
                                       },
-                                      "assignPublicIp": true,
-                                      "additionalIpConfigurations": {
+                                      "networkInterfaces": {
                                         "type": "array",
                                         "items": {
                                           "type": "object",
                                           "properties": {
-                                            "name": {
-                                              "type": "string",
-                                              "example": "config1"
+                                            "isPrimary": {
+                                              "type": "boolean",
+                                              "description": "Defines whether the network interface is primary or not.\n",
+                                              "example": true
                                             },
-                                            "privateIpAddressVersion": {
+                                            "subnetName": {
                                               "type": "string",
-                                              "example": "IPv4"
+                                              "description": "Subnet name\n",
+                                              "example": "my-subnet-name"
+                                            },
+                                            "assignPublicIp": {
+                                              "type": "boolean",
+                                              "description": "Assign public IP\n",
+                                              "example": true
+                                            },
+                                            "publicIpSku": {
+                                              "type": "string",
+                                              "description": "required if \"assignPublicIp\":\"true\".\n",
+                                              "enum": [
+                                                "STANDARD",
+                                                "BASIC"
+                                              ],
+                                              "example": "STANDARD"
+                                            },
+                                            "securityGroup": {
+                                              "type": "object",
+                                              "properties": {
+                                                "name": {
+                                                  "type": "string",
+                                                  "description": "requires valid security group name.\\\nRequired if security group is specified.\n",
+                                                  "example": "testSecurityGroup"
+                                                },
+                                                "resourceGroupName": {
+                                                  "type": "string",
+                                                  "description": "requires valid resource group name.\\\nRequired if security group is specified.\n",
+                                                  "example": "testResourceGroup"
+                                                }
+                                              }
+                                            },
+                                            "enableIPForwarding": {
+                                              "type": "boolean",
+                                              "description": "Enable IP Forwarding\n",
+                                              "example": true
+                                            },
+                                            "additionalIpConfigurations": {
+                                              "type": "array",
+                                              "description": "Additional configuration of network interface\n",
+                                              "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                  "name": {
+                                                    "type": "string",
+                                                    "description": "required if additionalConfiguration has been specified.\n",
+                                                    "example": "TestIbSecodary"
+                                                  },
+                                                  "privateIpAddressVersion": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                      "IPv4",
+                                                      "IPv6"
+                                                    ],
+                                                    "example": "IPv4",
+                                                    "default": "IPv4"
+                                                  }
+                                                }
+                                              }
                                             }
                                           }
                                         }
                                       }
                                     }
                                   },
-                                  "extensions": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "object",
-                                      "properties": {
-                                        "autoUpgradeMinorVersion": {
-                                          "type": "boolean",
-                                          "example": true
-                                        },
-                                        "name": {
-                                          "type": "string",
-                                          "example": "k8s-agentpool1-38611891-vmss-computeAksLinuxBilling"
-                                        },
-                                        "protectedSettings": {
-                                          "type": "string",
-                                          "example": null
-                                        },
-                                        "publisher": {
-                                          "type": "string",
-                                          "example": "Microsoft.AKS"
-                                        },
-                                        "type": {
-                                          "type": "string",
-                                          "example": "Compute.AKS-Engine.Linux.Billing"
-                                        },
-                                        "typeHandlerVersion": {
-                                          "type": "string",
-                                          "example": "1.0"
+                                  "login": {
+                                    "type": "object",
+                                    "description": "Set admin access for accessing your VMs. Password/SSH is required for Linux.\n",
+                                    "properties": {
+                                      "userName": {
+                                        "type": "string",
+                                        "description": "user name for admin access to VMs.\\\nLogin can be set:\n* for windows: compute.launchSpecification.login.password\n* for linux: compute.launchSpecification.login.sshPublicKey\n\nJust user name, without pwd or SSH key\n",
+                                        "example": "spotinst"
+                                      },
+                                      "sshPublicKey": {
+                                        "type": "string",
+                                        "description": "SSH for admin access to Linux VMs.\\\nOptional for Linux.\n",
+                                        "example": "ssh-rsa"
+                                      },
+                                      "password": {
+                                        "type": "string",
+                                        "writeOnly": true,
+                                        "description": "Password for admin access to Windows VMs.\\\nRequired for Windows.\n"
+                                      }
+                                    }
+                                  },
+                                  "loadBalancersConfig": {
+                                    "type": "object",
+                                    "description": "Configure a Load Balancer.\n",
+                                    "properties": {
+                                      "loadBalancers": {
+                                        "type": "array",
+                                        "description": "Add a load balancer. For Azure Gateway, each Backend Pool is a separate load balancer.\n",
+                                        "items": {
+                                          "type": "object",
+                                          "properties": {
+                                            "type": {
+                                              "type": "string",
+                                              "description": "The type of load balancer.\n",
+                                              "enum": [
+                                                "loadBalancer",
+                                                "applicationGateway"
+                                              ],
+                                              "example": "loadBalancer"
+                                            },
+                                            "resourceGroupName": {
+                                              "type": "string",
+                                              "description": "The Resource Group name of the Load Balancer.\n",
+                                              "example": "testResourceGroup"
+                                            },
+                                            "name": {
+                                              "type": "string",
+                                              "description": "Name of the Application Gateway/Load Balancer\n",
+                                              "example": "testLoadBalancer"
+                                            },
+                                            "sku": {
+                                              "type": "string",
+                                              "description": "* if type is LoadBalancer then possible values are:\n * “Standard\"\n * Basic”\n* if ApplicationGateway then possible values are:\n * “Standard_Large”\n * “Standard_Medium”\n * “Standard_Small”\n * “Standard_v2\n * “WAF_Large”\n * “WAF_Medium\"\n * “WAF_v2\"\n",
+                                              "example": "Standard"
+                                            },
+                                            "backendPoolNames": {
+                                              "type": "array",
+                                              "description": "Name of the Backend Pool to register the Elastigroup VMs to.\\\nEach Backend Pool is a separate load balancer.\\\nRequired if Type is APPLICATION_GATEWAY.\n",
+                                              "example": [
+                                                "testBackendPool1",
+                                                "testBackendPool2"
+                                              ]
+                                            }
+                                          }
                                         }
                                       }
                                     }
                                   },
-                                  "customData": {
-                                    "type": "string"
+                                  "managedServiceIdentities": {
+                                    "type": "array",
+                                    "writeOnly": true,
+                                    "description": "Add a user-assigned managed identity to the VMs in the cluster.\n",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "name": {
+                                          "type": "string",
+                                          "description": "name of the managed identity\n",
+                                          "example": "mySI2"
+                                        },
+                                        "resourceGroupName": {
+                                          "type": "string",
+                                          "description": "The Resource Group that the user-assigned managed identity resides in.\n",
+                                          "example": "myResourceGroup"
+                                        }
+                                      }
+                                    }
                                   },
-                                  "login": {
+                                  "shutdownScript": {
+                                    "type": "string",
+                                    "format": "byte",
+                                    "writeOnly": true,
+                                    "example": "IyEvdXNyL2Jpbi9lbnYgYmFzaAoiR29vZGJ5ZSBvbGQgaW5zdGFuY2Ui",
+                                    "description": "shutdown script for the group. Value should be passed as a string encoded at Base64 only\n"
+                                  },
+                                  "tags": {
+                                    "type": "array",
+                                    "description": "Key-Value pairs for VMs in the Elastigroup.\n",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "tagKey": {
+                                          "type": "string",
+                                          "description": "Tag Key for Vms in Elastigroup.\n",
+                                          "example": "env"
+                                        },
+                                        "tagValue": {
+                                          "type": "string",
+                                          "description": "Tag Value for VMs in Elastigroup.\n",
+                                          "example": "staging"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "extensions": {
+                                    "type": "array",
+                                    "description": "List of objects for azure extensions\n",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "name": {
+                                          "type": "string",
+                                          "description": "Required on compute.launchSpecification.extensions object\n",
+                                          "required": true,
+                                          "example": "extensionName"
+                                        },
+                                        "type": {
+                                          "type": "string",
+                                          "required": true,
+                                          "description": "Required on compute.launchSpecification.extensions object\n",
+                                          "example": "customScript"
+                                        },
+                                        "publisher": {
+                                          "type": "string",
+                                          "description": "Required on compute.launchSpecification.extensions object\n",
+                                          "required": true,
+                                          "example": "MMicrosoft.Azure.Extensions"
+                                        },
+                                        "apiVersion": {
+                                          "type": "string",
+                                          "description": "The API version of the extension. Required if extension specified.\n",
+                                          "example": "2.0"
+                                        },
+                                        "minorVersionAutoUpgrade": {
+                                          "type": "boolean",
+                                          "required": true,
+                                          "description": "Required on compute.launchSpecification.extensions object\n",
+                                          "example": true
+                                        },
+                                        "publicSettings": {
+                                          "type": "object",
+                                          "description": "Object for public settings\n"
+                                        },
+                                        "protectedSettings": {
+                                          "type": "object",
+                                          "description": "Object for protected settings\n"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "dataDisks": {
+                                    "type": "array",
+                                    "description": "list of data disks to be attached to the vms in the group.\n",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "sizeGB": {
+                                          "type": "integer",
+                                          "description": "The size of the data disk in GB, Required if dataDisks is specified.\n",
+                                          "minimum": 1,
+                                          "maximum": 1023,
+                                          "example": 1
+                                        },
+                                        "lun": {
+                                          "type": "integer",
+                                          "description": "The lun of the data disk, Required if dataDisks is specified.\n",
+                                          "example": 1
+                                        },
+                                        "type": {
+                                          "type": "string",
+                                          "description": "The type of the data disk\n",
+                                          "enum": [
+                                            "Standard_LRS",
+                                            "Premium_LRS",
+                                            "StandardSSD_LRS"
+                                          ],
+                                          "example": "Standard_LRS"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "osDisk": {
                                     "type": "object",
+                                    "description": "Specify OS disk specification other than default.\n",
                                     "properties": {
-                                      "userName": {
+                                      "type": {
                                         "type": "string",
-                                        "example": "spotinst"
+                                        "description": "The type of the OS disk,\n",
+                                        "enum": [
+                                          "Standard_LRS",
+                                          "Premium_LRS",
+                                          "StandardSSD_LRS"
+                                        ],
+                                        "example": "Standard_LRS"
                                       },
-                                      "sshPublicKey": {
-                                        "type": "string"
-                                      },
-                                      "password": {
-                                        "type": "string"
+                                      "sizeGB": {
+                                        "type": "integer",
+                                        "description": "The size of the data disk in GB, Required if dataDisks is specified.\n",
+                                        "minimum": 1,
+                                        "maximum": 1023,
+                                        "example": 30
                                       }
                                     }
                                   }
@@ -14781,23 +15656,48 @@
                           },
                           "health": {
                             "type": "object",
+                            "title": "Elastigroup Health",
+                            "description": "Autohealing of unhealthy VMs.\n",
                             "properties": {
-                              "autoHealing": {
-                                "type": "boolean",
-                                "example": true
-                              },
-                              "healthCheckType": {
-                                "type": "string",
-                                "example": "INSTANCE_STATE",
+                              "healthCheckTypes": {
+                                "type": "array",
+                                "description": "Healthcheck to use to validate VM health.\n",
                                 "enum": [
-                                  "INSTANCE_STATE"
+                                  "vmState",
+                                  "applicationGateway"
+                                ],
+                                "example": [
+                                  "vmState"
                                 ]
                               },
                               "gracePeriod": {
                                 "type": "integer",
+                                "description": "Period of time to wait for VM to reach healthiness before monitoring for unhealthiness.\n",
                                 "example": 120
+                              },
+                              "autoHealing": {
+                                "type": "boolean",
+                                "example": true,
+                                "description": "Enable Autohealing of unhealthy VMs.\n"
+                              },
+                              "unhealthyDuration": {
+                                "type": "integer",
+                                "description": "amount of time to be unhealthy before a replacement is triggered\n",
+                                "example": 360
                               }
                             }
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "readOnly": true,
+                            "format": "date-time",
+                            "example": "2018-10-10T10:50:29.000+0000"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "readOnly": true,
+                            "format": "date-time",
+                            "example": "2018-11-01T10:50:29.000+0000"
                           }
                         }
                       }
@@ -15003,11 +15903,11 @@
         }
       }
     },
-    "/azure/compute/group/{groupId}/scale/down": {
+    "/azure/compute/group/{groupId}/detachInstances": {
       "put": {
-        "summary": "Scale Down",
-        "description": "Scale down virtual machines in Elastigroup cluster.\n",
-        "operationId": "elastigroupAzureSpotVmsScaleDown",
+        "summary": "Detach VMs",
+        "description": "Scale down specific virtual machines in Elastigroup cluster.\n",
+        "operationId": "elastigroupAzureSpotVmsDetachVms",
         "tags": [
           "Elastigroup Azure Spot VMs"
         ],
@@ -15041,12 +15941,12 @@
                       "scale": {
                         "type": "object",
                         "required": [
-                          "virtualMachinesToDetach",
-                          "shouldTerminateVirtualMachines",
+                          "vmsToDetach",
+                          "shouldTerminateVms",
                           "shouldDecrementTargetCapacity"
                         ],
                         "properties": {
-                          "virtualMachinesToDetach": {
+                          "vmsToDetach": {
                             "type": "array",
                             "items": {
                               "type": "string",
@@ -15054,7 +15954,7 @@
                             },
                             "description": "Names of virtual machines to detach. Not empty.\n"
                           },
-                          "shouldTerminateVirtualMachines": {
+                          "shouldTerminateVms": {
                             "type": "Boolean",
                             "example": true,
                             "description": "Indicates whether to terminate the VMs or not\n"
@@ -15067,7 +15967,8 @@
                           "drainingTimeout": {
                             "type": "string",
                             "example": 300,
-                            "description": "The time in seconds to allow the virtual machine be be drained from incoming TCP connections and detached from MLB before terminating it. Default: 300\n"
+                            "description": "The time in seconds to allow the virtual machine be be drained from incoming TCP connections and detached from MLB before terminating it.\n",
+                            "default": 300
                           }
                         }
                       }
@@ -15078,6 +15979,170 @@
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "Elastigroup Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "detachedVms": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "vmName": {
+                                          "type": "string",
+                                          "example": "vm-12345"
+                                        },
+                                        "region": {
+                                          "type": "string",
+                                          "example": "eastus"
+                                        },
+                                        "vmSize": {
+                                          "type": "string",
+                                          "example": "standard_a1_v2"
+                                        },
+                                        "lifeCycle": {
+                                          "type": "string",
+                                          "example": "spot"
+                                        },
+                                        "os": {
+                                          "type": "string",
+                                          "example": "Linux"
+                                        },
+                                        "privateIp": {
+                                          "type": "integer",
+                                          "example": "192.0.0.1"
+                                        },
+                                        "publicIp": {
+                                          "type": "integer",
+                                          "example": "183.123.67.79",
+                                          "provisioningState": {
+                                            "type": "string",
+                                            "example": "succeeded"
+                                          },
+                                          "powerState": {
+                                            "type": "string",
+                                            "example": "detached"
+                                          },
+                                          "createdAt": {
+                                            "type": "string",
+                                            "example": "2020-06-18T12:02:49.000Z"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "newVms": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "vmName": {
+                                          "type": "string",
+                                          "example": "vm-56789"
+                                        },
+                                        "region": {
+                                          "type": "string",
+                                          "example": "eastus"
+                                        },
+                                        "vmSize": {
+                                          "type": "string",
+                                          "example": "standard_a1_v2"
+                                        },
+                                        "lifeCycle": {
+                                          "type": "string",
+                                          "example": "spot"
+                                        },
+                                        "os": {
+                                          "type": "string",
+                                          "example": "Linux"
+                                        },
+                                        "privateIp": {
+                                          "type": "integer",
+                                          "example": "192.0.0.1"
+                                        },
+                                        "publicIp": {
+                                          "type": "integer",
+                                          "example": "183.123.67.79"
+                                        },
+                                        "provisioningState": {
+                                          "type": "string",
+                                          "example": "succeeded"
+                                        },
+                                        "powerState": {
+                                          "type": "string",
+                                          "example": "running"
+                                        },
+                                        "createdAt": {
+                                          "type": "string",
+                                          "example": "2020-06-18T12:02:49.000Z"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:azure:compute:group:detachVms"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/azure/compute/group/{groupId}/scale/down": {
+      "put": {
+        "summary": "Scale Down",
+        "description": "Scale down virtual machines in Elastigroup cluster.\n",
+        "operationId": "elastigroupAzureSpotVmsScaleDown",
+        "tags": [
+          "Elastigroup Azure Spot VMs"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/put/parameters/0"
+          },
+          {
+            "in": "query",
+            "name": "adjustment",
+            "example": 5,
+            "description": "Number of VMs to scale down\n",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
         "responses": {
           "200": {
             "$ref": "#/paths/~1azure~1compute~1group~1%7BgroupId%7D~1status/get/responses/200"
