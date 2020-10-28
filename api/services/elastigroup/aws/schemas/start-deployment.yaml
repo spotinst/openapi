@@ -1,0 +1,66 @@
+type: object
+required:
+  - batchSizePercentage
+  - gracePeriod
+properties:
+  batchSizePercentage:
+    type: integer
+    example: 20
+    description: >
+      Indicates (in percentage) the batch size of the deployment (meaning, how many instances to replace in each batch)
+  gracePeriod:
+    type: integer
+    example: 300
+    description: >
+      Indicates (in seconds) the timeout to wait until instance become healthy based on the healthCheckType
+  healthCheckType:
+    type: string
+    example: "EC2"
+    description: >
+      Define a health check type. valid values: ELB, ECS_CLUSTER_INSTANCE, TARGET_GROUP, OPSWORKS, NOMAD_NODE, MULTAI_TARGET_SET, HCS, EC2, NONE (wait the entire grace period for each batch). If no value is set the roll will use the group’s auto-healing health check.
+  strategy:
+    description: >
+      The roll strategy
+    properties:
+      action:
+        type: string
+        default: "REPLACE_SERVER"
+        example: "REPLACE_SERVER"
+        description: >
+          The roll action to perform. valid values: REPLACE_SERVER, RESTART_SERVER
+      batchMinHealthyPercentage:
+        type: integer
+        default: 50
+        example: 25
+        description: >
+          Indicates the threshold of minimum healthy instances in single batch. If the amount of healthy instances in single batch is under the threshold, the deployment will fail. If exists, the parameter value will be in range of 0-100. In case of null as value, the default value in the backend will be 50%. Value of param should represent the number in percentage (%) of the batch.
+      onFailure:
+        type: object
+        required:
+          - actionType
+        description: >
+          Set detach options to the deployment
+        properties:
+          actionType:
+            type: string
+            example: "DETACH_NEW"
+            description: >
+              Sets the action that will take place, Accepted values are: DETACH_OLD, DETACH_NEW
+          shouldHandleAllBatches:
+            type: boolean
+            default: false
+            example: true
+            description: >
+              Indicator if the action should apply to all batches of the deployment or only the latest batch
+          drainingTimeout:
+            type: integer
+            default: The Elastigroups draining time out
+            example: 120
+            description: >
+              Indicates (in seconds) the timeout to drain the instances
+          shouldDecrementTargetCapacity:
+            type: boolean
+            default: true
+            example: true
+            description: >
+              Decrementing the group target capacity after detaching the instances
