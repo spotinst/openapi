@@ -17,7 +17,9 @@ properties:
     type: string
     example: "EC2"
     description: >
-      Define a health check type. valid values: ELB, ECS_CLUSTER_INSTANCE, TARGET_GROUP, OPSWORKS, NOMAD_NODE, MULTAI_TARGET_SET, HCS, EC2, NONE (wait the entire grace period for each batch). If no value is set the roll will use the group’s auto-healing health check.
+      Define a health check type.\
+      If no value is set the roll will use the group’s auto-healing health check.
+    enum: [ELB, ECS_CLUSTER_INSTANCE, TARGET_GROUP, OPSWORKS, NOMAD_NODE, MULTAI_TARGET_SET, HCS, EC2, NONE]
   strategy:
     description: >
       The roll strategy
@@ -27,13 +29,19 @@ properties:
         default: "REPLACE_SERVER"
         example: "REPLACE_SERVER"
         description: >
-          The roll action to perform. valid values: REPLACE_SERVER, RESTART_SERVER
+          The roll action to perform.
+        enum: [REPLACE_SERVER, RESTART_SERVER]
       batchMinHealthyPercentage:
         type: integer
         default: 50
         example: 25
         description: >
-          Indicates the threshold of minimum healthy instances in single batch. If the amount of healthy instances in single batch is under the threshold, the deployment will fail. If exists, the parameter value will be in range of 0-100. In case of null as value, the default value in the backend will be 50%. Value of param should represent the number in percentage (%) of the batch.
+          Indicates the threshold of minimum healthy instances in single batch.\
+          If the amount of healthy instances in single batch is under the threshold, the deployment will fail.\
+          In case of null as value, the default value in the backend will be 50%.\
+          Value of param should represent the number in percentage (%) of the batch.
+        minimum: 0
+        maximum: 100
       onFailure:
         type: object
         required:
@@ -45,7 +53,8 @@ properties:
             type: string
             example: "DETACH_NEW"
             description: >
-              Sets the action that will take place, Accepted values are: DETACH_OLD, DETACH_NEW
+              Sets the action that will take place.
+            enum: [DETACH_OLD, DETACH_NEW]
           shouldHandleAllBatches:
             type: boolean
             default: false
