@@ -6859,8 +6859,8 @@
           {
             "in": "query",
             "name": "severity",
-            "example": "all",
-            "description": "Filter log extracted entires related to a specific resource id\n",
+            "example": "ALL",
+            "description": "Severity of log entries to extract. Valid Values: ALL, INFO,DEBUG,WARN. Default: ALL\n",
             "schema": {
               "type": "string"
             },
@@ -6870,7 +6870,7 @@
             "in": "query",
             "name": "resourceId",
             "example": "i-12345678",
-            "description": "Filter log extracted entires related to a specific resource id. Default: Null\n",
+            "description": "Filter extracted log entries for a specific resource id. Default: Null\n",
             "schema": {
               "type": "string"
             },
@@ -19699,6 +19699,184 @@
         }
       }
     },
+    "/ocean/aws/ecs/cluster/{OCEAN_ID}/log": {
+      "summary": "Ocean for AWS ECS",
+      "get": {
+        "summary": "Fetch Elastilog",
+        "description": "Fetch an Ocean Cluster's log\n",
+        "operationId": "oceanEcsFetchLog",
+        "tags": [
+          "Ocean ECS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec/get/parameters/1"
+          },
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "in": "query",
+            "name": "fromDate",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "data values following either a date format (yyyy-mm-dd ; 2016-11-20) or ms (1494751821472)\n"
+          },
+          {
+            "in": "query",
+            "name": "toDate",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "data values following either a date format (yyyy-mm-dd ; 2016-11-20) or ms (1494751821472)\n"
+          },
+          {
+            "in": "query",
+            "name": "LIMIT",
+            "description": "Maximum number of lines to extract in a response. Default: 500\n",
+            "schema": {
+              "type": "integer"
+            },
+            "required": false,
+            "default": 500,
+            "max": 1000,
+            "example": 200
+          },
+          {
+            "in": "query",
+            "name": "SEVERITY",
+            "description": "Severity of log entries to extract. Valid Values: ALL, INFO, DEBUG, WARN. Default: ALL\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "default": "ALL",
+            "enum": [
+              "ALL",
+              "INFO",
+              "DEBUG",
+              "WARN"
+            ],
+            "example": "INFO"
+          },
+          {
+            "in": "query",
+            "name": "resourceId",
+            "example": "i-12345678",
+            "description": "Filter extracted log entries for a specific resource id. Default: Null\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean Get Log Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "request": {
+                      "type": "object",
+                      "description": "Original request properties\n",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "3213f42e-455e-4801-a185-cd3eb65fac5f",
+                          "description": "Unique ID associated with this request\n"
+                        },
+                        "url": {
+                          "type": "string",
+                          "example": "/ocean/aws/ecs/cluster/o-e0a2bd7c/log?fromDate=2020-10-06&toDate=2020-10-08&severity=ALL&limit=500",
+                          "description": "The URL that was used for the request\n"
+                        },
+                        "method": {
+                          "type": "string",
+                          "example": "GET",
+                          "description": "The HTTP **METHOD** used for the request\n"
+                        },
+                        "timestamp": {
+                          "type": "string",
+                          "example": "2020-10-05T16:20:38.579Z",
+                          "description": "When the request was received by Spot\n"
+                        }
+                      }
+                    },
+                    "response": {
+                      "type": "object",
+                      "description": "Response package that includes, status, type and any relevant data.\n",
+                      "properties": {
+                        "status": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "integer",
+                              "example": "200",
+                              "description": "HTTP status code assigned to this response\n"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "OK",
+                              "description": "HTTP status message for the respective status code\n"
+                            }
+                          }
+                        },
+                        "kind": {
+                          "type": "string",
+                          "example": "spotinst:ocean:cluster:log"
+                        },
+                        "items": {
+                          "type": "array",
+                          "description": "Array of data objects\n",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "message": {
+                                "type": "string"
+                              },
+                              "severity": {
+                                "type": "string"
+                              },
+                              "createdAt": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "example": [
+                            {
+                              "message": "Instances Terminated - ECS Autoscaler ,Terminated 1, List of instances: [i-0914721d46ebbabb2]",
+                              "severity": "INFO",
+                              "createdAt": "2020-10-07T09:51:12.000Z"
+                            },
+                            {
+                              "message": "Instances: [i-0914721d46ebbabb2] have been detached. Reason: Auto scale",
+                              "severity": "INFO",
+                              "createdAt": "2020-10-07T09:51:11.000Z"
+                            }
+                          ]
+                        },
+                        "count": {
+                          "type": "integer",
+                          "example": "2"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/ocean/aws/ecs/cluster/{OCEAN_CLUSTER_ID}/rightSizing/suggestion": {
       "get": {
         "summary": "Get Right-Sizing Recommendations",
@@ -20212,6 +20390,14 @@
                             "items": {
                               "type": "string",
                               "example": "sg1, sg3"
+                            }
+                          },
+                          "instanceTypes": {
+                            "type": "array",
+                            "description": "A array of supported instance types for the Launch Spec\n",
+                            "items": {
+                              "type": "string",
+                              "example": "c3.2xlarge, c4.2xlarge"
                             }
                           },
                           "subnetIds": {
@@ -22377,6 +22563,137 @@
         }
       }
     },
+    "/ocean/aws/k8s/cluster/{OCEAN_ID}/log": {
+      "summary": "Ocean for AWS K8s",
+      "get": {
+        "summary": "Fetch Elastilog",
+        "description": "Fetch an Ocean Cluster's log\n",
+        "operationId": "oceanAwsFetchLog",
+        "tags": [
+          "Ocean AWS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec/get/parameters/1"
+          },
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/2"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/3"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/4"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/5"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/6"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean Get Log Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "request": {
+                      "type": "object",
+                      "description": "Original request properties\n",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "3213f42e-455e-4801-a185-cd3eb65fac5f",
+                          "description": "Unique ID associated with this request\n"
+                        },
+                        "url": {
+                          "type": "string",
+                          "example": "/ocean/aws/k8s/cluster/o-e0a2bd7c/log?fromDate=2020-10-06&toDate=2020-10-08&severity=ALL&limit=500",
+                          "description": "The URL that was used for the request\n"
+                        },
+                        "method": {
+                          "type": "string",
+                          "example": "GET",
+                          "description": "The HTTP **METHOD** used for the request\n"
+                        },
+                        "timestamp": {
+                          "type": "string",
+                          "example": "2020-10-05T16:20:38.579Z",
+                          "description": "When the request was received by Spot\n"
+                        }
+                      }
+                    },
+                    "response": {
+                      "type": "object",
+                      "description": "Response package that includes, status, type and any relevant data.\n",
+                      "properties": {
+                        "status": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "integer",
+                              "example": "200",
+                              "description": "HTTP status code assigned to this response\n"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "OK",
+                              "description": "HTTP status message for the respective status code\n"
+                            }
+                          }
+                        },
+                        "kind": {
+                          "type": "string",
+                          "example": "spotinst:ocean:cluster:log"
+                        },
+                        "items": {
+                          "type": "array",
+                          "description": "Array of data objects\n",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "message": {
+                                "type": "string"
+                              },
+                              "severity": {
+                                "type": "string"
+                              },
+                              "createdAt": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "example": [
+                            {
+                              "message": "Ocean o-e0a2bd7c successfully created.",
+                              "severity": "INFO",
+                              "createdAt": "2020-10-07T09:51:12.000Z"
+                            }
+                          ]
+                        },
+                        "count": {
+                          "type": "integer",
+                          "example": "1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/ocean/aws/k8s/cluster/autoScalingGroup/import": {
       "get": {
         "summary": "Import ASG To Ocean Cluster",
@@ -22677,10 +22994,10 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/3"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/3"
           },
           {
-            "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/2"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/2"
           },
           {
             "$ref": "#/paths/~1mcs~1kubernetes~1cluster~1%7BclusterId%7D~1costs/get/parameters/3"
@@ -23216,7 +23533,7 @@
                                 },
                                 "userData": {
                                   "type": "base64",
-                                  "descritpion": "The Base64-encoded MIME user data to make available to the instances."
+                                  "description": "The Base64-encoded MIME user data to make available to the instances."
                                 },
                                 "securityGroupIds": {
                                   "type": "array of string",
@@ -23259,7 +23576,7 @@
                                 },
                                 "loadBalancers": {
                                   "type": "array of object",
-                                  "description": "Configure load balancers settings to Ocen cluster\n",
+                                  "description": "Configure load balancers settings to Ocean cluster\n",
                                   "properties": {
                                     "type": {
                                       "type": "string",
@@ -23762,14 +24079,14 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "in": "query",
+            "in": "path",
             "name": "OCEAN_ID",
             "schema": {
               "type": "string"
             },
             "required": true,
-            "example": "o-1abcd124",
-            "description": "The ID of the Ocean cluster to delete.\n"
+            "example": "o-abcd1234",
+            "description": "The ID of the Ocean cluster.\n"
           }
         ],
         "responses": {
@@ -31547,69 +31864,37 @@
       "summary": "Ocean for GKE",
       "get": {
         "summary": "Fetch Elastilog",
-        "description": "Roll an entire Ocean cluster or roll subsets of the cluster by specifying launchSpecIds or instanceIds. Performing this request will start the roll immediately, by defined batches.\nNote that the first response for a successful request will notify for starting a roll. In order to check the status of a roll, you can use the GET Roll API.\n",
-        "operationId": "oceanGkeFetch",
+        "description": "Fetch an Ocean Cluster's log\n",
+        "operationId": "oceanGkeFetchLog",
         "tags": [
           "Ocean GKE"
         ],
         "parameters": [
           {
-            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
-          },
-          {
             "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec/get/parameters/1"
           },
           {
-            "in": "query",
-            "name": "fromDate",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "description": "data values following either a date format (yyyy-mm-dd ; 2016-11-20) or ms (1494751821472)\n"
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "in": "query",
-            "name": "toDate",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "description": "data values following either a date format (yyyy-mm-dd ; 2016-11-20) or ms (1494751821472)\n"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/2"
           },
           {
-            "in": "query",
-            "name": "LIMIT",
-            "description": "Maximum number of lines to extract in a response.\n",
-            "schema": {
-              "type": "integer"
-            },
-            "required": false,
-            "default": 500,
-            "max": 1000,
-            "example": 200
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/3"
           },
           {
-            "in": "query",
-            "name": "SEVERITY",
-            "description": "Severity of log entries to extract.\n",
-            "schema": {
-              "type": "string"
-            },
-            "required": false,
-            "default": "ALL",
-            "enum": [
-              "ALL",
-              "INFO",
-              "DEBUG",
-              "WARN"
-            ],
-            "example": "INFO"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/4"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/5"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/6"
           }
         ],
         "responses": {
           "200": {
-            "description": "Ocean Get Heartbeat Response",
+            "description": "Ocean Get Log Response",
             "content": {
               "application/json": {
                 "schema": {
@@ -31626,17 +31911,18 @@
                         },
                         "url": {
                           "type": "string",
-                          "example": "/gcp/gce/group/sig-123456/log?fromDate=2019-01-01&toDate=2019-01-02",
+                          "example": "/ocean/gcp/k8s/cluster/o-e0a2bd7c/log?fromDate=2020-10-06&toDate=2020-10-08&severity=ALL&limit=500",
                           "description": "The URL that was used for the request\n"
                         },
                         "method": {
                           "type": "string",
+                          "example": "GET",
                           "description": "The HTTP **METHOD** used for the request\n"
                         },
                         "timestamp": {
                           "type": "string",
-                          "example": "2018-06-20T11:35:01.745Z",
-                          "description": "When the requets was received by Spot\n"
+                          "example": "2020-10-05T16:20:38.579Z",
+                          "description": "When the request was received by Spot\n"
                         }
                       }
                     },
@@ -31661,24 +31947,32 @@
                         },
                         "kind": {
                           "type": "string",
-                          "example": "spotinst:ocean:k8s:cluster:controllerHeartbeat"
+                          "example": "spotinst:ocean:cluster:log"
                         },
                         "items": {
-                          "type": "object",
-                          "properties": {
-                            "message": {
-                              "type": "string",
-                              "example": "Ocean o-e0a2bd7c successfully created."
-                            },
-                            "severity": {
-                              "type": "string",
-                              "example": "INFO"
-                            },
-                            "createdAt": {
-                              "type": "string",
-                              "example": "2019-05-19T14:34:15.000Z"
+                          "type": "array",
+                          "description": "Array of data objects\n",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "message": {
+                                "type": "string"
+                              },
+                              "severity": {
+                                "type": "string"
+                              },
+                              "createdAt": {
+                                "type": "string"
+                              }
                             }
-                          }
+                          },
+                          "example": [
+                            {
+                              "message": "Ocean o-e0a2bd7c successfully created.",
+                              "severity": "INFO",
+                              "createdAt": "2020-10-07T09:51:12.000Z"
+                            }
+                          ]
                         },
                         "count": {
                           "type": "integer",
@@ -31845,10 +32139,10 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/3"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/3"
           },
           {
-            "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/2"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/2"
           },
           {
             "in": "query",
@@ -32444,6 +32738,14 @@
                                 }
                               }
                             ]
+                          },
+                          "instanceTypes": {
+                            "type": "array",
+                            "description": "A array of supported machine types for the Launch Spec. Can be null\n",
+                            "items": {
+                              "type": "string",
+                              "example": "n1-standard-1, n1-standard-2"
+                            }
                           },
                           "taints": {
                             "type": "object",
