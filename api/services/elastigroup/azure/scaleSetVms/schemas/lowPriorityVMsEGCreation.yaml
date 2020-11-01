@@ -546,7 +546,7 @@ properties:
             properties:
               odSizes:
                 title: OD Sizes
-                type: string
+                type: array
                 description: "Array of string (s) with Available On-Demand sizes (pls chose items that correspond to your location or zone):
                 <ul>
                     <li>standard_e64-32s_v4</li>
@@ -906,7 +906,9 @@ properties:
                     <li>standard_b1s</li>
                     <li>standard_b1ls</li>
                 <ul>"
-                example:
+                items:
+                  type: string
+                  example: standard_b1s
 
               lowPrioritySizes:
                 title: Low Priority Sizes
@@ -946,7 +948,7 @@ properties:
                   - INSTANCE_STATE
               gracePeriod:
                 title: Grace Period
-                desription: Period of time to wait for VM to reach healthiness before monitoring for unhealthiness.
+                description: Period of time to wait for VM to reach healthiness before monitoring for unhealthiness.
                 type: integer
                 example: 120
               unhealthyDuration:
@@ -955,12 +957,14 @@ properties:
                 type: integer
                 example: 360
           launchSpecification:
+            title: Launch Specification
+            description: Launch Specification Configuration
             type: object
             required:
+              - login
               - image
               - network
               - subnetName
-              - extensions
             properties:
               image:
                 title: Image
@@ -1104,10 +1108,10 @@ properties:
                     example: true
                   additionalIpConfigurations:
                     type: array
-                    required:
-                      - name
                     items:
                       type: object
+                      required:
+                        - name
                       properties:
                         name:
                           type: string
@@ -1116,58 +1120,193 @@ properties:
                           type: string
                           example: IPv4
               extensions:
-
+                title: Extensions
+                description: List of objects for Azure extensions
                 type: array
-                required:
-                  - name
                 items:
                   type: object
+                  required:
+                    - autoUpgradeMinorVersion
+                    - name
+                    - publisher
+                    - type
+                    - typeHandlerVersion
                   properties:
                     autoUpgradeMinorVersion:
+                      title: Auto Upgrade Minor Version
+                      description: Required on compute.launchSpecification.extensions object
                       type: boolean
                       example: true
+                      required: true
                     name:
+                      title: name
+                      description: Required on compute.launchSpecification.extensions object
                       type: string
                       example: "k8s-agentpool1-38611891-vmss-computeAksLinuxBilling"
                     protectedSettings:
-                      type: string
-                      example: null
+                      title: Protected Settings
+                      description: Object for protected settings
+                      type: object
+                      required:
+                        - commandToExecute
+                      properties:
+                        commandToExecute:
+                          title: Command To Execute
+                          description: Required for compute.launchSpecification.extensions.protectedSettings object
+                          type: string
                     publisher:
+                      title: Publisher
+                      description: Required on compute.launchSpecification.extensions object
                       type: string
                       example: "Microsoft.AKS"
                     type:
+                      title: Type
+                      description: Required on compute.launchSpecification.extensions object
                       type: string
                       example: "Compute.AKS-Engine.Linux.Billing"
                     typeHandlerVersion:
+                      title: Type Handler Version
+                      description: Required on compute.launchSpecification.extensions object
                       type: string
                       example: "1.0"
               customData:
+                title: Custom Data
+                description: This value will hold the YML in base64 and will be added to the scaleSets
                 type: string
+                example: IyEvYmluL2Jhc2gKZWNobyAidGVzdCI=
               login:
-                type: object
+                title: Login
+                description: Set admin access for accessing your VMs.
+                type: array
+                items:
+                required:
+                  - userName
                 properties:
                   userName:
+                    title: User Name
+                    description: "User name for admin access to VMs.
+                     <ul>
+                      <li>for windows: compute.launchSpecification.login.password</li>
+                      <li>for linux: compute.launchSpecification.login.sshPublicKey</li>
+                     </ul>"
                     type: string
                     example: spotinst
                   sshPublicKey:
-                    description: '"sshPublicKey" can not exist simultaneously with "password"'
+                    title: SSH Public Key
+                    description: "SSH for admin access to Linux VMs. </br> <a style = color:red>Required for Linux.  Can not exist simultaneously with 'password'</a>"
                     type: string
                   password:
-                    description: '"password" can not exist simultaneously with "sshPublicKey"'
+                    title: Password
+                    description: "Password for admin access to Windows VMs. </br> <a style = color:red>Required for Windows. Can not exist simultaneously with 'sshPublicKey'</a>"
                     type: string
       thirdPartiesIntegration:
+        title: Third Parties Integration
+        description: Settings for 3rd party integrations on group.
         type: "object"
         properties:
           kubernetes:
+            title: Kubernetes Integration Configuration
+            description: Define Kubernetes integration on group
             type: "object"
+            required:
+              - clusterIdentifier
             properties:
               clusterIdentifier:
+                title: Cluster Identifier
+                description:
+                  "Must match the clusterIdentifier that was sent when the Spot Controller was installed.
+                  </br><a style = color:red>Required on thirdPartiesIntegration.kubernetes object</a>"
                 type: string
                 example: "aks-engine-cluser"
-                description: >
-                  Must mastch the clusterIdentifier that was sent when
-                   the [Spot Controller](https://api.spot.io/container-management/kubernetes/kubernetes-tutorials/installing-kubernetes-controller/)
-                   was installed.
+              autoScale:
+                title: Auto Scale
+                description: K8's auto scaler configuration
+                type: object
+                properties:
+                  isEnabled:
+                    title: Is Enabled Criteria
+                    description: Is the auto scaler enabled or not
+                    type: boolean
+                    example: true
+                  isAutoConfig:
+                    title: Is Auto Config Criteria
+                    description: Set to true if you want to use the Automated headroom feature
+                    type: boolean
+                    example: false
+                  cooldown:
+                    title: Cooldown
+                    description: Cool down period between scaling actions
+                    type: integer
+                    example: 180
+                  down:
+                    title: Down
+                    description: Auto scaler Scale down configuration
+                    type: object
+                    properties:
+                      maxScaleDownPercentage:
+                        title: Max Scale Down Percentage
+                        description: Would represent the maximum % to scale-down. Number between 1-100
+                        type: integer
+                        example: 50
+                  headroom:
+                    title: Headroom
+                    description: Headroom configuration of the auto scaler
+                    type: object
+                    properties:
+                      cpuPerUnit:
+                        title: cpuPerUnit
+                        description: Optionally configure the number of CPUs to allocate the headroom. CPUs are denoted in millicores, where 1000 millicores = 1 vCPU.
+                        type: integer
+                        example: 2
+                      memoryPerUnit:
+                        title: memoryPerUnit
+                        description: Optionally configure the amount of memory (MiB) to allocate the headroom.
+                        type: integer
+                        example: 2
+                      gpuPerUnit:
+                        title: GPU Per Unit
+                        description: How much GPU allocate for headroom unit.
+                        type: integer
+                        example: 2
+                      numOfUnits:
+                        title: Number Of Units
+                        description: The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.
+                        type: integer
+                        example: 2
+                  labels:
+                    title: Labels
+                    description: Key/value pairs to use as constraints.
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          title: Key
+                          description: Key of constraint
+                          type: string
+                          example: group
+                        value:
+                          title: Value
+                          description: Value of constraint
+                          type: string
+                          example: microservices
+                  resourceLimits:
+                    title: Resource Limits
+                    description: Optionally set upper and lower bounds on the resource usage of the cluster.
+                    type: object
+                    properties:
+                      maxVCpu:
+                        title: MAX VCpu
+                        description: The maximum cpu in vCpu units that can be allocated to the cluster.
+                        type: integer
+                        example: 4
+                      maxMemoryGib:
+                        title: MAX Memory Gib
+                        description: The maximum memory in GiB units that can be allocated to the cluster.
+                        type: integer
+                        example: 4
+
+
           hpcGridEngine:
             type: "object"
             required:
