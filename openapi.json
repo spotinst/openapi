@@ -25944,7 +25944,7 @@
           },
           {
             "in": "query",
-            "name": "ACCOUNT_ID",
+            "name": "accountId",
             "example": "act-123abc",
             "description": "ID of the account associated with your token\n",
             "required": false
@@ -26169,7 +26169,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "ACCOUNT_ID",
+            "name": "accountId",
             "example": "act-123abc",
             "description": "ID of the account associated with your token\n",
             "required": false
@@ -26413,58 +26413,10 @@
       }
     },
     "/events/notification/accountPolicy": {
-      "get": {
+      "put": {
         "summary": "Update Account Notification Policy",
         "description": "Update the account notification policy\n",
         "operationId": "NotificationsServiceUpdateAccountNotificationPolicy",
-        "tags": [
-          "Notifications Service"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "response": {
-                          "type": "object",
-                          "properties": {
-                            "items": {
-                              "type": "array",
-                              "items": {
-                                "$ref": "#/paths/~1events~1notification~1accountPolicy/put/requestBody/content/application~1json/schema/allOf/0"
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
-      },
-      "put": {
-        "summary": "Get Account Notification Policy",
-        "description": "Get the account notification policy\n",
-        "operationId": "NotificationsServiceGetAccountNotificationPolicy",
         "tags": [
           "Notifications Service"
         ],
@@ -26620,6 +26572,54 @@
             "description": "Bad Request"
           }
         }
+      },
+      "get": {
+        "summary": "Get Account Notification Policy",
+        "description": "Get the account notification policy\n",
+        "operationId": "NotificationsServiceGetAccountNotificationPolicy",
+        "tags": [
+          "Notifications Service"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1events~1notification~1accountPolicy/put/requestBody/content/application~1json/schema/allOf/0"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
       }
     },
     "/events/subscription": {
@@ -26680,10 +26680,53 @@
                             "required": true
                           },
                           "eventFormat": {
-                            "type": "string",
-                            "example": "{\"event\": \"%event%\", \"resourceId\": \"%resource-id%\", \"resourceName\": \"%resource-name%\", \"myCustomKey\": \"My content is set here\" }",
-                            "description": "The format of the notification content (JSON Format - Key+Value). Valid Values : %instance-id%, %event%, %resource-id%, %resource-name%, %subnet-id%, %availability-zone%, %reason%,%private-ip%,%launchspec-id%\nExample: {\"event\": \"%event%\", \"resourceId\": \"%resource-id%\", \"resourceName\": \"%resource-name%\", \"myCustomKey\": \"My content is set here\" } Default: {\"event\": \"<event>\", \"instanceId\": \"<instance-id>\", \"resourceId\": \"<resource-id>\", \"resourceName\": \"<resource-name>\" }\n",
-                            "required": false
+                            "type": "object",
+                            "description": "The format of the notification content (JSON Format: Key + Value).\n",
+                            "enum": [
+                              "%instance-id%",
+                              "%event%",
+                              "%resource-id%",
+                              "%resource-name%",
+                              "%subnet-id%",
+                              "%availability-zone%",
+                              "%reason%",
+                              "%private-ip%",
+                              "%launchspec-id%"
+                            ],
+                            "example": {
+                              "event": "%event%",
+                              "resourceId": "%resource-id%",
+                              "resourceName": "%resource-name%",
+                              "myCustomKey": "My content is set here"
+                            },
+                            "default": {
+                              "event": "<event>",
+                              "instanceId": "<instance-id>",
+                              "resourceId": "<resource-id>",
+                              "resourceName": "<resource-name>"
+                            },
+                            "properties": {
+                              "event": {
+                                "type": "string",
+                                "description": "Allow to get name of event that happened",
+                                "example": "%event%"
+                              },
+                              "resourceId": {
+                                "type": "string",
+                                "description": "Allow to get ID of resource where event happened",
+                                "example": "%resource-id%"
+                              },
+                              "resourceName": {
+                                "type": "string",
+                                "description": "Allow to get the name of resource (related to ID)",
+                                "example": "%resource-name%"
+                              },
+                              "myCustomKey": {
+                                "type": "string",
+                                "description": "Allow to use custom text in messages",
+                                "example": "My content is set here"
+                              }
+                            }
                           }
                         }
                       }
@@ -26800,13 +26843,13 @@
         "parameters": [
           {
             "in": "query",
-            "name": "ACCOUNT_ID",
+            "name": "accountId",
             "example": "act-123abc",
             "description": "ID of the account associated with your token\n",
             "required": false
           },
           {
-            "in": "query",
+            "in": "path",
             "name": "SUBSCRIPTION_ID",
             "example": "hcs-123",
             "description": "The subscription you want to update\n",
@@ -26832,13 +26875,13 @@
         "parameters": [
           {
             "in": "query",
-            "name": "ACCOUNT_ID",
+            "name": "accountId",
             "example": "act-123abc",
             "description": "ID of the account associated with your token\n",
             "required": false
           },
           {
-            "in": "query",
+            "in": "path",
             "name": "SUBSCRIPTION_ID",
             "example": "hcs-123",
             "description": "The subscription you want to update\n",
@@ -26864,13 +26907,13 @@
         "parameters": [
           {
             "in": "query",
-            "name": "ACCOUNT_ID",
+            "name": "accountId",
             "example": "act-123abc",
             "description": "ID of the account associated with your token\n",
             "required": false
           },
           {
-            "in": "query",
+            "in": "path",
             "name": "SUBSCRIPTION_ID",
             "example": "hcs-123",
             "description": "The subscription you want to update\n",
@@ -26891,10 +26934,11 @@
                     "properties": {
                       "subscription": {
                         "type": "object",
-                        "description": "Group",
+                        "description": "Element that store all the subscription config",
                         "properties": {
                           "endpoint": {
                             "type": "string",
+                            "description": "The endpoint the notification will be sent to. url in case of http/https/web, email address in case of email/email-json and sns-topic-arn in case of aws-sns",
                             "example": "SNS_TOPIC_ARN"
                           }
                         }
@@ -26908,7 +26952,75 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/responses/200"
+            "description": "Update Subscription Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "allOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "request": {
+                              "type": "object",
+                              "description": "Original request properties\n",
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "example": "46642c7d-bc29-417d-8ce4-79626f00c63c",
+                                  "description": "Unique ID associated with this request\n"
+                                },
+                                "url": {
+                                  "type": "string",
+                                  "example": "/events/subscription/sis-56879d5c?accountId=act-123abc",
+                                  "description": "The URL that was used for the request\n"
+                                },
+                                "method": {
+                                  "type": "string",
+                                  "example": "PUT",
+                                  "description": "The HTTP **METHOD** used for the request\n"
+                                },
+                                "timestamp": {
+                                  "type": "string",
+                                  "example": "2018-11-19T13:49:11.911Z",
+                                  "description": "When the request was received by Spot\n"
+                                }
+                              }
+                            },
+                            "response": {
+                              "type": "object",
+                              "description": "Response package that includes, status, type and any relevant data.\n",
+                              "properties": {
+                                "status": {
+                                  "type": "object",
+                                  "properties": {
+                                    "code": {
+                                      "type": "integer",
+                                      "example": 200,
+                                      "description": "HTTP status code assigned to this response\n"
+                                    },
+                                    "message": {
+                                      "type": "string",
+                                      "example": "OK",
+                                      "description": "HTTP status message for the respective status code\n"
+                                    }
+                                  }
+                                },
+                                "affectedRows": {
+                                  "type": "integer",
+                                  "example": 1
+                                }
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -26933,25 +27045,20 @@
                   {
                     "type": "object",
                     "properties": {
-                      "request": {
-                        "type": "object",
-                        "properties": {
-                          "accountIds": {
-                            "type": "array",
-                            "items": {
-                              "type": "string",
-                              "example": "act-abc12345"
-                            }
-                          },
-                          "fromDate": {
-                            "type": "string",
-                            "example": 1569950296
-                          },
-                          "toDate": {
-                            "type": "string",
-                            "example": 1570727896
-                          }
+                      "accountIds": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "example": "act-abc12345"
                         }
+                      },
+                      "fromDate": {
+                        "type": "string",
+                        "example": 1569950296
+                      },
+                      "toDate": {
+                        "type": "string",
+                        "example": 1570727896
                       }
                     }
                   }
