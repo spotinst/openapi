@@ -1,5 +1,5 @@
 type: "object"
-title: "Create Elastigroup Azure Scale Set VMs Body"
+title: "Create Elastigroup Azure Spot VMs Body"
 required:
   - group
   - name
@@ -73,6 +73,17 @@ properties:
             type: object
             title: Scale Up Policies
             description: Provide the ability to accommodate increased workloads.
+            required:
+              - policyName
+              - metricName
+              - statistic
+              - threshold
+              - period
+              - evaluationPeriods
+              - cooldown
+              - action
+              - operator
+              - namespace
             properties:
               policyName:
                 title: Policy Name
@@ -95,6 +106,21 @@ properties:
                   - sum
                   - minimum
                   - maximum
+              unit:
+                title: Unit
+                description: "Unit to measure to evaluate the selected metric:
+                </br> Valid Values:
+                <ul>
+                  <li>Count</li>
+                  <li>Bytes</li>
+                  <li>Percent</li>
+                  <li>CountPerSecond</li>
+                  <li>Milliseconds</li>
+                  <li>BytesPerSecond</li>
+                  <li>Seconds</li>
+                </ul>"
+                type: string
+                example: Count
               threshold:
                 title: Threshold
                 description: The value at which the scaling action is triggered.
@@ -211,16 +237,17 @@ properties:
                   - lte
               dimenstions:
                 title: Dimenstions
-                description: TBD
+                description: "Required if scaling.up.namespace is different from 'Microsoft.Compute'. 2 dimensions are required, example: </br>
+                “dimensions”: </br> [ </br> { “key” : “resourceGroupName”, “value” : “testResourceGroup” } , </br> { “key” : “resourceName”, “value” : “testApplicationGateway” } </br> ]"
                 type: array
                 items:
                   type: object
                   properties:
-                    name:
+                    key:
                       title: TBD
                       description: TBD
                       type: string
-                      example: resourceName
+                      example: resourceGroupName
                     value:
                       title: TBD
                       description: TBD
@@ -230,6 +257,8 @@ properties:
                 title: Action
                 description: Scaling action to take when the policy is triggered.
                 type: object
+                required:
+                  - type
                 properties:
                   type:
                     title: Type
@@ -251,12 +280,6 @@ properties:
                     </ul>"
                     type: string
                     example: "2"
-                  minTargetCapacity:
-                    title: Minimum Target Capacity
-                    description: "Value to adjust the capacity to. Required if using as action type:
-                    <ul>
-                      <li>setMinTarget</li>
-                    </ul>"
                   target:
                     title: Target
                     description: "Value to update the group target capacity to. Also you must indicate “minimum” and “maximum” amounts. Required if selected as action type:
@@ -286,6 +309,17 @@ properties:
             type: object
             title: Scale Down Policies
             description: Provide the ability to scale down to maximize cost efficiency.
+            required:
+              - policyName
+              - metricName
+              - statistic
+              - threshold
+              - period
+              - evaluationPeriods
+              - cooldown
+              - action
+              - operator
+              - namespace
             properties:
               policyName:
                 title: Policy Name
@@ -308,6 +342,21 @@ properties:
                   - sum
                   - minimum
                   - maximum
+              unit:
+                title: Unit
+                description: "Unit to measure to evaluate the selected metric:
+                              </br> Valid Values:
+                              <ul>
+                                <li>Count</li>
+                                <li>Bytes</li>
+                                <li>Percent</li>
+                                <li>CountPerSecond</li>
+                                <li>Milliseconds</li>
+                                <li>BytesPerSecond</li>
+                                <li>Seconds</li>
+                              </ul>"
+                type: string
+                example: Count
               threshold:
                 title: Threshold
                 description: The value at which the scaling action is triggered.
@@ -423,26 +472,33 @@ properties:
                   - lt
                   - lte
               dimenstions:
-                title: TBD
-                description: TBD
+                title: Dimenstions
+                description: "Required if scaling.up.namespace is different from 'Microsoft.Compute'. 2 dimensions are required, example: </br>
+                              “dimensions”: </br> [ </br> { “key” : “resourceGroupName”, “value” : “testResourceGroup” } , </br> { “key” : “resourceName”, “value” : “testApplicationGateway” } </br> ]"
                 type: array
                 items:
                   type: object
                   properties:
-                    name:
-                      title: TBD
-                      description: TBD
+                    key:
+                      title: Key
+                      description: Azure resource group for the scaling.down.dimensions. Required if using namespace different from "Microsoft.Compute".
                       type: string
-                      example: resourceName
+                      example: resourceGroupName
                     value:
-                      title: TBD
-                      description: TBD
+                      title: Value
+                      description: Azure resource the scaling.down.dimensions. Required if using namespace different from "Microsoft.Compute".
                       type: string
                       example: TestAppGateway
               action:
                 title: Action
                 description: Scaling action to take when the policy is triggered.
                 type: object
+                required:
+                  - type
+                  - adjustment
+                  - target
+                  - minimum
+                  - maximum
                 properties:
                   type:
                     title: Type
@@ -510,30 +566,102 @@ properties:
         type: "object"
         title: Scaling Strategy
         properties:
-          lowPriorityPercentage:
-            title: Low Priority Percentage
-            description: "Percentage of Low Priority instances to maintain.
+          spotPercentage:
+            title: Spot Percentage
+            description: "Percentage of Spot-VMs to maintain.
             </br><a style=color:red>Required if odCount isn't specified.</a>"
-            type: "integer"
+            type: integer
             default: 100
+            example: 100
           onDemandCount:
             title: On Demand Count
             type: integer
-            description: "Number of On-Demand instances to maintain.
-            </br><a style=color:red>Required if lowPriorityPercentage isn't specified.</a>"
+            description: "Number of On-Demand VMs to maintain.
+            </br><a style=color:red>Required if spotPercentage isn't specified.</a>"
+            example: 3
           drainingTimeout:
-            title: On Demand Count
+            title: Draining Timeout
             type: integer
-            description: "Time (seconds) to allow the instance be drained from incoming TCP
+            description: "Time (seconds) to allow the VM be drained from incoming TCP
             connections and detached from MLB before terminating it during a scale down operation."
             default: 120
+          revertToSpot:
+            title: Revert To Spot
+            type: object
+            description: "Hold settings for strategy correction - replacing On-Demand for Spot VMs"
+            properties:
+              performAt:
+                title: Perform At
+                type: string
+                description: "Settings for maintenance strategy - possible values:
+                <ul>
+                  <li>timeWindow</li>
+                  <li>never</li>
+                  <li>always</li>
+                </ul>"
+                default: always
+          optimizationWindows:
+            title: Optimization Windows
+            description: "Valid format:
+            <ul>
+              <li>ddd:hh:mm-ddd:hh:mm (day:hour(0-23):minute(0-59))</li>
+              <li>not empty if revertToSpot.performAt = timeWindow</li>
+            </ul>"
+            type: array
+          signals:
+            title: Signals
+            description: The signals defined for this group.
+            type: array
+            items:
+              type: object
+              properties:
+                timeout:
+                  title: Timeout
+                  description: The timeout in seconds to hold the vm until a signal is sent. If no signal is sent the vm will be replaced (vmReady) or we will terminate the vm (vmReadyToShutdown) after the timeout. (Maximum is 1800 seconds, Minimum is 60 seconds)
+                  default: 30
+                  type: integer
+                  example: 50
+                type:
+                  title: Type
+                  description: "The type of the signal defined for the group. Valid Values: vmReady, vmReadyToShutdown"
+                  type: string
+                  example: vmReady
+      health:
+        title: Health
+        description: Autohealing of unhealthy VMs.
+        type: object
+        properties:
+          autoHealing:
+            title: Auto Healing
+            description: Enable Autohealing of unhealthy VMs.
+            type: boolean
+            example: false
+          healthCheckTypes:
+            title: Health Check Types
+            description: "Healthcheck to use to validate VM health. </br>Valid Values:
+            <ul>
+              <li>vmState</li>
+              <li>applicationGateway</li>
+            </ul>"
+            type: string
+            example: vmState
+          gracePeriod:
+            title: Grace Period
+            description: "Period of time to wait for VM to reach healthiness before monitoring for unhealthiness."
+            type: integer
+            example: 300
+          unhealthyDuration:
+            title: Unhealthy Duration
+            description: Amount of time to be unhealthy before a replacement is triggered
+            type: integer
+            example: 360
       compute:
         title: Compute
         description: Elastigroup's Compute Configurtion
         type: "object"
         required:
           - vmSizes
-          - product
+          - os
           - launchSpecification
         properties:
           vmSizes:
@@ -542,7 +670,7 @@ properties:
             type: "object"
             required:
               - odSizes
-              - lowPrioritySizes
+              - spotSizes
             properties:
               odSizes:
                 title: OD Sizes
@@ -910,61 +1038,29 @@ properties:
                   type: string
                   example: standard_b1s
 
-              lowPrioritySizes:
-                title: Low Priority Sizes
-                description: Available Low-Priority sizes.
+              spotSizes:
+                title: Spot Sizes
+                description: Available Spot-VM sizes.
                 type: array
                 items:
                   type: string
-                  example: standard_a2_v2
-          product:
+                  example: standard_a1_v2
+          os:
             type: sting
             example: Linux
             enum:
               - Linux
               - Windows
-          health:
-            title: Health
-            description: Autohealing of unhealthy VMs.
-            type: object
-            properties:
-              autoHealing:
-                title: Auto Healing
-                description: Enable Autohealing of unhealthy VMs.
-                type: boolean
-                example: true
-              healthCheckType:
-                title:
-                description: "Healthcheck to use to validate VM health. </br> Valid Values:
-                <ul>
-                  <li>INSTANCE_STATE</li>
-                  <li>MULTAI_TARGET_SET</li>
-                  <li>HCS</li>
-                  <li>K8S_NODE</li>
-                </ul>"
-                type: string
-                example: INSTANCE_STATE
-                enum:
-                  - INSTANCE_STATE
-              gracePeriod:
-                title: Grace Period
-                description: Period of time to wait for VM to reach healthiness before monitoring for unhealthiness.
-                type: integer
-                example: 120
-              unhealthyDuration:
-                title: Unhealthy Duration
-                description: amount of time to be unhealthy before a replacement is triggered
-                type: integer
-                example: 360
+
           launchSpecification:
             title: Launch Specification
             description: Launch Specification Configuration
             type: object
             required:
-              - login
               - image
               - network
               - subnetName
+              - login
             properties:
               image:
                 title: Image
@@ -1008,7 +1104,7 @@ properties:
                         description: "Name of Resource Group for custom image. </br> <a style=color:red;>Required if custom image is specified.</a>"
                         type: string
                         example: "spotinst-azure"
-                      imageName:
+                      name:
                         title: Image Name
                         description: "Name of the custom image. </br> <a style=color:red;>Required if custom image is specified.</a>"
                         type: string
@@ -1028,6 +1124,13 @@ properties:
                           title: MULTAI_TARGET_SET
                           properties:
                             type:
+                              title: Type
+                              description: "The type of load balancer. </br>
+                              Valid Values:
+                              <ul>
+                                <li>MULTAI_TARGET_SET</li>
+                                <li>APPLICATION_GATEWAY</li>
+                              </ul>"
                               type: string
                               example: MULTAI_TARGET_SET
                               enum:
@@ -1045,11 +1148,20 @@ properties:
                           title: APPLICATION_GATEWAY
                           properties:
                             type:
+                              title: Type
+                              description: "The type of load balancer. </br>
+                              Valid Values:
+                              <ul>
+                                <li>MULTAI_TARGET_SET</li>
+                                <li>APPLICATION_GATEWAY</li>
+                              </ul>"
                               type: string
                               example: APPLICATION_GATEWAY
                               enum:
                                 - APPLICATION_GATEWAY
                             resourceGroupName:
+                              title: Resource Group Name
+                              description: "The Resource Group name of the Load Balancer."
                               type: string
                               example: azureResourceGroup
                             applicationGatewayName:
@@ -1058,11 +1170,6 @@ properties:
                             backendPoolName:
                               type: string
                               example: backendpool490822
-              userData:
-                title: User Data
-                description: Base64-encoded MIME user data to make available to the instances.
-                type: string
-                example: IyEvYmluL2Jhc2gKZWNobyAidGVzdCI=
               managedServiceIdentities:
                 title: Managed Service Identities
                 description: Add a user-assigned managed identity to the VMs in the cluster.
@@ -1082,8 +1189,8 @@ properties:
                       example: Test
               shutdownScript:
                 title: Shutdown Script
-                type: string
                 description: Shutdown script for the group. Value should be passed as a string encoded at Base64 only
+                type: string
                 example: IyEvYmluL2Jhc2gKZWNobyAidGVzdCI=
               tags:
                 title: Tags
@@ -1109,53 +1216,90 @@ properties:
                 required:
                   - resourceGroupName
                   - virtualNetworkName
-                  - subnetName
+                  - networkInterfaces
                 properties:
-                  virtualNetworkName:
-                    title: Virtual Network Name
-                    description: Name of Vnet.
-                    type: string
-                    example: vname
-                  subnetName:
-                    title: Subnet Name
-                    description: ID of subnet.
-                    type: string
-                    example: my-subnet-name
                   resourceGroupName:
                     title: Resource Group Name
                     description: Vnet Resource Group Name
                     type: string
                     example: subnetResourceGroup
-                  assignPublicIp:
-                    title: Assign Public Ip
-                    description: Assign a public IP to each VM in the Elastigroup.
-                    default: false
-                    type: boolean
-                    example: true
-                  additionalIPConfigurations:
-                    title: Additional IP Configurations
-                    description: Add array of additional IP configuration objects
+                  virtualNetworkName:
+                    title: Virtual Network Name
+                    description: Virtual Network
+                    type: string
+                    example: vname
+                  networkInterfaces:
+                    title: Virtual Network Name
+                    description: Virtual Network
                     type: array
                     items:
                       type: object
                       required:
-                        - name
+                        - isPrimary
+                        - subnetName
                       properties:
-                        name:
-                          title: Name
-                          description: The IP configuration name.
+                        isPrimary:
+                          title: Is Primary Criteria
+                          description: Defines whether the network interface is primary or not.
+                          type: boolean
+                          example: true
+                        subnetName:
+                          title: Subnet Name
+                          description: Subnet name
                           type: string
-                          example: config1
-                        privateIpAddressVersion:
-                          title: Private IP Address Version
-                          description: "Available from Azure Api-Version 2017-03-30 onwards, it represents whether the specific ipconfiguration is IPv4 or IPv6.
-                          Valid values:
-                          <ul>
-                            <li>IPv4</li>
-                            <li>IPv6</li>
-                          </ul>"
+                          example: testSubnet
+                        assignPublicIp:
+                          title: Assign Publick IP
+                          description: Assign public IP
+                          type: boolean
+                          example: true
+                        publicIpSku:
+                          title:
+                          description: Required if assignPublicIp=true values=[STANDARD/BASIC]
                           type: string
-                          example: IPv4
+                          example:
+                        securityGroup:
+                          title: Security Group
+                          description: Security Group
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                title: Name
+                                description: Requires valid security group name. Required if security group is specified.
+                                type: string
+                                example: test
+                              resourceGroupName:
+                                title: Resource Group Name
+                                description: Requires valid resource group name. Required if security group is specified.
+                                type: string
+                                example: test
+                        enableIPForwarding:
+                          title: Enable IP Forwarding
+                          description: Enable IP Forwarding
+                          type: boolean
+                          example: true
+                        additionalIpConfigurations:
+                          title: Additional IP Configurations
+                          description: Additional configuration of network interface
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                title: Name
+                                description: Required if additionalConfiguration has been specified.
+                                type: string
+                                example: test
+                              privateIpAddressVersion:
+                                title: Private IP Address Version
+                                description: "Possible values: </br>
+                                <ul>
+                                  <li>IPv4</li>
+                                  <li>IPv6</li>
+                                </li>"
+                                default: IPv4
               extensions:
                 title: Extensions
                 description: List of objects for Azure extensions
@@ -1167,7 +1311,6 @@ properties:
                     - name
                     - publisher
                     - type
-                    - typeHandlerVersion
                   properties:
                     autoUpgradeMinorVersion:
                       title: Auto Upgrade Minor Version
@@ -1191,6 +1334,10 @@ properties:
                           title: Command To Execute
                           description: Required for compute.launchSpecification.extensions.protectedSettings object
                           type: string
+                    publicSettings:
+                      title: Public Settings
+                      description: Public Settings
+                      type: object
                     publisher:
                       title: Publisher
                       description: Required on compute.launchSpecification.extensions object
@@ -1201,11 +1348,65 @@ properties:
                       description: Required on compute.launchSpecification.extensions object
                       type: string
                       example: "Compute.AKS-Engine.Linux.Billing"
-                    typeHandlerVersion:
-                      title: Type Handler Version
-                      description: Required on compute.launchSpecification.extensions object
+                    apiVersion:
+                      title: API Version
+                      description: The API version of the extension. Required if extension specified.
                       type: string
-                      example: "1.0"
+                      example: 1.0
+                    minorVersionAutoUpgrade:
+                      title: minorVersionAutoUpgrade
+                      description: Enable minor version upgrades of the extension. Required if extension specified.
+                      type: boolean
+                      example: true
+              dataDisks:
+                title: Data Disks
+                description: List of data disks to be attached to the vms in the group.
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      title: Type
+                      description: "The type of the data disk, possible values:
+                       <ul>
+                        <li>Standard_LRS</li>
+                        <li>Premium_LRS</li>
+                        <li>StandardSSD_LRS</li>
+                       </ul>
+                       </br> Required if dataDisks is specified."
+                      type: string
+                      example: Standard_LRS
+                    lun:
+                      title: Lun
+                      description: The lun of the data disk, Required if dataDisks is specified.
+                      type: integer
+                      example: 6
+                    sizeGB:
+                      title: Size GB
+                      description: "The size of the data disk in GB, Required if dataDisks is specified. Minimum value: 1 Maximum value: 1023"
+                      type: integer
+                      example: 10
+              osDisk:
+                title: OS Disk
+                description: Specify OS disk specification other than default.
+                type: object
+                properties:
+                  type:
+                    title: Type
+                    description: "The type of the OS disk, possible values:
+                     <ul>
+                      <li>Standard_LRS</li>
+                      <li>Premium_LRS</li>
+                      <li>StandardSSD_LRS</li>
+                     </ul>
+                      Required if dataDisks is specified."
+                    type: string
+                    example: Standard_LRS
+                  size:
+                    title: Size
+                    description: "The size of the OS disk in GB, Required if dataDisks is specified. Minimum value: 1 Maximum value: 1023"
+                    type: integer
+                    example: 6
               customData:
                 title: Custom Data
                 description: This value will hold the YML in base64 and will be added to the scaleSets
@@ -1237,143 +1438,3 @@ properties:
                       title: Password
                       description: "Password for admin access to Windows VMs. </br> <a style = color:red>Required for Windows. Can not exist simultaneously with 'sshPublicKey'</a>"
                       type: string
-      thirdPartiesIntegration:
-        title: Third Parties Integration
-        description: Settings for 3rd party integrations on group.
-        type: "object"
-        properties:
-          kubernetes:
-            title: Kubernetes Integration Configuration
-            description: Define Kubernetes integration on group
-            type: "object"
-            required:
-              - clusterIdentifier
-            properties:
-              clusterIdentifier:
-                title: Cluster Identifier
-                description:
-                  "Must match the clusterIdentifier that was sent when the Spot Controller was installed.
-                  </br><a style = color:red>Required on thirdPartiesIntegration.kubernetes object</a>"
-                type: string
-                example: "aks-engine-cluser"
-              autoScale:
-                title: Auto Scale
-                description: K8's auto scaler configuration
-                type: object
-                properties:
-                  isEnabled:
-                    title: Is Enabled Criteria
-                    description: Is the auto scaler enabled or not
-                    type: boolean
-                    example: true
-                  isAutoConfig:
-                    title: Is Auto Config Criteria
-                    description: Set to true if you want to use the Automated headroom feature
-                    type: boolean
-                    example: false
-                  cooldown:
-                    title: Cooldown
-                    description: Cool down period between scaling actions
-                    type: integer
-                    example: 180
-                  down:
-                    title: Down
-                    description: Auto scaler Scale down configuration
-                    type: object
-                    properties:
-                      maxScaleDownPercentage:
-                        title: Max Scale Down Percentage
-                        description: Would represent the maximum % to scale-down. Number between 1-100
-                        type: integer
-                        example: 50
-                  headroom:
-                    title: Headroom
-                    description: Headroom configuration of the auto scaler
-                    type: object
-                    properties:
-                      cpuPerUnit:
-                        title: cpuPerUnit
-                        description: Optionally configure the number of CPUs to allocate the headroom. CPUs are denoted in millicores, where 1000 millicores = 1 vCPU.
-                        type: integer
-                        example: 2
-                      memoryPerUnit:
-                        title: memoryPerUnit
-                        description: Optionally configure the amount of memory (MiB) to allocate the headroom.
-                        type: integer
-                        example: 2
-                      gpuPerUnit:
-                        title: GPU Per Unit
-                        description: How much GPU allocate for headroom unit.
-                        type: integer
-                        example: 2
-                      numOfUnits:
-                        title: Number Of Units
-                        description: The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.
-                        type: integer
-                        example: 2
-                  labels:
-                    title: Labels
-                    description: Key/value pairs to use as constraints.
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        key:
-                          title: Key
-                          description: Key of constraint
-                          type: string
-                          example: group
-                        value:
-                          title: Value
-                          description: Value of constraint
-                          type: string
-                          example: microservices
-                  resourceLimits:
-                    title: Resource Limits
-                    description: Optionally set upper and lower bounds on the resource usage of the cluster.
-                    type: object
-                    properties:
-                      maxVCpu:
-                        title: MAX VCpu
-                        description: The maximum cpu in vCpu units that can be allocated to the cluster.
-                        type: integer
-                        example: 4
-                      maxMemoryGib:
-                        title: MAX Memory Gib
-                        description: The maximum memory in GiB units that can be allocated to the cluster.
-                        type: integer
-                        example: 4
-
-
-          hpcGridEngine:
-            type: "object"
-            required:
-              - clusterId
-            properties:
-              clusterId:
-                type: string
-                example: "spotinst-uge-cluster"
-                description: >
-                  Must match the clusterId used by the [controller](https://api.spot.io/elastigroup-for-azure/hpc/introduction/)
-              queues:
-                type: array
-                description: >
-                  If defined the autoscaler will only match this Elastigroup to jobs associated with the queues listed here. If empty or null, then all queues will be monitored.
-                items:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                      example: "burst.q"
-                      description: >
-                        The name of the queue to monitor
-              distribution:
-                type: string
-                enum:
-                  - sge
-                  - uge
-                description: >
-                  The specific distribution of grid engine. Defaults to `sge`
-                properties:
-                  name:
-                    type: string
