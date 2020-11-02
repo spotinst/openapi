@@ -1,0 +1,501 @@
+type: object
+title: "GCP Elastigroup Update"
+required:
+  - group
+properties:
+  group:
+    type: object
+    title: "GCP Elastigroup"
+    required:
+      - capacity
+      - compute
+    properties:
+      id:
+        type: "string"
+        example: "sig-1234567"
+        readOnly: true
+        description: >
+          GCP Elastigroup
+      name:
+        type: "string"
+        example: "spotinst-group"
+        description: >
+          GCP Elastigroup Name
+      description:
+        type: "string"
+        example: "Some GCP Elastigroup description"
+        description: >
+          Description for your GCP Elastigroup
+      capacity:
+        title: Capacity Units
+        type: object
+        required:
+          - target
+          - minimum
+          - maximum
+        properties:
+          target:
+            type: "integer"
+            example: 8
+            description: >
+              Current scale the Elastigroup will conform to.
+          minimum:
+            type: "integer"
+            example: 2
+            description: >
+              The Elastigroup will not set a target below this value.
+          maximum:
+            type: "integer"
+            example: 20
+            description: >
+              The Elastigroup will not set a target greater than this value.
+      scheduling:
+        title: "Scheduling Object"
+        type: object
+        properties:
+          tasks:
+            title: "Tasks Array"
+            type: array
+            items:
+              title: "Task Object"
+              type: object
+              properties:
+                isEnabled:
+                  type: boolean
+                  example: true
+                taskType:
+                  type: string
+                  example: "setCapacity"
+                cronExpression:
+                  type: string
+                  example: "1 10 * * *"
+                targetCapacity:
+                  type: integer
+                  example: 2
+                minCapacity:
+                  type: integer
+                  example: 1
+                maxCapacity:
+                  type: integer
+                  example: 3
+      strategy:
+        type: object
+        title: "Elastigroup Strategy"
+        required:
+          - preemptiblePercentage
+          - onDemandCount
+          - fallbackToOd
+        properties:
+          fallbackToOd:
+            type: boolean
+            example: true
+          optimizationWindows:
+            type: array
+            items:
+              type: string
+              format: date-time
+              example: [ "Mon:01:00-Mon:02:00" ]
+          revertToPreemptible:
+            required:
+              - performAt
+            type: object
+            properties:
+              performAt:
+                type: string
+                example: "timeWindow"
+          preemptiblePercentage:
+            type: integer
+            example: 90
+            description: >
+              percentage of Preemptible instances in the Elastigroup. The remaining percentage will be On-Demand instances.
+          onDemandCount:
+            type: integer
+            example: 2
+            description: >
+              the exact number of On-Demand instances required in the Elastigroup.
+          drainingTimeout:
+            example: 30
+            type: integer
+            description: >
+              The time in seconds, the instance is allowed to run while detached from the ELB.
+      compute:
+        type: object
+        title: "Compute Object"
+        required:
+          - availabilityZones
+          - subnets
+          - launchSpecification
+        properties:
+          launchSpecification:
+            type: object
+            title: "Launch Specification Object"
+            required:
+              - networkInterfaces
+              - disks
+            properties:
+              metadata:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    key:
+                      type: string
+                      example: "environment"
+                    value:
+                      type: string
+                      example: "production"
+              tags:
+                type: array
+                items:
+                  type: string
+                  example: [ "prod1", "testingfeature" ]
+              backendServiceConfig:
+                type: object
+                title: "backendServiceConfig Object"
+                properties:
+                  backendServices:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - backendServiceName
+                      properties:
+                        backendServiceName:
+                          type: string
+                          example: "bserv-2"
+                        locationType:
+                          type: string
+                          example: "global"
+                        scheme:
+                          type: string
+                          example: null
+                        namedPorts:
+                          type: object
+                          required:
+                            - name
+                            - ports
+                          properties:
+                            name:
+                              type: string
+                              example: "https"
+                            ports:
+                              type: array
+                              items:
+                                type: integer
+                                example: [ 443, 8443 ]
+              disks:
+                type: array
+                title: "Disks array"
+                required:
+                  - type
+                  - diskSizeGb
+                  - sourceImage
+                items:
+                  type: object
+                  properties:
+                    deviceName:
+                      type: string
+                      example: null
+                    initializeParams:
+                      type: object
+                      properties:
+                        diskSizeGb:
+                          type: integer
+                          example: 10
+                        diskType:
+                          type: string
+                          example: "pd-standard"
+                        sourceImage:
+                          type: string
+                          example: "https://www.googleapis.com/compute/v1/projects/test/global/images/docker-image-1"
+                    mode:
+                      type: string
+                      example: "READ_WRITE"
+                    source:
+                      type: string
+                      example: null
+                    type:
+                      type: string
+                      example: "PERSISTENT"
+                    autoDelete:
+                      type: boolean
+                      example: true
+                    boot:
+                      type: boolean
+                      example: true
+                    interface:
+                      type: string
+                      example: "SCSI"
+              networkInterfaces:
+                title: "Network Interfaces array"
+                type: array
+                items:
+                  type: object
+                  required:
+                    - network
+                  properties:
+                    network:
+                      type: string
+                      example: "spot-network"
+                    projectId:
+                      type: string
+                      example: "test-project"
+              startupScript:
+                type: string
+                example: "IyEvYmluL2Jhc2gNCnRvdWNoIHRlc3Qiquwhq38"
+              shutdownScript:
+                type: string
+                example: null
+              ipForwarding:
+                type: boolean
+                example: false
+              minCpuPlatform:
+                type: string
+                example: "Intel Sandy Bridge"
+          instanceTypes:
+            type: object
+            title: "On Demand & Preemptible Types Object"
+            required:
+              - ondemand
+              - preemptible
+            properties:
+              ondemand:
+                type: string
+                example: "n1-standard-1"
+                description: >
+                  The type of On Demand instances to utilize
+              preemptible:
+                type: array
+                example: [ "n1-standard-1", "n1-standard-2" ]
+                description: >
+                  The type of Preemptible instances to utilize
+          availabilityZones:
+            type: array
+            example: [
+                "asia-east1-a",
+                "asia-east1-b",
+                "asia-east1-c"
+            ]
+            description: Availability zones for the group
+          gpu:
+            type: object
+            title: "CPU Object"
+            properties:
+              type:
+                type: string
+                example: "nvidia-tesla-v100"
+              count:
+                type: integer
+                example: 1
+          subnets:
+            type: array
+            items:
+              type: object
+              properties:
+                region:
+                  type: string
+                  example: "us-west1"
+                subnetNames:
+                  type: array
+                  example: [ "private" ]
+            description: >
+              Subnets your group is associated with
+          elasticIps:
+            type: array
+            example: null
+            description: >
+              Elastic IPs your group is associated with
+      scaling:
+        type: object
+        title: "Scaling object"
+        properties:
+          up:
+            type: array
+            items:
+              title: "Up scaling object"
+              type: object
+              properties:
+                policyName:
+                  type: string
+                  example: "scale_up_1"
+                source:
+                  type: string
+                  example: "stackdriver"
+                metricName:
+                  type: string
+                  example: "instance/disk/read_ops_count"
+                statistic:
+                  type: string
+                  example: "average"
+                unit:
+                  type: string
+                  example: "percent"
+                threshold:
+                  type: integer
+                  example: 10000
+                namespace:
+                  type: string
+                  example: "compute"
+                period:
+                  type: integer
+                  example: 300
+                evaluationPeriods:
+                  type: integer
+                  example: 1
+                cooldown:
+                  type: integer
+                  example: 300
+                operator:
+                  type: string
+                  example: "gte"
+                dimensions:
+                  title: "Array of dimension objects"
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        example: "storage_type"
+                      value:
+                        type: string
+                        example: "pd-standard"
+                action:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      example: "adjustment"
+                    adjustment:
+                      type: integer
+                      example: 1
+          down:
+            type: array
+            items:
+              title: "Down scaling object"
+              type: object
+              properties:
+                policyName:
+                  type: string
+                  example: "scale_down_1"
+                source:
+                  type: string
+                  example: "stackdriver"
+                metricName:
+                  type: string
+                  example: "instance/disk/read_ops_count"
+                statistic:
+                  type: string
+                  example: "average"
+                unit:
+                  type: string
+                  example: "percent"
+                threshold:
+                  type: integer
+                  example: 10000
+                namespace:
+                  type: string
+                  example: "compute"
+                period:
+                  type: integer
+                  example: 300
+                evaluationPeriods:
+                  type: integer
+                  example: 1
+                cooldown:
+                  type: integer
+                  example: 300
+                operator:
+                  type: string
+                  example: "lte"
+                dimensions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        example: "storage_type"
+                      value:
+                        type: string
+                        example: "pd-standard"
+                action:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      example: "adjustment"
+                    adjustment:
+                      type: integer
+                      example: 1
+
+      thirdPartiesIntegration:
+        title: "Third Parties Integration Object"
+        type: object
+        properties:
+          dockerSwarm:
+            title: "DockerSwarm ThirdPartiesIntegration Object"
+            type: object
+            properties:
+              masterHost:
+                type: string
+                example: "swarm1.swarm.com"
+              masterPort:
+                type: integer
+                example: 1234
+          gke:
+            title: "GKE ThirdPartiesIntegration Object"
+            type: object
+            properties:
+              autoUpdate:
+                type: boolean
+                example: true
+              autoScale:
+                type: object
+                properties:
+                  isEnabled:
+                    type: boolean
+                    example: true
+                  isAutoConfig:
+                    type: boolean
+                    example: false
+                  cooldown:
+                    type: integer
+                    example: 300
+                  headroom:
+                    type: object
+                    properties:
+                      cpuPerUnit:
+                        type: integer
+                        example: 1
+                      memoryPerUnit:
+                        type: integer
+                        example: 0
+                      numOfUnits:
+                        type: integer
+                        example: 1
+                  down:
+                    type: object
+                    properties:
+                      evaluationPeriods:
+                        type: integer
+                        example: 5
+              clusterIdentifier:
+                type: string
+                example: "gke-clust-1"
+              location:
+                type: string
+                example: "us-west1"
+      createdAt:
+        type: "string"
+        example: "2020-10-16T09:03:23.000Z"
+        format: "date-time"
+        description: >
+          The datetime the group was created.
+      updatedAt:
+        type: "string"
+        example: "2020-10-16T09:03:23.000Z"
+        format: "date-time"
+        description: >
+          The datetime the group was last updated.
+
