@@ -47,8 +47,32 @@ put:
   parameters:
     - $ref: "../../../../../commons/parameters/accountId.yaml"
     - $ref: "../../../commons/parameters/groupId.yaml"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          properties:
+            batchSizePercentage:
+              title: Batch Size Percentage
+              type: integer
+              example: 50
+              description: Indicates (in percentage) the batch size of the roll (meaning, how many nodes to replace in each batch)
+            gracePeriod:
+              title: Grace Period
+              type: integer
+              description: Indicates (in seconds) the timeout to wait until node become healthy in the ELB
+              example: 300
+            healthCheckType:
+              title: Health Check Type
+              type: string
+              description: "Define a health check type.
+              valid values: mlb, node_state, none (wait the entire grace
+               period for each batch). If no value is set the roll will use the group’s auto-healing health check."
+              example: INSTANCE_STATE
+
   responses:
     200:
-      $ref: "../responses/deployment.yaml"
+      $ref: "../responses/startDeployment.yaml"
     400:
       description: "Bad Request"
