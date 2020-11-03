@@ -51,35 +51,53 @@ properties:
                 type: string
                 example: "value2"
       taints:
-        type: object
-        description: Add taints to cluster
-        properties:
-          key:
-            type: string
-            description: taint's key
-            example: test
-          value:
-            type: string
-            description: taint's value
-            example: test
-          effect:
-            type: string
-            description: taint's effect
-            example: NoExecute
+        type: array
+        description: Add taints to Launch Spec
+        items:
+          type: object
+          properties:
+            key:
+              type: string
+              description: Set taint key
+            value:
+              type: string
+              description: Set taint value
+            effect:
+              type: string
+              description: Set taint effect
+        example:
+          - key: taintKey
+            value: taintValue
+            effect: NoSchedule
       labels:
-        type: object
-        description: Add labels to cluster
-        properties:
-          - type: object
-            properties:
-              key:
-                type: string
-                description: Set label key
-                example: test
-              value:
-                type: string
-                description: Set label value
-                example: test
+        type: array
+        description: 'An array of labels to add to the Launch Spec. Custom user labels only,
+                no K8s built in labels or Spot internal labels.'
+        items:
+          type: object
+          properties:
+            key:
+              type: string
+              description: 'Set label key. May not be one of the following:
+                                   "kubernetes.io/hostname",
+                                   "failure-domain.beta.kubernetes.io/zone",
+                                   "topology.kubernetes.io/zone",
+                                   "failure-domain.beta.kubernetes.io/region",
+                                   "topology.kubernetes.io/region",
+                                   "beta.kubernetes.io/instance-type",
+                                   "node.kubernetes.io/instance-type",
+                                   "beta.kubernetes.io/os",
+                                   "kubernetes.io/os",
+                                   "beta.kubernetes.io/arch",
+                                   "kubernetes.io/arch",
+                                   "spotinst.io/node-lifecycle",
+                                   "spotinst.io/gpu-type"'
+            value:
+              type: string
+              description: Set label value
+        example:
+          - key: "env"
+            value: "test"
       autoScale:
         type: object
         properties:
