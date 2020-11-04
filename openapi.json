@@ -206,7 +206,7 @@
       "summary": "Elastigroups for AWS",
       "post": {
         "summary": "Create Elastigroup",
-        "description": "Create a new AWS Elastigroup",
+        "description": "Create a new AWS Elastigroup.\n\nThere are several third Party Integrations available, which can be activated based on your configuration, such as:\n* [Rancher Elastigroup](https://docs.spot.io/elastigroup/tools-integrations/rancher)\n* [Route53 Elastigroup](https://docs.spot.io/elastigroup/tools-integrations/route53)\n* [Beanstalk Elastigroup](https://docs.spot.io/elastigroup/tools-integrations/elastic-beanstalk)\n\n  You can create a beanstalk elastigroup with the following steps:\n  * [Get the beanstalk configuration](https://docs.spot.io/api/#operation/elastigroupAwsGetBeanstalkConfiguration) to JSON format\n  * Modify required parameters and post the JSON as a body to create a new elastigroup\n",
         "operationId": "elastigroupAwsCreate",
         "tags": [
           "Elastigroup AWS"
@@ -1473,22 +1473,17 @@
                                     }
                                   }
                                 }
+                              },
+                              "elasticBeanstalk": {
+                                "type": "object",
+                                "properties": {
+                                  "environmentId": {
+                                    "type": "string",
+                                    "example": "e-12345"
+                                  }
+                                }
                               }
                             }
-                          },
-                          "createdAt": {
-                            "type": "string",
-                            "readOnly": true,
-                            "title": "Creation Time Indicator",
-                            "description": "Creation Time Indicator",
-                            "example": "2020-10-01T05:23:59.302Z"
-                          },
-                          "updatedAt": {
-                            "type": "string",
-                            "readOnly": true,
-                            "title": "Update Time Indicator",
-                            "description": "Update Time Indicator",
-                            "example": "2020-10-01T05:23:59.302Z"
                           }
                         }
                       }
@@ -3730,467 +3725,10 @@
             "description": "Bad Request"
           }
         }
-      },
-      "post": {
-        "summary": "Create Beanstalk Elastigroup",
-        "description": "Create a beanstalk Elastigroup with the following steps:<ul>\n<li>Get the beanstalk configuration to JSON format</li> <li>Modify required parameters and post the JSON as a body to create a new Elastigroup</li> <ul>\n",
-        "operationId": "elastigroupAwsCreateBeanstalkElastigroup",
-        "tags": [
-          "Elastigroup AWS"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "type": "object",
-                    "required": [
-                      "group"
-                    ],
-                    "properties": {
-                      "group": {
-                        "type": "object",
-                        "title": "AWS Elastigroup",
-                        "required": [
-                          "name"
-                        ],
-                        "properties": {
-                          "name": {
-                            "type": "string",
-                            "example": "First Elastigroup",
-                            "description": "The name of the Elastigroup\n"
-                          },
-                          "description": {
-                            "type": "string",
-                            "example": "This is the first Spot Elastigroup of many",
-                            "description": "The detailed purpose for this Elastigroup\n"
-                          },
-                          "capacity": {
-                            "type": "object",
-                            "title": "Capacity Units",
-                            "required": [
-                              "target"
-                            ],
-                            "properties": {
-                              "minimum": {
-                                "type": "integer",
-                                "example": 1,
-                                "description": "The minimum number of units Elastigroup will scale down to        \n"
-                              },
-                              "maximum": {
-                                "type": "integer",
-                                "example": 10,
-                                "description": "The maximum number of units Elastigroup will scale up to\n"
-                              },
-                              "target": {
-                                "type": "integer",
-                                "example": 5,
-                                "description": "Number of units Elastigroup will start with\n"
-                              }
-                            }
-                          },
-                          "strategy": {
-                            "type": "object",
-                            "properties": {
-                              "risk": {
-                                "type": "integer",
-                                "example": 100
-                              }
-                            }
-                          },
-                          "compute": {
-                            "type": "object",
-                            "properties": {
-                              "instanceTypes": {
-                                "type": "object",
-                                "properties": {
-                                  "ondemand": {
-                                    "type": "string",
-                                    "example": "t2.micro"
-                                  },
-                                  "spot": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "string"
-                                    }
-                                  }
-                                }
-                              },
-                              "availabilityZones": {
-                                "type": "array",
-                                "items": {
-                                  "type": "object",
-                                  "properties": {
-                                    "name": {
-                                      "type": "string",
-                                      "example": "us-west-2a"
-                                    }
-                                  }
-                                }
-                              },
-                              "launchSpecification": {
-                                "type": "object",
-                                "properties": {
-                                  "loadBalancersConfig": {
-                                    "type": "object",
-                                    "properties": {
-                                      "loadBalancers": {
-                                        "type": "array",
-                                        "items": {
-                                          "anyOf": [
-                                            {
-                                              "type": "object",
-                                              "title": "MULTAI_TARGET_SET",
-                                              "properties": {
-                                                "name": {
-                                                  "type": "string",
-                                                  "example": "awseb-AWSEB-12345"
-                                                },
-                                                "arn": {
-                                                  "type": "string",
-                                                  "example": "arn:aws:elasticloadbalancing:us-west-2:842422002533:targetgroup/awseb-AWSEB-12345/245f20215d9ba7fc"
-                                                },
-                                                "type": {
-                                                  "type": "string",
-                                                  "example": "TARGET_GROUP"
-                                                }
-                                              }
-                                            },
-                                            {
-                                              "type": "object",
-                                              "title": "APPLICATION_GATEWAY",
-                                              "properties": {
-                                                "type": {
-                                                  "type": "string",
-                                                  "example": "APPLICATION_GATEWAY",
-                                                  "enum": [
-                                                    "APPLICATION_GATEWAY"
-                                                  ]
-                                                },
-                                                "resourceGroupName": {
-                                                  "type": "string",
-                                                  "example": "azureResourceGroup"
-                                                },
-                                                "applicationGatewayName": {
-                                                  "type": "string",
-                                                  "example": "appGateway"
-                                                },
-                                                "backendPoolName": {
-                                                  "type": "string",
-                                                  "example": "backendpool490822"
-                                                }
-                                              }
-                                            }
-                                          ]
-                                        }
-                                      }
-                                    }
-                                  },
-                                  "healthCheckType": {
-                                    "type": "string",
-                                    "example": "EC2"
-                                  },
-                                  "securityGroupIds": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "string",
-                                      "example": "sg-12345"
-                                    }
-                                  },
-                                  "monitoring": {
-                                    "type": "Boolean",
-                                    "example": true
-                                  },
-                                  "imageId": {
-                                    "type": "string",
-                                    "example": "ami-12345"
-                                  },
-                                  "iamRole": {
-                                    "type": "object",
-                                    "properties": {
-                                      "name": {
-                                        "type": "string",
-                                        "example": "aws-elasticbeanstalk-ec2-role"
-                                      }
-                                    }
-                                  },
-                                  "userData": {
-                                    "type": "string",
-                                    "example": "Q29udGVudC1UeXBlOiBtdWx0aXBhcnQvbWl4ZWQ7IGJvdW5kYXJ5PSI9PT09PT09PT09PT09PT01MTg5MDY1Mzc3MjIyODk4NDA3PT0iCk1JTUUtVmVyc2lvbjogMS4wCgotLT09PT09PT09PT09PT09PTUxODkwNjUzNzcyMjI4OTg0MDc9PQpDb250ZW50LVR5cGU6IHRleHQvY2xvdWQtY29uZmlnOyBjaGFyc2V0PSJ1cy1hc2NpaSIKTUlNRS1WZXJzaW9uOiAxLjAKQ29udGVudC1UcmFuc2Zlci1FbmNvZGluZzogN2JpdApDb250ZW50LURpc3Bvc2l0aW9uOiBhdHRhY2htZW50OyBmaWxlbmFtZT0iY2xvdWQtY29uZmlnLnR4dCIKCiNjbG91ZC1jb25maWcKcmVwb191cGdyYWRlOiBub25lCnJlcG9fcmVsZWFzZXZlcjogMjAxNy4wOQpjbG91ZF9maW5hbF9tb2R1bGVzOgogLSBbc2NyaXB0cy11c2VyLCBhbHdheXNdCgotLT09PT09PT09PT09PT09PTUxODkwNjUzNzcyMjI4OTg0MDc9PQpDb250ZW50LVR5cGU6IHRleHQveC1zaGVsbHNjcmlwdDsgY2hhcnNldD0idXMtYXNjaWkiCk1JTUUtVmVyc2lvbjogMS4wCkNvbnRlbnQtVHJhbnNmZXItRW5jb2Rpbmc6IDdiaXQKQ29udGVudC1EaXNwb3NpdGlvbjogYXR0YWNobWVudDsgZmlsZW5hbWU9InVzZXItZGF0YS50eHQiCgojIS9iaW4vYmFzaApleGVjID4gPih0ZWUgLWEgL3Zhci9sb2cvZWItY2ZuLWluaXQubG9nfGxvZ2dlciAtdCBbZWItY2ZuLWluaXRdIC1zIDI"
-                                  },
-                                  "tags": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "object",
-                                      "properties": {
-                                        "tagKey": {
-                                          "type": "string",
-                                          "example": "env"
-                                        },
-                                        "tagValue": {
-                                          "type": "string",
-                                          "example": "staging"
-                                        }
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          },
-                          "scaling": {
-                            "type": "object",
-                            "properties": {
-                              "up": {
-                                "type": "array",
-                                "items": {
-                                  "allOf": [
-                                    {
-                                      "type": "object",
-                                      "properties": {
-                                        "policyName": {
-                                          "type": "string",
-                                          "example": "cpuScale"
-                                        },
-                                        "metricName": {
-                                          "type": "string",
-                                          "example": "NetworkOut"
-                                        },
-                                        "statistic": {
-                                          "type": "string",
-                                          "example": "average",
-                                          "enum": [
-                                            "average",
-                                            "sampleCount",
-                                            "sum",
-                                            "minimum",
-                                            "maximum"
-                                          ]
-                                        },
-                                        "unit": {
-                                          "type": "string",
-                                          "example": "bytes"
-                                        },
-                                        "threshold": {
-                                          "type": "integer",
-                                          "example": 6000000
-                                        },
-                                        "namespace": {
-                                          "type": "string",
-                                          "example": "AWS/EC2"
-                                        },
-                                        "source": {
-                                          "type": "string",
-                                          "example": "cloudWatch"
-                                        },
-                                        "period": {
-                                          "type": "integer",
-                                          "example": 300
-                                        },
-                                        "evaluationPeriods": {
-                                          "type": "integer",
-                                          "example": 1
-                                        },
-                                        "cooldown": {
-                                          "type": "integer",
-                                          "example": 360
-                                        },
-                                        "dimenstions": {
-                                          "type": "array",
-                                          "items": {
-                                            "type": "object",
-                                            "properties": {
-                                              "name": {
-                                                "type": "string",
-                                                "example": "resourceName"
-                                              }
-                                            }
-                                          }
-                                        },
-                                        "action": {
-                                          "type": "object",
-                                          "properties": {
-                                            "type": {
-                                              "type": "string",
-                                              "example": "adjustment"
-                                            },
-                                            "adjustment": {
-                                              "type": "string",
-                                              "example": 1
-                                            }
-                                          }
-                                        },
-                                        "operator": {
-                                          "type": "string",
-                                          "example": "gte",
-                                          "enum": [
-                                            "gt",
-                                            "gte",
-                                            "lt",
-                                            "lte"
-                                          ]
-                                        }
-                                      }
-                                    },
-                                    {
-                                      "type": "object",
-                                      "properties": {
-                                        "policyName": {
-                                          "example": "awseb-e-12345-stack-AWSEBCloudwatchAlarmHigh-56QPITB3WUFM"
-                                        },
-                                        "threshold": {
-                                          "example": 6000000
-                                        },
-                                        "operator": {
-                                          "example": "gte"
-                                        },
-                                        "action": {
-                                          "type": "object",
-                                          "properties": {
-                                            "type": {
-                                              "type": "string",
-                                              "example": "adjustment",
-                                              "enum": [
-                                                "adjustment",
-                                                "setMinTarget",
-                                                "updateCapacity",
-                                                "percentageAdjustment"
-                                              ]
-                                            }
-                                          }
-                                        }
-                                      }
-                                    }
-                                  ]
-                                }
-                              },
-                              "down": {
-                                "type": "array",
-                                "items": {
-                                  "allOf": [
-                                    {
-                                      "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/scaling/properties/up/items/allOf/0"
-                                    },
-                                    {
-                                      "type": "object",
-                                      "properties": {
-                                        "policyName": {
-                                          "example": "awseb-e-12345-stack-AWSEBCloudwatchAlarmLow-UNGVBRKT0EHP"
-                                        },
-                                        "threshold": {
-                                          "example": 2000000
-                                        },
-                                        "operator": {
-                                          "example": "lte"
-                                        },
-                                        "action": {
-                                          "type": "object",
-                                          "properties": {
-                                            "type": {
-                                              "type": "string",
-                                              "example": "adjustment",
-                                              "enum": [
-                                                "adjustment",
-                                                "setMaxTarget",
-                                                "updateCapacity",
-                                                "percentageAdjustment"
-                                              ]
-                                            }
-                                          }
-                                        }
-                                      }
-                                    }
-                                  ]
-                                }
-                              }
-                            }
-                          },
-                          "thirdPartiesIntegration": {
-                            "type": "object",
-                            "properties": {
-                              "elasticBeanstalk": {
-                                "type": "object",
-                                "properties": {
-                                  "environmentId": {
-                                    "type": "string",
-                                    "example": "e-12345"
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "group": {
-                        "type": "object",
-                        "properties": {
-                          "compute": {
-                            "type": "object",
-                            "properties": {
-                              "instanceTypes": {
-                                "type": "object",
-                                "properties": {
-                                  "ondemand": {
-                                    "type": "string",
-                                    "example": "t2.micro"
-                                  },
-                                  "spot": {
-                                    "type": "array",
-                                    "description": "Your spot types\n",
-                                    "items": {
-                                      "type": "string",
-                                      "example": "t2.micro"
-                                    }
-                                  }
-                                }
-                              },
-                              "product": {
-                                "type": "string",
-                                "example": "Linux/UNIX",
-                                "description": "Operation system type. Example: Linux/UNIX, SUSE Linux, Windows, Linux/UNIX (Amazon VPC), SUSE Linux (Amazon VPC), Windows (Amazon VPC)\n"
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Spot Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
       }
     },
     "/aws/ec2/group/{groupId}/statefulInstance": {
-      "put": {
+      "get": {
         "summary": "List Stateful Instances",
         "description": "List all stateful instances associated with the Elastigroup\n",
         "operationId": "listStatefulInstances",
@@ -4334,7 +3872,7 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D~1statefulInstance/put/parameters/1"
+            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D~1statefulInstance/get/parameters/1"
           },
           {
             "in": "path",
@@ -4349,7 +3887,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/responses/200"
+            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -4370,7 +3908,7 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D~1statefulInstance/put/parameters/1"
+            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D~1statefulInstance/get/parameters/1"
           },
           {
             "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D~1statefulInstance~1%7BStatefulInstanceId%7D~1pause/put/parameters/2"
@@ -4378,7 +3916,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/responses/200"
+            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -4399,7 +3937,7 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D~1statefulInstance/put/parameters/1"
+            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D~1statefulInstance/get/parameters/1"
           },
           {
             "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D~1statefulInstance~1%7BStatefulInstanceId%7D~1pause/put/parameters/2"
@@ -4407,7 +3945,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/responses/200"
+            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -4428,7 +3966,7 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D~1statefulInstance/put/parameters/1"
+            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D~1statefulInstance/get/parameters/1"
           },
           {
             "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D~1statefulInstance~1%7BStatefulInstanceId%7D~1pause/put/parameters/2"
@@ -4436,7 +3974,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/responses/200"
+            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -4478,30 +4016,25 @@
                           "name"
                         ],
                         "properties": {
-                          "shouldKeepPrivateIp": {
-                            "type": "Boolean",
-                            "example": "false",
-                            "readOnly": true,
-                            "description": "Setting this value to true will maintain the initial instance private IP. This will also require that the original instance be terminated in the import process incurring maintenance time. Note: This value must be false if you would like to configure availability zones and subnet ids.\n"
-                          },
                           "originalInstanceId": {
                             "type": "string",
                             "example": "i-123c53d9f152a1234",
                             "description": "The originating Instance ID. This instance will be imported along with its State.\n"
                           },
+                          "shouldKeepPrivateIp": {
+                            "type": "Boolean",
+                            "example": "false",
+                            "description": "Setting this value to true will maintain the initial instance private IP. This will also require that the original instance be terminated in the import process incurring maintenance time. Note: This value must be false if you would like to configure availability zones and subnet ids.\n"
+                          },
+                          "shouldTerminateInstance": {
+                            "type": "Boolean",
+                            "description": "Decide if the instance termination should be automatic or manual. True = automatic termination. False = manual termination.\n",
+                            "example": true
+                          },
                           "name": {
                             "type": "string",
                             "example": "MyNewElastigroup",
                             "description": "Specify the new Elastigroup name.\n"
-                          },
-                          "region": {
-                            "type": "string",
-                            "example": "us-west-2",
-                            "description": "Specify the AWS Region the instance is running in and the new Elastigroup will be created in.\n"
-                          },
-                          "shouldTerminateInstance": {
-                            "type": "Boolean",
-                            "description": "Decide if the instance termination should be automatic or manual. True = automatic termination. False = manual termination.\n"
                           },
                           "product": {
                             "type": "string",
@@ -4515,6 +4048,11 @@
                               "type": "string",
                               "example": "m3.large"
                             }
+                          },
+                          "region": {
+                            "type": "string",
+                            "example": "us-west-2",
+                            "description": "Specify the AWS Region the instance is running in and the new Elastigroup will be created in.\n"
                           },
                           "availabilityZones": {
                             "type": "array",
@@ -6541,7 +6079,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/responses/200"
+            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -14646,7 +14184,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/responses/200"
+            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -15585,7 +15123,7 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/responses/200"
+            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -16291,7 +15829,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/responses/200"
+            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -17425,7 +16963,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/responses/200"
+            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -20914,7 +20452,8 @@
               "type": "string"
             },
             "required": true,
-            "description": "Azure Elastigroup ID\n"
+            "example": "sig-12345",
+            "description": "Elastigroup ID\n"
           }
         ],
         "responses": {
@@ -20943,7 +20482,14 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/responses/200"
+            "description": "Spot Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -22255,7 +21801,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/responses/200"
+            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -22281,7 +21827,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/responses/200"
+            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -22831,7 +22377,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/responses/200"
+            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -24572,7 +24118,7 @@
       }
     },
     "/aws/ec2/group/{groupId}/clusterRoll/{rollId}": {
-      "post": {
+      "get": {
         "summary": "ECS Get Cluster Roll Status by Roll ID",
         "description": "Get status for specific ECS cluster rolls in given Elastigroup\n",
         "operationId": "elastigroupAwsEcsGetClusterRollStatusByRollID",
@@ -24607,7 +24153,7 @@
       }
     },
     "/aws/ec2/group/{groupId}/beanstalk/maintenance/start": {
-      "post": {
+      "put": {
         "summary": "Start Beanstalk Maintenance",
         "description": "Put your Beanstslk Elastigroup into maintenance mode, before you start updating the beanstalk configuration.\n",
         "operationId": "elastigroupAwsStartBeanstalkMaintenance",
@@ -24624,7 +24170,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/responses/200"
+            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -24650,7 +24196,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/responses/200"
+            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -24733,24 +24279,21 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/get/parameters/1"
-          },
-          {
             "in": "query",
-            "name": "ENVIRONMENT_ID",
+            "name": "environmentId",
             "example": "e-12345",
             "required": true,
-            "description": "The ASG name\n",
+            "description": "The Beanstalk name\n",
             "schema": {
               "type": "string"
             }
           },
           {
             "in": "query",
-            "name": "REGION",
+            "name": "region",
             "example": "us-east-1",
             "required": true,
-            "description": "The AWS region for the ASG\n",
+            "description": "The AWS region for the Beanstalk\n",
             "schema": {
               "type": "string"
             }
@@ -24775,7 +24318,385 @@
                             "items": {
                               "type": "array",
                               "items": {
-                                "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/requestBody/content/application~1json/schema/allOf/0"
+                                "type": "object",
+                                "required": [
+                                  "group"
+                                ],
+                                "properties": {
+                                  "group": {
+                                    "type": "object",
+                                    "title": "AWS Elastigroup",
+                                    "required": [
+                                      "name"
+                                    ],
+                                    "properties": {
+                                      "name": {
+                                        "type": "string",
+                                        "example": "First Elastigroup",
+                                        "description": "The name of the Elastigroup\n"
+                                      },
+                                      "description": {
+                                        "type": "string",
+                                        "example": "This is the first Spot Elastigroup of many",
+                                        "description": "The detailed purpose for this Elastigroup\n"
+                                      },
+                                      "capacity": {
+                                        "type": "object",
+                                        "title": "Capacity Units",
+                                        "required": [
+                                          "target"
+                                        ],
+                                        "properties": {
+                                          "minimum": {
+                                            "type": "integer",
+                                            "example": 1,
+                                            "description": "The minimum number of units Elastigroup will scale down to        \n"
+                                          },
+                                          "maximum": {
+                                            "type": "integer",
+                                            "example": 10,
+                                            "description": "The maximum number of units Elastigroup will scale up to\n"
+                                          },
+                                          "target": {
+                                            "type": "integer",
+                                            "example": 5,
+                                            "description": "Number of units Elastigroup will start with\n"
+                                          }
+                                        }
+                                      },
+                                      "strategy": {
+                                        "type": "object",
+                                        "properties": {
+                                          "risk": {
+                                            "type": "integer",
+                                            "example": 100
+                                          }
+                                        }
+                                      },
+                                      "compute": {
+                                        "type": "object",
+                                        "properties": {
+                                          "instanceTypes": {
+                                            "type": "object",
+                                            "properties": {
+                                              "ondemand": {
+                                                "type": "string",
+                                                "example": "t2.micro"
+                                              },
+                                              "spot": {
+                                                "type": "array",
+                                                "items": {
+                                                  "type": "string"
+                                                }
+                                              }
+                                            }
+                                          },
+                                          "availabilityZones": {
+                                            "type": "array",
+                                            "items": {
+                                              "type": "object",
+                                              "properties": {
+                                                "name": {
+                                                  "type": "string",
+                                                  "example": "us-west-2a"
+                                                }
+                                              }
+                                            }
+                                          },
+                                          "launchSpecification": {
+                                            "type": "object",
+                                            "properties": {
+                                              "loadBalancersConfig": {
+                                                "type": "object",
+                                                "properties": {
+                                                  "loadBalancers": {
+                                                    "type": "array",
+                                                    "items": {
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "object",
+                                                          "title": "MULTAI_TARGET_SET",
+                                                          "properties": {
+                                                            "name": {
+                                                              "type": "string",
+                                                              "example": "awseb-AWSEB-12345"
+                                                            },
+                                                            "arn": {
+                                                              "type": "string",
+                                                              "example": "arn:aws:elasticloadbalancing:us-west-2:842422002533:targetgroup/awseb-AWSEB-12345/245f20215d9ba7fc"
+                                                            },
+                                                            "type": {
+                                                              "type": "string",
+                                                              "example": "TARGET_GROUP"
+                                                            }
+                                                          }
+                                                        },
+                                                        {
+                                                          "type": "object",
+                                                          "title": "APPLICATION_GATEWAY",
+                                                          "properties": {
+                                                            "type": {
+                                                              "type": "string",
+                                                              "example": "APPLICATION_GATEWAY",
+                                                              "enum": [
+                                                                "APPLICATION_GATEWAY"
+                                                              ]
+                                                            },
+                                                            "resourceGroupName": {
+                                                              "type": "string",
+                                                              "example": "azureResourceGroup"
+                                                            },
+                                                            "applicationGatewayName": {
+                                                              "type": "string",
+                                                              "example": "appGateway"
+                                                            },
+                                                            "backendPoolName": {
+                                                              "type": "string",
+                                                              "example": "backendpool490822"
+                                                            }
+                                                          }
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                              "healthCheckType": {
+                                                "type": "string",
+                                                "example": "EC2"
+                                              },
+                                              "securityGroupIds": {
+                                                "type": "array",
+                                                "items": {
+                                                  "type": "string",
+                                                  "example": "sg-12345"
+                                                }
+                                              },
+                                              "monitoring": {
+                                                "type": "Boolean",
+                                                "example": true
+                                              },
+                                              "imageId": {
+                                                "type": "string",
+                                                "example": "ami-12345"
+                                              },
+                                              "iamRole": {
+                                                "type": "object",
+                                                "properties": {
+                                                  "name": {
+                                                    "type": "string",
+                                                    "example": "aws-elasticbeanstalk-ec2-role"
+                                                  }
+                                                }
+                                              },
+                                              "userData": {
+                                                "type": "string",
+                                                "example": "Q29udGVudC1UeXBlOiBtdWx0aXBhcnQvbWl4ZWQ7IGJvdW5kYXJ5PSI9PT09PT09PT09PT09PT01MTg5MDY1Mzc3MjIyODk4NDA3PT0iCk1JTUUtVmVyc2lvbjogMS4wCgotLT09PT09PT09PT09PT09PTUxODkwNjUzNzcyMjI4OTg0MDc9PQpDb250ZW50LVR5cGU6IHRleHQvY2xvdWQtY29uZmlnOyBjaGFyc2V0PSJ1cy1hc2NpaSIKTUlNRS1WZXJzaW9uOiAxLjAKQ29udGVudC1UcmFuc2Zlci1FbmNvZGluZzogN2JpdApDb250ZW50LURpc3Bvc2l0aW9uOiBhdHRhY2htZW50OyBmaWxlbmFtZT0iY2xvdWQtY29uZmlnLnR4dCIKCiNjbG91ZC1jb25maWcKcmVwb191cGdyYWRlOiBub25lCnJlcG9fcmVsZWFzZXZlcjogMjAxNy4wOQpjbG91ZF9maW5hbF9tb2R1bGVzOgogLSBbc2NyaXB0cy11c2VyLCBhbHdheXNdCgotLT09PT09PT09PT09PT09PTUxODkwNjUzNzcyMjI4OTg0MDc9PQpDb250ZW50LVR5cGU6IHRleHQveC1zaGVsbHNjcmlwdDsgY2hhcnNldD0idXMtYXNjaWkiCk1JTUUtVmVyc2lvbjogMS4wCkNvbnRlbnQtVHJhbnNmZXItRW5jb2Rpbmc6IDdiaXQKQ29udGVudC1EaXNwb3NpdGlvbjogYXR0YWNobWVudDsgZmlsZW5hbWU9InVzZXItZGF0YS50eHQiCgojIS9iaW4vYmFzaApleGVjID4gPih0ZWUgLWEgL3Zhci9sb2cvZWItY2ZuLWluaXQubG9nfGxvZ2dlciAtdCBbZWItY2ZuLWluaXRdIC1zIDI"
+                                              },
+                                              "tags": {
+                                                "type": "array",
+                                                "items": {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "tagKey": {
+                                                      "type": "string",
+                                                      "example": "env"
+                                                    },
+                                                    "tagValue": {
+                                                      "type": "string",
+                                                      "example": "staging"
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "scaling": {
+                                        "type": "object",
+                                        "properties": {
+                                          "up": {
+                                            "type": "array",
+                                            "items": {
+                                              "allOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "policyName": {
+                                                      "type": "string",
+                                                      "example": "cpuScale"
+                                                    },
+                                                    "metricName": {
+                                                      "type": "string",
+                                                      "example": "NetworkOut"
+                                                    },
+                                                    "statistic": {
+                                                      "type": "string",
+                                                      "example": "average",
+                                                      "enum": [
+                                                        "average",
+                                                        "sampleCount",
+                                                        "sum",
+                                                        "minimum",
+                                                        "maximum"
+                                                      ]
+                                                    },
+                                                    "unit": {
+                                                      "type": "string",
+                                                      "example": "bytes"
+                                                    },
+                                                    "threshold": {
+                                                      "type": "integer",
+                                                      "example": 6000000
+                                                    },
+                                                    "namespace": {
+                                                      "type": "string",
+                                                      "example": "AWS/EC2"
+                                                    },
+                                                    "source": {
+                                                      "type": "string",
+                                                      "example": "cloudWatch"
+                                                    },
+                                                    "period": {
+                                                      "type": "integer",
+                                                      "example": 300
+                                                    },
+                                                    "evaluationPeriods": {
+                                                      "type": "integer",
+                                                      "example": 1
+                                                    },
+                                                    "cooldown": {
+                                                      "type": "integer",
+                                                      "example": 360
+                                                    },
+                                                    "dimenstions": {
+                                                      "type": "array",
+                                                      "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "name": {
+                                                            "type": "string",
+                                                            "example": "resourceName"
+                                                          }
+                                                        }
+                                                      }
+                                                    },
+                                                    "action": {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "type": {
+                                                          "type": "string",
+                                                          "example": "adjustment"
+                                                        },
+                                                        "adjustment": {
+                                                          "type": "string",
+                                                          "example": 1
+                                                        }
+                                                      }
+                                                    },
+                                                    "operator": {
+                                                      "type": "string",
+                                                      "example": "gte",
+                                                      "enum": [
+                                                        "gt",
+                                                        "gte",
+                                                        "lt",
+                                                        "lte"
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "policyName": {
+                                                      "example": "awseb-e-12345-stack-AWSEBCloudwatchAlarmHigh-56QPITB3WUFM"
+                                                    },
+                                                    "threshold": {
+                                                      "example": 6000000
+                                                    },
+                                                    "operator": {
+                                                      "example": "gte"
+                                                    },
+                                                    "action": {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "type": {
+                                                          "type": "string",
+                                                          "example": "adjustment",
+                                                          "enum": [
+                                                            "adjustment",
+                                                            "setMinTarget",
+                                                            "updateCapacity",
+                                                            "percentageAdjustment"
+                                                          ]
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          },
+                                          "down": {
+                                            "type": "array",
+                                            "items": {
+                                              "allOf": [
+                                                {
+                                                  "$ref": "#/paths/~1aws~1ec2~1group~1beanstalk~1import/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/group/properties/scaling/properties/up/items/allOf/0"
+                                                },
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "policyName": {
+                                                      "example": "awseb-e-12345-stack-AWSEBCloudwatchAlarmLow-UNGVBRKT0EHP"
+                                                    },
+                                                    "threshold": {
+                                                      "example": 2000000
+                                                    },
+                                                    "operator": {
+                                                      "example": "lte"
+                                                    },
+                                                    "action": {
+                                                      "type": "object",
+                                                      "properties": {
+                                                        "type": {
+                                                          "type": "string",
+                                                          "example": "adjustment",
+                                                          "enum": [
+                                                            "adjustment",
+                                                            "setMaxTarget",
+                                                            "updateCapacity",
+                                                            "percentageAdjustment"
+                                                          ]
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "thirdPartiesIntegration": {
+                                        "type": "object",
+                                        "properties": {
+                                          "elasticBeanstalk": {
+                                            "type": "object",
+                                            "properties": {
+                                              "environmentId": {
+                                                "type": "string",
+                                                "example": "e-12345"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
                               }
                             },
                             "kind": {
@@ -24797,7 +24718,7 @@
       }
     },
     "/aws/ec2/group/{groupId}/beanstalk/reimport": {
-      "get": {
+      "put": {
         "summary": "Beanstalk Reimport",
         "description": "Re-import the beanstalk configuration\n",
         "operationId": "elastigroupAwsBeanstalkReImport",
@@ -25494,7 +25415,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/responses/200"
+            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -28029,7 +27950,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/responses/200"
+            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -28922,7 +28843,7 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/responses/200"
+            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -28948,7 +28869,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/responses/200"
+            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -28974,7 +28895,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/responses/200"
+            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -29000,7 +28921,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/responses/200"
+            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -29870,7 +29791,7 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/responses/200"
+            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -29930,7 +29851,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/responses/200"
+            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -30092,7 +30013,7 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/responses/200"
+            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -30384,7 +30305,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/responses/200"
+            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -34721,7 +34642,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/post/responses/200"
+            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
           },
           "400": {
             "description": "Bad Request"
