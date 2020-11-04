@@ -1,0 +1,65 @@
+get:
+  summary: "Roll Status"
+  description: >
+    Get status of a specific roll
+  operationId: "lowPriorityVMsRollStatus"
+  tags:
+    - Elastigroup Azure Scale Set VMs
+  parameters:
+    - in: path
+      name: groupId
+      example: sig-12345
+      description: >
+        The Elasticgroup id you want to roll
+      schema:
+        type: string
+      required: true
+    - in: path
+      name: rollId
+      example: sbgd-9876
+      description: >
+        The roll id you want to query
+      schema:
+        type: string
+      required: true
+    - in: query
+      name: accountId
+      example: act-123abc
+      description: >
+        Your Spotinst accountid associated with your token
+      schema:
+        type: string
+      required: false
+  responses:
+    200:
+      $ref: "../responses/roll.yaml"
+    400:
+      description: "Bad Request"
+
+put:
+  summary: "Update Task"
+  description: >
+    Update an Elastigroup Azure
+  operationId: "tasksScaleSetsAzureUpdate"
+  tags:
+    - Elastigroup Azure Scale Set VMs
+  parameters:
+    - $ref: "../../../../../commons/parameters/accountId.yaml"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          allOf:
+            - $ref: "../schemas/elastigroup.yaml"
+            - type: "object"
+              properties:
+                group:
+                  type: object
+                  required:
+                    - name
+  responses:
+    200:
+      $ref: "../responses/elastigroup.yaml"
+    400:
+      description: "Bad Request"
