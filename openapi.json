@@ -223,7 +223,1276 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/put/requestBody/content/application~1json/schema"
+                    "type": "object",
+                    "title": "AWS Elastigroup",
+                    "required": [
+                      "group"
+                    ],
+                    "properties": {
+                      "group": {
+                        "type": "object",
+                        "description": "Elastigroup Configuration",
+                        "required": [
+                          "name",
+                          "capacity"
+                        ],
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "AWS Elastigroup Name\n",
+                            "example": "my-Elastigroup",
+                            "required": true
+                          },
+                          "description": {
+                            "type": "string",
+                            "description": "Describe your AWS Elastigroup\n",
+                            "example": "This Elastigroup is used for Development"
+                          },
+                          "region": {
+                            "type": "string",
+                            "description": "The AWS region your group will be created in.\n This parameter is required if you specify subnets (through compute.subnetIds).\n This parameter is optional if you specify Availability Zones (through compute.availabilityZones).\n",
+                            "example": "use-east-1"
+                          },
+                          "capacity": {
+                            "description": "Capacity Configuration",
+                            "type": "object",
+                            "title": "Elastigroup Capacity",
+                            "required": [
+                              "target",
+                              "minimum",
+                              "maximum",
+                              "unit"
+                            ],
+                            "properties": {
+                              "target": {
+                                "type": "integer",
+                                "description": "The number of instances to launch\n",
+                                "example": 1
+                              },
+                              "minimum": {
+                                "type": "integer",
+                                "description": "The lower limit number of instances that you can scale down to\n",
+                                "example": 0
+                              },
+                              "maximum": {
+                                "type": "integer",
+                                "description": "The upper limit number of instances that you can scale up to\n",
+                                "example": 10
+                              },
+                              "unit": {
+                                "type": "string",
+                                "enum": [
+                                  "instance",
+                                  "weight"
+                                ],
+                                "description": "The capacity unit to launch instances by.\nNote: for groups with integration to K8S / ECS weight option is not supported.\n",
+                                "example": "instance"
+                              }
+                            }
+                          },
+                          "strategy": {
+                            "type": "object",
+                            "title": "Elastigroup Strategy",
+                            "description": "Strategy",
+                            "required": [
+                              "availabilityVsCost"
+                            ],
+                            "properties": {
+                              "risk": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 100,
+                                "example": 100,
+                                "default": 0,
+                                "description": "The percentage of Elastigroup that will run with spot market capacity\n"
+                              },
+                              "onDemandCount": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "example": 0,
+                                "description": "Minimum number of instances that will always be on-demand\n"
+                              },
+                              "availabilityVsCost": {
+                                "type": "string",
+                                "enum": [
+                                  "costOriented",
+                                  "availabilityOriented",
+                                  "balanced",
+                                  "cheapest",
+                                  "equalAzDistribution"
+                                ],
+                                "default": "balanced",
+                                "description": "How Elastigroup determines which instances to add and replace.\n(please read this article before using [Equal AZ Instance Distribution](https://docs.spot.io/elastigroup-for-aws/concepts/general-concepts/equal-az-distribution))\n"
+                              },
+                              "fallbackToOd": {
+                                "type": "boolean",
+                                "default": false,
+                                "example": true,
+                                "description": "When set to `true` Elastigroup will launch On Demand instances if no spot market is available\n"
+                              },
+                              "utilizeReservedInstances": {
+                                "type": "boolean",
+                                "description": "In case of any available Reserved Instances, Elastigroup will utilize them before purchasing Spot instances\n",
+                                "example": false
+                              },
+                              "drainingTimeout": {
+                                "type": "integer",
+                                "example": 120,
+                                "description": "The time in seconds to allow the instance be drained from incoming TCP connections and detached from ELB before terminating it, during a scale down operation\n"
+                              },
+                              "signals": {
+                                "type": "array",
+                                "description": "The signals defined for this group. For more information refer the below article: [Signals](https://docs.spot.io/elastigroup-for-aws/concepts/compute-concepts/using-signals-in-elastigroups)\n",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "name": {
+                                      "type": "string",
+                                      "description": "The name of the signal defined for the group.\n",
+                                      "enum": [
+                                        "INSTANCE_READY",
+                                        "INSTANCE_READY_TO_SHUTDOWN"
+                                      ]
+                                    },
+                                    "timeout": {
+                                      "type": "integer",
+                                      "minimum": 60,
+                                      "maximum": 1800,
+                                      "description": "The timeout in seconds to hold the instance until a signal is sent.\nIf no signal is sent the instance will be replaced (INSTANCE_READY) or we will terminate the instance (INSTANCE_READY_TO_SHUTDOWN) after the timeout.\n",
+                                      "default": 1800,
+                                      "example": 120
+                                    }
+                                  }
+                                }
+                              },
+                              "persistence": {
+                                "type": "array",
+                                "description": "You can register persistence (Stateful) recovery arguments\n",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "shouldPersistPrivateIp": {
+                                      "item": "boolean",
+                                      "description": "Should the instance maintain its private IP\n",
+                                      "example": true
+                                    },
+                                    "shouldPersistRootDevice": {
+                                      "item": "boolean",
+                                      "description": "Should the instance maintain its root device volumes\n",
+                                      "example": true
+                                    },
+                                    "shouldPersistBlockDevices": {
+                                      "item": "boolean",
+                                      "description": "Should the instance maintain its Data volumes\n",
+                                      "example": true
+                                    },
+                                    "blockDevicesMode": {
+                                      "item": "string",
+                                      "description": "Determine the way we attach the data volumes to the data devices\n",
+                                      "enum": [
+                                        "reattach",
+                                        "onLaunch"
+                                      ],
+                                      "example": "reattach"
+                                    }
+                                  }
+                                }
+                              },
+                              "revertToSpot": {
+                                "type": "object",
+                                "description": "Hold settings for strategy correction - replacing On-Demand for Spot instances\n",
+                                "properties": {
+                                  "performAt": {
+                                    "type": "string",
+                                    "description": "Settings for maintenance strategy - possible values: timeWindow, never, always.\nperformAt of type: 'never' OR 'timeWindow' can only be applied to groups with \"availabilityOriented\" OR groups with \"persistence\",\nother groups allow either 'always' type or nothing which also means always.\n",
+                                    "enum": [
+                                      "never",
+                                      "always",
+                                      "timeWindow"
+                                    ],
+                                    "example": "timeWindow",
+                                    "default": "always"
+                                  },
+                                  "timeWindows": {
+                                    "type": "array",
+                                    "description": "When performAt is 'timeWindow': must specify a list of 'timeWindows' with at least one time window Each string is in the format of - ddd:hh:mm-ddd:hh:mm\nddd = day of week = Sun | Mon | Tue | Wed | Thu | Fri | Sat\nhh = hour 24 = 0 -23\nmm = minute = 0 - 59\n",
+                                    "items": {
+                                      "type": "string",
+                                      "example": "Mon:03:00-Wed:02:30"
+                                    }
+                                  }
+                                }
+                              },
+                              "scalingStrategy": {
+                                "type": "object",
+                                "description": "Set termination policy\n",
+                                "properties": {
+                                  "terminationPolicy": {
+                                    "type": "string",
+                                    "enum": [
+                                      "default",
+                                      "newestInstance"
+                                    ],
+                                    "example": "default"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "compute": {
+                            "type": "object",
+                            "title": "Elastigroup Compute",
+                            "required": [
+                              "product",
+                              "availabilityZones"
+                            ],
+                            "properties": {
+                              "product": {
+                                "type": "string",
+                                "description": "Operation system type.\n",
+                                "enum": [
+                                  "Linux/UNIX (Amazon VPC)",
+                                  "SUSE Linux (Amazon VPC)",
+                                  "Windows (Amazon VPC)",
+                                  "Red Hat Enterprise Linux (Amazon VPC)"
+                                ],
+                                "example": "Linux/UNIX"
+                              },
+                              "elasticIps": {
+                                "type": "array",
+                                "description": "List of ElasticIPs Allocation Ids to associate to the group instances\n",
+                                "items": {
+                                  "type": "string",
+                                  "example": "eipalloc-9d4e16f8"
+                                }
+                              },
+                              "privateIps": {
+                                "type": "array",
+                                "description": "List of Private IPs to associate to the group instances.\nPlease note: This setting will only apply if rategy.persistence.shouldPersistPrivateIp is set to true.\n",
+                                "items": {
+                                  "type": "string",
+                                  "default": "172.1.1.0"
+                                }
+                              },
+                              "instanceTypes": {
+                                "type": "object",
+                                "description": "Instance Types\n",
+                                "required": [
+                                  "ondemand",
+                                  "spot"
+                                ],
+                                "properties": {
+                                  "ondemand": {
+                                    "type": "string",
+                                    "description": "Available Instance types\n",
+                                    "example": "m3.medium"
+                                  },
+                                  "spot": {
+                                    "type": "array",
+                                    "description": "Available Spot Instance types\n",
+                                    "example": [
+                                      "c3.large",
+                                      "c4.large",
+                                      "m3.large",
+                                      "r3.large"
+                                    ]
+                                  },
+                                  "preferredSpot": {
+                                    "type": "array",
+                                    "description": "Prioritize a subset of spot instance types. Must be a subset of the selected spot instance types.\n",
+                                    "example": [
+                                      "c4.large"
+                                    ]
+                                  },
+                                  "weights": {
+                                    "type": "array",
+                                    "description": "Custom weight for each instance type (only valid in weight capacity unit)\n",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "instanceType": {
+                                          "type": "string",
+                                          "description": "The instance type to customize its weight\n",
+                                          "example": "c4.large"
+                                        },
+                                        "weightedCapacity": {
+                                          "type": "integer",
+                                          "description": "The weight\n",
+                                          "exmample": 8
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "subnetIds": {
+                                "type": "array",
+                                "description": "A comma-separated list of subnet identifiers for your group.\nWhen this parameter is set, compute.availabilityZones should be left unused.\n",
+                                "example": [
+                                  "subnet-4c1d1538",
+                                  "subnet-2791bb61",
+                                  "subnet-703a6f58",
+                                  "subnet-c62846fc"
+                                ]
+                              },
+                              "availabilityZones": {
+                                "type": "array",
+                                "description": "One or more availability Zones for the group.\nWhen this parameter is set, compute.subnetIds should be left unused.\n",
+                                "items": {
+                                  "type": "object",
+                                  "required": [
+                                    "name"
+                                  ],
+                                  "properties": {
+                                    "name": {
+                                      "type": "string",
+                                      "description": "The Availability Zone name\n",
+                                      "example": "us-west-2a"
+                                    },
+                                    "subnetIds": {
+                                      "type": "array",
+                                      "description": "A comma-separated list of subnet identifiers for your group.\n",
+                                      "example": [
+                                        "subnet-4333093a"
+                                      ]
+                                    },
+                                    "placementGroupName": {
+                                      "type": "string",
+                                      "description": "specify a Placement Group name, the instances will be launched in the Placement Group for the AZ.\n"
+                                    }
+                                  }
+                                }
+                              },
+                              "preferredAvailabilityZones": {
+                                "type": "array",
+                                "description": "The AZs to prioritize when launching Spot instances.\nIf no markets are available in the Preferred AZs, Spot instances are launched in the non-preferred AZs.\n* Must be a sublist of compute.AvailabilityZones\n* strategy.availabilityVsCost must not be equalAzDistribution\n",
+                                "example": [
+                                  "us-east-1a",
+                                  "us-east-1b"
+                                ]
+                              },
+                              "launchSpecification": {
+                                "type": "object",
+                                "required": [
+                                  "securityGroupIds",
+                                  "monitoring",
+                                  "imageId",
+                                  "keyPair"
+                                ],
+                                "properties": {
+                                  "creditSpecification": {
+                                    "type": "object",
+                                    "description": "creditSpecification is a parameter that indicates in what mode t2/t3 instances will be launched with. It consists of one key: cpuCredits (String)\n",
+                                    "properties": {
+                                      "cpuCredits": {
+                                        "type": "string",
+                                        "enum": [
+                                          "unlimited",
+                                          "standard"
+                                        ],
+                                        "example": "unlimited"
+                                      }
+                                    }
+                                  },
+                                  "loadBalancersConfig": {
+                                    "type": "object",
+                                    "description": "Elastic Load Balancers configurations\n",
+                                    "properties": {
+                                      "loadBalancers": {
+                                        "type": "array",
+                                        "description": "List of classic load balancers and/or application load balancer target groups and/or Multai load balancer target sets\n",
+                                        "items": {
+                                          "type": "object",
+                                          "properties": {
+                                            "name": {
+                                              "type": "string",
+                                              "description": "The AWS resource name. Required for Classic Load Balancer. Optional for Application Load Balancer.\n",
+                                              "example": "MyTargetGroup"
+                                            },
+                                            "arn": {
+                                              "type": "string",
+                                              "description": "The AWS resource ARN (Required only for ALB target groups)\n",
+                                              "example": "arn:aws:elasticloadbalancing:us-west-2:922761411234:targetgroup/MyTargetGroup/1fe63217f8ff1234"
+                                            },
+                                            "type": {
+                                              "type": "string",
+                                              "description": "The resource type.\n",
+                                              "enum": [
+                                                "CLASSIC",
+                                                "TARGET_GROUP",
+                                                "MULTAI_TARGET_SET"
+                                              ],
+                                              "example": "TARGET_GROUP"
+                                            },
+                                            "balancerId": {
+                                              "type": "string",
+                                              "description": "The Multai load balancer ID\n",
+                                              "example": "lb-123456789"
+                                            },
+                                            "targetSetId": {
+                                              "description": "The Multai load target set ID\n",
+                                              "type": "string",
+                                              "example": "ts-123456789"
+                                            },
+                                            "azAwerness": {
+                                              "description": "`AZ Awareness` will ensure that instances within the same AZ are using the corresponding MLB runtime instance in the same AZ. This feature reduces multi-zone data transfer fees\n",
+                                              "type": "boolean",
+                                              "example": false
+                                            },
+                                            "autoWeight": {
+                                              "description": "`Auto Weight` will automatically provide a higher weight for instances that are larger as appropriate. For example, if you have configured your Elastigroup with m4.large and m4.xlarge instances the m4.large will have half the weight of an m4.xlarge. This ensures that larger instances receive a higher number of MLB requests\n",
+                                              "type": "boolean",
+                                              "example": true
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "healthCheckType": {
+                                    "type": "string",
+                                    "description": "The service to use for the health check.\n",
+                                    "enum": [
+                                      "ELB",
+                                      "HCS",
+                                      "TARGET_GROUP",
+                                      "MLB",
+                                      "ECS_CLUSTER_INSTANCE",
+                                      "EC2",
+                                      "OPSWORKS",
+                                      "MULTAI_TARGET_SET",
+                                      "K8S_NODE",
+                                      "NOMAD_NODE"
+                                    ],
+                                    "example": "EC2"
+                                  },
+                                  "healthCheckGracePeriod": {
+                                    "type": "integer",
+                                    "description": "The amount of time, in seconds, after the instance has launched to starts and check its health.\n",
+                                    "default": 300,
+                                    "example": 600
+                                  },
+                                  "healthCheckUnhealthyDurationBeforeReplacement": {
+                                    "type": "integer",
+                                    "description": "The amount of time, in seconds, an existing instance should remain active after becoming unhealthy.\nAfter the set time out the instance will be replaced\n",
+                                    "example": 60
+                                  },
+                                  "securityGroupIds": {
+                                    "type": "array",
+                                    "description": "One or more security group IDs. In case of update it will override the existing Security Group with the new given array\n",
+                                    "items": {
+                                      "type": "string",
+                                      "example": [
+                                        "sg-0dfc2c8760df6fec7"
+                                      ]
+                                    }
+                                  },
+                                  "monitoring": {
+                                    "type": "boolean",
+                                    "description": "Describes whether instance Enhanced Monitoring is enabled\n",
+                                    "example": false
+                                  },
+                                  "ebsOptimized": {
+                                    "type": "boolean",
+                                    "description": "Enable EBS optimization for supported instance which is not enabled by default.\nNote - additional charges will be applied.\n",
+                                    "example": false
+                                  },
+                                  "imageId": {
+                                    "type": "string",
+                                    "description": "The ID of the image used to launch the instance.\n* The following instance types are supported by HVM image: M3, M4, C3, C4, D2, G2, R3, CC2, CC1, CG1, CR1.\n* The following instance types are supported by PV image: M1, M2, M3, C1, C3.\n* In case of conflict between Instance type to image type, an error message will be returned\n",
+                                    "example": "ami-01e24be29428c15b2"
+                                  },
+                                  "keyPair": {
+                                    "type": "string",
+                                    "description": "Specify a Key Pair to attach to the instances\n",
+                                    "example": "labs-oregon"
+                                  },
+                                  "blockDeviceMappings": {
+                                    "type": "array",
+                                    "description": "Array list of block devices that are exposed to the instance, You can specify virtual devices and EBS volumes.\n",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "deviceName": {
+                                          "type": "string",
+                                          "description": "Set device name\n",
+                                          "example": "/dev/xvdcz"
+                                        },
+                                        "ebs": {
+                                          "type": "object",
+                                          "description": "Set EBS properties\n",
+                                          "properties": {
+                                            "volumeType": {
+                                              "type": "string",
+                                              "description": "Set volume type\n",
+                                              "example": "gp2"
+                                            },
+                                            "deleteOnTermination": {
+                                              "type": "boolean",
+                                              "description": "Flag to delete the EBS on instance termination\n",
+                                              "example": true
+                                            },
+                                            "volumeSize": {
+                                              "type": "integer",
+                                              "description": "Set volume size (in GB). When using this property - don't use dynamicVolumeSize.\nVolume size should be greater or equal than the size configured in the AMI\n",
+                                              "example": 12
+                                            },
+                                            "dynamicVolumeSize": {
+                                              "type": "object",
+                                              "description": "Set dynamic volume size properties. When using this object, you cannot use volumeSize. You must use one or the other.\n",
+                                              "properties": {
+                                                "baseSize": {
+                                                  "type": "integer",
+                                                  "description": "Initial size for volume\n",
+                                                  "example": 50
+                                                },
+                                                "resource": {
+                                                  "type": "string",
+                                                  "example": "CPU"
+                                                },
+                                                "sizePerResourceUnit": {
+                                                  "type": "integer",
+                                                  "description": "Additional size per resource unit (in GB). For example: if baseSize=50, and sizePerResourceUnit=20, and an instance with 2 CPU is launched - its disk size will be: 90GB\n",
+                                                  "example": 20
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "networkInterfaces": {
+                                    "type": "array",
+                                    "description": "List of network interfaces in an EC2 instance.\nIf you define network interface, please pay attention to omit these properties from other sections in this JSON and set them here: subnetId - compute.availabilityZones\n",
+                                    "items": {
+                                      "type": "object",
+                                      "required": [
+                                        "deviceIndex"
+                                      ],
+                                      "properties": {
+                                        "description": {
+                                          "type": "string",
+                                          "description": "The description of the network interface. Applies only if creating a network interface when launching an instance.\n"
+                                        },
+                                        "deviceIndex": {
+                                          "type": "integer",
+                                          "description": "The position of the network interface in the attachment order.\nA primary network interface has a device index of 0.\nIf you specify a network interface when launching an instance, you must specify the device index.\n",
+                                          "example": 0
+                                        },
+                                        "secondaryPrivateIpAddressCount": {
+                                          "type": "integer",
+                                          "description": "The number of secondary private IPv4 addresses to assign to a network interface.\nWhen you specify a number of secondary IPv4 addresses, Amazon EC2 selects these IP addresses within the subnet's IPv4 CIDR range.\nYou can't specify this option and specify more than one private IP address using privateIpAddresses.\nThe number of IP addresses you can assign to a network interface varies by instance type.\nFor more information, see IP Addresses Per ENI Per Instance Type in the Amazon Virtual Private Cloud User Guide.\n"
+                                        },
+                                        "associatePublicIpAddress": {
+                                          "type": "boolean",
+                                          "description": "Indicates whether to assign a public IPv4 address to an instance you launch in a VPC.\nThe public IP address can only be assigned to a network interface for eth0, and can only be assigned to a new network interface, not an existing one.\nYou cannot specify more than one network interface in the request.\nIf launching into a default subnet, the default value is true.\n",
+                                          "example": true
+                                        },
+                                        "deleteOnTermination": {
+                                          "type": "boolean",
+                                          "description": "If set to true, the interface is deleted when the instance is terminated.\nYou can specify true only if creating a new network interface when launching an instance.\n"
+                                        },
+                                        "networkInterfaceId": {
+                                          "type": "string",
+                                          "description": "The ID of the network interface. Used to attach the specified network interface to the instance.\n"
+                                        },
+                                        "privateIpAddresses": {
+                                          "type": "array",
+                                          "description": "One or more private IPv4 addresses to assign to the network interface.\nOnly one private IPv4 address can be designated as primary.\nYou cannot specify this option if you're launching more than one instance in a RunInstances request.\n",
+                                          "items": {
+                                            "type": "object",
+                                            "required": [
+                                              "privateIpAddress",
+                                              "primary"
+                                            ],
+                                            "properties": {
+                                              "privateIpAddress": {
+                                                "type": "string",
+                                                "description": "The private IPv4 address.\n"
+                                              },
+                                              "primary": {
+                                                "type": "boolean",
+                                                "description": "Indicates whether the private IPv4 address is the primary private IPv4 address. Only one IPv4 address can be designated as primary.\n"
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "subnetId": {
+                                          "type": "string",
+                                          "description": "The ID of the subnet to associate with the network interface.\nRequired when creating a new Network Interface, and not attaching an existing one via networkInterfaceId.\n"
+                                        },
+                                        "associateIpv6Address": {
+                                          "type": "boolean",
+                                          "description": "Indicates whether to assign an IPv6 address. Amazon EC2 chooses the IPv6 addresses from the range of the subnet.\n"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "iamRole": {
+                                    "type": "object",
+                                    "description": "The instance profile iamRole\n",
+                                    "properties": {
+                                      "name": {
+                                        "type": "string",
+                                        "description": "The iamRole name\n",
+                                        "example": "my-iamRole"
+                                      }
+                                    }
+                                  },
+                                  "userData": {
+                                    "type": "string",
+                                    "format": "byte",
+                                    "description": "The Base64-encoded MIME user data to make available to the instances\n",
+                                    "example": "dXNlcmJhc2g2NGVuY29kZWQ="
+                                  },
+                                  "shutdownScript": {
+                                    "type": "string",
+                                    "format": "byte",
+                                    "description": "The Base64-encoded shutdown script to execute prior to instance termination. For more information please see: [Shutdown Script](https://docs.spot.io/integration-docs/elastigroup/concepts/compute-concepts/shutdown-scripts/)\n",
+                                    "example": "dXNlcmJhc2g2NGVuY29kZWQ="
+                                  },
+                                  "tags": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "tagKey": {
+                                          "type": "string",
+                                          "description": "The tag's key\n",
+                                          "example": "Creator"
+                                        },
+                                        "tagValue": {
+                                          "type": "string",
+                                          "description": "The tag's value\n",
+                                          "example": "John Doe"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "metadataOptions": {
+                                    "title": "Metadata Options",
+                                    "type": "object",
+                                    "description": "Optional field. Used for IMDSv2. In Create route can't be null. In Update route can be null.",
+                                    "required": [
+                                      "httpTokens"
+                                    ],
+                                    "properties": {
+                                      "httpTokens": {
+                                        "title": "HTTP Tokens",
+                                        "type": "string",
+                                        "description": "Required for IMDSv2. Can’t be null in Create or Update. Values can be \"optional\" or \"required\".",
+                                        "example": "optional"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "scaling": {
+                            "type": "object",
+                            "title": "Elastigroup Scaling",
+                            "properties": {
+                              "up": {
+                                "type": "object",
+                                "properties": {
+                                  "policyName": {
+                                    "type": "string",
+                                    "description": "The policy name\n",
+                                    "example": "my-up-policy"
+                                  },
+                                  "metricName": {
+                                    "type": "string",
+                                    "description": "The name of the metric.\n",
+                                    "default": "CPUUtilization",
+                                    "example": "CPUUtilization"
+                                  },
+                                  "statistic": {
+                                    "type": "string",
+                                    "description": "The metric statistics to return.\n",
+                                    "enum": [
+                                      "average",
+                                      "sum",
+                                      "sampleCount",
+                                      "maximum",
+                                      "minimum",
+                                      "percentile"
+                                    ],
+                                    "example": "average"
+                                  },
+                                  "extendedStatistic": {
+                                    "type": "string",
+                                    "description": "Percentile statistic. Valid values: p0.1 - p100\n",
+                                    "example": "p1.5"
+                                  },
+                                  "unit": {
+                                    "type": "string",
+                                    "description": "The unit for the alarm's associated metric.\n",
+                                    "enum": [
+                                      "seconds",
+                                      "microseconds",
+                                      "milliseconds",
+                                      "bytes",
+                                      "kilobytes",
+                                      "megabytes",
+                                      "gigabytes",
+                                      "terabytes",
+                                      "bits",
+                                      "kilobits",
+                                      "megabits",
+                                      "gigabits",
+                                      "terabits",
+                                      "percent",
+                                      "count",
+                                      "bytes/second",
+                                      "kilobytes/second",
+                                      "megabytes/second",
+                                      "gigabytes/second",
+                                      "terabytes/second",
+                                      "bits/second",
+                                      "kilobits/second",
+                                      "megabits/second",
+                                      "gigabits/second",
+                                      "terabits/second",
+                                      "count/second",
+                                      "none"
+                                    ],
+                                    "example": "percent"
+                                  },
+                                  "threshold": {
+                                    "type": "double",
+                                    "description": "The value against which the specified statistic is compared\n",
+                                    "example": 90
+                                  },
+                                  "action": {
+                                    "type": "object",
+                                    "description": "The action to take when scale up is needed\n",
+                                    "properties": {
+                                      "type": {
+                                        "type": "string",
+                                        "description": "The type of the action to take when scale up is needed.\n",
+                                        "enum": [
+                                          "adjustment",
+                                          "updateCapacity setMinTarget",
+                                          "percentageAdjustment"
+                                        ],
+                                        "example": "updateCapacity"
+                                      },
+                                      "adjustment": {
+                                        "type": "integer",
+                                        "description": "The number / percentage associated with the specified adjustment type.\nRequired if using `adjustment` or `percentageAdjustment` as action type\n",
+                                        "example": 1
+                                      },
+                                      "minTargetCapacity": {
+                                        "type": "integer",
+                                        "description": "The number with the target capacity needed.\nRequired if using `setMinTarget` as action type\n",
+                                        "example": 1
+                                      },
+                                      "target": {
+                                        "type": "integer",
+                                        "description": "The desired number of instances. Required if using `updateCapacity` as action type and neither `minimum` nor `maximum` are not defined.\n",
+                                        "example": 1
+                                      },
+                                      "minimum": {
+                                        "type": "integer",
+                                        "description": "The lower limit number of instances that you can scale down to. Optional, required if using `updateCapacity` as action type and neither `target` nor `maximum` are not defined\n",
+                                        "example": 0
+                                      },
+                                      "maximum": {
+                                        "type": "integer",
+                                        "description": "The upper limit number of instances that you can scale up to. Optional, required if using `updateCapacity` as action type and neither `target` nor `minimum` are not defined\n",
+                                        "example": 5
+                                      }
+                                    }
+                                  },
+                                  "namespace": {
+                                    "type": "string",
+                                    "description": "The namespace for the alarm's associated metric.\n",
+                                    "default": "AWS/EC2"
+                                  },
+                                  "dimentions": {
+                                    "type": "array",
+                                    "description": "The dimensions for the alarm's associated metric.\nIf the user mentioned name as instanceId, there is NO value\n",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "name": {
+                                          "type": "string",
+                                          "example": "InstanceId"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "period": {
+                                    "type": "integer",
+                                    "description": "The period in seconds over which the statistic is applied.\n",
+                                    "example": 300
+                                  },
+                                  "evaluationPeriods": {
+                                    "type": "integer",
+                                    "description": "The number of periods over which data is compared to the specified threshold.\n",
+                                    "example": 1
+                                  },
+                                  "cooldown": {
+                                    "type": "integer",
+                                    "description": "The amount of time, in seconds, after a scaling activity completes before any further trigger-related scaling activities can start.\n",
+                                    "example": 300
+                                  },
+                                  "operator": {
+                                    "type": "string",
+                                    "description": "The operator to use in order to determine if the scaling policy is applicable.\n",
+                                    "enum": [
+                                      "gt",
+                                      "gte",
+                                      "lt",
+                                      "lte"
+                                    ],
+                                    "example": "gte"
+                                  },
+                                  "isEnabled": {
+                                    "type": "boolean",
+                                    "description": "Specifies whether the scaling policy described in this block is enabled.\n",
+                                    "default": true,
+                                    "example": true
+                                  }
+                                }
+                              },
+                              "down": {
+                                "type": "object",
+                                "properties": {
+                                  "policyName": {
+                                    "type": "string",
+                                    "description": "The policy name\n",
+                                    "example": "my-down-policy"
+                                  },
+                                  "metricName": {
+                                    "type": "string",
+                                    "description": "The name of the metric.\n",
+                                    "default": "CPUUtilization",
+                                    "example": "CPUUtilization"
+                                  },
+                                  "statistic": {
+                                    "type": "string",
+                                    "description": "The metric statistics to return.\n",
+                                    "enum": [
+                                      "average",
+                                      "sum",
+                                      "sampleCount",
+                                      "maximum",
+                                      "minimum",
+                                      "percentile"
+                                    ],
+                                    "example": "average"
+                                  },
+                                  "extendedStatistic": {
+                                    "type": "string",
+                                    "description": "Percentile statistic. Valid values: p0.1 - p100\n",
+                                    "example": "p1.5"
+                                  },
+                                  "unit": {
+                                    "type": "string",
+                                    "description": "The unit for the alarm's associated metric.\n",
+                                    "enum": [
+                                      "seconds",
+                                      "microseconds",
+                                      "milliseconds",
+                                      "bytes",
+                                      "kilobytes",
+                                      "megabytes",
+                                      "gigabytes",
+                                      "terabytes",
+                                      "bits",
+                                      "kilobits",
+                                      "megabits",
+                                      "gigabits",
+                                      "terabits",
+                                      "percent",
+                                      "count",
+                                      "bytes/second",
+                                      "kilobytes/second",
+                                      "megabytes/second",
+                                      "gigabytes/second",
+                                      "terabytes/second",
+                                      "bits/second",
+                                      "kilobits/second",
+                                      "megabits/second",
+                                      "gigabits/second",
+                                      "terabits/second",
+                                      "count/second",
+                                      "none"
+                                    ],
+                                    "example": "percent"
+                                  },
+                                  "threshold": {
+                                    "type": "double",
+                                    "description": "The value against which the specified statistic is compared\n",
+                                    "example": 90
+                                  },
+                                  "action": {
+                                    "type": "object",
+                                    "description": "The action to take when scale up is needed\n",
+                                    "properties": {
+                                      "type": {
+                                        "type": "string",
+                                        "description": "The type of the action to take when scale up is needed.\n",
+                                        "enum": [
+                                          "adjustment",
+                                          "updateCapacity setMinTarget",
+                                          "percentageAdjustment"
+                                        ],
+                                        "example": "updateCapacity"
+                                      },
+                                      "adjustment": {
+                                        "type": "integer",
+                                        "description": "The number / percentage associated with the specified adjustment type.\nRequired if using `adjustment` or `percentageAdjustment` as action type\n",
+                                        "example": 1
+                                      },
+                                      "minTargetCapacity": {
+                                        "type": "integer",
+                                        "description": "The number with the target capacity needed.\nRequired if using `setMinTarget` as action type\n",
+                                        "example": 1
+                                      },
+                                      "target": {
+                                        "type": "integer",
+                                        "description": "The desired number of instances. Required if using `updateCapacity` as action type and neither `minimum` nor `maximum` are not defined.\n",
+                                        "example": 1
+                                      },
+                                      "minimum": {
+                                        "type": "integer",
+                                        "description": "The lower limit number of instances that you can scale down to. Optional, required if using `updateCapacity` as action type and neither `target` nor `maximum` are not defined\n",
+                                        "example": 0
+                                      },
+                                      "maximum": {
+                                        "type": "integer",
+                                        "description": "The upper limit number of instances that you can scale up to. Optional, required if using `updateCapacity` as action type and neither `target` nor `minimum` are not defined\n",
+                                        "example": 5
+                                      }
+                                    }
+                                  },
+                                  "namespace": {
+                                    "type": "string",
+                                    "description": "The namespace for the alarm's associated metric.\n",
+                                    "default": "AWS/EC2"
+                                  },
+                                  "dimentions": {
+                                    "type": "array",
+                                    "description": "The dimensions for the alarm's associated metric.\nIf the user mentioned name as instanceId, there is NO value\n",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "name": {
+                                          "type": "string",
+                                          "example": "InstanceId"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "period": {
+                                    "type": "integer",
+                                    "description": "The period in seconds over which the statistic is applied.\n",
+                                    "example": 300
+                                  },
+                                  "evaluationPeriods": {
+                                    "type": "integer",
+                                    "description": "The number of periods over which data is compared to the specified threshold.\n",
+                                    "example": 1
+                                  },
+                                  "cooldown": {
+                                    "type": "integer",
+                                    "description": "The amount of time, in seconds, after a scaling activity completes before any further trigger-related scaling activities can start.\n",
+                                    "example": 300
+                                  },
+                                  "operator": {
+                                    "type": "string",
+                                    "description": "The operator to use in order to determine if the scaling policy is applicable.\n",
+                                    "enum": [
+                                      "gt",
+                                      "gte",
+                                      "lt",
+                                      "lte"
+                                    ],
+                                    "example": "gte"
+                                  },
+                                  "isEnabled": {
+                                    "type": "boolean",
+                                    "description": "Specifies whether the scaling policy described in this block is enabled.\n",
+                                    "default": true,
+                                    "example": true
+                                  }
+                                }
+                              },
+                              "target": {
+                                "type": "object",
+                                "properties": {
+                                  "source": {
+                                    "title": "Source",
+                                    "desctiption": "The source of the metric Supported values: “cloudWatch”, “spectrum”",
+                                    "type": "string",
+                                    "example": "spectrum"
+                                  },
+                                  "policyName": {
+                                    "type": "string",
+                                    "description": "The policy name\n",
+                                    "example": "my-up-policy"
+                                  },
+                                  "metricName": {
+                                    "type": "string",
+                                    "description": "The name of the metric.\n",
+                                    "default": "CPUUtilization",
+                                    "example": "CPUUtilization"
+                                  },
+                                  "statistic": {
+                                    "type": "string",
+                                    "description": "The metric statistics to return.\n",
+                                    "enum": [
+                                      "average",
+                                      "sum",
+                                      "sampleCount",
+                                      "maximum",
+                                      "minimum",
+                                      "percentile"
+                                    ],
+                                    "example": "average"
+                                  },
+                                  "unit": {
+                                    "type": "string",
+                                    "description": "The unit for the alarm's associated metric.\n",
+                                    "enum": [
+                                      "seconds",
+                                      "microseconds",
+                                      "milliseconds",
+                                      "bytes",
+                                      "kilobytes",
+                                      "megabytes",
+                                      "gigabytes",
+                                      "terabytes",
+                                      "bits",
+                                      "kilobits",
+                                      "megabits",
+                                      "gigabits",
+                                      "terabits",
+                                      "percent",
+                                      "count",
+                                      "bytes/second",
+                                      "kilobytes/second",
+                                      "megabytes/second",
+                                      "gigabytes/second",
+                                      "terabytes/second",
+                                      "bits/second",
+                                      "kilobits/second",
+                                      "megabits/second",
+                                      "gigabits/second",
+                                      "terabits/second",
+                                      "count/second",
+                                      "none"
+                                    ],
+                                    "example": "percent"
+                                  },
+                                  "namespace": {
+                                    "type": "string",
+                                    "description": "The namespace for the alarm's associated metric.\n",
+                                    "default": "AWS/EC2"
+                                  },
+                                  "target": {
+                                    "type": "integer",
+                                    "description": "The target value for the group\n",
+                                    "example": 1
+                                  },
+                                  "cooldown": {
+                                    "type": "integer",
+                                    "description": "The amount of time, in seconds, after a scaling activity completes before any further trigger-related scaling activities can start.\n",
+                                    "example": 300
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "scheduling": {
+                            "type": "object",
+                            "title": "Elastigroup Scheduling",
+                            "description": "Schedule tasks to execute, using CRON expressions.\n",
+                            "properties": {
+                              "tasks": {
+                                "type": "array",
+                                "description": "The scheduling tasks for the group.\n",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "isEnabled": {
+                                      "type": "boolean",
+                                      "description": "Describes whether the task is enabled. When true the task should run when false it should not run.\n",
+                                      "example": true
+                                    },
+                                    "startTime": {
+                                      "type": "string",
+                                      "description": "DATETIME in ISO-8601 format and is in UTC time. Sets a start time for scheduled actions.\nIf \"frequency\" or \"cronExpression\" are not used - the task will run only once at the start time and will then be deleted from the group configuration.\n",
+                                      "example": "2018-05-23T10:55:09Z"
+                                    },
+                                    "frequency": {
+                                      "type": "string",
+                                      "description": "The recurrence frequency to run this task.\nOnly one of ‘frequency' or ‘cronExpression' should be used at a time\n",
+                                      "enum": [
+                                        "hourly",
+                                        "daily",
+                                        "weekly"
+                                      ],
+                                      "example": "hourly"
+                                    },
+                                    "cronExpression": {
+                                      "type": "string",
+                                      "description": "A valid cron expression.\nThe cron is running in UTC time zone and is in Unix cron format Cron Expression Validator Script.\nOnly one of ‘frequency' or ‘cronExpression' should be used at a time.\n",
+                                      "example": "0 1 * * *"
+                                    },
+                                    "taskType": {
+                                      "type": "string",
+                                      "description": "The task type to run.\n",
+                                      "enum": [
+                                        "backup_ami",
+                                        "scale",
+                                        "scaleUp",
+                                        "roll",
+                                        "statefulUpdateCapacity",
+                                        "statefulRecycle",
+                                        "clusterRoll (For ECS Integration)"
+                                      ],
+                                      "example": "scale"
+                                    },
+                                    "scaleTargetCapacity": {
+                                      "type": "integer",
+                                      "description": "The target capacity of the group.\nShould be used when choosing ‘taskType' of ‘scale'.\n"
+                                    },
+                                    "scaleMinCapacity": {
+                                      "type": "integer",
+                                      "description": "The min capacity of the group.\nShould be used when choosing ‘taskType' of ‘scale'.\n"
+                                    },
+                                    "scaleMaxCapacity": {
+                                      "type": "integer",
+                                      "description": "The max capacity of the group.\nRequired when ‘taskType' is ‘scale'.\n"
+                                    },
+                                    "targetCapacity": {
+                                      "type": "integer",
+                                      "description": "Set a new target capacity for the Elastigroup.\nRequired when ‘taskType' is ‘statefulUpdateCapacity'.\n"
+                                    },
+                                    "MinCapacity": {
+                                      "type": "integer",
+                                      "description": "Set a new minimum capacity for the Elastigroup.\nRequired when ‘taskType' is ‘statefulUpdateCapacity'.\n"
+                                    },
+                                    "MaxCapacity": {
+                                      "type": "integer",
+                                      "description": "Set a new maximum capacity for the Elastigroup.\nRequired when ‘taskType' is ‘statefulUpdateCapacity'.\n"
+                                    },
+                                    "batchSizePercentage": {
+                                      "type": "integer",
+                                      "description": "The percentage size of each batch in the scheduled deployment roll.\nRequired when the taskType is roll.\n"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "thirdPartiesIntegration": {
+                            "type": "object",
+                            "title": "Elastigroup Third Party Integrations",
+                            "description": "All definitions for using third-party Integrations\n",
+                            "properties": {
+                              "rancher": {
+                                "type": "object",
+                                "description": "All definitions for using Rancher Labs integration.\n",
+                                "properties": {
+                                  "masterHost": {
+                                    "type": "string",
+                                    "description": "Rancher master url\n",
+                                    "example": "http://myRancher.com:8080/v1"
+                                  },
+                                  "accessKey": {
+                                    "type": "string",
+                                    "description": "Rancher version\n",
+                                    "example": "1",
+                                    "default": "1"
+                                  }
+                                }
+                              },
+                              "route53": {
+                                "type": "object",
+                                "description": "Route53 integration object.\n",
+                                "properties": {
+                                  "domains": {
+                                    "type": "array",
+                                    "description": "Route53 domain configurations.\n",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "hostedZoneId": {
+                                          "type": "string",
+                                          "description": "The Route53 Hosted Zone ID for the registered domain.\n",
+                                          "example": "Z3UFMBCGJMYLUT"
+                                        },
+                                        "spotinstAccountId": {
+                                          "type": "string",
+                                          "description": "The Spot account ID that is linked to the AWS account that holds the Route53 hosted Zone ID.\nThe default is the user Spot account provided as a URL parameter.\n",
+                                          "example": "act-1234abcd"
+                                        },
+                                        "recordSetType": {
+                                          "type": "string",
+                                          "description": "Set the type of recordSet to update.\nValid values:\n* \"a\" - means register and de-register of instances done by IP address (IPv4).\nWhen it is \"a\" you should also specify usePublicIp.\n* \"cname\" - register and de-register of instances done by CNAME. When it is \"cname\", you should also specify usePublicDns.\n",
+                                          "enum": [
+                                            "a",
+                                            "cname"
+                                          ],
+                                          "example": "a",
+                                          "default": "a"
+                                        },
+                                        "recordSets": {
+                                          "type": "array",
+                                          "description": "List of record sets.\n",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "name": {
+                                                "type": "string",
+                                                "description": "Name of the recordSet.\n",
+                                                "example": "testcname.spot.io."
+                                              },
+                                              "usePublicIp": {
+                                                "type": "boolean",
+                                                "description": "Defines whether to use public or private IP. Relevant only when recordSetType=a.\n",
+                                                "example": true,
+                                                "default": false
+                                              },
+                                              "usePublicDns": {
+                                                "type": "boolean",
+                                                "description": "Defines whether to use a public DNS or private DNS in the instance registration process.\nRelevant only when recordSetType=cname.\n* False=Create a new weighted CNAME recordset with same name and the instance Private DNS.\n* True=instances should be registered with public DNS.\n",
+                                                "example": true,
+                                                "default": false
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "readOnly": true,
+                            "title": "Creation Time Indicator",
+                            "description": "Creation Time Indicator",
+                            "example": "2020-10-01T05:23:59.302Z"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "readOnly": true,
+                            "title": "Update Time Indicator",
+                            "description": "Update Time Indicator",
+                            "example": "2020-10-01T05:23:59.302Z"
+                          }
+                        }
+                      }
+                    }
                   }
                 ]
               }
@@ -2360,468 +3629,7 @@
         },
         "responses": {
           "200": {
-            "description": "List Group Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "allOf": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "request": {
-                              "type": "object",
-                              "description": "Original request properties\n",
-                              "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "example": "67582d0c-108b-4ef7-9fdc-d39678a30844",
-                                  "description": "Unique ID associated with this request\n"
-                                },
-                                "url": {
-                                  "type": "string",
-                                  "example": "/aws/ec2/group/sig-1234567",
-                                  "description": "The URL that was used for the request\n"
-                                },
-                                "method": {
-                                  "type": "string",
-                                  "example": "GET",
-                                  "description": "The HTTP **METHOD** used for the request\n"
-                                },
-                                "timestamp": {
-                                  "type": "string",
-                                  "example": "2018-01-07T07:30:58.622Z",
-                                  "description": "When the request was received by Spot\n"
-                                }
-                              }
-                            },
-                            "response": {
-                              "type": "object",
-                              "description": "Response package that includes, status, type and any relevant data.\n",
-                              "properties": {
-                                "status": {
-                                  "type": "object",
-                                  "properties": {
-                                    "code": {
-                                      "type": "integer",
-                                      "example": 200,
-                                      "description": "HTTP status code assigned to this response\n"
-                                    },
-                                    "message": {
-                                      "type": "string",
-                                      "example": "OK",
-                                      "description": "HTTP status message for the respective status code\n"
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "response": {
-                              "type": "object",
-                              "properties": {
-                                "kind": {
-                                  "type": "string",
-                                  "example": "spotinst:aws:ec2:group",
-                                  "description": "The data type of each item in the response\n"
-                                },
-                                "items": {
-                                  "type": "array",
-                                  "description": "Array of data objects\n",
-                                  "items": [
-                                    {
-                                      "type": "object",
-                                      "properties": {
-                                        "id": {
-                                          "type": "string",
-                                          "title": "ID",
-                                          "example": "sig-1234567"
-                                        },
-                                        "name": {
-                                          "type": "string",
-                                          "title": "Name",
-                                          "example": "EG"
-                                        },
-                                        "description": {
-                                          "type": "string",
-                                          "title": "Validation",
-                                          "example": "validation"
-                                        },
-                                        "capacity": {
-                                          "type": "object",
-                                          "title": "Capacity",
-                                          "properties": {
-                                            "minimum": {
-                                              "type": "integer",
-                                              "title": "Min Capacity Amount",
-                                              "example": 1
-                                            },
-                                            "maximum": {
-                                              "type": "integer",
-                                              "title": "Max Capacity Amount",
-                                              "example": 1
-                                            },
-                                            "target": {
-                                              "type": "integer",
-                                              "title": "Target Amount",
-                                              "example": 1
-                                            },
-                                            "unit": {
-                                              "type": "string",
-                                              "title": "Unit",
-                                              "example": "instance"
-                                            }
-                                          }
-                                        },
-                                        "strategy": {
-                                          "type": "object",
-                                          "title": "Strategy",
-                                          "properties": {
-                                            "risk": {
-                                              "type": "integer",
-                                              "title": "Risk",
-                                              "example": 100
-                                            },
-                                            "onDemandCount": {
-                                              "type": "integer",
-                                              "title": "On Demand Count",
-                                              "example": null
-                                            },
-                                            "availabilityVsCost": {
-                                              "type": "string",
-                                              "title": "Availability VS Cost",
-                                              "example": "balanced"
-                                            },
-                                            "lifetimePeriod": {
-                                              "type": "string",
-                                              "title": "Life Time Period",
-                                              "example": "days"
-                                            },
-                                            "fallbackToOd": {
-                                              "type": "boolean",
-                                              "title": "Fallback To On-Demand",
-                                              "example": true
-                                            },
-                                            "persistence": {
-                                              "type": "object",
-                                              "title": "Fallback To On-Demand"
-                                            },
-                                            "revertToSpot": {
-                                              "type": "object",
-                                              "title": "Revert To Spot",
-                                              "properties": {
-                                                "performAt": {
-                                                  "type": "string",
-                                                  "title": "Perform At",
-                                                  "example": "always"
-                                                }
-                                              }
-                                            }
-                                          }
-                                        },
-                                        "compute": {
-                                          "type": "object",
-                                          "title": "Compute",
-                                          "properties": {
-                                            "instanceTypes": {
-                                              "type": "object",
-                                              "title": "Insatnce Types",
-                                              "properties": {
-                                                "ondemand": {
-                                                  "type": "string",
-                                                  "title": "On Demand",
-                                                  "example": "c3.4xlarge"
-                                                },
-                                                "spot": {
-                                                  "type": "string",
-                                                  "title": "On Demand",
-                                                  "example": [
-                                                    "c3.2xlarge",
-                                                    "c4.2xlarge"
-                                                  ]
-                                                }
-                                              }
-                                            },
-                                            "availabilityZones": {
-                                              "type": "object",
-                                              "title": "Availability Zones",
-                                              "properties": {
-                                                "name": {
-                                                  "type": "string",
-                                                  "title": "Name",
-                                                  "example": "eu-west-1b"
-                                                },
-                                                "subnetIds": {
-                                                  "type": "string",
-                                                  "title": "SubnetIds",
-                                                  "example": [
-                                                    "eu-west-1b"
-                                                  ]
-                                                }
-                                              }
-                                            },
-                                            "product": {
-                                              "type": "object",
-                                              "title": "Product",
-                                              "example": "Linux/UNIX (Amazon VPC)"
-                                            },
-                                            "launchSpecification": {
-                                              "type": "object",
-                                              "title": "Launch Specification",
-                                              "properties": {
-                                                "loadBalancerNames": {
-                                                  "type": "string",
-                                                  "title": "Load Balancer Names",
-                                                  "example": null
-                                                },
-                                                "loadBalancersConfig": {
-                                                  "type": "object",
-                                                  "title": "Load Balancers Config",
-                                                  "properties": {
-                                                    "loadBalancers": {
-                                                      "type": "string",
-                                                      "title": "Load Balancer Names",
-                                                      "example": null
-                                                    }
-                                                  }
-                                                },
-                                                "healthCheckGracePeriod": {
-                                                  "type": "integer",
-                                                  "title": "Health Check Grace Period",
-                                                  "example": 300
-                                                },
-                                                "securityGroupIds": {
-                                                  "type": "string",
-                                                  "title": "Security Groups IDs",
-                                                  "example": [
-                                                    "sg-1234567"
-                                                  ]
-                                                },
-                                                "monitoring": {
-                                                  "type": "boolean",
-                                                  "title": "Monitoring",
-                                                  "example": false
-                                                },
-                                                "ebsOptimized": {
-                                                  "type": "boolean",
-                                                  "title": "EBS Optimized",
-                                                  "example": false
-                                                },
-                                                "imageId": {
-                                                  "type": "boolean",
-                                                  "title": "Image ID",
-                                                  "example": "ami-1234567"
-                                                },
-                                                "iamRole": {
-                                                  "type": "object",
-                                                  "title": "IAM Role",
-                                                  "properties": {
-                                                    "name": {
-                                                      "type": "string",
-                                                      "title": "Name",
-                                                      "example": null
-                                                    },
-                                                    "arn": {
-                                                      "type": "string",
-                                                      "title": "ARN",
-                                                      "example": "arn:aws:iam::1234356789:instance-profile/Loader"
-                                                    }
-                                                  }
-                                                },
-                                                "keyPair": {
-                                                  "type": "string",
-                                                  "title": "Key Pair",
-                                                  "example": "PA"
-                                                },
-                                                "userData": {
-                                                  "type": "string",
-                                                  "title": "User Data",
-                                                  "example": "sldkfoisnfgodng"
-                                                },
-                                                "shutdownScript": {
-                                                  "type": "string",
-                                                  "title": "Shut Down Script",
-                                                  "example": null
-                                                },
-                                                "tags": {
-                                                  "type": "object",
-                                                  "title": "Tags",
-                                                  "properties": {
-                                                    "tagKey": {
-                                                      "type": "string",
-                                                      "title": "Tag Key",
-                                                      "example": "Env"
-                                                    },
-                                                    "tagValue": {
-                                                      "type": "string",
-                                                      "title": "Tag Value",
-                                                      "example": "TEST"
-                                                    }
-                                                  }
-                                                },
-                                                "tenancy": {
-                                                  "type": "string",
-                                                  "title": "Tenancy",
-                                                  "example": "default"
-                                                }
-                                              }
-                                            }
-                                          }
-                                        },
-                                        "scaling": {
-                                          "type": "object",
-                                          "title": "Scaling"
-                                        },
-                                        "scheduling": {
-                                          "type": "object",
-                                          "title": "Scheduling",
-                                          "properties": {
-                                            "tasks": {
-                                              "type": "array",
-                                              "title": "Tasks",
-                                              "items": [
-                                                {
-                                                  "type": "object",
-                                                  "properties": {
-                                                    "frequency": {
-                                                      "type": "boolean",
-                                                      "title": "Frequency",
-                                                      "example": "hourly"
-                                                    },
-                                                    "taskType": {
-                                                      "type": "string",
-                                                      "title": "Task Type",
-                                                      "example": "backup_ami"
-                                                    }
-                                                  }
-                                                },
-                                                {
-                                                  "type": "object",
-                                                  "properties": {
-                                                    "isEnabled": {
-                                                      "type": "boolean",
-                                                      "title": "Is Enabled",
-                                                      "example": true
-                                                    },
-                                                    "taskType": {
-                                                      "type": "boolean",
-                                                      "title": "Task Type",
-                                                      "example": "scale"
-                                                    },
-                                                    "cronExpression": {
-                                                      "type": "string",
-                                                      "title": "Cron Expression",
-                                                      "example": "55 19 * * 0-4"
-                                                    },
-                                                    "scaleTargetCapacity": {
-                                                      "type": "integer",
-                                                      "title": "Scale Target Capacity",
-                                                      "example": 1
-                                                    },
-                                                    "scaleMinCapacity": {
-                                                      "type": "integer",
-                                                      "title": "Scale Min Capacity",
-                                                      "example": 1
-                                                    },
-                                                    "scaleMaxCapacity": {
-                                                      "type": "integer",
-                                                      "title": "Scale Max Capacity",
-                                                      "example": 1
-                                                    }
-                                                  }
-                                                },
-                                                {
-                                                  "type": "object",
-                                                  "properties": {
-                                                    "groupId": {
-                                                      "type": "string",
-                                                      "title": "Group Id",
-                                                      "example": "sig-12345"
-                                                    },
-                                                    "eventType": {
-                                                      "type": "string",
-                                                      "title": "Event Type",
-                                                      "example": "Scale"
-                                                    },
-                                                    "createdAt": {
-                                                      "type": "string",
-                                                      "title": "Created At",
-                                                      "example": "2016-01-21T16:51:09.000+0000"
-                                                    },
-                                                    "subEvents": {
-                                                      "type": "object",
-                                                      "title": "Sub Evenet",
-                                                      "properties": {
-                                                        "type": {
-                                                          "type": "string",
-                                                          "title": "Type",
-                                                          "example": "scaleUp"
-                                                        },
-                                                        "terminatedSpots": {
-                                                          "type": "string",
-                                                          "example": [
-                                                            {
-                                                              "spotInstanceRequestId": "sir-029404xk"
-                                                            },
-                                                            {
-                                                              "instanceId": "i-7fb4facc"
-                                                            }
-                                                          ]
-                                                        },
-                                                        "terminatedInstances": {
-                                                          "type": "array"
-                                                        }
-                                                      }
-                                                    }
-                                                  }
-                                                }
-                                              ]
-                                            }
-                                          }
-                                        },
-                                        "thirdPartiesIntegration": {
-                                          "type": "object",
-                                          "title": "Third Parties Integration"
-                                        },
-                                        "multai": {
-                                          "type": "string",
-                                          "title": "Multai",
-                                          "example": null
-                                        },
-                                        "createdAt": {
-                                          "type": "string",
-                                          "title": "Created At",
-                                          "example": "2015-10-23T09:00:00.000Z"
-                                        },
-                                        "updatedAt": {
-                                          "type": "string",
-                                          "title": "Updated At",
-                                          "example": "2018-08-01T14:11:39.000Z"
-                                        }
-                                      }
-                                    }
-                                  ]
-                                },
-                                "count": {
-                                  "type": "integer",
-                                  "example": 1,
-                                  "description": "Size of the data object array\n"
-                                }
-                              }
-                            }
-                          }
-                        }
-                      ]
-                    }
-                  ]
-                }
-              }
-            }
+            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/get/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -4095,11 +4903,11 @@
           },
           {
             "in": "query",
-            "name": "ttl",
+            "name": "ttlInMinutes",
             "example": "23",
-            "description": "Specify a TTL (in minutes) for this lock, meaning, for how long the protection will be valid for\n",
+            "description": "Specify a TTL (in minutes) for this lock, meaning, for how long the protection will be valid for.\n",
             "schema": {
-              "type": "string"
+              "type": "integer"
             },
             "required": false
           }
@@ -6015,7 +6823,7 @@
         }
       }
     },
-    "/aws/emr/mrScaler/{mrScalerId}/scale/cluster": {
+    "/aws/emr/mrScaler/{mrScalerId}/cluster": {
       "get": {
         "summary": "List Scalers",
         "description": "Get a list of all MR Scaler clusters",
@@ -6102,7 +6910,7 @@
         }
       }
     },
-    "/aws/emr/mrScaler/{mrScalerId}/scale/costs": {
+    "/aws/emr/mrScaler/{mrScalerId}/costs": {
       "get": {
         "summary": "Get Scaler Costs",
         "description": "Get financial information on the MR Scaler, including running time, costs, and savings",
@@ -6469,7 +7277,7 @@
           },
           {
             "in": "query",
-            "name": "startDate",
+            "name": "fromDate",
             "example": "2016-10-01",
             "description": "Starting date to fetch the events from\n",
             "schema": {
@@ -7803,6 +8611,12 @@
                                           "type": "string",
                                           "description": "Elastigroup ID",
                                           "example": "sig-12345"
+                                        },
+                                        "processes": {
+                                          "type": "array",
+                                          "example": [
+                                            "AUTO_SCALE"
+                                          ]
                                         },
                                         "suspensions": {
                                           "type": "array",
@@ -9457,7 +10271,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "insatnceId",
+            "name": "instanceId",
             "example": "i-123456",
             "description": "The instance ID you want to query\n",
             "schema": {
@@ -9943,7 +10757,7 @@
       }
     },
     "/aws/ec2/group/{groupId}/detachInstances": {
-      "post": {
+      "put": {
         "summary": "Detach Instance",
         "description": "Detach instances from your Elastigroup",
         "operationId": "elastigroupAwsDetachInstance",
@@ -10108,7 +10922,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "asgName",
+            "name": "autoScalingGroupName",
             "example": "MyASG",
             "description": "The ASG name\n",
             "schema": {
@@ -11586,95 +12400,6 @@
             "required": false
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "type": "object",
-                    "properties": {
-                      "batchSizePercentage": {
-                        "type": "integer",
-                        "title": "Batch size percentage indicator",
-                        "description": "Indicates (in percentage) the batch size of the deployment (meaning, how many instances to replace in each batch)\n",
-                        "example": 20
-                      },
-                      "gracePeriod": {
-                        "type": "integer",
-                        "title": "Grace period indicator",
-                        "example": 300,
-                        "description": "Indicates (in seconds) the timeout to wait until instance become healthy based on the healthCheckType\n"
-                      },
-                      "healthCheckType": {
-                        "type": "string",
-                        "title": "Health check type indicator",
-                        "description": "Define a health check type. valid values: ELB, ECS_CLUSTER_INSTANCE, TARGET_GROUP, OPSWORKS, NOMAD_NODE, MULTAI_TARGET_SET, HCS, EC2, NONE (wait the entire grace period for each batch). If no value is set the roll will use the group's auto-healing health check.\n",
-                        "example": "EC2"
-                      },
-                      "strategy": {
-                        "type": "object",
-                        "title": "Strategy",
-                        "description": "The roll strategy\n",
-                        "properties": {
-                          "action": {
-                            "type": "string",
-                            "title": "Action indicator",
-                            "description": "The roll action to perform. valid values: REPLACE_SERVER, RESTART_SERVER\n",
-                            "default": "REPLACE_SERVER",
-                            "example": "REPLACE_SERVER"
-                          },
-                          "batchMinHealthyPercentage": {
-                            "type": "integer",
-                            "title": "Batch min healthy percentage indicator",
-                            "description": "Indicates the threshold of minimum healthy instances in single batch. If the amount of healthy instances in single batch is under the threshold, the deployment will fail. If exists, the parameter value will be in range of 0-100. In case of null as value, the default value in the backend will be 50%. Value of param should represent the number in percentage (%) of the batch.\n",
-                            "default": 50,
-                            "example": 25
-                          },
-                          "onFailure": {
-                            "type": "object",
-                            "title": "On Failure",
-                            "description": "Set detach options to the deployment\n",
-                            "properties": {
-                              "actionType": {
-                                "type": "string",
-                                "title": "Action Type Indicator",
-                                "description": "Sets the action that will take place, Accepted values are: DETACH_OLD, DETACH_NEW\n",
-                                "example": "DETACH_NEW"
-                              },
-                              "shouldHandleAllBatches": {
-                                "type": "boolean",
-                                "title": "Should Handle ALl Batches Crieria",
-                                "description": "Indicator if the action should apply to all batches of the deployment or only the latest batch\n",
-                                "default": false,
-                                "example": true
-                              },
-                              "drainingTimeout": {
-                                "type": "integer",
-                                "title": "Draining Timeout Indicator",
-                                "description": "Indicates (in seconds) the timeout to drain the instances\n",
-                                "default": "The Elastigroups draining time out",
-                                "example": 600
-                              },
-                              "shouldDecrementTargetCapacity": {
-                                "type": "boolean",
-                                "title": "Should Decrement Target Capacity",
-                                "description": "Decrementing the group target capacity after detaching the instances\n",
-                                "default": true,
-                                "example": true
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Group's Deployments Status Response",
