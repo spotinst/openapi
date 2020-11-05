@@ -206,7 +206,7 @@
       "summary": "Elastigroups for AWS",
       "post": {
         "summary": "Create Elastigroup",
-        "description": "Create a new AWS Elastigroup.\n\nThere are several third Party Integrations available, which can be activated based on your configuration, such as:\n* [Rancher Elastigroup](https://docs.spot.io/elastigroup/tools-integrations/rancher)\n* [Route53 Elastigroup](https://docs.spot.io/elastigroup/tools-integrations/route53)\n* [Beanstalk Elastigroup](https://docs.spot.io/elastigroup/tools-integrations/elastic-beanstalk)\n\n  You can create a beanstalk elastigroup with the following steps:\n  * [Get the beanstalk configuration](https://docs.spot.io/api/#operation/elastigroupAwsGetBeanstalkConfiguration) to JSON format\n  * Modify required parameters and post the JSON as a body to create a new elastigroup\n",
+        "description": "Create a new AWS Elastigroup.\n\nThere are several third Party Integrations available, which can be activated based on your configuration, such as:\n* [Rancher Elastigroup](https://docs.spot.io/elastigroup/tools-integrations/rancher)\n* [Route53 Elastigroup](https://docs.spot.io/elastigroup/tools-integrations/route53)\n* [ECS Elastigroup](https://docs.spot.io/elastigroup/features/amazon-ecs/elastigroup-for-ecs)\n* [Beanstalk Elastigroup](https://docs.spot.io/elastigroup/tools-integrations/elastic-beanstalk)\n\n\n  You can create a beanstalk elastigroup with the following steps:\n  * [Get the beanstalk configuration](https://docs.spot.io/api/#operation/elastigroupAwsGetBeanstalkConfiguration) to JSON format\n  * Modify required parameters and post the JSON as a body to create a new elastigroup\n",
         "operationId": "elastigroupAwsCreate",
         "tags": [
           "Elastigroup AWS"
@@ -1398,7 +1398,7 @@
                             "properties": {
                               "rancher": {
                                 "type": "object",
-                                "description": "All definitions for using Rancher Labs integration.\n",
+                                "description": "Rancher integration object.\n",
                                 "properties": {
                                   "masterHost": {
                                     "type": "string",
@@ -1476,10 +1476,64 @@
                               },
                               "elasticBeanstalk": {
                                 "type": "object",
+                                "description": "Beanstalk integration object.\n",
                                 "properties": {
                                   "environmentId": {
                                     "type": "string",
                                     "example": "e-12345"
+                                  }
+                                }
+                              },
+                              "ecs": {
+                                "type": "object",
+                                "description": "ECS integration object.\n",
+                                "properties": {
+                                  "clusterName": {
+                                    "type": "string",
+                                    "example": "test-ecs",
+                                    "description": "ECS cluster name\n"
+                                  },
+                                  "autoScale": {
+                                    "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/properties/autoScaler"
+                                  },
+                                  "batch": {
+                                    "type": "object",
+                                    "properties": {
+                                      "jobQueueNames": {
+                                        "type": "array",
+                                        "example": [
+                                          "dumpy-big-processing"
+                                        ]
+                                      }
+                                    }
+                                  },
+                                  "optimizeImages": {
+                                    "type": "object",
+                                    "properties": {
+                                      "shouldOptimizeEcsAmi": {
+                                        "type": "boolean",
+                                        "example": true
+                                      },
+                                      "performAt": {
+                                        "type": "string",
+                                        "description": "Settings for maintenance strategy.\\\nperformAt of type: 'never' OR 'timeWindow' can only be applied to groups with \"availabilityOriented\" OR groups with \"persistence\",\\\nother groups allow either 'always' type or nothing which also means always.\n",
+                                        "enum": [
+                                          "never",
+                                          "always",
+                                          "timeWindow"
+                                        ],
+                                        "example": "timeWindow",
+                                        "default": "always"
+                                      },
+                                      "timeWindows": {
+                                        "type": "array",
+                                        "description": "When performAt is 'timeWindow':\\\nmust specify a list of 'timeWindows' with at least one time window Each string is in the format of - ddd:hh:mm-ddd:hh:mm\n* ddd = day of week = Sun | Mon | Tue | Wed | Thu | Fri | Sat\n* hh = hour 24 = 0 -23\n* mm = minute = 0 - 59\n",
+                                        "items": {
+                                          "type": "string",
+                                          "example": "Mon:03:00-Wed:02:30"
+                                        }
+                                      }
+                                    }
                                   }
                                 }
                               }
