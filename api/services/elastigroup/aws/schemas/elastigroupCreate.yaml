@@ -960,7 +960,7 @@ properties:
           rancher:
             type: object
             description: |
-              All definitions for using Rancher Labs integration.
+              Rancher integration object.
             properties:
               masterHost:
                 type: string
@@ -1036,7 +1036,55 @@ properties:
                             default: false
           elasticBeanstalk:
             type: object
+            description: |
+              Beanstalk integration object.
             properties:
               environmentId:
                 type: string
                 example: e-12345
+          ecs:
+            type: object
+            description: |
+              ECS integration object.
+            properties:
+              clusterName:
+                type: string
+                example: "test-ecs"
+                description: |
+                  ECS cluster name
+              autoScale:
+                $ref: "../../../ocean/ecs/schemas/ocean-autoscaler.yaml"
+              batch:
+                type: object
+                properties:
+                  jobQueueNames:
+                    type: array
+                    example: ["dumpy-big-processing"]
+              optimizeImages:
+                    type: object
+                    properties:
+                      shouldOptimizeEcsAmi:
+                        type: boolean
+                        example: true
+                      performAt:
+                        type: string
+                        description: |
+                          Settings for maintenance strategy.\
+                          performAt of type: 'never' OR 'timeWindow' can only be applied to groups with "availabilityOriented" OR groups with "persistence",\
+                          other groups allow either 'always' type or nothing which also means always.
+                        enum: [never, always, timeWindow]
+                        example: "timeWindow"
+                        default: "always"
+                      timeWindows:
+                        type: array
+                        description: |
+                          When performAt is 'timeWindow':\
+                          must specify a list of 'timeWindows' with at least one time window Each string is in the format of - ddd:hh:mm-ddd:hh:mm
+                          * ddd = day of week = Sun | Mon | Tue | Wed | Thu | Fri | Sat
+                          * hh = hour 24 = 0 -23
+                          * mm = minute = 0 - 59
+                        items:
+                          type: string
+                          example: "Mon:03:00-Wed:02:30"
+
+
