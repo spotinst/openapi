@@ -1,4 +1,4 @@
-description: Ocean Get Heartbeat Response
+description: Ocean Get Log Response
 content:
   application/json:
     schema:
@@ -16,18 +16,19 @@ content:
                 Unique ID associated with this request
             url:
               type: "string"
-              example: /gcp/gce/group/sig-123456/log?fromDate=2019-01-01&toDate=2019-01-02
+              example: /ocean/gcp/k8s/cluster/o-e0a2bd7c/log?fromDate=2020-10-06&toDate=2020-10-08&severity=ALL&limit=500
               description: >
                 The URL that was used for the request
             method:
               type: "string"
+              example: GET
               description: >
                 The HTTP **METHOD** used for the request
             timestamp:
               type: "string"
-              example: "2018-06-20T11:35:01.745Z"
+              example: "2020-10-05T16:20:38.579Z"
               description: >
-                When the requets was received by Spot
+                When the request was received by Spot
         response:
           type: "object"
           description: >
@@ -48,19 +49,24 @@ content:
                     HTTP status message for the respective status code
             kind:
               type: "string"
-              example: "spotinst:ocean:k8s:cluster:controllerHeartbeat"
+              example: "spotinst:ocean:cluster:log"
             items:
-              type: "object"
-              properties:
-                message:
-                  type: "string"
-                  example: "Ocean o-e0a2bd7c successfully created."
-                severity:
-                  type: "string"
-                  example: "INFO"
-                createdAt:
-                  type: string
-                  example: 2019-05-19T14:34:15.000Z
+              type: "array"
+              description: >
+                Array of data objects
+              items:
+                type: object
+                properties:
+                  message:
+                    type: "string"
+                  severity:
+                    type: "string"
+                  createdAt:
+                    type: "string"
+              example:
+                - message: "Ocean o-e0a2bd7c successfully created."
+                  severity: "INFO"
+                  createdAt: 2020-10-07T09:51:12.000Z
             count:
               type: "integer"
               example: "1"

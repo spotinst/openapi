@@ -4,7 +4,7 @@ serve: ## Start the ReDoc webserver
 
 .PHONY: bundle-redoc
 bundle-redoc: ## Make a static HTML file with ReDoc
-	docker run --rm -it -v $(PWD):/src -w /src node:14 npx redoc-cli bundle --output build/index.html api/spot.yaml
+	docker run --rm -it -v $(PWD):/src -w /src node:14 npx redoc-cli bundle --template redoc/template.hbs.html --output build/index.html api/spot.yaml
 
 .PHONY: bundle-swagger
 bundle-swagger: ## Make a single JSON bundle of the OpenAPI spec
