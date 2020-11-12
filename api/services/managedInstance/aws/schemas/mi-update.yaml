@@ -1,0 +1,336 @@
+type: object
+title: MI Update
+properties:
+  managedInstance:
+    title: Managed Instance
+    description: Update Config
+    type: object
+    properties:
+      region:
+        title: Region
+        description: MI region
+        type: string
+        example: sa-east-1
+      name:
+        title: Name
+        description: MI Name
+        type: string
+        example: sa-east-1
+      strategy:
+        title: Strategy
+        description: Strategy Configuration
+        type: object
+        properties:
+          revertToSpot:
+            title: Revert To Spot
+            description: Revert To Spot Configuration
+            type: object
+            properties:
+              performAt:
+                title: Perform At
+                description: "Valid values: always, never, 'timeWindow' Example: never Default: never"
+                type: string
+                example: always
+      persistence:
+        title: Persistence
+        description: Persistence settings. Should omit at least one of the persist options below.
+        type: object
+        properties:
+          persistRootDevice:
+            title: Persist Root Device
+            description: Should the instance maintain its root device volumes
+            type: boolean
+            example: true
+          blockDevicesMode:
+            title: Block Devices Mode
+            description: "Determine the way we attach the data volumes to the data devices. Valid values: ‘reattach', ‘onLaunch' Default: onLaunch"
+            type: string
+            example: onLaunch
+      healthCheck:
+        title: Health Check
+        type: object
+        description: Health Check Configuration
+        properties:
+          type:
+            title: Type
+            type: string
+            description: "The service to use for the health check. Valid values: EC2, ELB, TARGET_GROUP, MULTAI_TARGET_SET Default: EC2"
+            example: EC2
+          autoHealing:
+            title: Auto Healing
+            type: boolean
+            description: "Enable the auto healing which auto replaces the instance in case the health check fails Default: true"
+            example: true
+          gracePeriod:
+            title: Grace Period
+            type: integer
+            description: "The amount of time, in seconds, after the instance has launched to starts and check its health. Default: 120"
+            example: 120
+          unhealthyDuration:
+            title: Unhealthy Duration
+            type: integer
+            description: "The amount of time, in seconds, an existing instance should remain active after becoming unhealthy. After the set time out the instance will be replaced Default: 120"
+            example: 120
+      compute:
+        title: Compute
+        description: MI Compute Configuration
+        type: object
+        properties:
+          subnetIds:
+            title: Subnet IDs
+            description: A comma-separated list of subnet identifiers for your instance.
+            type: array
+            example:
+              - subnet-a7b560c1
+          vpcId:
+            title: VPC ID
+            description: VPC ID for your instance.
+            type: string
+            example: vpc-111
+      launchSpecification:
+        title: Launch Specification
+        description: MI Launch Specification Configuration
+        type: object
+        properties:
+          instanceTypes:
+            title: Instance Types
+            description: Instance Types Configuration
+            type: object
+            properties:
+              preferredType:
+                type: string
+                required: true
+                example: t2.micro
+                description: >
+                  Comma separated list of available instance types for instance
+              types:
+                type: array
+                description: >
+                  Set instance types settings
+                items:
+                  type: string
+                  example: t2.micro
+          ebsOptimized:
+            type: boolean
+            example: false
+            description: >
+              Enable EBS optimization for supported instance which is not enabled by default. Note - additional charges will be applied.
+              Default: false
+          monitoring:
+            type: boolean
+            example: false
+            description: >
+              Describes whether instance Enhanced Monitoring is enabled.
+              Default: false
+          tenancy:
+            type: string
+            example: default
+            description: >
+              Valid values: "default", "dedicated"
+              Default: default
+          iamRole:
+            title: IAM Role
+            description: IAM Role
+            type: object
+            properties:
+              name:
+                title: Name
+                type: string
+                example: name
+              arn:
+                type: string
+                example: arn
+          securityGroupIds:
+            title: Security Group IDs
+            type: array
+            items:
+              type: string
+              example: sg-0dfc2c8760df6fec7
+          imageId:
+            title: Image ID
+            description: Image ID
+            type: string
+            example: ami-01e24be29428c15b2
+          keyPair:
+            title: Key Pair
+            description: Key Pair
+            type: string
+            example: labs-oregon
+          tags:
+            title: Tags
+            description: Tags
+            type: array
+            items:
+              type: object
+              properties:
+                tagKey:
+                  type: string
+                  example: Creator
+                tagValue:
+                  type: string
+                  example: test1@spot.io
+          userData:
+            title: User Data
+            description: Start Up Script
+            type: string
+            example: dXNlcmJhc2g2NGVuY29kZWQ=
+          shutdownScript:
+            title: Shutdown Script
+            type: string
+            example: dXNlcmJhc2g2NGVuY29kZWQ=
+          creditSpecification:
+            title: Credit Specification
+            description: Credit Specification
+            type: object
+            properties:
+              cpuCredits:
+                type: string
+                example: unlimited
+          networkInterfaces:
+            title: Network Interfaces
+            description: Network Interfaces
+            type: array
+            items:
+              type: object
+              properties:
+                deviceIndex:
+                  type: integer
+                  example: 0
+                associatePublicIpAddress:
+                  type: boolean
+                  example: true
+                associateIpv6Address:
+                  type: boolean
+                  example: true
+          blockDeviceMappings:
+            title: Block Device Mappings
+            type: array
+            items:
+              type: object
+              properties:
+                deviceName:
+                  type: string
+                  example: /dev/xvdcz
+                ebs:
+                  type: object
+                  properties:
+                    deleteOnTermination:
+                      type: boolean
+                      example: true
+                    volumeSize:
+                      type: integer
+                      example: 12
+                    volumeType:
+                      type: string
+                      example: gp2
+      integration:
+        title: Itegration
+        description: MI Integration
+        type: object
+        properties:
+          type: object
+          title: MI integrations
+          properties:
+            loadBalancersConfig:
+              type: object
+              properties:
+                loadBalancers:
+                  type: array
+                  items:
+                    anyOf:
+                      - type: object
+                        properties:
+                          name:
+                            type: string
+                            example: name
+                          arn:
+                            type: string
+                            example: arn
+                          type:
+                            type: string
+                            example: MULTAI_TARGET_SET
+                            description: >
+                              The resource type. Valid Values: CLASSIC, TARGET_GROUP, MULTAI_TARGET_SET
+                          balancerId:
+                            type: string
+                            example: lb-1ee2e3q
+                          targetSetId:
+                            type: string
+                            example: ts-3eq
+                          azAwerness:
+                            type: boolean
+                            example: true
+                          autoWeight:
+                            type: boolean
+                            example: true
+            route53:
+              type: object
+              properties:
+                domains:
+                  type: array
+                  items:
+                    anyOf:
+                      - type: object
+                        properties:
+                          hostedZoneId:
+                            type: string
+                            example: Z00275642KS5ZZJFIQBCA
+                          recordSetType:
+                            type: string
+                            example: a
+                          spotinstAccountId:
+                            type: string
+                            example: act-1234
+                          recordSets:
+                            type: array
+                            items:
+                              anyOf:
+                                - type: object
+                                  properties:
+                                    usePublicIp:
+                                      type: boolean
+                                      example: true
+                                    name:
+                                      type: string
+                                      example: testa.spot.io
+      scheduling:
+        title: Scheduling
+        description: MI Scheduling
+        type: object
+        properties:
+            tasks:
+              type: array
+              items:
+                type: object
+                title: Task Definition
+                properties:
+                  taskType:
+                    type: string
+                    example: scale
+                    enum: [ backup_ami, scale, scaleUp, roll, statefulUpdateCapacity, statefulRecycle ]
+                    description: >
+                      The task type to run.
+                  startTime:
+                    type: string
+                    example: 2018-05-23T10:55:09Z
+                    description: >
+                      DATETIME in ISO-8601 format. Sets a start time for scheduled actions. If `frequency` or `cronExpression` are not used - the task will run only once at the start time and will then be deleted from the group configuration
+                  cronExpression:
+                    type: string
+                    example: 0 1 * * *
+                    description: >
+                      A valid cron expression.
+                      For example : " * * * * * ".
+                      The cron is running in UTC time zone and is in Unix cron format Cron Expression Validator Script.
+                      Only one of ‘frequency' or ‘cronExpression' should be used at a time.
+                  isEnabled:
+                    type: boolean
+                    default: true
+                    example: true
+                    description: >
+                      Describes whether the task is enabled. When true the task should run when false it should not run.
+                  frequency:
+                    type: string
+                    enum: [ hourly, daily, weekly ]
+                    description: >
+                      The recurrence frequency to run this task. Only one of `frequency` or `cronExpression` should be used at a time
