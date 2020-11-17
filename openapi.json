@@ -205,7 +205,7 @@
       "summary": "Elastigroups for AWS",
       "post": {
         "summary": "Create Elastigroup",
-        "description": "Create a new AWS Elastigroup.\n\nThere are several third Party Integrations available, which can be activated based on your configuration, such as:\n* [Rancher Elastigroup](https://docs.spot.io/elastigroup/tools-integrations/rancher)\n* [Route53 Elastigroup](https://docs.spot.io/elastigroup/tools-integrations/route53)\n* [ECS Elastigroup](https://docs.spot.io/elastigroup/features/amazon-ecs/elastigroup-for-ecs)\n* [Beanstalk Elastigroup](https://docs.spot.io/elastigroup/tools-integrations/elastic-beanstalk)\n\n\n  You can create a beanstalk elastigroup with the following steps:\n  * [Get the beanstalk configuration](https://docs.spot.io/api/#operation/elastigroupAwsGetBeanstalkConfiguration) to JSON format\n  * Modify required parameters and post the JSON as a body to create a new elastigroup\n",
+        "description": "Create a new AWS Elastigroup.\n\nThere are several third Party Integrations available, which can be activated based on your configuration, such as:\n* [Rancher Elastigroup](https://docs.spot.io/elastigroup/tools-integrations/rancher)\n* [Route53 Elastigroup](https://docs.spot.io/elastigroup/tools-integrations/route53)\n* [DockerSwarm Elastigroup](https://docs.spot.io/elastigroup/tools-integrations/docker-swarm)\n* [ECS Elastigroup](https://docs.spot.io/elastigroup/features/amazon-ecs/elastigroup-for-ecs)\n* [Beanstalk Elastigroup](https://docs.spot.io/elastigroup/tools-integrations/elastic-beanstalk)\n\n\n  You can create a beanstalk elastigroup with the following steps:\n  * [Get the beanstalk configuration](https://docs.spot.io/api/#operation/elastigroupAwsGetBeanstalkConfiguration) to JSON format\n  * Modify required parameters and post the JSON as a body to create a new elastigroup\n",
         "operationId": "elastigroupAwsCreate",
         "tags": [
           "Elastigroup AWS"
@@ -1530,6 +1530,95 @@
                                         "items": {
                                           "type": "string",
                                           "example": "Mon:03:00-Wed:02:30"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "dockerSwarm": {
+                                "title": "DockerSwarm ThirdPartiesIntegration Object",
+                                "type": "object",
+                                "description": "DockerSwarm integration object.\n",
+                                "properties": {
+                                  "masterHost": {
+                                    "type": "string",
+                                    "example": "swarm1.swarm.com",
+                                    "description": "Docker swarm master hostname\n"
+                                  },
+                                  "masterPort": {
+                                    "type": "integer",
+                                    "example": 1234,
+                                    "description": "Docker swarm master port number\n"
+                                  },
+                                  "autoScale": {
+                                    "type": "object",
+                                    "description": "autoScale configuration\n",
+                                    "properties": {
+                                      "isEnabled": {
+                                        "type": "boolean",
+                                        "example": "true",
+                                        "description": "Specifies whether the scaling policy described in this block is enabled.\n",
+                                        "default": true
+                                      },
+                                      "cooldown": {
+                                        "type": "integer",
+                                        "example": 300,
+                                        "description": "The amount of time, in seconds, after a scaling activity completes before any further trigger-related scaling activities can start.\n"
+                                      },
+                                      "down": {
+                                        "type": "object",
+                                        "properties": {
+                                          "evaluationPeriods": {
+                                            "type": "integer",
+                                            "example": 4,
+                                            "description": "The number of periods over which data is compared to the specified threshold.\n"
+                                          },
+                                          "maxScaleDownPercentage": {
+                                            "type": "integer",
+                                            "example": 20,
+                                            "description": "Would represent the maximum % to scale-down.\n",
+                                            "minimum": 1,
+                                            "maximum": 100
+                                          }
+                                        }
+                                      },
+                                      "headroom": {
+                                        "type": "object",
+                                        "description": "Set custom headroom per launch spec. provide list of launchSpec.autoScale.headrooms object\n",
+                                        "properties": {
+                                          "cpuPerUnit": {
+                                            "type": "integer",
+                                            "description": "configure the number of CPUs to allocate the headroom. CPUs are denoted in millicores, where 1000 millicores = 1 vCPU\n",
+                                            "example": 1000
+                                          },
+                                          "memoryPerUnit": {
+                                            "type": "integer",
+                                            "description": "Configure the amount of memory (MiB) to allocate the headroom.\n",
+                                            "example": 2048
+                                          },
+                                          "numOfUnits": {
+                                            "type": "integer",
+                                            "description": "The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.\n",
+                                            "example": 3
+                                          }
+                                        }
+                                      },
+                                      "tlsConfig": {
+                                        "type": "object",
+                                        "properties": {
+                                          "tlsEnabled": {
+                                            "type": "boolean",
+                                            "example": true
+                                          },
+                                          "privateKey": {
+                                            "type": "string",
+                                            "example": "PRIVATE KEY CERTIFICATE STR"
+                                          },
+                                          "certificate": {
+                                            "type": "string",
+                                            "example": "PUBLIC KEY CERTIFICATE STR"
+                                          }
                                         }
                                       }
                                     }
@@ -3551,6 +3640,9 @@
                                 }
                               }
                             }
+                          },
+                          "dockerSwarm": {
+                            "$ref": "#/paths/~1aws~1ec2~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/thirdPartiesIntegration/properties/dockerSwarm"
                           }
                         }
                       },
