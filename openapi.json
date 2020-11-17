@@ -27784,10 +27784,11 @@
     "/mcs/kubernetes/cluster/{clusterIdentifier}/costs": {
       "get": {
         "summary": "Get Cluster Costs",
-        "description": "Describes Kubernetes cluster costs in a time range based on resource allocation.\nThe response will provide the distribution of the costs per cluster, namespace, and deployment.\nFor each entity, the response will contain breakdown to compute and EBS costs as well.\nIn addition, response will show labels/annotations for each namespace or deployment so you can filter costs by labels or annotations.\n",
-        "operationId": "oceanAwsClusterCosts",
+        "description": "Describes Kubernetes cluster costs in a time range based on resource allocation.\\\nThe response will provide the distribution of the costs per cluster, namespace, and deployment.\\\nFor each entity, the response will contain breakdown to compute and EBS costs as well.\\\nIn addition, response will show labels/annotations for each namespace or deployment so you can filter costs by labels or annotations.\n",
+        "operationId": "oceanK8sClusterCosts",
         "tags": [
-          "Ocean AWS"
+          "Ocean AWS",
+          "Ocean GKE"
         ],
         "parameters": [
           {
@@ -27800,7 +27801,13 @@
             "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/2"
           },
           {
-            "$ref": "#/paths/~1mcs~1kubernetes~1cluster~1%7BclusterId%7D~1costs/get/parameters/3"
+            "in": "query",
+            "name": "aggregationPeriod",
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "description": "Possible values: \"daily\", null. For daily value response contains aggregated data by day. <br /> If null - response returns sum of costs per period\n"
           },
           {
             "in": "path",
@@ -27809,8 +27816,8 @@
               "type": "string"
             },
             "required": true,
-            "example": "o-1abcd124",
-            "description": "Identifier Of Cluster\n"
+            "example": "my-cluster-identifier",
+            "description": "clusterIdentifier field as set in the Ocean cluster configuration\n"
           }
         ],
         "responses": {
@@ -27826,74 +27833,313 @@
                     {
                       "type": "object",
                       "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/mcs/kubernetes/cluster/my-cluster-identifier/costs"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
                         "response": {
                           "type": "object",
                           "properties": {
                             "items": {
-                              "type": "object",
-                              "properties": {
-                                "totalCost": {
-                                  "type": "float",
-                                  "example": 279.9907
-                                },
-                                "totalComputeCost": {
-                                  "type": "float",
-                                  "example": 279.9907
-                                },
-                                "totalEbsCost": {
-                                  "type": "float",
-                                  "example": 0
-                                },
-                                "totalStorageCost": {
-                                  "type": "float",
-                                  "example": 0
-                                },
-                                "namespaces": {
+                              "type": "array",
+                              "items": [
+                                {
                                   "type": "object",
                                   "properties": {
-                                    "namespace": {
-                                      "type": "string",
-                                      "example": "default"
-                                    },
-                                    "cost": {
+                                    "totalCost": {
                                       "type": "float",
-                                      "example": 18.00862
+                                      "example": 279.9907
                                     },
-                                    "computeCost": {
+                                    "totalComputeCost": {
                                       "type": "float",
-                                      "example": 18.00862
+                                      "example": 279.9907
                                     },
-                                    "ebsCost": {
+                                    "totalEbsCost": {
                                       "type": "float",
                                       "example": 0
                                     },
-                                    "storageCost": {
+                                    "totalStorageCost": {
                                       "type": "float",
                                       "example": 0
                                     },
-                                    "labels": {
+                                    "namespaces": {
                                       "type": "object",
                                       "properties": {
-                                        "region": {
+                                        "namespace": {
                                           "type": "string",
-                                          "example": "west"
+                                          "example": "default"
                                         },
-                                        "env": {
-                                          "type": "string",
-                                          "example": "prod"
-                                        }
-                                      }
-                                    },
-                                    "annotations": {
-                                      "type": "object",
-                                      "properties": {
-                                        "region": {
-                                          "type": "string",
-                                          "example": "west"
+                                        "cost": {
+                                          "type": "float",
+                                          "example": 18.00862
                                         },
-                                        "env": {
-                                          "type": "string",
-                                          "example": "prod"
+                                        "computeCost": {
+                                          "type": "float",
+                                          "example": 18.00862
+                                        },
+                                        "ebsCost": {
+                                          "type": "float",
+                                          "example": 0
+                                        },
+                                        "storageCost": {
+                                          "type": "float",
+                                          "example": 0
+                                        },
+                                        "labels": {
+                                          "type": "object",
+                                          "properties": {
+                                            "region": {
+                                              "type": "string",
+                                              "example": "west"
+                                            },
+                                            "env": {
+                                              "type": "string",
+                                              "example": "prod"
+                                            }
+                                          }
+                                        },
+                                        "annotations": {
+                                          "type": "object",
+                                          "properties": {
+                                            "region": {
+                                              "type": "string",
+                                              "example": "west"
+                                            },
+                                            "env": {
+                                              "type": "string",
+                                              "example": "prod"
+                                            }
+                                          }
+                                        },
+                                        "deployments": {
+                                          "type": "object",
+                                          "properties": {
+                                            "name": {
+                                              "type": "string",
+                                              "example": "cpu-deployment-check5"
+                                            },
+                                            "namespace": {
+                                              "type": "stirng",
+                                              "example": "default"
+                                            },
+                                            "cost": {
+                                              "type": "float",
+                                              "example": 3.7410312
+                                            },
+                                            "computeCost": {
+                                              "type": "float",
+                                              "example": 3.7410312
+                                            },
+                                            "ebsCost": {
+                                              "type": "float",
+                                              "example": 0
+                                            },
+                                            "storageCost": {
+                                              "type": "float",
+                                              "example": 0
+                                            },
+                                            "labels": {
+                                              "type": "object",
+                                              "properties": {
+                                                "region": {
+                                                  "type": "string",
+                                                  "example": "west"
+                                                },
+                                                "env": {
+                                                  "type": "string",
+                                                  "example": "prod"
+                                                }
+                                              }
+                                            },
+                                            "annotations": {
+                                              "type": "object",
+                                              "properties": {
+                                                "region": {
+                                                  "type": "string",
+                                                  "example": "west"
+                                                },
+                                                "env": {
+                                                  "type": "string",
+                                                  "example": "prod"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "statefulSets": {
+                                          "type": "object",
+                                          "properties": {
+                                            "name": {
+                                              "type": "string",
+                                              "example": "cpu-deployment-check5"
+                                            },
+                                            "namespace": {
+                                              "type": "stirng",
+                                              "example": "default"
+                                            },
+                                            "cost": {
+                                              "type": "float",
+                                              "example": 3.7410312
+                                            },
+                                            "computeCost": {
+                                              "type": "float",
+                                              "example": 3.7410312
+                                            },
+                                            "ebsCost": {
+                                              "type": "float",
+                                              "example": 0
+                                            },
+                                            "storageCost": {
+                                              "type": "float",
+                                              "example": 0
+                                            },
+                                            "labels": {
+                                              "type": "object",
+                                              "properties": {
+                                                "region": {
+                                                  "type": "string",
+                                                  "example": "west"
+                                                },
+                                                "env": {
+                                                  "type": "string",
+                                                  "example": "prod"
+                                                }
+                                              }
+                                            },
+                                            "annotations": {
+                                              "type": "object",
+                                              "properties": {
+                                                "region": {
+                                                  "type": "string",
+                                                  "example": "west"
+                                                },
+                                                "env": {
+                                                  "type": "string",
+                                                  "example": "prod"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "daemonSets": {
+                                          "type": "object",
+                                          "properties": {
+                                            "name": {
+                                              "type": "string",
+                                              "example": "cpu-deployment-check5"
+                                            },
+                                            "namespace": {
+                                              "type": "stirng",
+                                              "example": "default"
+                                            },
+                                            "cost": {
+                                              "type": "float",
+                                              "example": 3.7410312
+                                            },
+                                            "computeCost": {
+                                              "type": "float",
+                                              "example": 3.7410312
+                                            },
+                                            "ebsCost": {
+                                              "type": "float",
+                                              "example": 0
+                                            },
+                                            "storageCost": {
+                                              "type": "float",
+                                              "example": 0
+                                            },
+                                            "labels": {
+                                              "type": "object",
+                                              "properties": {
+                                                "region": {
+                                                  "type": "string",
+                                                  "example": "west"
+                                                },
+                                                "env": {
+                                                  "type": "string",
+                                                  "example": "prod"
+                                                }
+                                              }
+                                            },
+                                            "annotations": {
+                                              "type": "object",
+                                              "properties": {
+                                                "region": {
+                                                  "type": "string",
+                                                  "example": "west"
+                                                },
+                                                "env": {
+                                                  "type": "string",
+                                                  "example": "prod"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "jobs": {
+                                          "type": "object",
+                                          "properties": {
+                                            "name": {
+                                              "type": "string",
+                                              "example": "cpu-deployment-check5"
+                                            },
+                                            "namespace": {
+                                              "type": "stirng",
+                                              "example": "default"
+                                            },
+                                            "cost": {
+                                              "type": "float",
+                                              "example": 3.7410312
+                                            },
+                                            "computeCost": {
+                                              "type": "float",
+                                              "example": 3.7410312
+                                            },
+                                            "ebsCost": {
+                                              "type": "float",
+                                              "example": 0
+                                            },
+                                            "storageCost": {
+                                              "type": "float",
+                                              "example": 0
+                                            },
+                                            "labels": {
+                                              "type": "object",
+                                              "properties": {
+                                                "region": {
+                                                  "type": "string",
+                                                  "example": "west"
+                                                },
+                                                "env": {
+                                                  "type": "string",
+                                                  "example": "prod"
+                                                }
+                                              }
+                                            },
+                                            "annotations": {
+                                              "type": "object",
+                                              "properties": {
+                                                "region": {
+                                                  "type": "string",
+                                                  "example": "west"
+                                                },
+                                                "env": {
+                                                  "type": "string",
+                                                  "example": "prod"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "standAlonePodsCost": {
+                                          "type": "float"
                                         }
                                       }
                                     },
@@ -27952,240 +28198,17 @@
                                         }
                                       }
                                     },
-                                    "statefulSets": {
-                                      "type": "object",
-                                      "properties": {
-                                        "name": {
-                                          "type": "string",
-                                          "example": "cpu-deployment-check5"
-                                        },
-                                        "namespace": {
-                                          "type": "stirng",
-                                          "example": "default"
-                                        },
-                                        "cost": {
-                                          "type": "float",
-                                          "example": 3.7410312
-                                        },
-                                        "computeCost": {
-                                          "type": "float",
-                                          "example": 3.7410312
-                                        },
-                                        "ebsCost": {
-                                          "type": "float",
-                                          "example": 0
-                                        },
-                                        "storageCost": {
-                                          "type": "float",
-                                          "example": 0
-                                        },
-                                        "labels": {
-                                          "type": "object",
-                                          "properties": {
-                                            "region": {
-                                              "type": "string",
-                                              "example": "west"
-                                            },
-                                            "env": {
-                                              "type": "string",
-                                              "example": "prod"
-                                            }
-                                          }
-                                        },
-                                        "annotations": {
-                                          "type": "object",
-                                          "properties": {
-                                            "region": {
-                                              "type": "string",
-                                              "example": "west"
-                                            },
-                                            "env": {
-                                              "type": "string",
-                                              "example": "prod"
-                                            }
-                                          }
-                                        }
-                                      }
-                                    },
-                                    "daemonSets": {
-                                      "type": "object",
-                                      "properties": {
-                                        "name": {
-                                          "type": "string",
-                                          "example": "cpu-deployment-check5"
-                                        },
-                                        "namespace": {
-                                          "type": "stirng",
-                                          "example": "default"
-                                        },
-                                        "cost": {
-                                          "type": "float",
-                                          "example": 3.7410312
-                                        },
-                                        "computeCost": {
-                                          "type": "float",
-                                          "example": 3.7410312
-                                        },
-                                        "ebsCost": {
-                                          "type": "float",
-                                          "example": 0
-                                        },
-                                        "storageCost": {
-                                          "type": "float",
-                                          "example": 0
-                                        },
-                                        "labels": {
-                                          "type": "object",
-                                          "properties": {
-                                            "region": {
-                                              "type": "string",
-                                              "example": "west"
-                                            },
-                                            "env": {
-                                              "type": "string",
-                                              "example": "prod"
-                                            }
-                                          }
-                                        },
-                                        "annotations": {
-                                          "type": "object",
-                                          "properties": {
-                                            "region": {
-                                              "type": "string",
-                                              "example": "west"
-                                            },
-                                            "env": {
-                                              "type": "string",
-                                              "example": "prod"
-                                            }
-                                          }
-                                        }
-                                      }
-                                    },
-                                    "jobs": {
-                                      "type": "object",
-                                      "properties": {
-                                        "name": {
-                                          "type": "string",
-                                          "example": "cpu-deployment-check5"
-                                        },
-                                        "namespace": {
-                                          "type": "stirng",
-                                          "example": "default"
-                                        },
-                                        "cost": {
-                                          "type": "float",
-                                          "example": 3.7410312
-                                        },
-                                        "computeCost": {
-                                          "type": "float",
-                                          "example": 3.7410312
-                                        },
-                                        "ebsCost": {
-                                          "type": "float",
-                                          "example": 0
-                                        },
-                                        "storageCost": {
-                                          "type": "float",
-                                          "example": 0
-                                        },
-                                        "labels": {
-                                          "type": "object",
-                                          "properties": {
-                                            "region": {
-                                              "type": "string",
-                                              "example": "west"
-                                            },
-                                            "env": {
-                                              "type": "string",
-                                              "example": "prod"
-                                            }
-                                          }
-                                        },
-                                        "annotations": {
-                                          "type": "object",
-                                          "properties": {
-                                            "region": {
-                                              "type": "string",
-                                              "example": "west"
-                                            },
-                                            "env": {
-                                              "type": "string",
-                                              "example": "prod"
-                                            }
-                                          }
-                                        }
-                                      }
-                                    },
-                                    "standAlonePodsCost": {
-                                      "type": "float"
-                                    }
-                                  }
-                                },
-                                "deployments": {
-                                  "type": "object",
-                                  "properties": {
-                                    "name": {
-                                      "type": "string",
-                                      "example": "cpu-deployment-check5"
-                                    },
-                                    "namespace": {
-                                      "type": "stirng",
-                                      "example": "default"
-                                    },
-                                    "cost": {
-                                      "type": "float",
-                                      "example": 3.7410312
-                                    },
-                                    "computeCost": {
-                                      "type": "float",
-                                      "example": 3.7410312
-                                    },
-                                    "ebsCost": {
+                                    "headroomCost": {
                                       "type": "float",
                                       "example": 0
                                     },
-                                    "storageCost": {
+                                    "idleCost": {
                                       "type": "float",
-                                      "example": 0
-                                    },
-                                    "labels": {
-                                      "type": "object",
-                                      "properties": {
-                                        "region": {
-                                          "type": "string",
-                                          "example": "west"
-                                        },
-                                        "env": {
-                                          "type": "string",
-                                          "example": "prod"
-                                        }
-                                      }
-                                    },
-                                    "annotations": {
-                                      "type": "object",
-                                      "properties": {
-                                        "region": {
-                                          "type": "string",
-                                          "example": "west"
-                                        },
-                                        "env": {
-                                          "type": "string",
-                                          "example": "prod"
-                                        }
-                                      }
+                                      "example": 216.10321
                                     }
                                   }
-                                },
-                                "headroomCost": {
-                                  "type": "float",
-                                  "example": 0
-                                },
-                                "idleCost": {
-                                  "type": "float",
-                                  "example": 216.10321
                                 }
-                              }
+                              ]
                             }
                           }
                         }
@@ -37438,423 +37461,6 @@
                       }
                     }
                   }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
-      }
-    },
-    "/mcs/kubernetes/cluster/{clusterId}/costs": {
-      "get": {
-        "summary": "Get Cluster Costs",
-        "description": "Describes Kubernetes cluster costs in a time range based on resource allocation.\nThe response will provide the distribution of the costs per cluster, namespace, and deployment.\nFor each entity, the response will contain breakdown to compute and EBS costs as well.\nIn addition, response will show labels/annotations for each namespace or deployment so you can filter costs by labels or annotations.\n",
-        "operationId": "OceanGKEClusterCosts",
-        "tags": [
-          "Ocean GKE"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
-          },
-          {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/3"
-          },
-          {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/2"
-          },
-          {
-            "in": "query",
-            "name": "aggregationPeriod",
-            "schema": {
-              "type": "string"
-            },
-            "required": false,
-            "description": "Possible values: \"daily\", null. For daily value response contains aggregated data by day. <br /> If null - response returns sum of costs per period\n"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Ocean Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "response": {
-                          "type": "object",
-                          "properties": {
-                            "items": {
-                              "type": "object",
-                              "properties": {
-                                "totalCost": {
-                                  "type": "float",
-                                  "example": 279.9907
-                                },
-                                "totalComputeCost": {
-                                  "type": "float",
-                                  "example": 279.9907
-                                },
-                                "totalEbsCost": {
-                                  "type": "float",
-                                  "example": 0
-                                },
-                                "totalStorageCost": {
-                                  "type": "float",
-                                  "example": 0
-                                },
-                                "namespaces": {
-                                  "type": "object",
-                                  "properties": {
-                                    "namespace": {
-                                      "type": "string",
-                                      "example": "default"
-                                    },
-                                    "cost": {
-                                      "type": "float",
-                                      "example": 18.00862
-                                    },
-                                    "computeCost": {
-                                      "type": "float",
-                                      "example": 18.00862
-                                    },
-                                    "ebsCost": {
-                                      "type": "float",
-                                      "example": 0
-                                    },
-                                    "storageCost": {
-                                      "type": "float",
-                                      "example": 0
-                                    },
-                                    "labels": {
-                                      "type": "object",
-                                      "properties": {
-                                        "region": {
-                                          "type": "string",
-                                          "example": "west"
-                                        },
-                                        "env": {
-                                          "type": "string",
-                                          "example": "prod"
-                                        }
-                                      }
-                                    },
-                                    "annotations": {
-                                      "type": "object",
-                                      "properties": {
-                                        "region": {
-                                          "type": "string",
-                                          "example": "west"
-                                        },
-                                        "env": {
-                                          "type": "string",
-                                          "example": "prod"
-                                        }
-                                      }
-                                    },
-                                    "deployments": {
-                                      "type": "object",
-                                      "properties": {
-                                        "name": {
-                                          "type": "string",
-                                          "example": "cpu-deployment-check5"
-                                        },
-                                        "namespace": {
-                                          "type": "stirng",
-                                          "example": "default"
-                                        },
-                                        "cost": {
-                                          "type": "float",
-                                          "example": 3.7410312
-                                        },
-                                        "computeCost": {
-                                          "type": "float",
-                                          "example": 3.7410312
-                                        },
-                                        "ebsCost": {
-                                          "type": "float",
-                                          "example": 0
-                                        },
-                                        "storageCost": {
-                                          "type": "float",
-                                          "example": 0
-                                        },
-                                        "labels": {
-                                          "type": "object",
-                                          "properties": {
-                                            "region": {
-                                              "type": "string",
-                                              "example": "west"
-                                            },
-                                            "env": {
-                                              "type": "string",
-                                              "example": "prod"
-                                            }
-                                          }
-                                        },
-                                        "annotations": {
-                                          "type": "object",
-                                          "properties": {
-                                            "region": {
-                                              "type": "string",
-                                              "example": "west"
-                                            },
-                                            "env": {
-                                              "type": "string",
-                                              "example": "prod"
-                                            }
-                                          }
-                                        }
-                                      }
-                                    },
-                                    "statefulSets": {
-                                      "type": "object",
-                                      "properties": {
-                                        "name": {
-                                          "type": "string",
-                                          "example": "stateful-example"
-                                        },
-                                        "namespace": {
-                                          "type": "stirng",
-                                          "example": "default"
-                                        },
-                                        "cost": {
-                                          "type": "float",
-                                          "example": 3.7410312
-                                        },
-                                        "computeCost": {
-                                          "type": "float",
-                                          "example": 3.7410312
-                                        },
-                                        "ebsCost": {
-                                          "type": "float",
-                                          "example": 0
-                                        },
-                                        "storageCost": {
-                                          "type": "float",
-                                          "example": 0
-                                        },
-                                        "labels": {
-                                          "type": "object",
-                                          "properties": {
-                                            "region": {
-                                              "type": "string",
-                                              "example": "west"
-                                            },
-                                            "env": {
-                                              "type": "string",
-                                              "example": "prod"
-                                            }
-                                          }
-                                        },
-                                        "annotations": {
-                                          "type": "object",
-                                          "properties": {
-                                            "region": {
-                                              "type": "string",
-                                              "example": "west"
-                                            },
-                                            "env": {
-                                              "type": "string",
-                                              "example": "prod"
-                                            }
-                                          }
-                                        }
-                                      }
-                                    },
-                                    "daemonSets": {
-                                      "type": "object",
-                                      "properties": {
-                                        "name": {
-                                          "type": "string",
-                                          "example": "cpu-deployment-check5"
-                                        },
-                                        "namespace": {
-                                          "type": "stirng",
-                                          "example": "default"
-                                        },
-                                        "cost": {
-                                          "type": "float",
-                                          "example": 3.7410312
-                                        },
-                                        "computeCost": {
-                                          "type": "float",
-                                          "example": 3.7410312
-                                        },
-                                        "ebsCost": {
-                                          "type": "float",
-                                          "example": 0
-                                        },
-                                        "storageCost": {
-                                          "type": "float",
-                                          "example": 0
-                                        },
-                                        "labels": {
-                                          "type": "object",
-                                          "properties": {
-                                            "region": {
-                                              "type": "string",
-                                              "example": "west"
-                                            },
-                                            "env": {
-                                              "type": "string",
-                                              "example": "prod"
-                                            }
-                                          }
-                                        },
-                                        "annotations": {
-                                          "type": "object",
-                                          "properties": {
-                                            "region": {
-                                              "type": "string",
-                                              "example": "west"
-                                            },
-                                            "env": {
-                                              "type": "string",
-                                              "example": "prod"
-                                            }
-                                          }
-                                        }
-                                      }
-                                    },
-                                    "jobs": {
-                                      "type": "object",
-                                      "properties": {
-                                        "name": {
-                                          "type": "string",
-                                          "example": "cpu-deployment-check5"
-                                        },
-                                        "namespace": {
-                                          "type": "stirng",
-                                          "example": "default"
-                                        },
-                                        "cost": {
-                                          "type": "float",
-                                          "example": 3.7410312
-                                        },
-                                        "computeCost": {
-                                          "type": "float",
-                                          "example": 3.7410312
-                                        },
-                                        "ebsCost": {
-                                          "type": "float",
-                                          "example": 0
-                                        },
-                                        "storageCost": {
-                                          "type": "float",
-                                          "example": 0
-                                        },
-                                        "labels": {
-                                          "type": "object",
-                                          "properties": {
-                                            "region": {
-                                              "type": "string",
-                                              "example": "west"
-                                            },
-                                            "env": {
-                                              "type": "string",
-                                              "example": "prod"
-                                            }
-                                          }
-                                        },
-                                        "annotations": {
-                                          "type": "object",
-                                          "properties": {
-                                            "region": {
-                                              "type": "string",
-                                              "example": "west"
-                                            },
-                                            "env": {
-                                              "type": "string",
-                                              "example": "prod"
-                                            }
-                                          }
-                                        }
-                                      }
-                                    },
-                                    "standAlonePodsCost": {
-                                      "type": "float"
-                                    }
-                                  }
-                                },
-                                "deployments": {
-                                  "type": "object",
-                                  "properties": {
-                                    "name": {
-                                      "type": "string",
-                                      "example": "cpu-deployment-check5"
-                                    },
-                                    "namespace": {
-                                      "type": "stirng",
-                                      "example": "default"
-                                    },
-                                    "cost": {
-                                      "type": "float",
-                                      "example": 3.7410312
-                                    },
-                                    "computeCost": {
-                                      "type": "float",
-                                      "example": 3.7410312
-                                    },
-                                    "ebsCost": {
-                                      "type": "float",
-                                      "example": 0
-                                    },
-                                    "storageCost": {
-                                      "type": "float",
-                                      "example": 0
-                                    },
-                                    "labels": {
-                                      "type": "object",
-                                      "properties": {
-                                        "region": {
-                                          "type": "string",
-                                          "example": "west"
-                                        },
-                                        "env": {
-                                          "type": "string",
-                                          "example": "prod"
-                                        }
-                                      }
-                                    },
-                                    "annotations": {
-                                      "type": "object",
-                                      "properties": {
-                                        "region": {
-                                          "type": "string",
-                                          "example": "west"
-                                        },
-                                        "env": {
-                                          "type": "string",
-                                          "example": "prod"
-                                        }
-                                      }
-                                    }
-                                  }
-                                },
-                                "headroomCost": {
-                                  "type": "float",
-                                  "example": 0
-                                },
-                                "idleCost": {
-                                  "type": "float",
-                                  "example": 216.10321
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  ]
                 }
               }
             }
