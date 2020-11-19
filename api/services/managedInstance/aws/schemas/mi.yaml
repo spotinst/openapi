@@ -22,6 +22,12 @@ properties:
           The AWS region your resource will be created in.
       strategy:
         $ref: "../schemas/mi-strategy.yaml"
+      compute:
+        $ref: "../schemas/mi-compute.yaml"
+      integrations:
+        $ref: "../schemas/mi-integrations.yaml"
+      scheduling:
+        $ref: "../schemas/mi-scheduling.yaml"
       persistence:
         type: object
         description: >
@@ -31,18 +37,19 @@ properties:
             type: string
             example: reattach
             description: >
-                Determine the way we attach the data volumes to the data devices. Valid values: ‘reattach', ‘onLaunch'
-                Default: onLaunch
+              Determine the way we attach the data volumes to the data devices.
+            enum: [reattach, onLaunch]
+            default: "onLaunch"
           persistRootDevice:
             type: boolean
             example: true
             description: >
-                Should the instance maintain its root device volumes
+              Should the instance maintain its root device volumes
           persistBlockDevices:
             type: boolean
             example: true
             description: >
-                Should the instance maintain its Data volumes
+              Should the instance maintain its Data volumes
           persistPrivateIp:
             type: boolean
             example: true
@@ -53,34 +60,30 @@ properties:
         properties:
           type:
             type: string
-            example: EC2
+            example: "EC2"
             description: >
-              The service to use for the health check. Valid values: `EC2`, `ELB`, `TARGET_GROUP`, `MULTAI_TARGET_SET`
-              Default: EC2
+              The service to use for the health check.
+            enum: [EC2, ELB, TARGET_GROUP, MULTAI_TARGET_SET]
+            default: "EC2"
           autoHealing:
             type: boolean
             example: true
             description: >
-                Enable the auto healing which auto replaces the instance in case the health check fails
-                Default: true
+              Enable the auto healing which auto replaces the instance in case the health check fails
+            default: true
           gracePeriod:
             type: integer
             example: 120
             description: >
-                The amount of time, in seconds, after the instance has launched to starts and check its health.
-                Default: 120
+              The amount of time, in seconds, after the instance has launched to starts and check its health.
+            default: 120
           unhealthyDuration:
             type: integer
             example: 120
-            description: >
-                The amount of time, in seconds, an existing instance should remain active after becoming unhealthy. After the set time out the instance will be replaced
-                Default: 120
-      compute:
-        $ref: "../schemas/mi-compute.yaml"
-      integrations:
-        $ref: "../schemas/mi-integrations.yaml"
-      scheduling:
-        $ref: "../schemas/mi-scheduling.yaml"
+            description: |
+              The amount of time, in seconds, an existing instance should remain active after becoming unhealthy.\
+              After the set time out the instance will be replaced
+            default: 120
 
 
 
