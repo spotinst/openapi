@@ -19388,7 +19388,7 @@
         }
       }
     },
-    "/azure/compute/group/{groupId}/detachInstances": {
+    "/azure/compute/group/{groupId}/detachVms": {
       "put": {
         "summary": "Detach VMs",
         "description": "Scale down specific virtual machines in Elastigroup cluster.\n",
@@ -19402,16 +19402,6 @@
           },
           {
             "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/put/parameters/0"
-          },
-          {
-            "in": "query",
-            "name": "adjustment",
-            "example": 5,
-            "description": "Number of VMs to scale down\n",
-            "schema": {
-              "type": "integer"
-            },
-            "required": true
           }
         ],
         "requestBody": {
@@ -19419,47 +19409,38 @@
           "content": {
             "application/json": {
               "schema": {
-                "allOf": [
-                  {
-                    "type": "object",
-                    "properties": {
-                      "scale": {
-                        "type": "object",
-                        "required": [
-                          "vmsToDetach",
-                          "shouldTerminateVms",
-                          "shouldDecrementTargetCapacity"
-                        ],
-                        "properties": {
-                          "vmsToDetach": {
-                            "type": "array",
-                            "items": {
-                              "type": "string",
-                              "example": "vm01"
-                            },
-                            "description": "Names of virtual machines to detach. Not empty.\n"
-                          },
-                          "shouldTerminateVms": {
-                            "type": "Boolean",
-                            "example": true,
-                            "description": "Indicates whether to terminate the VMs or not\n"
-                          },
-                          "shouldDecrementTargetCapacity": {
-                            "type": "Boolean",
-                            "example": true,
-                            "description": "Prevent Elastigroup from scaling back to target capacity when virtual machines are detached.\n"
-                          },
-                          "drainingTimeout": {
-                            "type": "string",
-                            "example": 300,
-                            "description": "The time in seconds to allow the virtual machine be be drained from incoming TCP connections and detached from MLB before terminating it.\n",
-                            "default": 300
-                          }
-                        }
-                      }
-                    }
+                "required": [
+                  "vmsToDetach",
+                  "shouldTerminateVms",
+                  "shouldDecrementTargetCapacity"
+                ],
+                "type": "object",
+                "properties": {
+                  "vmsToDetach": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "vm-0fbd69f960db"
+                    },
+                    "description": "Array of virtual machine names to detach.\n"
+                  },
+                  "shouldTerminateVms": {
+                    "type": "Boolean",
+                    "example": true,
+                    "description": "Whether to terminate the VMs or not.\n"
+                  },
+                  "shouldDecrementTargetCapacity": {
+                    "type": "Boolean",
+                    "example": true,
+                    "description": "Prevent Elastigroup from scaling back to target capacity when virtual machines are detached.\n"
+                  },
+                  "drainingTimeout": {
+                    "type": "string",
+                    "example": 300,
+                    "description": "The time in seconds to allow the virtual machine be be drained from incoming TCP connections and detached from MLB before terminating it.\n",
+                    "default": 300
                   }
-                ]
+                }
               }
             }
           }
