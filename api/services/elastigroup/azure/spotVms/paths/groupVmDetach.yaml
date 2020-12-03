@@ -8,52 +8,40 @@ put:
   parameters:
     - $ref: "../../../../../commons/parameters/accountId.yaml"
     - $ref: "../../../../../commons/parameters/groupId.yaml"
-    - in: query
-      name: adjustment
-      example: 5
-      description: |
-        Number of VMs to scale down
-      schema:
-          type: "integer"
-      required: true
   requestBody:
     required: true
     content:
       application/json:
         schema:
-          allOf:
-            - type: "object"
-              properties:
-                scale:
-                  type: object
-                  required:
-                    - vmsToDetach
-                    - shouldTerminateVms
-                    - shouldDecrementTargetCapacity
-                  properties:
-                    vmsToDetach:
-                      type: array
-                      items:
-                        type: string
-                        example: 'vm01'
-                      description: |
-                        Names of virtual machines to detach. Not empty.
-                    shouldTerminateVms:
-                      type: Boolean
-                      example: true
-                      description: |
-                        Indicates whether to terminate the VMs or not
-                    shouldDecrementTargetCapacity:
-                      type: Boolean
-                      example: true
-                      description: |
-                        Prevent Elastigroup from scaling back to target capacity when virtual machines are detached.
-                    drainingTimeout:
-                      type: string
-                      example: 300
-                      description: |
-                        The time in seconds to allow the virtual machine be be drained from incoming TCP connections and detached from MLB before terminating it.
-                      default: 300
+          required:
+              - vmsToDetach
+              - shouldTerminateVms
+              - shouldDecrementTargetCapacity
+          type: object          
+          properties:
+            vmsToDetach:
+              type: array
+              items:
+                type: string
+                example: 'vm-0fbd69f960db'
+              description: |
+                Array of virtual machine names to detach.
+            shouldTerminateVms:
+              type: Boolean
+              example: true
+              description: |
+                Whether to terminate the VMs or not.
+            shouldDecrementTargetCapacity:
+              type: Boolean
+              example: true
+              description: |
+                Prevent Elastigroup from scaling back to target capacity when virtual machines are detached.
+            drainingTimeout:
+              type: string
+              example: 300
+              description: |
+                The time in seconds to allow the virtual machine be be drained from incoming TCP connections and detached from MLB before terminating it.
+              default: 300
   responses:
     200:
       $ref: "../responses/groupVmDetach.yaml"
