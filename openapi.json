@@ -27586,10 +27586,10 @@
       }
     },
     "/ocean/aws/k8s/cluster/{OCEAN_ID}/rightSizing/suggestion": {
-      "get": {
-        "summary": "Fetch Right-Sizing Recommendations",
+      "post": {
+        "summary": "Get Right-Sizing Recommendations With Filter",
         "description": "Get right-sizing recommendations for an Ocean cluster and filter them according to namespace or label.\n",
-        "operationId": "oceanAwsFilterRightSizing",
+        "operationId": "oceanAwsFilterRightSizingWithFilter",
         "tags": [
           "Ocean AWS"
         ],
@@ -27601,6 +27601,77 @@
             "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec/get/parameters/1"
           }
         ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Optional - may be null.\n",
+                        "properties": {
+                          "namespaces": {
+                            "type": "array of string",
+                            "description": "Optional - may be null. If exists - should contain at least 1 item.\n",
+                            "example": [
+                              "sparkSpace",
+                              "kube-system"
+                            ]
+                          },
+                          "attribute": {
+                            "type": "object",
+                            "description": "Optional - may be null.\n",
+                            "required": [
+                              "type",
+                              "key"
+                            ],
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "required": true,
+                                "enum": [
+                                  "label",
+                                  "annotation"
+                                ],
+                                "example": "label"
+                              },
+                              "key": {
+                                "type": "string",
+                                "description": "May be any string, but shouldn't be empty.\n",
+                                "example": "app"
+                              },
+                              "operator": {
+                                "type": "string",
+                                "description": "Optional - may be null.\n",
+                                "enum": [
+                                  "Equals",
+                                  "notEquals",
+                                  "exists",
+                                  "doesNotExist"
+                                ],
+                                "default": "equals",
+                                "example": "equals"
+                              },
+                              "value": {
+                                "type": "string",
+                                "description": "Required whenever the operator is \"equals\" or \"notEquals\". |\nIf exists, may be any string.\n",
+                                "example": "redis"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Ocean RightSizing Recommendation Response",
@@ -27629,7 +27700,7 @@
                                 },
                                 "method": {
                                   "type": "string",
-                                  "example": "GET",
+                                  "example": "POST",
                                   "description": "The HTTP **METHOD** used for the request\n"
                                 },
                                 "timestamp": {
@@ -37003,11 +37074,11 @@
         }
       }
     },
-    "/ocean/gcp/k8s/cluster/{OCEAN_ID}/rightSizing/resourceSuggetsion": {
-      "get": {
-        "summary": "Filter Right-Sizing Recommendations",
+    "/ocean/gcp/k8s/cluster/{OCEAN_ID}/rightSizing/suggestion": {
+      "post": {
+        "summary": "Get Right-Sizing Recommendations With Filter",
         "description": "Get right-sizing recommendations for an Ocean cluster and filter them according to namespace or label.\n",
-        "operationId": "oceanGkeGetRightSizingRecommendations",
+        "operationId": "oceanGkeGetRightSizingRecommendationsWithFilter",
         "tags": [
           "Ocean GKE"
         ],
@@ -37019,9 +37090,29 @@
             "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec/get/parameters/1"
           },
           {
-            "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster~1%7BOCEAN_ID%7D~1rightSizing~1suggestion/get/parameters/2"
+            "in": "query",
+            "name": "namespace_name",
+            "description": "For K8S, namespace is an optional query param which filters the retrieved resources\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
           }
         ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BOCEAN_ID%7D~1rightSizing~1suggestion/post/requestBody/content/application~1json/schema/allOf/0"
+                  }
+                ]
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Ocean RightSizing Recommendation Response",
@@ -37126,113 +37217,6 @@
                           "example": 2
                         }
                       }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
-      }
-    },
-    "/ocean/gcp/k8s/cluster/{OCEAN_ID}/rightSizing/suggestion": {
-      "get": {
-        "summary": "Filter Right-Sizing Recommendations - Legacy",
-        "description": "Get right-sizing recommendations for an Ocean cluster and filter them according to namespace or label.\n",
-        "operationId": "oceanGkeGetRightSizingRecommendationsLegacy",
-        "tags": [
-          "Ocean GKE"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
-          },
-          {
-            "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec/get/parameters/1"
-          },
-          {
-            "in": "query",
-            "name": "namespace_name",
-            "description": "For K8S, namespace is an optional query param which filters the retrieved resources\n",
-            "schema": {
-              "type": "string"
-            },
-            "required": false
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Ocean RightSizing Recommendation (Legacy) Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "suggestions": {
-                      "type": "array",
-                      "items": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "namespace": {
-                              "type": "string",
-                              "example": "myNamespace"
-                            },
-                            "deploymentName": {
-                              "type": "string",
-                              "example": "coredns"
-                            },
-                            "suggestedCPU": {
-                              "type": "float",
-                              "example": 0.12225669
-                            },
-                            "suggestedMemory": {
-                              "type": "integer",
-                              "example": 550
-                            },
-                            "requestedCPU": {
-                              "type": "float",
-                              "example": 5.5
-                            },
-                            "requestedMemory": {
-                              "type": "integer",
-                              "example": 1024
-                            }
-                          }
-                        },
-                        {
-                          "type": "object",
-                          "properties": {
-                            "namespace": {
-                              "type": "string",
-                              "example": "myNamespace"
-                            },
-                            "deploymentName": {
-                              "type": "string",
-                              "example": "spark"
-                            },
-                            "suggestedCPU": {
-                              "type": "float",
-                              "example": 0.13
-                            },
-                            "suggestedMemory": {
-                              "type": "integer",
-                              "example": 250
-                            },
-                            "requestedCPU": {
-                              "type": "float",
-                              "example": 2.5
-                            },
-                            "requestedMemory": {
-                              "type": "integer",
-                              "example": 512
-                            }
-                          }
-                        }
-                      ]
                     }
                   }
                 }
