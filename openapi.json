@@ -34239,32 +34239,6 @@
                         {
                           "type": "object",
                           "properties": {
-                            "request": {
-                              "type": "object",
-                              "description": "Original request properties\n",
-                              "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "example": "46642c7d-bc29-417d-8ce4-79626f00c63c",
-                                  "description": "Unique ID associated with this request\n"
-                                },
-                                "url": {
-                                  "type": "string",
-                                  "example": "/setup/user/?generateToken=true",
-                                  "description": "The URL that was used for the request\n"
-                                },
-                                "method": {
-                                  "type": "string",
-                                  "example": "POST",
-                                  "description": "The HTTP **METHOD** used for the request\n"
-                                },
-                                "timestamp": {
-                                  "type": "string",
-                                  "example": "2018-11-19T13:49:11.911Z",
-                                  "description": "When the request was received by Spot\n"
-                                }
-                              }
-                            },
                             "response": {
                               "type": "object",
                               "description": "Response package that includes, status, type and any relevant data.\n",
@@ -34304,7 +34278,24 @@
                                   "description": "Array of data objects\n",
                                   "items": [
                                     {
-                                      "$ref": "#/paths/~1setup~1user/post/responses/200/content/application~1json/schema/allOf/0/allOf/1/properties/response/properties/items/items/0"
+                                      "type": "object",
+                                      "properties": {
+                                        "token": {
+                                          "type": "string",
+                                          "description": "Token",
+                                          "example": "f872e7b157866a36229d915aa21cf430f661234568703fd"
+                                        },
+                                        "name": {
+                                          "type": "string",
+                                          "description": "Name",
+                                          "example": "TestApi1"
+                                        },
+                                        "id": {
+                                          "type": "string",
+                                          "description": "ID",
+                                          "example": "pu-6a6976ab"
+                                        }
+                                      }
                                     }
                                   ]
                                 },
@@ -34312,6 +34303,314 @@
                                   "type": "integer",
                                   "example": 1,
                                   "description": "Size of the data object array\n"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/setup/user/programmatic/{userId}": {
+      "put": {
+        "summary": "Update Programmatic User",
+        "description": "Updates the Programmatic User.\n",
+        "operationId": "OrganizationsAndAccountsUpdateAProgrammaticUser",
+        "tags": [
+          "Organizations"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "example": "pu_968465",
+            "description": "ID of the user\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "description": {
+                        "type": "string",
+                        "description": "Brief description of the user.",
+                        "example": "test programmatic"
+                      },
+                      "accounts": {
+                        "type": "array of object",
+                        "description": "All the accounts the programmatic user will have access to. Cannot be empty.",
+                        "items": [
+                          {
+                            "$ref": "#/paths/~1setup~1user~1programmatic/post/requestBody/content/application~1json/schema/allOf/0/properties/accounts/items/0"
+                          },
+                          {
+                            "$ref": "#/paths/~1setup~1user~1programmatic/post/requestBody/content/application~1json/schema/allOf/0/properties/accounts/items/1"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Update Programmatic User Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "allOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "response": {
+                              "type": "object",
+                              "description": "Response package that includes, status, type and any relevant data.\n",
+                              "properties": {
+                                "status": {
+                                  "type": "object",
+                                  "properties": {
+                                    "code": {
+                                      "type": "integer",
+                                      "example": 200,
+                                      "description": "HTTP status code assigned to this response\n"
+                                    },
+                                    "message": {
+                                      "type": "string",
+                                      "example": "OK",
+                                      "description": "HTTP status message for the respective status code\n"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "response": {
+                              "type": "object",
+                              "properties": {
+                                "kind": {
+                                  "type": "string",
+                                  "example": "spotinst:setup:programmaticUser",
+                                  "description": "The data type of each item in the response\n"
+                                },
+                                "items": {
+                                  "type": "array",
+                                  "description": "Array of data objects\n",
+                                  "items": [
+                                    {
+                                      "type": "object",
+                                      "properties": {
+                                        "id": {
+                                          "type": "string",
+                                          "description": "ID",
+                                          "example": "pu_968465"
+                                        },
+                                        "userName": {
+                                          "type": "string",
+                                          "description": "User Name",
+                                          "example": "pu_name"
+                                        },
+                                        "description": {
+                                          "type": "string",
+                                          "description": "Discription",
+                                          "example": "test programmatic"
+                                        },
+                                        "accounts": {
+                                          "type": "array",
+                                          "description": "All the accounts the programmatic user will have access to. Cannot be empty.",
+                                          "items": [
+                                            {
+                                              "$ref": "#/paths/~1setup~1user~1programmatic/post/requestBody/content/application~1json/schema/allOf/0/properties/accounts/items/0"
+                                            },
+                                            {
+                                              "$ref": "#/paths/~1setup~1user~1programmatic/post/requestBody/content/application~1json/schema/allOf/0/properties/accounts/items/1"
+                                            }
+                                          ]
+                                        }
+                                      }
+                                    }
+                                  ]
+                                },
+                                "count": {
+                                  "type": "integer",
+                                  "example": 1,
+                                  "description": "Size of the data object array\n"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get Programmatic User",
+        "description": "Gets the Programmatic User.\n",
+        "operationId": "OrganizationsAndAccountsGetAProgrammaticUser",
+        "tags": [
+          "Organizations"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1setup~1user~1programmatic~1%7BuserId%7D/put/parameters/0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get Programmatic User Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "allOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "response": {
+                              "type": "object",
+                              "description": "Response package that includes, status, type and any relevant data.\n",
+                              "properties": {
+                                "status": {
+                                  "type": "object",
+                                  "properties": {
+                                    "code": {
+                                      "type": "integer",
+                                      "example": 200,
+                                      "description": "HTTP status code assigned to this response\n"
+                                    },
+                                    "message": {
+                                      "type": "string",
+                                      "example": "OK",
+                                      "description": "HTTP status message for the respective status code\n"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "response": {
+                              "type": "object",
+                              "properties": {
+                                "kind": {
+                                  "type": "string",
+                                  "example": "spotinst:setup:programmaticUser",
+                                  "description": "The data type of each item in the response\n"
+                                },
+                                "items": {
+                                  "type": "array",
+                                  "description": "Array of data objects\n",
+                                  "items": [
+                                    {
+                                      "$ref": "#/paths/~1setup~1user~1programmatic~1%7BuserId%7D/put/responses/200/content/application~1json/schema/allOf/0/allOf/1/properties/response/properties/items/items/0"
+                                    }
+                                  ]
+                                },
+                                "count": {
+                                  "type": "integer",
+                                  "example": 1,
+                                  "description": "Size of the data object array\n"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/setup/user/programmatic/{userId}/account": {
+      "delete": {
+        "summary": "Delete Programmatic User",
+        "description": "Deletes the Programmatic User.\n",
+        "operationId": "OrganizationsAndAccountsDeleteAProgrammaticUser",
+        "tags": [
+          "Organizations"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1setup~1user~1programmatic~1%7BuserId%7D/put/parameters/0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Delete Programmatic User Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "allOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "response": {
+                              "type": "object",
+                              "description": "Response package that includes, status, type and any relevant data.\n",
+                              "properties": {
+                                "status": {
+                                  "type": "object",
+                                  "properties": {
+                                    "code": {
+                                      "type": "integer",
+                                      "example": 200,
+                                      "description": "HTTP status code assigned to this response\n"
+                                    },
+                                    "message": {
+                                      "type": "string",
+                                      "example": "OK",
+                                      "description": "HTTP status message for the respective status code\n"
+                                    }
+                                  }
                                 }
                               }
                             }
