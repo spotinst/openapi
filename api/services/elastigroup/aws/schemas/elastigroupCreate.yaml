@@ -601,6 +601,29 @@ properties:
                     type: string
                     description: Required for IMDSv2. Can’t be null in Create or Update. Values can be "optional" or "required".
                     example: optional
+                  httpPutResponseHopLimit:
+                    type: int
+                    example: "33"
+                    description: |
+                      An integer within 1,64 range (including).
+                      The desired HTTP PUT response hop limit for instance metadata requests.
+                      The larger the number, the further instance metadata requests can travel.
+              cpuOptions:
+                title: CPU options
+                type: object
+                description: Optional field. The CPU options for the instances that are launched within the group.
+                required:
+                  - threadsPerCore
+                properties:
+                  threadsPerCore:
+                    title: thread per core
+                    type: int
+                    example: "1"
+                    description: |
+                      The number of threads per CPU core.
+                      To disable multithreading for the instances, specify a value of 1 .
+                      Otherwise, specify the default value of 2 .
+
       scaling:
         type: object
         title: Elastigroup Scaling
@@ -643,8 +666,11 @@ properties:
                 example: 90
               action:
                 type: object
+                example: "adjustment"
                 description: |
-                  The action to take when scale up is needed
+                  The action to take when scale up is needed.
+                  A mandatory field, that should be filled with one of the following:
+                  "adjustment", "percentageAdjustment", "setMaxTarget", "setMinTarget", "updateCapacity".
                 properties:
                   type:
                     type: string
@@ -760,8 +786,11 @@ properties:
                 example: 90
               action:
                 type: object
+                example: "adjustment"
                 description: |
-                  The action to take when scale up is needed
+                  The action to take when scale up is needed.
+                  A mandatory field, that should be filled with one of the following:
+                  "adjustment", "percentageAdjustment", "setMaxTarget", "setMinTarget", "updateCapacity".
                 properties:
                   type:
                     type: string
@@ -1101,5 +1130,7 @@ properties:
                           example: "Mon:03:00-Wed:02:30"
           dockerSwarm:
             $ref: "../schemas/dockerSwarm.yaml"
+#          datadog:
+ #           $ref: "../schemas/datadog.yaml"
 
 
