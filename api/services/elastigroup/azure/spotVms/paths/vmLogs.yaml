@@ -1,7 +1,7 @@
 get:
   summary: "Get Elastilog"
   description:
-    You can fetch a Elastigroup's elastilog via the Spot API, in order to be able to consume elastilog from various tools used for log storing and analyzing.
+    You can fetch a Elastigroup's Elastilog via the Spot API, in order to be able to consume elastilog from various tools used for log storing and analyzing.
     Logs have retention of 3 months back, so minimal fromDate should be up to 3 months back at runtime.
   operationId: "elastigroupAzureSpotVmsGetElastigroupLogEntries"
   tags:
@@ -9,31 +9,16 @@ get:
   parameters:
     - $ref: "../../../../../commons/parameters/accountId.yaml"
     - $ref: "../../../../../commons/parameters/groupId.yaml"
-    - in: query
-      name: fromDate
-      example: 1540036800000
-      description: >
-        Epoch number that represents the date from which to collect the log (millisecond format)
-      schema:
-        type: string
-      required: true
-    - in: query
-      name: toDate
-      example: 1542715200000
-      description: >
-        Epoch number that represents the date until which log is collected (millisecond format)
-      schema:
-        type: string
-      required: true
+    - $ref: "../../../../../commons/parameters/fromDateUnixEnabled.yaml"
+    - $ref: "../../../../../commons/parameters/toDateUnixEnabled.yaml"
     - in: query
       name: SEVERITY
-      example: ALL
+      example: WARN
       description: >
         Severity of log entries to extract.
-        Valid Values: ALL, INFO,DEBUG,WARN
-        Default: ALL
       schema:
         type: string
+        enum: ["DEBUG", "WARN", "INFO", "ALL", "ERROR"]
     - in: query
       name: RESOURCE_ID
       example: vm-12345678
@@ -43,14 +28,66 @@ get:
       schema:
         type: string
     - in: query
-      name: LIMIT
+      name: limit
       example: 500
       description: >
         Maximum number of lines to extract in a response. Max value allowed - 1000.
+        Default is 500, if got null.
       schema:
-        type: string
+        type: integer
+        maximum: 1000
+        minimum: 0
   responses:
     200:
       $ref: "../responses/vmLogs.yaml"
     400:
       description: "Bad Request"
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - type: object
+                title: "Failed to get group log"
+                properties:
+                  errorCode:
+                    type: integer
+                    example: 400
+                  description:
+                    type: string
+                    example: "Failed to get group log. Errors: {dal errors}"
+              - type: object
+                title: "FAILED_TO_PARSE_TO_DATE"
+                properties:
+                  errorCode:
+                    type: integer
+                    example: 400
+                  description:
+                    type: string
+                    example: "FAILED_TO_PARSE_TO_DATE: failed to parse: {toDate}"
+              - type: object
+                title: "FAILED_TO_PARSE_FROM_DATE"
+                properties:
+                  errorCode:
+                    type: integer
+                    example: 400
+                  description:
+                    type: string
+                    example: "FAILED_TO_PARSE_FROM_DATE: failed to parse: {fromDate}"
+              - type: object
+                title: "INVALID_DATE_RANGE"
+                properties:
+                  errorCode:
+                    type: integer
+                    example: 400
+                  description:
+                    type: string
+                    example: "INVALID_DATE_RANGE: toDate: {toDate} can not be after: {current date}"
+              - type: object
+                title: "INVALID_DATE_RANGE"
+                properties:
+                  errorCode:
+                    type: integer
+                    example: 400
+                  description:
+                    type: string
+                    example: "INVALID_DATE_RANGE:fromDate: {fromDate}, must be after{3 month back}"
