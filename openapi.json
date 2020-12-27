@@ -20253,7 +20253,7 @@
     "/azure/compute/group/{groupId}/logs": {
       "get": {
         "summary": "Get Elastilog",
-        "description": "You can fetch a Elastigroup's elastilog via the Spot API, in order to be able to consume elastilog from various tools used for log storing and analyzing. Logs have retention of 3 months back, so minimal fromDate should be up to 3 months back at runtime.",
+        "description": "You can fetch a Elastigroup's Elastilog via the Spot API, in order to be able to consume elastilog from various tools used for log storing and analyzing. Logs have retention of 3 months back from today, so minimal fromDate should be up to 3 months back at runtime.",
         "operationId": "elastigroupAzureSpotVmsGetElastigroupLogEntries",
         "tags": [
           "Elastigroup Azure Spot VMs"
@@ -20266,32 +20266,25 @@
             "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/put/parameters/0"
           },
           {
-            "in": "query",
-            "name": "fromDate",
-            "example": 1540036800000,
-            "description": "Epoch number that represents the date from which to collect the log (millisecond format)\n",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
+            "$ref": "#/paths/~1azure~1costs/get/parameters/1"
           },
           {
-            "in": "query",
-            "name": "toDate",
-            "example": 1542715200000,
-            "description": "Epoch number that represents the date until which log is collected (millisecond format)\n",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
+            "$ref": "#/paths/~1azure~1costs/get/parameters/2"
           },
           {
             "in": "query",
             "name": "SEVERITY",
-            "example": "ALL",
-            "description": "Severity of log entries to extract. Valid Values: ALL, INFO,DEBUG,WARN Default: ALL\n",
+            "example": "WARN",
+            "description": "Severity of log entries to extract.\n",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "DEBUG",
+                "WARN",
+                "INFO",
+                "ALL",
+                "ERROR"
+              ]
             }
           },
           {
@@ -20305,11 +20298,13 @@
           },
           {
             "in": "query",
-            "name": "LIMIT",
+            "name": "limit",
             "example": 500,
-            "description": "Maximum number of lines to extract in a response. Max value allowed - 1000.\n",
+            "description": "Maximum number of lines to extract in a response. Max value allowed - 1000. Default is 500, if got null.\n",
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "maximum": 1000,
+              "minimum": 0
             }
           }
         ],
@@ -20335,25 +20330,17 @@
                                 "type": "object",
                                 "title": "Elastigroup Wrapper",
                                 "properties": {
-                                  "logs": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "object",
-                                      "properties": {
-                                        "message": {
-                                          "type": "string",
-                                          "example": "Group sig-e0a2bd7c successfully created."
-                                        },
-                                        "severity": {
-                                          "type": "string",
-                                          "example": "INFO"
-                                        },
-                                        "createdAt": {
-                                          "type": "string",
-                                          "example": "2018-11-19T14:34:15.000Z"
-                                        }
-                                      }
-                                    }
+                                  "message": {
+                                    "type": "string",
+                                    "example": "Successfully detached [vm-b4ab9da435aa]"
+                                  },
+                                  "severity": {
+                                    "type": "string",
+                                    "example": "INFO"
+                                  },
+                                  "createdAt": {
+                                    "type": "string",
+                                    "example": "2020-07-16T16:46:49.000Z"
                                   }
                                 }
                               }
