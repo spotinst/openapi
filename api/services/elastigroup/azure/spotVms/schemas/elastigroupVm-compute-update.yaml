@@ -87,81 +87,110 @@ properties:
                   * Required if custom image is specified.
                 example: "custom-image-name"
       network:
+        title: Network
+        description: Define the Virtual Network and Subnet for your Elastigroup.
         type: object
-        description: |
-          Define the Virtual Network and Subnet for your Elastigroup.
+        required:
+          - resourceGroupName
+          - virtualNetworkName
+          - networkInterfaces
         properties:
-          virtualNetworkName:
-            type: string
-            description: |
-              Name of Vnet.
-            example: "vname"
           resourceGroupName:
+            title: Resource Group Name
+            description: Vnet Resource Group Name
             type: string
-            description: |
-              Vnet Resource Group Name
-            example: "subnetResourceGroup"
+            example: subnetResourceGroup
+          virtualNetworkName:
+            title: Virtual Network Name
+            description: Virtual Network
+            type: string
+            example: vname
           networkInterfaces:
+            title: Virtual Network Name
+            description: Virtual Network
             type: array
             items:
               type: object
+              required:
+                - isPrimary
+                - subnetName
               properties:
                 isPrimary:
+                  title: Is Primary Criteria
+                  description: Defines whether the network interface is primary or not.
                   type: boolean
-                  description: |
-                    Defines whether the network interface is primary or not.
                   example: true
                 subnetName:
+                  title: Subnet Name
+                  description: Subnet name
                   type: string
-                  description: |
-                    Subnet name
-                  example: "my-subnet-name"
+                  example: testSubnet
                 assignPublicIp:
+                  title: Assign Publick IP
+                  description: Assign public IP
                   type: boolean
-                  description: |
-                    Assign public IP
                   example: true
                 publicIpSku:
+                  title:
+                  description: Required if assignPublicIp=true values=[STANDARD/BASIC]
                   type: string
-                  description: |
-                    required if "assignPublicIp":"true".
-                  enum: [STANDARD, BASIC]
-                  example: "STANDARD"
+                  example:
                 securityGroup:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                      description: |
-                        requires valid security group name. Required if security group is specified.
-                      example: "testSecurityGroup"
-                    resourceGroupName:
-                      type: string
-                      description: |
-                        requires valid resource group name. Required if security group is specified.
-                      example: "testResourceGroup"
-                enableIPForwarding:
-                  type: boolean
-                  description: |
-                    Enable IP Forwarding
-                  example: true
-                additionalIpConfigurations:
+                  title: Security Group
+                  description: Security Group
                   type: array
-                  description: |
-                    Additional configuration of network interface
                   items:
                     type: object
                     properties:
                       name:
+                        title: Name
+                        description: Requires valid security group name. Required if security group is specified.
                         type: string
-                        description: |
-                          required if additionalConfiguration has been specified.
-                        example: "TestIbSecodary"
+                        example: test
+                      resourceGroupName:
+                        title: Resource Group Name
+                        description: Requires valid resource group name. Required if security group is specified.
+                        type: string
+                        example: test
+                publicIps:
+                  description: List of objects, In create group, cannot be empty.
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      resourceGroupName:
+                        description: Cannot be empty.
+                        type: string
+                        example: resourceGroup
+                      name:
+                        description: Cannot be empty.
+                        type: string
+                        example: name
+                enableIPForwarding:
+                  title: Enable IP Forwarding
+                  description: Enable IP Forwarding
+                  type: boolean
+                  example: true
+                additionalIpConfigurations:
+                  title: Additional IP Configurations
+                  description: Additional configuration of network interface
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        title: Name
+                        description: Required if additionalConfiguration has been specified.
+                        type: string
+                        example: test
                       privateIpAddressVersion:
-                        type: string
-                        enum: [IPv4, IPv6]
-                        example: "IPv4"
-                        default: "IPv4"
+                        title: Private IP Address Version
+                        description: "Possible values:
+
+                                      + IPv4
+
+                                      + IPv6"
+                        default: IPv4
       login:
         type: object
         description: |
