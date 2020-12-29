@@ -19461,6 +19461,64 @@
                                         }
                                       }
                                     }
+                                  },
+                                  "suspendedProcesses": {
+                                    "type": "array",
+                                    "items": [
+                                      {
+                                        "type": "object",
+                                        "properties": {
+                                          "name": {
+                                            "type": "string",
+                                            "example": "autoHealing"
+                                          },
+                                          "expiresAt": {
+                                            "type": "string",
+                                            "example": "2020-11-10T18:43:52.000Z"
+                                          }
+                                        }
+                                      },
+                                      {
+                                        "type": "object",
+                                        "properties": {
+                                          "name": {
+                                            "type": "string",
+                                            "example": "signalTimeout"
+                                          }
+                                        }
+                                      },
+                                      {
+                                        "type": "object",
+                                        "properties": {
+                                          "name": {
+                                            "type": "string",
+                                            "example": "autoScale"
+                                          }
+                                        }
+                                      },
+                                      {
+                                        "type": "object",
+                                        "properties": {
+                                          "name": {
+                                            "type": "string",
+                                            "example": "scaleDown"
+                                          }
+                                        }
+                                      },
+                                      {
+                                        "type": "object",
+                                        "properties": {
+                                          "name": {
+                                            "type": "string",
+                                            "example": "syncStrategy"
+                                          },
+                                          "expiresAt": {
+                                            "type": "string",
+                                            "example": "2020-11-10T17:43:52.000Z"
+                                          }
+                                        }
+                                      }
+                                    ]
                                   }
                                 }
                               }
@@ -19473,6 +19531,153 @@
                       }
                     }
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/azure/compute/group/{groupId}/suspend": {
+      "put": {
+        "summary": "Suspend Group",
+        "description": "Suspends the Group.\n",
+        "operationId": "elastigroupAzureSpotVmsSuspend",
+        "tags": [
+          "Elastigroup Azure Spot VMs"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/put/parameters/0"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "processes": {
+                        "type": "array",
+                        "items": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "example": "signalTimeout"
+                              },
+                              "ttlInMinutes": {
+                                "type": "string",
+                                "description": "The duration in minutes which the process is suspended for",
+                                "example": 180
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "example": "syncStrategy"
+                              },
+                              "ttlInMinutes": {
+                                "type": "string",
+                                "description": "The duration in minutes which the process is suspended for",
+                                "example": 180
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/paths/~1azure~1compute~1group~1%7BgroupId%7D~1resume/put/responses/200"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/azure/compute/group/{groupId}/resume": {
+      "put": {
+        "summary": "Resume Group",
+        "description": "Resumes the Group.\n",
+        "operationId": "elastigroupAzureSpotVmsResume",
+        "tags": [
+          "Elastigroup Azure Spot VMs"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/put/parameters/0"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "processes": {
+                        "type": "array",
+                        "items": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "example": "signalTimeout"
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "example": "syncStrategy"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Spot Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
                 }
               }
             }
