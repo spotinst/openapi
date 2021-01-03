@@ -6590,6 +6590,99 @@
         }
       }
     },
+    "/aws/emr/mrScalerOperator": {
+      "post": {
+        "summary": "Create Scaler Operator",
+        "description": "mrScaler – required will have the same configuration as in createMrScaler with one exception:\nwe will only work with strategy of “new”, no “clone”/”warp” will be allowed.\n",
+        "operationId": "elastigroupAwsEmrOperatorCreate",
+        "tags": [
+          "Elastigroup AWS EMR Scaler"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "title": "MRScaler object Wrapper",
+                    "required": [
+                      "mrScaler"
+                    ],
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "example": "GuyEmrOperatorTest"
+                      },
+                      "mrScaler": {
+                        "required": [
+                          "name",
+                          "region",
+                          "strategy"
+                        ],
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "MRScaler name",
+                            "example": "my MRScaler"
+                          },
+                          "description": {
+                            "type": "string",
+                            "description": "description for the MRScaler",
+                            "example": "this is an MRScaler created with Spot"
+                          },
+                          "region": {
+                            "type": "string",
+                            "description": "The region of the source cluster",
+                            "example": "us-west-2"
+                          },
+                          "strategy": {
+                            "$ref": "#/paths/~1aws~1emr~1mrScaler/post/requestBody/content/application~1json/schema/allOf/0/properties/mrScaler/properties/strategy"
+                          },
+                          "compute": {
+                            "$ref": "#/paths/~1aws~1emr~1mrScaler/post/requestBody/content/application~1json/schema/allOf/0/properties/mrScaler/properties/compute"
+                          },
+                          "cluster": {
+                            "$ref": "#/paths/~1aws~1emr~1mrScaler/post/requestBody/content/application~1json/schema/allOf/0/properties/mrScaler/properties/cluster"
+                          },
+                          "scheduling": {
+                            "$ref": "#/paths/~1aws~1emr~1mrScaler/post/requestBody/content/application~1json/schema/allOf/0/properties/mrScaler/properties/scheduling"
+                          },
+                          "scaling": {
+                            "$ref": "#/paths/~1aws~1emr~1mrScaler/post/requestBody/content/application~1json/schema/allOf/0/properties/mrScaler/properties/scaling"
+                          },
+                          "terminationPolicies": {
+                            "type": "array",
+                            "description": "Termination policies for EMR clusters based on CloudWatch Metrics.\n",
+                            "items": {
+                              "$ref": "#/paths/~1aws~1emr~1mrScaler/post/requestBody/content/application~1json/schema/allOf/0/properties/mrScaler/properties/terminationPolicies/items"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/paths/~1aws~1emr~1mrScaler/post/responses/200"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/aws/emr/mrScaler/{mrScalerId}": {
       "get": {
         "summary": "Get Scaler",
@@ -9823,7 +9916,7 @@
         "description": "Retrieve costs per specified account over a specified time period. Example of URL with with daily aggregation period over a time period of 30 days - https://api.spotinst.io/aws/ec2/account/costs?fromDate=1585699200000&toDate=1588291199000&aggregationPeriod=daily",
         "operationId": "awsCostsPerAccount",
         "tags": [
-          "Elastigroup AWS"
+          "Insights Service"
         ],
         "parameters": [
           {
@@ -24349,7 +24442,7 @@
                                   },
                                   "maxScaleDownPercentage": {
                                     "type": "integer",
-                                    "description": "the maximum % of nodes that will be scaled down at once out of the total amount of potential nodes to scale down.\nexample: if 10 nodes can be scaled down, only 5 will be given 50% in this parameter.\nthe other 50% will be scaled down in the next autoscaling iteration.\n",
+                                    "description": "The maximum % of nodes that will be scaled down at once out of the total amount of potential nodes to scale down.\nexample: if 10 nodes can be scaled down, only 5 will be given 50% in this parameter.\nthe other 50% will be scaled down in the next autoscaling iteration.\n",
                                     "example": 20
                                   }
                                 }
