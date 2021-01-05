@@ -20611,10 +20611,10 @@
         }
       }
     },
-    "/azure/compute/group/import/{resourceGroupName}/{scaleSetName}": {
+    "/azure/compute/group/import/resourceGroup/{resourceGroupName}/scaleSet/{scaleSetName}": {
       "get": {
-        "summary": "Get Group By Scale Set",
-        "description": "A route that returns a group response.",
+        "summary": "Import Group From Scale Set",
+        "description": "Given a scale set, constructs a valid group configuration based on the scale set and returns it.",
         "operationId": "elastigroupAzureSpotVmsGetAScaleSet",
         "tags": [
           "Elastigroup Azure Spot VMs"
@@ -20623,7 +20623,7 @@
           {
             "in": "path",
             "name": "resourceGroupName",
-            "example": "spotinst-azure",
+            "example": "ExampleResourceGroup",
             "description": "Resource Group Name - Must be valid.\n",
             "schema": {
               "type": "string"
@@ -20633,7 +20633,7 @@
           {
             "in": "path",
             "name": "scaleSetName",
-            "example": "scaleSet",
+            "example": "MyExampleScaleSetImport",
             "description": "Scale Set Name - Must be valid\n",
             "schema": {
               "type": "string"
@@ -20680,7 +20680,7 @@
                                     "properties": {
                                       "name": {
                                         "type": "string",
-                                        "example": "spotinst-group",
+                                        "example": "MyExampleScaleSetImport",
                                         "description": "Azure Elastigroup Name\n"
                                       },
                                       "region": {
@@ -20690,7 +20690,7 @@
                                       },
                                       "resourceGroupName": {
                                         "type": "string",
-                                        "example": "spotinst-azure",
+                                        "example": "ExampleResourceGroup",
                                         "description": "Name of the Resource Group for Elastigroup.\n"
                                       },
                                       "capacity": {
@@ -20743,11 +20743,11 @@
         }
       }
     },
-    "/azure/compute/group/import/{resourceGroupName}/{virtualMachineName}": {
+    "/azure/compute/group/import/resourceGroup/{resourceGroupName}/virtualMachine/{virtualMachineName}": {
       "get": {
-        "summary": "Get Group By Virtual Machine",
-        "description": "Get Group By Virtual Machine.\n",
-        "operationId": "elastigroupAzureSpotVmsGetVirtualMachine",
+        "summary": "Import Group From Virtual Machine",
+        "description": "Given a virtual machine, constructs a valid group configuration based on the virtual machine and returns it.\n",
+        "operationId": "elastigroupAzureSpotVmsImportFromVirtualMachine",
         "tags": [
           "Elastigroup Azure Spot VMs"
         ],
@@ -20755,7 +20755,7 @@
           {
             "in": "path",
             "name": "resourceGroupName",
-            "example": "spotinst-azure",
+            "example": "ExampleResourceGroup",
             "schema": {
               "type": "string"
             }
@@ -20763,7 +20763,7 @@
           {
             "in": "path",
             "name": "virtualMachineName",
-            "example": "vm-12345",
+            "example": "MyExampleVirtualMachineImport",
             "schema": {
               "type": "string"
             }
@@ -20771,7 +20771,99 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1azure~1compute~1group~1import~1%7BresourceGroupName%7D~1%7BscaleSetName%7D/get/responses/200"
+            "description": "Elastigroup Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "title": "Create Elasitgroup Azure Spot VMs",
+                                "required": [
+                                  "group"
+                                ],
+                                "properties": {
+                                  "group": {
+                                    "type": "object",
+                                    "title": "Azure Elastigroup",
+                                    "required": [
+                                      "name",
+                                      "region",
+                                      "resourceGroupName",
+                                      "capacity",
+                                      "strategy",
+                                      "compute"
+                                    ],
+                                    "properties": {
+                                      "name": {
+                                        "type": "string",
+                                        "example": "MyExampleVirtualMachineImport",
+                                        "description": "Azure Elastigroup Name\n"
+                                      },
+                                      "region": {
+                                        "type": "string",
+                                        "example": "westus2",
+                                        "description": "The Azure region your Elastigroup will be created in.\n"
+                                      },
+                                      "resourceGroupName": {
+                                        "type": "string",
+                                        "example": "ExampleResourceGroup",
+                                        "description": "Name of the Resource Group for Elastigroup.\n"
+                                      },
+                                      "capacity": {
+                                        "$ref": "#/paths/~1azure~1compute~1group~1%7BgroupId%7D/put/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/capacity"
+                                      },
+                                      "strategy": {
+                                        "$ref": "#/paths/~1azure~1compute~1group~1%7BgroupId%7D/put/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/strategy"
+                                      },
+                                      "scaling": {
+                                        "$ref": "#/paths/~1azure~1compute~1group~1%7BgroupId%7D/put/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/scaling"
+                                      },
+                                      "compute": {
+                                        "$ref": "#/paths/~1azure~1compute~1group/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/group/properties/compute"
+                                      },
+                                      "health": {
+                                        "$ref": "#/paths/~1azure~1compute~1group~1%7BgroupId%7D/put/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/health"
+                                      },
+                                      "createdAt": {
+                                        "type": "string",
+                                        "readOnly": true,
+                                        "format": "date-time",
+                                        "example": "2018-10-10T10:50:29.000+0000"
+                                      },
+                                      "updatedAt": {
+                                        "type": "string",
+                                        "readOnly": true,
+                                        "format": "date-time",
+                                        "example": "2018-11-01T10:50:29.000+0000"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:azure:compute:elastigroup:import"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
