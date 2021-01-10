@@ -1445,6 +1445,286 @@
                                     "description": "Rancher version\n",
                                     "example": "1",
                                     "default": "1"
+                                  },
+                                  "secretKey": {
+                                    "type": "string",
+                                    "example": "SECRET"
+                                  },
+                                  "version": {
+                                    "type": "string",
+                                    "example": 1
+                                  }
+                                }
+                              },
+                              "kubernetes": {
+                                "type": "object",
+                                "properties": {
+                                  "integrationMode": {
+                                    "type": "string",
+                                    "example": "pod"
+                                  },
+                                  "clusterIdentifier": {
+                                    "type": "string",
+                                    "example": "test-k8s"
+                                  },
+                                  "autoScale": {
+                                    "type": "object",
+                                    "properties": {
+                                      "isEnabled": {
+                                        "type": "bool",
+                                        "example": true,
+                                        "default": true
+                                      },
+                                      "cooldown": {
+                                        "type": "integer",
+                                        "example": 300
+                                      },
+                                      "down": {
+                                        "type": "object",
+                                        "description": "Auto Scaling scale down operations.\n",
+                                        "properties": {
+                                          "evaluationPeriods": {
+                                            "type": "integer",
+                                            "example": 5
+                                          },
+                                          "maxScaleDownPercentage": {
+                                            "type": "integer",
+                                            "description": "The maximum % of nodes that will be scaled down at once out of the total amount of potential nodes to scale down.\nexample: if 10 nodes can be scaled down, only 5 will be given 50% in this parameter.\nthe other 50% will be scaled down in the next autoscaling iteration.\n",
+                                            "example": 70
+                                          },
+                                          "headroom": {
+                                            "type": "object",
+                                            "description": "Spare resource capacity management enabling fast assignment of Pods without waiting for new resources to launch.\n",
+                                            "properties": {
+                                              "cpuPerUnit": {
+                                                "type": "integer",
+                                                "description": "Optionally configure the number of CPUs to allocate per headroom unit. CPUs are denoted in CPU units, where 1024 units = 1 vCPU.\n",
+                                                "example": 2048
+                                              },
+                                              "memoryPerUnit": {
+                                                "type": "integer",
+                                                "description": "Optionally configure the amount of memory (MiB) to allocate per headroom unit.\n",
+                                                "example": 3
+                                              },
+                                              "numOfUnits": {
+                                                "type": "integer",
+                                                "description": "The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.\n",
+                                                "example": 2
+                                              },
+                                              "gpuPerUnit": {
+                                                "type": "integer",
+                                                "example": 2
+                                              }
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "labels": {
+                                        "type": "array",
+                                        "description": null,
+                                        "items": {
+                                          "type": "object",
+                                          "properties": {
+                                            "key": {
+                                              "type": "string",
+                                              "example": "group, kops.k8s.io/instancegroup"
+                                            },
+                                            "value": {
+                                              "type": "string",
+                                              "example": "microservices"
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "isAutoConfig": {
+                                        "type": "bool",
+                                        "example": false,
+                                        "default": false
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "mesosphere": {
+                                "type": "object",
+                                "properties": {
+                                  "apiServer": {
+                                    "type": "string",
+                                    "example": "1.2.3.4"
+                                  }
+                                }
+                              },
+                              "mlbRuntime": {
+                                "type": "object",
+                                "properties": {
+                                  "deploymentId": {
+                                    "type": "string",
+                                    "example": "dp-rm0f5b912345"
+                                  }
+                                }
+                              },
+                              "nomad": {
+                                "type": "object",
+                                "properties": {
+                                  "masterHost": {
+                                    "type": "string",
+                                    "example": "https://master.host.com"
+                                  },
+                                  "masterPort": {
+                                    "type": "integer",
+                                    "example": 443
+                                  },
+                                  "autoScale": {
+                                    "type": "object",
+                                    "properties": {
+                                      "isEnabled": {
+                                        "type": "boolean",
+                                        "description": "Enable the Autoscaler.\n",
+                                        "example": true
+                                      },
+                                      "cooldown": {
+                                        "type": "integer",
+                                        "description": "Cooldown period between scaling actions. Value should be cooldown period in seconds, greater than 180\n",
+                                        "example": 180
+                                      },
+                                      "down": {
+                                        "type": "object",
+                                        "description": "Auto Scaling scale down operations.\n",
+                                        "properties": {
+                                          "evaluationPeriods": {
+                                            "type": "integer",
+                                            "example": 3
+                                          }
+                                        }
+                                      },
+                                      "headroom": {
+                                        "type": "object",
+                                        "description": "Spare resource capacity management enabling fast assignment of Pods without waiting for new resources to launch.\n",
+                                        "properties": {
+                                          "cpuPerUnit": {
+                                            "type": "integer",
+                                            "description": "Optionally configure the number of CPUs to allocate per headroom unit. CPUs are denoted in CPU units, where 1024 units = 1 vCPU.\n",
+                                            "example": 2048
+                                          },
+                                          "memoryPerUnit": {
+                                            "type": "integer",
+                                            "description": "Optionally configure the amount of memory (MiB) to allocate per headroom unit.\n",
+                                            "example": 3
+                                          },
+                                          "numOfUnits": {
+                                            "type": "integer",
+                                            "description": "The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.\n",
+                                            "example": 2
+                                          }
+                                        }
+                                      },
+                                      "constraints": {
+                                        "type": "array",
+                                        "description": null,
+                                        "items": {
+                                          "type": "object",
+                                          "properties": {
+                                            "key": {
+                                              "type": "string",
+                                              "example": "${node.class}"
+                                            },
+                                            "value": {
+                                              "type": "string",
+                                              "example": "value"
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "aclToken": {
+                                    "type": "string",
+                                    "example": 123
+                                  }
+                                }
+                              },
+                              "chef": {
+                                "type": "object",
+                                "properties": {
+                                  "chefServer": {
+                                    "type": "string",
+                                    "example": "https://master.host.com"
+                                  },
+                                  "organization": {
+                                    "type": "string",
+                                    "example": "ORGNAME"
+                                  },
+                                  "chefVersion": {
+                                    "type": "string",
+                                    "example": 12.1
+                                  },
+                                  "user": {
+                                    "type": "string",
+                                    "example": "User"
+                                  },
+                                  "pemKey": {
+                                    "type": "string",
+                                    "example": "Key"
+                                  }
+                                }
+                              },
+                              "rightScale": {
+                                "type": "object",
+                                "properties": {
+                                  "accountId": {
+                                    "type": "string",
+                                    "example": "ID"
+                                  },
+                                  "refreshToken": {
+                                    "type": "string",
+                                    "example": "TOKEN"
+                                  },
+                                  "region": {
+                                    "type": "string",
+                                    "example": "us-east-1"
+                                  }
+                                }
+                              },
+                              "opsWorks": {
+                                "type": "object",
+                                "properties": {
+                                  "layerId": {
+                                    "type": "string",
+                                    "example": "00d9m815-8aac-62b7-cc01-123456, xxxxxx-xxxxxxxx, xxxxxxx-xxxxxxxxxx"
+                                  },
+                                  "stackType": {
+                                    "type": "string",
+                                    "example": "CLASSIC"
+                                  }
+                                }
+                              },
+                              "codeDeploy": {
+                                "type": "object",
+                                "properties": {
+                                  "cleanUpOnFailure": {
+                                    "type": "boolean",
+                                    "example": false
+                                  },
+                                  "terminateInstanceOnFailure": {
+                                    "type": "boolean",
+                                    "example": false
+                                  },
+                                  "deploymentGroups": {
+                                    "type": "array",
+                                    "description": null,
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "applicationName": {
+                                          "type": "string",
+                                          "example": "test-app"
+                                        },
+                                        "deploymentGroupName": {
+                                          "type": "string",
+                                          "example": "test-grp"
+                                        }
+                                      }
+                                    }
                                   }
                                 }
                               },
@@ -1516,6 +1796,62 @@
                                   "environmentId": {
                                     "type": "string",
                                     "example": "e-12345"
+                                  },
+                                  "deploymentPreferences": {
+                                    "type": "object",
+                                    "properties": {
+                                      "automaticRoll": {
+                                        "type": "bool",
+                                        "example": true
+                                      },
+                                      "batchSizePercentage": {
+                                        "type": "int",
+                                        "example": 50
+                                      },
+                                      "gracePeriod": {
+                                        "type": "int",
+                                        "example": 600
+                                      },
+                                      "strategy": {
+                                        "type": "object",
+                                        "properties": {
+                                          "action": {
+                                            "type": "string",
+                                            "example": "REPLACE_SERVER"
+                                          },
+                                          "shouldDrainInstances": {
+                                            "type": "bool",
+                                            "example": true
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "managedActions": {
+                                    "type": "object",
+                                    "properties": {
+                                      "platformUpdate": {
+                                        "type": "object",
+                                        "properties": {
+                                          "performAt": {
+                                            "type": "string",
+                                            "example": "timeWindow"
+                                          },
+                                          "timeWindow": {
+                                            "type": "string",
+                                            "example": "Mon:23:50-Tue:00:20"
+                                          },
+                                          "updateLevel": {
+                                            "type": "string",
+                                            "example": "patch"
+                                          },
+                                          "instanceRefreshEnabled": {
+                                            "type": "bool",
+                                            "example": true
+                                          }
+                                        }
+                                      }
+                                    }
                                   }
                                 }
                               },
@@ -3651,6 +3987,59 @@
                         "title": "Elastigroup Third Party Integrations",
                         "description": "All definitions for using third-party Integrations\n",
                         "properties": {
+                          "ecs": {
+                            "type": "object",
+                            "description": "ECS integration object.\n",
+                            "properties": {
+                              "clusterName": {
+                                "type": "string",
+                                "example": "test-ecs",
+                                "description": "ECS cluster name\n"
+                              },
+                              "autoScale": {
+                                "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/properties/autoScaler"
+                              },
+                              "batch": {
+                                "type": "object",
+                                "properties": {
+                                  "jobQueueNames": {
+                                    "type": "array",
+                                    "example": [
+                                      "dumpy-big-processing"
+                                    ]
+                                  }
+                                }
+                              },
+                              "optimizeImages": {
+                                "type": "object",
+                                "properties": {
+                                  "shouldOptimizeEcsAmi": {
+                                    "type": "boolean",
+                                    "example": true
+                                  },
+                                  "performAt": {
+                                    "type": "string",
+                                    "description": "Settings for maintenance strategy.\\\nperformAt of type: 'never' OR 'timeWindow' can only be applied to groups with \"availabilityOriented\" OR groups with \"persistence\",\\\nother groups allow either 'always' type or nothing which also means always.\n",
+                                    "enum": [
+                                      "never",
+                                      "always",
+                                      "timeWindow"
+                                    ],
+                                    "example": "timeWindow",
+                                    "default": "always"
+                                  },
+                                  "timeWindows": {
+                                    "type": "array",
+                                    "description": "When performAt is 'timeWindow':\\\nmust specify a list of 'timeWindows' with at least one time window Each string is in the format of - ddd:hh:mm-ddd:hh:mm\n* ddd = day of week = Sun | Mon | Tue | Wed | Thu | Fri | Sat\n* hh = hour 24 = 0 -23\n* mm = minute = 0 - 59\n",
+                                    "items": {
+                                      "type": "string",
+                                      "example": "Mon:03:00-Wed:02:30"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
                           "rancher": {
                             "type": "object",
                             "description": "All definitions for using Rancher Labs integration.\n",
@@ -3665,6 +4054,243 @@
                                 "description": "Rancher version\n",
                                 "example": "1",
                                 "default": "1"
+                              },
+                              "secretKey": {
+                                "type": "string",
+                                "example": "SECRET"
+                              },
+                              "version": {
+                                "type": "string",
+                                "example": 1
+                              }
+                            }
+                          },
+                          "kubernetes": {
+                            "type": "object",
+                            "properties": {
+                              "integrationMode": {
+                                "type": "string",
+                                "example": "pod"
+                              },
+                              "clusterIdentifier": {
+                                "type": "string",
+                                "example": "test-k8s"
+                              },
+                              "autoScale": {
+                                "type": "object",
+                                "properties": {
+                                  "isEnabled": {
+                                    "type": "bool",
+                                    "example": true,
+                                    "default": true
+                                  },
+                                  "cooldown": {
+                                    "type": "integer",
+                                    "example": 300
+                                  },
+                                  "down": {
+                                    "type": "object",
+                                    "description": "Auto Scaling scale down operations.\n",
+                                    "properties": {
+                                      "evaluationPeriods": {
+                                        "type": "integer",
+                                        "example": 5
+                                      },
+                                      "maxScaleDownPercentage": {
+                                        "type": "integer",
+                                        "description": "The maximum % of nodes that will be scaled down at once out of the total amount of potential nodes to scale down.\nexample: if 10 nodes can be scaled down, only 5 will be given 50% in this parameter.\nthe other 50% will be scaled down in the next autoscaling iteration.\n",
+                                        "example": 70
+                                      },
+                                      "headroom": {
+                                        "type": "object",
+                                        "description": "Spare resource capacity management enabling fast assignment of Pods without waiting for new resources to launch.\n",
+                                        "properties": {
+                                          "cpuPerUnit": {
+                                            "type": "integer",
+                                            "description": "Optionally configure the number of CPUs to allocate per headroom unit. CPUs are denoted in CPU units, where 1024 units = 1 vCPU.\n",
+                                            "example": 2048
+                                          },
+                                          "memoryPerUnit": {
+                                            "type": "integer",
+                                            "description": "Optionally configure the amount of memory (MiB) to allocate per headroom unit.\n",
+                                            "example": 3
+                                          },
+                                          "numOfUnits": {
+                                            "type": "integer",
+                                            "description": "The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.\n",
+                                            "example": 2
+                                          },
+                                          "gpuPerUnit": {
+                                            "type": "integer",
+                                            "example": 2
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "labels": {
+                                    "type": "array",
+                                    "description": null,
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "key": {
+                                          "type": "string",
+                                          "example": "group, kops.k8s.io/instancegroup"
+                                        },
+                                        "value": {
+                                          "type": "string",
+                                          "example": "microservices"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "isAutoConfig": {
+                                    "type": "bool",
+                                    "example": false,
+                                    "default": false
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "mesosphere": {
+                            "type": "object",
+                            "properties": {
+                              "apiServer": {
+                                "type": "string",
+                                "example": "1.2.3.4"
+                              }
+                            }
+                          },
+                          "mlbRuntime": {
+                            "type": "object",
+                            "properties": {
+                              "deploymentId": {
+                                "type": "string",
+                                "example": "dp-rm0f5b912345"
+                              }
+                            }
+                          },
+                          "nomad": {
+                            "type": "object",
+                            "properties": {
+                              "masterHost": {
+                                "type": "string",
+                                "example": "https://master.host.com"
+                              },
+                              "masterPort": {
+                                "type": "integer",
+                                "example": 443
+                              },
+                              "autoScale": {
+                                "type": "object",
+                                "properties": {
+                                  "isEnabled": {
+                                    "type": "boolean",
+                                    "description": "Enable the Autoscaler.\n",
+                                    "example": true
+                                  },
+                                  "cooldown": {
+                                    "type": "integer",
+                                    "description": "Cooldown period between scaling actions. Value should be cooldown period in seconds, greater than 180\n",
+                                    "example": 180
+                                  },
+                                  "down": {
+                                    "type": "object",
+                                    "description": "Auto Scaling scale down operations.\n",
+                                    "properties": {
+                                      "evaluationPeriods": {
+                                        "type": "integer",
+                                        "example": 3
+                                      }
+                                    }
+                                  },
+                                  "headroom": {
+                                    "type": "object",
+                                    "description": "Spare resource capacity management enabling fast assignment of Pods without waiting for new resources to launch.\n",
+                                    "properties": {
+                                      "cpuPerUnit": {
+                                        "type": "integer",
+                                        "description": "Optionally configure the number of CPUs to allocate per headroom unit. CPUs are denoted in CPU units, where 1024 units = 1 vCPU.\n",
+                                        "example": 2048
+                                      },
+                                      "memoryPerUnit": {
+                                        "type": "integer",
+                                        "description": "Optionally configure the amount of memory (MiB) to allocate per headroom unit.\n",
+                                        "example": 3
+                                      },
+                                      "numOfUnits": {
+                                        "type": "integer",
+                                        "description": "The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.\n",
+                                        "example": 2
+                                      }
+                                    }
+                                  },
+                                  "constraints": {
+                                    "type": "array",
+                                    "description": null,
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "key": {
+                                          "type": "string",
+                                          "example": "${node.class}"
+                                        },
+                                        "value": {
+                                          "type": "string",
+                                          "example": "value"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "aclToken": {
+                                "type": "string",
+                                "example": 123
+                              }
+                            }
+                          },
+                          "chef": {
+                            "type": "object",
+                            "properties": {
+                              "chefServer": {
+                                "type": "string",
+                                "example": "https://master.host.com"
+                              },
+                              "organization": {
+                                "type": "string",
+                                "example": "ORGNAME"
+                              },
+                              "chefVersion": {
+                                "type": "string",
+                                "example": 12.1
+                              },
+                              "user": {
+                                "type": "string",
+                                "example": "User"
+                              },
+                              "pemKey": {
+                                "type": "string",
+                                "example": "Key"
+                              }
+                            }
+                          },
+                          "rightScale": {
+                            "type": "object",
+                            "properties": {
+                              "accountId": {
+                                "type": "string",
+                                "example": "ID"
+                              },
+                              "refreshToken": {
+                                "type": "string",
+                                "example": "TOKEN"
+                              },
+                              "region": {
+                                "type": "string",
+                                "example": "us-east-1"
                               }
                             }
                           },
@@ -24507,6 +25133,19 @@
                                 "type": "integer",
                                 "description": "Cooldown period between scaling actions. Value should be cooldown period in seconds, greater than 180\n",
                                 "example": 300
+                              },
+                              "attributes": {
+                                "type": "object",
+                                "properties": {
+                                  "key": {
+                                    "type": "string",
+                                    "example": "the_key"
+                                  },
+                                  "value": {
+                                    "type": "string",
+                                    "axample": "the_value"
+                                  }
+                                }
                               },
                               "resourceLimits": {
                                 "type": "object",
