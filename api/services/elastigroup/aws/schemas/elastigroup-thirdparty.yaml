@@ -3,6 +3,50 @@ title: Elastigroup Third Party Integrations
 description: |
   All definitions for using third-party Integrations
 properties:
+  ecs:
+    type: object
+    description: |
+      ECS integration object.
+    properties:
+      clusterName:
+        type: string
+        example: "test-ecs"
+        description: |
+          ECS cluster name
+      autoScale:
+        $ref: "../../../ocean/ecs/schemas/ocean-autoscaler.yaml"
+      batch:
+        type: object
+        properties:
+          jobQueueNames:
+            type: array
+            example: ["dumpy-big-processing"]
+      optimizeImages:
+        type: object
+        properties:
+          shouldOptimizeEcsAmi:
+            type: boolean
+            example: true
+          performAt:
+            type: string
+            description: |
+              Settings for maintenance strategy.\
+              performAt of type: 'never' OR 'timeWindow' can only be applied to groups with "availabilityOriented" OR groups with "persistence",\
+              other groups allow either 'always' type or nothing which also means always.
+            enum: [never, always, timeWindow]
+            example: "timeWindow"
+            default: "always"
+          timeWindows:
+            type: array
+            description: |
+              When performAt is 'timeWindow':\
+              must specify a list of 'timeWindows' with at least one time window Each string is in the format of - ddd:hh:mm-ddd:hh:mm
+              * ddd = day of week = Sun | Mon | Tue | Wed | Thu | Fri | Sat
+              * hh = hour 24 = 0 -23
+              * mm = minute = 0 - 59
+            items:
+              type: string
+              example: "Mon:03:00-Wed:02:30"
   rancher:
     type: object
     description: |
@@ -19,6 +63,192 @@ properties:
           Rancher version
         example: "1"
         default: "1"
+      secretKey:
+        type: string
+        example: SECRET
+      version:
+        type: string
+        example: 1
+  kubernetes:
+    type: object
+    properties:
+      integrationMode:
+        type: string
+        example: pod
+      clusterIdentifier:
+        type: string
+        example: test-k8s
+      autoScale:
+        type: object
+        properties:
+          isEnabled:
+            type: bool
+            example: true
+            default: true
+          cooldown:
+            type: integer
+            example: 300
+          down:
+            type: object
+            description: >
+              Auto Scaling scale down operations.
+            properties:
+              evaluationPeriods:
+                type: integer
+                example: 5
+              maxScaleDownPercentage:
+                type: integer
+                description: |
+                  The maximum % of nodes that will be scaled down at once out of the total amount of potential nodes to scale down.
+                  example: if 10 nodes can be scaled down, only 5 will be given 50% in this parameter.
+                  the other 50% will be scaled down in the next autoscaling iteration.
+                example: 70
+              headroom:
+                type: object
+                description: >
+                  Spare resource capacity management enabling fast assignment of Pods without waiting for new resources to launch.
+                properties:
+                  cpuPerUnit:
+                    type: integer
+                    description: >
+                      Optionally configure the number of CPUs to allocate per headroom unit. CPUs are denoted in CPU units, where 1024 units = 1 vCPU.
+                    example: 2048
+                  memoryPerUnit:
+                    type: integer
+                    description: >
+                      Optionally configure the amount of memory (MiB) to allocate per headroom unit.
+                    example: 3
+                  numOfUnits:
+                    type: integer
+                    description: >
+                      The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.
+                    example: 2
+                  gpuPerUnit:
+                    type: integer
+                    example: 2
+          labels:
+            type: array
+            description:
+            items:
+              type: object
+              properties:
+                key:
+                  type: string
+                  example: group, kops.k8s.io/instancegroup
+                value:
+                  type: string
+                  example: microservices
+          isAutoConfig:
+            type: bool
+            example: false
+            default: false
+  mesosphere:
+    type: object
+    properties:
+      apiServer:
+        type: string
+        example: 1.2.3.4
+  mlbRuntime:
+    type: object
+    properties:
+      deploymentId:
+        type: string
+        example: dp-rm0f5b912345
+  nomad:
+    type: object
+    properties:
+      masterHost:
+        type: string
+        example: https://master.host.com
+      masterPort:
+        type: integer
+        example: 443
+      autoScale:
+        type: object
+        properties:
+          isEnabled:
+            type: boolean
+            description: >
+              Enable the Autoscaler.
+            example: true
+          cooldown:
+            type: integer
+            description: >
+              Cooldown period between scaling actions. Value should be cooldown period in seconds, greater than 180
+            example: 180
+          down:
+            type: object
+            description: >
+              Auto Scaling scale down operations.
+            properties:
+              evaluationPeriods:
+                type: integer
+                example: 3
+          headroom:
+            type: object
+            description: >
+              Spare resource capacity management enabling fast assignment of Pods without waiting for new resources to launch.
+            properties:
+              cpuPerUnit:
+                type: integer
+                description: >
+                  Optionally configure the number of CPUs to allocate per headroom unit. CPUs are denoted in CPU units, where 1024 units = 1 vCPU.
+                example: 2048
+              memoryPerUnit:
+                type: integer
+                description: >
+                  Optionally configure the amount of memory (MiB) to allocate per headroom unit.
+                example: 3
+              numOfUnits:
+                type: integer
+                description: >
+                  The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.
+                example: 2
+          constraints:
+            type: array
+            description:
+            items:
+              type: object
+              properties:
+                key:
+                  type: string
+                  example: ${node.class}
+                value:
+                  type: string
+                  example: value
+      aclToken:
+        type: string
+        example: 123
+  chef:
+    type: object
+    properties:
+      chefServer:
+        type: string
+        example: https://master.host.com
+      organization:
+        type: string
+        example: ORGNAME
+      chefVersion:
+        type: string
+        example: 12.1
+      user:
+        type: string
+        example: User
+      pemKey:
+        type: string
+        example: Key
+  rightScale:
+    type: object
+    properties:
+      accountId:
+        type: string
+        example: ID
+      refreshToken:
+        type: string
+        example: TOKEN
+      region:
+        type: string
+        example: us-east-1
   route53:
     type: object
     description: |
