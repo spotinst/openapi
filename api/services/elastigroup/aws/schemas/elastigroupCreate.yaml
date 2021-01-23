@@ -133,22 +133,22 @@ properties:
               type: object
               properties:
                 shouldPersistPrivateIp:
-                  item: boolean
+                  type: boolean
                   description: |
                     Should the instance maintain its private IP
                   example: true
                 shouldPersistRootDevice:
-                  item: boolean
+                  type: boolean
                   description: |
                     Should the instance maintain its root device volumes
                   example: true
                 shouldPersistBlockDevices:
-                  item: boolean
+                  type: boolean
                   description: |
                     Should the instance maintain its Data volumes
                   example: true
                 blockDevicesMode:
-                  item: string
+                  type: string
                   description: |
                     Determine the way we attach the data volumes to the data devices
                   enum: [ reattach, onLaunch ]
@@ -231,12 +231,16 @@ properties:
                 type: array
                 description: |
                   Available Spot Instance types
-                example: [ "c3.large", "c4.large", "m3.large", "r3.large" ]
+                items:
+                  type: string
+                  example: [ "c3.large", "c4.large", "m3.large", "r3.large" ]
               preferredSpot:
                 type: array
                 description: |
                   Prioritize a subset of spot instance types. Must be a subset of the selected spot instance types.
-                example: [ "c4.large" ]
+                items:
+                  type: string
+                  example: [ "c4.large" ]
               weights:
                 type: array
                 description: |
@@ -253,7 +257,7 @@ properties:
                       type: integer
                       description: |
                         The weight
-                      exmample: 8
+                      example: 8
           subnetIds:
             type: array
             description: |
@@ -602,7 +606,7 @@ properties:
                     description: Required for IMDSv2. Can’t be null in Create or Update. Values can be "optional" or "required".
                     example: optional
                   httpPutResponseHopLimit:
-                    type: int
+                    type: integer
                     example: "33"
                     description: |
                       An integer within 1,64 range (including).
@@ -617,7 +621,7 @@ properties:
                 properties:
                   threadsPerCore:
                     title: thread per core
-                    type: int
+                    type: integer
                     example: "1"
                     description: |
                       The number of threads per CPU core.
@@ -660,7 +664,7 @@ properties:
                 enum: [ seconds , microseconds , milliseconds , bytes , kilobytes , megabytes , gigabytes , terabytes , bits , kilobits , megabits , gigabits , terabits , percent , count , bytes/second , kilobytes/second , megabytes/second , gigabytes/second , terabytes/second , bits/second , kilobits/second , megabits/second , gigabits/second , terabits/second , count/second , none ]
                 example: "percent"
               threshold:
-                type: double
+                type: integer
                 description: |
                   The value against which the specified statistic is compared
                 example: 90
@@ -780,7 +784,7 @@ properties:
                 enum: [ seconds , microseconds , milliseconds , bytes , kilobytes , megabytes , gigabytes , terabytes , bits , kilobits , megabits , gigabits , terabits , percent , count , bytes/second , kilobytes/second , megabytes/second , gigabytes/second , terabytes/second , bits/second , kilobits/second , megabits/second , gigabits/second , terabits/second , count/second , none ]
                 example: "percent"
               threshold:
-                type: double
+                type: integer
                 description: |
                   The value against which the specified statistic is compared
                 example: 90
@@ -873,7 +877,7 @@ properties:
             properties:
               source:
                 title: Source
-                desctiption: "The source of the metric Supported values: “cloudWatch”, “spectrum”"
+                description: "The source of the metric Supported values: “cloudWatch”, “spectrum”"
                 type: string
                 example: spectrum
               policyName:
@@ -1034,7 +1038,7 @@ properties:
                 type: object
                 properties:
                   isEnabled:
-                    type: bool
+                    type: boolean
                     example: true
                     default: true
                   cooldown:
@@ -1091,7 +1095,7 @@ properties:
                           type: string
                           example: microservices
                   isAutoConfig:
-                    type: bool
+                    type: boolean
                     example: false
                     default: false
           mesosphere:
@@ -1324,13 +1328,13 @@ properties:
                 type: object
                 properties:
                   automaticRoll:
-                    type: bool
+                    type: boolean
                     example: true
                   batchSizePercentage:
-                    type: int
+                    type: integer
                     example: 50
                   gracePeriod:
-                    type: int
+                    type: integer
                     example: 600
                   strategy:
                     type: object
@@ -1339,7 +1343,7 @@ properties:
                         type: string
                         example: REPLACE_SERVER
                       shouldDrainInstances:
-                        type: bool
+                        type: boolean
                         example: true
               managedActions:
                 type: object
@@ -1357,7 +1361,7 @@ properties:
                         type: string
                         example: patch
                       instanceRefreshEnabled:
-                        type: bool
+                        type: boolean
                         example: true
           ecs:
             type: object
@@ -1376,7 +1380,9 @@ properties:
                 properties:
                   jobQueueNames:
                     type: array
-                    example: ["dumpy-big-processing"]
+                    items:
+                      type: string
+                      example: ["dumpy-big-processing"]
               optimizeImages:
                     type: object
                     properties:
