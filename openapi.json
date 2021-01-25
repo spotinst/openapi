@@ -28,7 +28,7 @@
   ],
   "components": {
     "securitySchemes": {
-      "Auth": {
+      "auth": {
         "description": "To generate bearer tokens and understand more about Spot by NetApp\nauthentication see the howto for\n[token creation](https://docs.spot.io/administration/api/create-api-token)\non the Spot Help site.\n\n### Organizations and Accounts\n\nEach Spot account is assigned to an organization and a set of environment Accounts.\nAn account is then linked to a specific cloud provider account.\n\nSpot accounts are given an ID in the format `act-123abcd` that is sent as a query parameter while performing API calls.\n\nTo locate the account ID navigate to Settings -> Account in the Spot console.\n\n### Organizations with a Single Account\nEach API call you make can be used with or without the account ID.\n\n### Organizations with Multiple Accounts\nEach API call you make should be appended to the account ID. For example:\n\nGET `https://api.spotinst.io/aws/ec2/group?accountId=act-123de678`\nThis call will return the list of Elastigroups for the specific Account used.\n\n> NOTE: If no `accountId` is provided, the default (dldest) account for the Organization will be used.\n",
         "type": "http",
         "scheme": "bearer"
@@ -239,8 +239,7 @@
                           "name": {
                             "type": "string",
                             "description": "AWS Elastigroup Name\n",
-                            "example": "my-Elastigroup",
-                            "required": true
+                            "example": "my-Elastigroup"
                           },
                           "description": {
                             "type": "string",
@@ -371,22 +370,22 @@
                                   "type": "object",
                                   "properties": {
                                     "shouldPersistPrivateIp": {
-                                      "item": "boolean",
+                                      "type": "boolean",
                                       "description": "Should the instance maintain its private IP\n",
                                       "example": true
                                     },
                                     "shouldPersistRootDevice": {
-                                      "item": "boolean",
+                                      "type": "boolean",
                                       "description": "Should the instance maintain its root device volumes\n",
                                       "example": true
                                     },
                                     "shouldPersistBlockDevices": {
-                                      "item": "boolean",
+                                      "type": "boolean",
                                       "description": "Should the instance maintain its Data volumes\n",
                                       "example": true
                                     },
                                     "blockDevicesMode": {
-                                      "item": "string",
+                                      "type": "string",
                                       "description": "Determine the way we attach the data volumes to the data devices\n",
                                       "enum": [
                                         "reattach",
@@ -489,19 +488,25 @@
                                   "spot": {
                                     "type": "array",
                                     "description": "Available Spot Instance types\n",
-                                    "example": [
-                                      "c3.large",
-                                      "c4.large",
-                                      "m3.large",
-                                      "r3.large"
-                                    ]
+                                    "items": {
+                                      "type": "string",
+                                      "example": [
+                                        "c3.large",
+                                        "c4.large",
+                                        "m3.large",
+                                        "r3.large"
+                                      ]
+                                    }
                                   },
                                   "preferredSpot": {
                                     "type": "array",
                                     "description": "Prioritize a subset of spot instance types. Must be a subset of the selected spot instance types.\n",
-                                    "example": [
-                                      "c4.large"
-                                    ]
+                                    "items": {
+                                      "type": "string",
+                                      "example": [
+                                        "c4.large"
+                                      ]
+                                    }
                                   },
                                   "weights": {
                                     "type": "array",
@@ -517,7 +522,7 @@
                                         "weightedCapacity": {
                                           "type": "integer",
                                           "description": "The weight\n",
-                                          "exmample": 8
+                                          "example": 8
                                         }
                                       }
                                     }
@@ -527,12 +532,15 @@
                               "subnetIds": {
                                 "type": "array",
                                 "description": "A comma-separated list of subnet identifiers for your group.\nWhen this parameter is set, compute.availabilityZones should be left unused.\n",
-                                "example": [
-                                  "subnet-4c1d1538",
-                                  "subnet-2791bb61",
-                                  "subnet-703a6f58",
-                                  "subnet-c62846fc"
-                                ]
+                                "items": {
+                                  "type": "string",
+                                  "example": [
+                                    "subnet-4c1d1538",
+                                    "subnet-2791bb61",
+                                    "subnet-703a6f58",
+                                    "subnet-c62846fc"
+                                  ]
+                                }
                               },
                               "availabilityZones": {
                                 "type": "array",
@@ -551,9 +559,12 @@
                                     "subnetIds": {
                                       "type": "array",
                                       "description": "A comma-separated list of subnet identifiers for your group.\n",
-                                      "example": [
-                                        "subnet-4333093a"
-                                      ]
+                                      "items": {
+                                        "type": "string",
+                                        "example": [
+                                          "subnet-4333093a"
+                                        ]
+                                      }
                                     },
                                     "placementGroupName": {
                                       "type": "string",
@@ -565,10 +576,13 @@
                               "preferredAvailabilityZones": {
                                 "type": "array",
                                 "description": "The AZs to prioritize when launching Spot instances.\nIf no markets are available in the Preferred AZs, Spot instances are launched in the non-preferred AZs.\n* Must be a sublist of compute.AvailabilityZones\n* strategy.availabilityVsCost must not be equalAzDistribution\n",
-                                "example": [
-                                  "us-east-1a",
-                                  "us-east-1b"
-                                ]
+                                "items": {
+                                  "type": "string",
+                                  "example": [
+                                    "us-east-1a",
+                                    "us-east-1b"
+                                  ]
+                                }
                               },
                               "launchSpecification": {
                                 "type": "object",
@@ -897,7 +911,7 @@
                                         "example": "optional"
                                       },
                                       "httpPutResponseHopLimit": {
-                                        "type": "int",
+                                        "type": "integer",
                                         "example": "33",
                                         "description": "An integer within 1,64 range (including).\nThe desired HTTP PUT response hop limit for instance metadata requests.\nThe larger the number, the further instance metadata requests can travel.\n"
                                       }
@@ -913,7 +927,7 @@
                                     "properties": {
                                       "threadsPerCore": {
                                         "title": "thread per core",
-                                        "type": "int",
+                                        "type": "integer",
                                         "example": "1",
                                         "description": "The number of threads per CPU core.\nTo disable multithreading for the instances, specify a value of 1 .\nOtherwise, specify the default value of 2 .\n"
                                       }
@@ -994,7 +1008,7 @@
                                     "example": "percent"
                                   },
                                   "threshold": {
-                                    "type": "double",
+                                    "type": "integer",
                                     "description": "The value against which the specified statistic is compared\n",
                                     "example": 90
                                   },
@@ -1159,7 +1173,7 @@
                                     "example": "percent"
                                   },
                                   "threshold": {
-                                    "type": "double",
+                                    "type": "integer",
                                     "description": "The value against which the specified statistic is compared\n",
                                     "example": 90
                                   },
@@ -1262,7 +1276,7 @@
                                 "properties": {
                                   "source": {
                                     "title": "Source",
-                                    "desctiption": "The source of the metric Supported values: “cloudWatch”, “spectrum”",
+                                    "description": "The source of the metric Supported values: “cloudWatch”, “spectrum”",
                                     "type": "string",
                                     "example": "spectrum"
                                   },
@@ -1471,7 +1485,7 @@
                                     "type": "object",
                                     "properties": {
                                       "isEnabled": {
-                                        "type": "bool",
+                                        "type": "boolean",
                                         "example": true,
                                         "default": true
                                       },
@@ -1537,7 +1551,7 @@
                                         }
                                       },
                                       "isAutoConfig": {
-                                        "type": "bool",
+                                        "type": "boolean",
                                         "example": false,
                                         "default": false
                                       }
@@ -1732,7 +1746,6 @@
                                   },
                                   "deploymentGroups": {
                                     "type": "array",
-                                    "description": null,
                                     "items": {
                                       "type": "object",
                                       "properties": {
@@ -1822,15 +1835,15 @@
                                     "type": "object",
                                     "properties": {
                                       "automaticRoll": {
-                                        "type": "bool",
+                                        "type": "boolean",
                                         "example": true
                                       },
                                       "batchSizePercentage": {
-                                        "type": "int",
+                                        "type": "integer",
                                         "example": 50
                                       },
                                       "gracePeriod": {
-                                        "type": "int",
+                                        "type": "integer",
                                         "example": 600
                                       },
                                       "strategy": {
@@ -1841,7 +1854,7 @@
                                             "example": "REPLACE_SERVER"
                                           },
                                           "shouldDrainInstances": {
-                                            "type": "bool",
+                                            "type": "boolean",
                                             "example": true
                                           }
                                         }
@@ -1867,7 +1880,7 @@
                                             "example": "patch"
                                           },
                                           "instanceRefreshEnabled": {
-                                            "type": "bool",
+                                            "type": "boolean",
                                             "example": true
                                           }
                                         }
@@ -1893,9 +1906,12 @@
                                     "properties": {
                                       "jobQueueNames": {
                                         "type": "array",
-                                        "example": [
-                                          "dumpy-big-processing"
-                                        ]
+                                        "items": {
+                                          "type": "string",
+                                          "example": [
+                                            "dumpy-big-processing"
+                                          ]
+                                        }
                                       }
                                     }
                                   },
@@ -2977,22 +2993,22 @@
                               "type": "object",
                               "properties": {
                                 "shouldPersistPrivateIp": {
-                                  "item": "boolean",
+                                  "type": "boolean",
                                   "description": "Should the instance maintain its private IP\n",
                                   "example": true
                                 },
                                 "shouldPersistRootDevice": {
-                                  "item": "boolean",
+                                  "type": "boolean",
                                   "description": "Should the instance maintain its root device volumes\n",
                                   "example": true
                                 },
                                 "shouldPersistBlockDevices": {
-                                  "item": "boolean",
+                                  "type": "boolean",
                                   "description": "Should the instance maintain its Data volumes\n",
                                   "example": true
                                 },
                                 "blockDevicesMode": {
-                                  "item": "string",
+                                  "type": "string",
                                   "description": "Determine the way we attach the data volumes to the data devices\n",
                                   "enum": [
                                     "reattach",
@@ -3088,19 +3104,25 @@
                               "spot": {
                                 "type": "array",
                                 "description": "Available Spot Instance types\n",
-                                "example": [
-                                  "c3.large",
-                                  "c4.large",
-                                  "m3.large",
-                                  "r3.large"
-                                ]
+                                "items": {
+                                  "type": "string",
+                                  "example": [
+                                    "c3.large",
+                                    "c4.large",
+                                    "m3.large",
+                                    "r3.large"
+                                  ]
+                                }
                               },
                               "preferredSpot": {
                                 "type": "array",
                                 "description": "Prioritize a subset of spot instance types. Must be a subset of the selected spot instance types.\n",
-                                "example": [
-                                  "c4.large"
-                                ]
+                                "items": {
+                                  "type": "string",
+                                  "example": [
+                                    "c4.large"
+                                  ]
+                                }
                               },
                               "weights": {
                                 "type": "array",
@@ -3116,7 +3138,7 @@
                                     "weightedCapacity": {
                                       "type": "integer",
                                       "description": "The weight\n",
-                                      "exmample": 8
+                                      "example": 8
                                     }
                                   }
                                 }
@@ -3126,12 +3148,15 @@
                           "subnetIds": {
                             "type": "array",
                             "description": "A comma-separated list of subnet identifiers for your group.\nWhen this parameter is set, compute.availabilityZones should be left unused.\n",
-                            "example": [
-                              "subnet-4c1d1538",
-                              "subnet-2791bb61",
-                              "subnet-703a6f58",
-                              "subnet-c62846fc"
-                            ]
+                            "items": {
+                              "type": "string",
+                              "example": [
+                                "subnet-4c1d1538",
+                                "subnet-2791bb61",
+                                "subnet-703a6f58",
+                                "subnet-c62846fc"
+                              ]
+                            }
                           },
                           "availabilityZones": {
                             "type": "array",
@@ -3147,9 +3172,12 @@
                                 "subnetIds": {
                                   "type": "array",
                                   "description": "A comma-separated list of subnet identifiers for your group.\n",
-                                  "example": [
-                                    "subnet-4333093a"
-                                  ]
+                                  "items": {
+                                    "type": "string",
+                                    "example": [
+                                      "subnet-4333093a"
+                                    ]
+                                  }
                                 },
                                 "placementGroupName": {
                                   "type": "string",
@@ -3161,10 +3189,13 @@
                           "preferredAvailabilityZones": {
                             "type": "array",
                             "description": "The AZs to prioritize when launching Spot instances.\nIf no markets are available in the Preferred AZs, Spot instances are launched in the non-preferred AZs.\n* Must be a sublist of compute.AvailabilityZones\n* strategy.availabilityVsCost must not be equalAzDistribution\n",
-                            "example": [
-                              "us-east-1a",
-                              "us-east-1b"
-                            ]
+                            "items": {
+                              "type": "string",
+                              "example": [
+                                "us-east-1a",
+                                "us-east-1b"
+                              ]
+                            }
                           },
                           "launchSpecification": {
                             "type": "object",
@@ -3480,7 +3511,7 @@
                                     "example": "optional"
                                   },
                                   "httpPutResponseHopLimit": {
-                                    "type": "int",
+                                    "type": "integer",
                                     "example": "33",
                                     "description": "An integer within 1,64 range (including).\nThe desired HTTP PUT response hop limit for instance metadata requests.\nThe larger the number, the further instance metadata requests can travel.\n"
                                   }
@@ -3496,7 +3527,7 @@
                                 "properties": {
                                   "threadsPerCore": {
                                     "title": "thread per core",
-                                    "type": "int",
+                                    "type": "integer",
                                     "example": "1",
                                     "description": "The number of threads per CPU core.\nTo disable multithreading for the instances, specify a value of 1 .\nOtherwise, specify the default value of 2 .\n"
                                   }
@@ -3577,7 +3608,7 @@
                                 "example": "percent"
                               },
                               "threshold": {
-                                "type": "double",
+                                "type": "integer",
                                 "description": "The value against which the specified statistic is compared\n",
                                 "example": 90
                               },
@@ -3742,7 +3773,7 @@
                                 "example": "percent"
                               },
                               "threshold": {
-                                "type": "double",
+                                "type": "integer",
                                 "description": "The value against which the specified statistic is compared\n",
                                 "example": 90
                               },
@@ -4025,9 +4056,12 @@
                                 "properties": {
                                   "jobQueueNames": {
                                     "type": "array",
-                                    "example": [
-                                      "dumpy-big-processing"
-                                    ]
+                                    "items": {
+                                      "type": "string",
+                                      "example": [
+                                        "dumpy-big-processing"
+                                      ]
+                                    }
                                   }
                                 }
                               },
@@ -4101,7 +4135,7 @@
                                 "type": "object",
                                 "properties": {
                                   "isEnabled": {
-                                    "type": "bool",
+                                    "type": "boolean",
                                     "example": true,
                                     "default": true
                                   },
@@ -4151,7 +4185,6 @@
                                   },
                                   "labels": {
                                     "type": "array",
-                                    "description": null,
                                     "items": {
                                       "type": "object",
                                       "properties": {
@@ -4167,7 +4200,7 @@
                                     }
                                   },
                                   "isAutoConfig": {
-                                    "type": "bool",
+                                    "type": "boolean",
                                     "example": false,
                                     "default": false
                                   }
@@ -4250,7 +4283,6 @@
                                   },
                                   "constraints": {
                                     "type": "array",
-                                    "description": null,
                                     "items": {
                                       "type": "object",
                                       "properties": {
@@ -5017,7 +5049,7 @@
                                                     },
                                                     "subEvents": {
                                                       "type": "object",
-                                                      "title": "Sub Evenet",
+                                                      "title": "Sub Event",
                                                       "properties": {
                                                         "type": {
                                                           "type": "string",
@@ -5036,7 +5068,10 @@
                                                           ]
                                                         },
                                                         "terminatedInstances": {
-                                                          "type": "array"
+                                                          "type": "array",
+                                                          "items": {
+                                                            "type": "string"
+                                                          }
                                                         }
                                                       }
                                                     }
@@ -8395,7 +8430,7 @@
                                             },
                                             "subEvents": {
                                               "type": "object",
-                                              "title": "Sub Evenet",
+                                              "title": "Sub Event",
                                               "properties": {
                                                 "type": {
                                                   "type": "string",
@@ -8426,7 +8461,10 @@
                                                   ]
                                                 },
                                                 "newInstances": {
-                                                  "type": "array"
+                                                  "type": "array",
+                                                  "items": {
+                                                    "type": "string"
+                                                  }
                                                 }
                                               }
                                             }
@@ -8452,7 +8490,7 @@
                                             },
                                             "subEvents": {
                                               "type": "object",
-                                              "title": "Sub Evenet",
+                                              "title": "Sub Event",
                                               "properties": {
                                                 "type": {
                                                   "type": "string",
@@ -8483,7 +8521,10 @@
                                                   ]
                                                 },
                                                 "newInstances": {
-                                                  "type": "array"
+                                                  "type": "array",
+                                                  "items": {
+                                                    "type": "string"
+                                                  }
                                                 }
                                               }
                                             }
@@ -8509,7 +8550,7 @@
                                             },
                                             "subEvents": {
                                               "type": "object",
-                                              "title": "Sub Evenet",
+                                              "title": "Sub Event",
                                               "properties": {
                                                 "type": {
                                                   "type": "string",
@@ -8540,7 +8581,10 @@
                                                   ]
                                                 },
                                                 "newInstances": {
-                                                  "type": "array"
+                                                  "type": "array",
+                                                  "items": {
+                                                    "type": "string"
+                                                  }
                                                 }
                                               }
                                             }
@@ -8566,7 +8610,7 @@
                                             },
                                             "subEvents": {
                                               "type": "object",
-                                              "title": "Sub Evenet",
+                                              "title": "Sub Event",
                                               "properties": {
                                                 "type": {
                                                   "type": "string",
@@ -8597,7 +8641,10 @@
                                                   ]
                                                 },
                                                 "newInstances": {
-                                                  "type": "array"
+                                                  "type": "array",
+                                                  "items": {
+                                                    "type": "string"
+                                                  }
                                                 }
                                               }
                                             }
@@ -9493,33 +9540,39 @@
                       "groupId": {
                         "type": "array",
                         "description": "groupId",
-                        "example": "sig-12345"
+                        "items": {
+                          "type": "string",
+                          "example": "sig-12345"
+                        }
                       },
                       "suspensions": {
                         "type": "array",
                         "description": "Suspensions",
-                        "example": [
-                          {
-                            "name": "AUTO_SCALE",
-                            "expiresAt": null
-                          },
-                          {
-                            "name": "OUT_OF_STRATEGY",
-                            "expiresAt": "2018-10-03T07:23:24.000+0000"
-                          },
-                          {
-                            "name": "PREVENTIVE_REPLACEMENT",
-                            "expiresAt": "2018-10-03T09:03:24.000+0000"
-                          },
-                          {
-                            "name": "REVERT_PREFERRED",
-                            "expiresAt": null
-                          },
-                          {
-                            "name": "SCHEDULING",
-                            "expiresAt": null
-                          }
-                        ]
+                        "items": {
+                          "type": "object",
+                          "example": [
+                            {
+                              "name": "AUTO_SCALE",
+                              "expiresAt": null
+                            },
+                            {
+                              "name": "OUT_OF_STRATEGY",
+                              "expiresAt": "2018-10-03T07:23:24.000+0000"
+                            },
+                            {
+                              "name": "PREVENTIVE_REPLACEMENT",
+                              "expiresAt": "2018-10-03T09:03:24.000+0000"
+                            },
+                            {
+                              "name": "REVERT_PREFERRED",
+                              "expiresAt": null
+                            },
+                            {
+                              "name": "SCHEDULING",
+                              "expiresAt": null
+                            }
+                          ]
+                        }
                       }
                     }
                   }
@@ -9603,25 +9656,28 @@
                                 "items": {
                                   "type": "array",
                                   "description": "Array of data objects\n",
-                                  "items": [
-                                    {
-                                      "type": "object",
-                                      "properties": {
-                                        "groupId": {
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "groupId": {
+                                        "type": "string",
+                                        "description": "Elastigroup ID",
+                                        "example": "sig-12345"
+                                      },
+                                      "processes": {
+                                        "type": "array",
+                                        "items": {
                                           "type": "string",
-                                          "description": "Elastigroup ID",
-                                          "example": "sig-12345"
-                                        },
-                                        "processes": {
-                                          "type": "array",
                                           "example": [
                                             "AUTO_SCALE"
                                           ]
-                                        },
-                                        "suspensions": {
-                                          "type": "array",
-                                          "description": "Suspensions",
-                                          "items": null,
+                                        }
+                                      },
+                                      "suspensions": {
+                                        "type": "array",
+                                        "description": "Suspensions",
+                                        "items": {
+                                          "type": "object",
                                           "example": [
                                             {
                                               "name": "AUTO_SCALE",
@@ -9647,7 +9703,7 @@
                                         }
                                       }
                                     }
-                                  ]
+                                  }
                                 },
                                 "count": {
                                   "type": "integer",
@@ -9767,25 +9823,23 @@
                                 "items": {
                                   "type": "array",
                                   "description": "Array of data objects\n",
-                                  "items": [
-                                    {
-                                      "type": "object",
-                                      "properties": {
-                                        "groupId": {
-                                          "type": "string",
-                                          "example": "sig-12345",
-                                          "description": "Elastigroup ID"
-                                        },
-                                        "processes": {
-                                          "type": "string",
-                                          "description": "Processes",
-                                          "example": [
-                                            "AUTO_SCALE"
-                                          ]
-                                        }
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "groupId": {
+                                        "type": "string",
+                                        "example": "sig-12345",
+                                        "description": "Elastigroup ID"
+                                      },
+                                      "processes": {
+                                        "type": "string",
+                                        "description": "Processes",
+                                        "example": [
+                                          "AUTO_SCALE"
+                                        ]
                                       }
                                     }
-                                  ]
+                                  }
                                 },
                                 "count": {
                                   "type": "integer",
@@ -9843,9 +9897,12 @@
                         "type": "array",
                         "title": "Processes",
                         "description": "The list of processes to remove from suspension. Valid values are: AUTO_SCALE, AUTO_HEALING, OUT_OF_STRATEGY, PREVENTIVE_REPLACEMENT, REVERT_PREFERRED, SCHEDULING\n",
-                        "example": [
-                          "AUTO_SCALE"
-                        ]
+                        "items": {
+                          "type": "string",
+                          "example": [
+                            "AUTO_SCALE"
+                          ]
+                        }
                       }
                     }
                   }
@@ -9929,36 +9986,31 @@
                                 "items": {
                                   "type": "array",
                                   "description": "Array of data objects\n",
-                                  "items": [
-                                    {
-                                      "type": "object",
-                                      "title": "Metadata Options Update",
-                                      "description": "Request - Example 6 - Update Metadata Options",
-                                      "properties": {
-                                        "group": {
-                                          "type": "object",
-                                          "title": "AWS Elastigroup",
-                                          "properties": {
-                                            "compute": {
-                                              "type": "object",
-                                              "name": "Compute Attribute",
-                                              "title": "Compute Attribute",
-                                              "properties": {
-                                                "launchSpecification": {
-                                                  "type": "object",
-                                                  "name": "Launch Specification Attribute",
-                                                  "title": "Launch Specification Attribute",
-                                                  "properties": {
-                                                    "metadataOptions": {
-                                                      "type": "object",
-                                                      "name": "Metadata Options Attribute",
-                                                      "title": "Metadata Options Attribute",
-                                                      "properties": {
-                                                        "httpTokens": {
-                                                          "type": "string",
-                                                          "example": "optional",
-                                                          "description": "Http Token\n"
-                                                        }
+                                  "items": {
+                                    "type": "object",
+                                    "title": "Metadata Options Update",
+                                    "description": "Request - Example 6 - Update Metadata Options",
+                                    "properties": {
+                                      "group": {
+                                        "type": "object",
+                                        "title": "AWS Elastigroup",
+                                        "properties": {
+                                          "compute": {
+                                            "type": "object",
+                                            "title": "Compute Attribute",
+                                            "properties": {
+                                              "launchSpecification": {
+                                                "type": "object",
+                                                "title": "Launch Specification Attribute",
+                                                "properties": {
+                                                  "metadataOptions": {
+                                                    "type": "object",
+                                                    "title": "Metadata Options Attribute",
+                                                    "properties": {
+                                                      "httpTokens": {
+                                                        "type": "string",
+                                                        "example": "optional",
+                                                        "description": "Http Token\n"
                                                       }
                                                     }
                                                   }
@@ -9969,7 +10021,7 @@
                                         }
                                       }
                                     }
-                                  ]
+                                  }
                                 },
                                 "count": {
                                   "type": "integer",
@@ -10091,28 +10143,26 @@
                                 "items": {
                                   "type": "array",
                                   "description": "Array of data objects\n",
-                                  "items": [
-                                    {
-                                      "type": "object",
-                                      "properties": {
-                                        "scalePolicySuspensions": {
-                                          "type": "object",
-                                          "example": [
-                                            {
-                                              "groupId": "sig-12345",
-                                              "policyName": "test",
-                                              "state": "suspended"
-                                            },
-                                            {
-                                              "groupId": "sig-12345",
-                                              "policyName": "down Scaling Policy 1",
-                                              "state": "suspended"
-                                            }
-                                          ]
-                                        }
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "scalePolicySuspensions": {
+                                        "type": "object",
+                                        "example": [
+                                          {
+                                            "groupId": "sig-12345",
+                                            "policyName": "test",
+                                            "state": "suspended"
+                                          },
+                                          {
+                                            "groupId": "sig-12345",
+                                            "policyName": "down Scaling Policy 1",
+                                            "state": "suspended"
+                                          }
+                                        ]
                                       }
                                     }
-                                  ]
+                                  }
                                 },
                                 "count": {
                                   "type": "integer",
@@ -10244,11 +10294,9 @@
                                 "items": {
                                   "type": "array",
                                   "description": "Array of data objects\n",
-                                  "items": [
-                                    {
-                                      "type": "object"
-                                    }
-                                  ]
+                                  "items": {
+                                    "type": "object"
+                                  }
                                 },
                                 "count": {
                                   "type": "integer",
@@ -10718,19 +10766,23 @@
                                             "type": "object",
                                             "properties": {
                                               "runningHours": {
-                                                "type": "float",
+                                                "type": "number",
+                                                "format": "float",
                                                 "example": 1470.8
                                               },
                                               "actualCosts": {
-                                                "type": "float",
+                                                "type": "number",
+                                                "format": "float",
                                                 "example": 107.3
                                               },
                                               "potentialCosts": {
-                                                "type": "float",
+                                                "type": "number",
+                                                "format": "float",
                                                 "example": 378.41
                                               },
                                               "savingsPercentage": {
-                                                "type": "float",
+                                                "type": "number",
+                                                "format": "float",
                                                 "example": 71.64
                                               }
                                             }
@@ -11148,12 +11200,14 @@
                                           "type": "object",
                                           "properties": {
                                             "actual": {
-                                              "type": "float",
+                                              "type": "number",
+                                              "format": "float",
                                               "title": "Actual",
                                               "example": 0.268
                                             },
                                             "potential": {
-                                              "type": "float",
+                                              "type": "number",
+                                              "format": "float",
                                               "title": "Potential",
                                               "example": 0.268
                                             }
@@ -11208,7 +11262,8 @@
                                           "type": "object",
                                           "properties": {
                                             "value": {
-                                              "type": "float",
+                                              "type": "number",
+                                              "format": "float",
                                               "title": "Value",
                                               "example": 89.3233
                                             },
@@ -11223,12 +11278,14 @@
                                           "type": "object",
                                           "properties": {
                                             "actual": {
-                                              "type": "float",
+                                              "type": "number",
+                                              "format": "float",
                                               "title": "Actual",
                                               "example": 0.0568
                                             },
                                             "potential": {
-                                              "type": "float",
+                                              "type": "number",
+                                              "format": "float",
                                               "title": "Potential",
                                               "example": 0.532
                                             }
@@ -14805,7 +14862,8 @@
                                   "threshold": {
                                     "title": "Threshold",
                                     "description": "The value at which the scaling action is triggered.",
-                                    "type": "float",
+                                    "type": "number",
+                                    "format": "float",
                                     "example": 0.75
                                   },
                                   "period": {
@@ -14943,7 +15001,8 @@
                                   "threshold": {
                                     "title": "Threshold",
                                     "description": "The value at which the scaling action is triggered.",
-                                    "type": "float",
+                                    "type": "number",
+                                    "format": "float",
                                     "example": 0.75
                                   },
                                   "period": {
@@ -16837,7 +16896,8 @@
                                           ]
                                         },
                                         "threshold": {
-                                          "type": "float",
+                                          "type": "number",
+                                          "format": "float",
                                           "example": 0.75
                                         },
                                         "period": {
@@ -17830,7 +17890,8 @@
                                           ]
                                         },
                                         "threshold": {
-                                          "type": "float",
+                                          "type": "number",
+                                          "format": "float",
                                           "description": "The value at which the scaling action is triggered.\n",
                                           "example": 0.75
                                         },
@@ -18713,7 +18774,8 @@
                                   "threshold": {
                                     "title": "Threshold",
                                     "description": "The value at which the scaling action is triggered.",
-                                    "type": "float",
+                                    "type": "number",
+                                    "format": "float",
                                     "example": 0.75
                                   },
                                   "period": {
@@ -18868,7 +18930,8 @@
                                   "threshold": {
                                     "title": "Threshold",
                                     "description": "The value at which the scaling action is triggered.",
-                                    "type": "float",
+                                    "type": "number",
+                                    "format": "float",
                                     "example": 0.75
                                   },
                                   "period": {
@@ -19464,16 +19527,19 @@
                                               }
                                             },
                                             "privateIpAddresses": {
-                                              "type": "array of string",
+                                              "type": "array",
                                               "description": "A list with unique items that every item is a valid IP",
-                                              "example": [
-                                                "172.232.5.3",
-                                                "172.23.5.4",
-                                                "172.23.5.7",
-                                                "172.23.5.8",
-                                                "172.23.5.9",
-                                                "172.23.5.10"
-                                              ]
+                                              "items": {
+                                                "type": "string",
+                                                "example": [
+                                                  "172.232.5.3",
+                                                  "172.23.5.4",
+                                                  "172.23.5.7",
+                                                  "172.23.5.8",
+                                                  "172.23.5.9",
+                                                  "172.23.5.10"
+                                                ]
+                                              }
                                             }
                                           }
                                         }
@@ -19980,11 +20046,14 @@
                                                           }
                                                         },
                                                         "privateIpAddresses": {
-                                                          "type": "array of string",
+                                                          "type": "array",
                                                           "description": "A list with unique items that every item is a valid IP",
-                                                          "example": [
-                                                            "172.23.4.20"
-                                                          ]
+                                                          "items": {
+                                                            "type": "string",
+                                                            "example": [
+                                                              "172.23.4.20"
+                                                            ]
+                                                          }
                                                         }
                                                       }
                                                     }
@@ -25485,7 +25554,7 @@
                                 "type": "object",
                                 "properties": {
                                   "shouldOptimizeEcsAmi": {
-                                    "type": "bool",
+                                    "type": "boolean",
                                     "example": "true"
                                   },
                                   "performAt": {
@@ -26770,15 +26839,12 @@
                       "services": {
                         "type": "array",
                         "description": "List of Fargate services by their names. Must contain at least one service\n",
-                        "items": [
-                          {
-                            "type": "string",
-                            "example": "service_1"
-                          },
-                          {
-                            "type": "string",
-                            "example": "service_2"
-                          }
+                        "items": {
+                          "type": "string"
+                        },
+                        "example": [
+                          "service_1",
+                          "service_2"
                         ]
                       },
                       "simpleNewServiceNames": {
@@ -26834,15 +26900,12 @@
                                         "services": {
                                           "type": "array",
                                           "description": "List of Fargate services by their names. Must contain at least one service\n",
-                                          "items": [
-                                            {
-                                              "type": "string",
-                                              "example": "service_1"
-                                            },
-                                            {
-                                              "type": "string",
-                                              "example": "service_2"
-                                            }
+                                          "items": {
+                                            "type": "string"
+                                          },
+                                          "example": [
+                                            "service_1",
+                                            "service_2"
                                           ]
                                         }
                                       }
@@ -28585,12 +28648,15 @@
                                 "type": "object",
                                 "properties": {
                                   "approvedImages": {
-                                    "type": "array of string",
+                                    "type": "array",
                                     "description": "Set white list of repositories for container images.",
-                                    "example": [
-                                      "*.ecr.*.amazonaws.com/*",
-                                      "docker.*"
-                                    ]
+                                    "items": {
+                                      "type": "string",
+                                      "example": [
+                                        "*.ecr.*.amazonaws.com/*",
+                                        "docker.*"
+                                      ]
+                                    }
                                   }
                                 }
                               }
@@ -28791,7 +28857,7 @@
             "in": "query",
             "name": "autoApplyTags",
             "example": "true",
-            "deafult": "false",
+            "default": "false",
             "description": "Optionally update instance tags on the fly without rolling the cluster.\n",
             "schema": {
               "type": "string"
@@ -29148,19 +29214,25 @@
                       "properties": {
                         "subnetIds": {
                           "type": "array",
-                          "example": [
-                            "subnet-00cab2dd9f40a9883",
-                            "subnet-0df9d512c7cbbd9e1"
-                          ]
+                          "items": {
+                            "type": "string",
+                            "example": [
+                              "subnet-00cab2dd9f40a9883",
+                              "subnet-0df9d512c7cbbd9e1"
+                            ]
+                          }
                         },
                         "launchSpecification": {
                           "type": "object",
                           "properties": {
                             "securityGroupIds": {
                               "type": "array",
-                              "example": [
-                                "sg-03ccf232a2bf0f4ea"
-                              ]
+                              "items": {
+                                "type": "string",
+                                "example": [
+                                  "sg-03ccf232a2bf0f4ea"
+                                ]
+                              }
                             },
                             "keyPair": {
                               "type": "string",
@@ -29238,12 +29310,15 @@
                         "description": "Optional - may be null.\n",
                         "properties": {
                           "namespaces": {
-                            "type": "array of string",
+                            "type": "array",
                             "description": "Optional - may be null. If exists - should contain at least 1 item.\n",
-                            "example": [
-                              "sparkSpace",
-                              "kube-system"
-                            ]
+                            "items": {
+                              "type": "string",
+                              "example": [
+                                "sparkSpace",
+                                "kube-system"
+                              ]
+                            }
                           },
                           "attribute": {
                             "type": "object",
@@ -29276,8 +29351,8 @@
                                   "exists",
                                   "doesNotExist"
                                 ],
-                                "default": "equals",
-                                "example": "equals"
+                                "default": "Equals",
+                                "example": "Equals"
                               },
                               "value": {
                                 "type": "string",
@@ -29639,366 +29714,394 @@
                           "properties": {
                             "items": {
                               "type": "array",
-                              "items": [
-                                {
-                                  "type": "object",
-                                  "properties": {
-                                    "totalCost": {
-                                      "type": "float",
-                                      "example": 279.9907
-                                    },
-                                    "totalComputeCost": {
-                                      "type": "float",
-                                      "example": 279.9907
-                                    },
-                                    "totalEbsCost": {
-                                      "type": "float",
-                                      "example": 0
-                                    },
-                                    "totalStorageCost": {
-                                      "type": "float",
-                                      "example": 0
-                                    },
-                                    "namespaces": {
-                                      "type": "object",
-                                      "properties": {
-                                        "namespace": {
-                                          "type": "string",
-                                          "example": "default"
-                                        },
-                                        "cost": {
-                                          "type": "float",
-                                          "example": 18.00862
-                                        },
-                                        "computeCost": {
-                                          "type": "float",
-                                          "example": 18.00862
-                                        },
-                                        "ebsCost": {
-                                          "type": "float",
-                                          "example": 0
-                                        },
-                                        "storageCost": {
-                                          "type": "float",
-                                          "example": 0
-                                        },
-                                        "labels": {
-                                          "type": "object",
-                                          "properties": {
-                                            "region": {
-                                              "type": "string",
-                                              "example": "west"
-                                            },
-                                            "env": {
-                                              "type": "string",
-                                              "example": "prod"
-                                            }
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "totalCost": {
+                                    "type": "number",
+                                    "format": "float",
+                                    "example": 279.9907
+                                  },
+                                  "totalComputeCost": {
+                                    "type": "number",
+                                    "format": "float",
+                                    "example": 279.9907
+                                  },
+                                  "totalEbsCost": {
+                                    "type": "number",
+                                    "format": "float",
+                                    "example": 0
+                                  },
+                                  "totalStorageCost": {
+                                    "type": "number",
+                                    "format": "float",
+                                    "example": 0
+                                  },
+                                  "namespaces": {
+                                    "type": "object",
+                                    "properties": {
+                                      "namespace": {
+                                        "type": "string",
+                                        "example": "default"
+                                      },
+                                      "cost": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 18.00862
+                                      },
+                                      "computeCost": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 18.00862
+                                      },
+                                      "ebsCost": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 0
+                                      },
+                                      "storageCost": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 0
+                                      },
+                                      "labels": {
+                                        "type": "object",
+                                        "properties": {
+                                          "region": {
+                                            "type": "string",
+                                            "example": "west"
+                                          },
+                                          "env": {
+                                            "type": "string",
+                                            "example": "prod"
                                           }
-                                        },
-                                        "annotations": {
-                                          "type": "object",
-                                          "properties": {
-                                            "region": {
-                                              "type": "string",
-                                              "example": "west"
-                                            },
-                                            "env": {
-                                              "type": "string",
-                                              "example": "prod"
-                                            }
-                                          }
-                                        },
-                                        "deployments": {
-                                          "type": "object",
-                                          "properties": {
-                                            "name": {
-                                              "type": "string",
-                                              "example": "cpu-deployment-check5"
-                                            },
-                                            "namespace": {
-                                              "type": "stirng",
-                                              "example": "default"
-                                            },
-                                            "cost": {
-                                              "type": "float",
-                                              "example": 3.7410312
-                                            },
-                                            "computeCost": {
-                                              "type": "float",
-                                              "example": 3.7410312
-                                            },
-                                            "ebsCost": {
-                                              "type": "float",
-                                              "example": 0
-                                            },
-                                            "storageCost": {
-                                              "type": "float",
-                                              "example": 0
-                                            },
-                                            "labels": {
-                                              "type": "object",
-                                              "properties": {
-                                                "region": {
-                                                  "type": "string",
-                                                  "example": "west"
-                                                },
-                                                "env": {
-                                                  "type": "string",
-                                                  "example": "prod"
-                                                }
-                                              }
-                                            },
-                                            "annotations": {
-                                              "type": "object",
-                                              "properties": {
-                                                "region": {
-                                                  "type": "string",
-                                                  "example": "west"
-                                                },
-                                                "env": {
-                                                  "type": "string",
-                                                  "example": "prod"
-                                                }
-                                              }
-                                            }
-                                          }
-                                        },
-                                        "statefulSets": {
-                                          "type": "object",
-                                          "properties": {
-                                            "name": {
-                                              "type": "string",
-                                              "example": "cpu-deployment-check5"
-                                            },
-                                            "namespace": {
-                                              "type": "stirng",
-                                              "example": "default"
-                                            },
-                                            "cost": {
-                                              "type": "float",
-                                              "example": 3.7410312
-                                            },
-                                            "computeCost": {
-                                              "type": "float",
-                                              "example": 3.7410312
-                                            },
-                                            "ebsCost": {
-                                              "type": "float",
-                                              "example": 0
-                                            },
-                                            "storageCost": {
-                                              "type": "float",
-                                              "example": 0
-                                            },
-                                            "labels": {
-                                              "type": "object",
-                                              "properties": {
-                                                "region": {
-                                                  "type": "string",
-                                                  "example": "west"
-                                                },
-                                                "env": {
-                                                  "type": "string",
-                                                  "example": "prod"
-                                                }
-                                              }
-                                            },
-                                            "annotations": {
-                                              "type": "object",
-                                              "properties": {
-                                                "region": {
-                                                  "type": "string",
-                                                  "example": "west"
-                                                },
-                                                "env": {
-                                                  "type": "string",
-                                                  "example": "prod"
-                                                }
-                                              }
-                                            }
-                                          }
-                                        },
-                                        "daemonSets": {
-                                          "type": "object",
-                                          "properties": {
-                                            "name": {
-                                              "type": "string",
-                                              "example": "cpu-deployment-check5"
-                                            },
-                                            "namespace": {
-                                              "type": "stirng",
-                                              "example": "default"
-                                            },
-                                            "cost": {
-                                              "type": "float",
-                                              "example": 3.7410312
-                                            },
-                                            "computeCost": {
-                                              "type": "float",
-                                              "example": 3.7410312
-                                            },
-                                            "ebsCost": {
-                                              "type": "float",
-                                              "example": 0
-                                            },
-                                            "storageCost": {
-                                              "type": "float",
-                                              "example": 0
-                                            },
-                                            "labels": {
-                                              "type": "object",
-                                              "properties": {
-                                                "region": {
-                                                  "type": "string",
-                                                  "example": "west"
-                                                },
-                                                "env": {
-                                                  "type": "string",
-                                                  "example": "prod"
-                                                }
-                                              }
-                                            },
-                                            "annotations": {
-                                              "type": "object",
-                                              "properties": {
-                                                "region": {
-                                                  "type": "string",
-                                                  "example": "west"
-                                                },
-                                                "env": {
-                                                  "type": "string",
-                                                  "example": "prod"
-                                                }
-                                              }
-                                            }
-                                          }
-                                        },
-                                        "jobs": {
-                                          "type": "object",
-                                          "properties": {
-                                            "name": {
-                                              "type": "string",
-                                              "example": "cpu-deployment-check5"
-                                            },
-                                            "namespace": {
-                                              "type": "stirng",
-                                              "example": "default"
-                                            },
-                                            "cost": {
-                                              "type": "float",
-                                              "example": 3.7410312
-                                            },
-                                            "computeCost": {
-                                              "type": "float",
-                                              "example": 3.7410312
-                                            },
-                                            "ebsCost": {
-                                              "type": "float",
-                                              "example": 0
-                                            },
-                                            "storageCost": {
-                                              "type": "float",
-                                              "example": 0
-                                            },
-                                            "labels": {
-                                              "type": "object",
-                                              "properties": {
-                                                "region": {
-                                                  "type": "string",
-                                                  "example": "west"
-                                                },
-                                                "env": {
-                                                  "type": "string",
-                                                  "example": "prod"
-                                                }
-                                              }
-                                            },
-                                            "annotations": {
-                                              "type": "object",
-                                              "properties": {
-                                                "region": {
-                                                  "type": "string",
-                                                  "example": "west"
-                                                },
-                                                "env": {
-                                                  "type": "string",
-                                                  "example": "prod"
-                                                }
-                                              }
-                                            }
-                                          }
-                                        },
-                                        "standAlonePodsCost": {
-                                          "type": "float"
                                         }
-                                      }
-                                    },
-                                    "deployments": {
-                                      "type": "object",
-                                      "properties": {
-                                        "name": {
-                                          "type": "string",
-                                          "example": "cpu-deployment-check5"
-                                        },
-                                        "namespace": {
-                                          "type": "stirng",
-                                          "example": "default"
-                                        },
-                                        "cost": {
-                                          "type": "float",
-                                          "example": 3.7410312
-                                        },
-                                        "computeCost": {
-                                          "type": "float",
-                                          "example": 3.7410312
-                                        },
-                                        "ebsCost": {
-                                          "type": "float",
-                                          "example": 0
-                                        },
-                                        "storageCost": {
-                                          "type": "float",
-                                          "example": 0
-                                        },
-                                        "labels": {
-                                          "type": "object",
-                                          "properties": {
-                                            "region": {
-                                              "type": "string",
-                                              "example": "west"
-                                            },
-                                            "env": {
-                                              "type": "string",
-                                              "example": "prod"
-                                            }
+                                      },
+                                      "annotations": {
+                                        "type": "object",
+                                        "properties": {
+                                          "region": {
+                                            "type": "string",
+                                            "example": "west"
+                                          },
+                                          "env": {
+                                            "type": "string",
+                                            "example": "prod"
                                           }
-                                        },
-                                        "annotations": {
-                                          "type": "object",
-                                          "properties": {
-                                            "region": {
-                                              "type": "string",
-                                              "example": "west"
-                                            },
-                                            "env": {
-                                              "type": "string",
-                                              "example": "prod"
+                                        }
+                                      },
+                                      "deployments": {
+                                        "type": "object",
+                                        "properties": {
+                                          "name": {
+                                            "type": "string",
+                                            "example": "cpu-deployment-check5"
+                                          },
+                                          "namespace": {
+                                            "type": "stirng",
+                                            "example": "default"
+                                          },
+                                          "cost": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 3.7410312
+                                          },
+                                          "computeCost": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 3.7410312
+                                          },
+                                          "ebsCost": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 0
+                                          },
+                                          "storageCost": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 0
+                                          },
+                                          "labels": {
+                                            "type": "object",
+                                            "properties": {
+                                              "region": {
+                                                "type": "string",
+                                                "example": "west"
+                                              },
+                                              "env": {
+                                                "type": "string",
+                                                "example": "prod"
+                                              }
+                                            }
+                                          },
+                                          "annotations": {
+                                            "type": "object",
+                                            "properties": {
+                                              "region": {
+                                                "type": "string",
+                                                "example": "west"
+                                              },
+                                              "env": {
+                                                "type": "string",
+                                                "example": "prod"
+                                              }
                                             }
                                           }
                                         }
+                                      },
+                                      "statefulSets": {
+                                        "type": "object",
+                                        "properties": {
+                                          "name": {
+                                            "type": "string",
+                                            "example": "cpu-deployment-check5"
+                                          },
+                                          "namespace": {
+                                            "type": "stirng",
+                                            "example": "default"
+                                          },
+                                          "cost": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 3.7410312
+                                          },
+                                          "computeCost": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 3.7410312
+                                          },
+                                          "ebsCost": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 0
+                                          },
+                                          "storageCost": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 0
+                                          },
+                                          "labels": {
+                                            "type": "object",
+                                            "properties": {
+                                              "region": {
+                                                "type": "string",
+                                                "example": "west"
+                                              },
+                                              "env": {
+                                                "type": "string",
+                                                "example": "prod"
+                                              }
+                                            }
+                                          },
+                                          "annotations": {
+                                            "type": "object",
+                                            "properties": {
+                                              "region": {
+                                                "type": "string",
+                                                "example": "west"
+                                              },
+                                              "env": {
+                                                "type": "string",
+                                                "example": "prod"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "daemonSets": {
+                                        "type": "object",
+                                        "properties": {
+                                          "name": {
+                                            "type": "string",
+                                            "example": "cpu-deployment-check5"
+                                          },
+                                          "namespace": {
+                                            "type": "stirng",
+                                            "example": "default"
+                                          },
+                                          "cost": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 3.7410312
+                                          },
+                                          "computeCost": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 3.7410312
+                                          },
+                                          "ebsCost": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 0
+                                          },
+                                          "storageCost": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 0
+                                          },
+                                          "labels": {
+                                            "type": "object",
+                                            "properties": {
+                                              "region": {
+                                                "type": "string",
+                                                "example": "west"
+                                              },
+                                              "env": {
+                                                "type": "string",
+                                                "example": "prod"
+                                              }
+                                            }
+                                          },
+                                          "annotations": {
+                                            "type": "object",
+                                            "properties": {
+                                              "region": {
+                                                "type": "string",
+                                                "example": "west"
+                                              },
+                                              "env": {
+                                                "type": "string",
+                                                "example": "prod"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "jobs": {
+                                        "type": "object",
+                                        "properties": {
+                                          "name": {
+                                            "type": "string",
+                                            "example": "cpu-deployment-check5"
+                                          },
+                                          "namespace": {
+                                            "type": "stirng",
+                                            "example": "default"
+                                          },
+                                          "cost": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 3.7410312
+                                          },
+                                          "computeCost": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 3.7410312
+                                          },
+                                          "ebsCost": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 0
+                                          },
+                                          "storageCost": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 0
+                                          },
+                                          "labels": {
+                                            "type": "object",
+                                            "properties": {
+                                              "region": {
+                                                "type": "string",
+                                                "example": "west"
+                                              },
+                                              "env": {
+                                                "type": "string",
+                                                "example": "prod"
+                                              }
+                                            }
+                                          },
+                                          "annotations": {
+                                            "type": "object",
+                                            "properties": {
+                                              "region": {
+                                                "type": "string",
+                                                "example": "west"
+                                              },
+                                              "env": {
+                                                "type": "string",
+                                                "example": "prod"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "standAlonePodsCost": {
+                                        "type": "number"
                                       }
-                                    },
-                                    "headroomCost": {
-                                      "type": "float",
-                                      "example": 0
-                                    },
-                                    "idleCost": {
-                                      "type": "float",
-                                      "example": 216.10321
                                     }
+                                  },
+                                  "deployments": {
+                                    "type": "object",
+                                    "properties": {
+                                      "name": {
+                                        "type": "string",
+                                        "example": "cpu-deployment-check5"
+                                      },
+                                      "namespace": {
+                                        "type": "stirng",
+                                        "example": "default"
+                                      },
+                                      "cost": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 3.7410312
+                                      },
+                                      "computeCost": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 3.7410312
+                                      },
+                                      "ebsCost": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 0
+                                      },
+                                      "storageCost": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 0
+                                      },
+                                      "labels": {
+                                        "type": "object",
+                                        "properties": {
+                                          "region": {
+                                            "type": "string",
+                                            "example": "west"
+                                          },
+                                          "env": {
+                                            "type": "string",
+                                            "example": "prod"
+                                          }
+                                        }
+                                      },
+                                      "annotations": {
+                                        "type": "object",
+                                        "properties": {
+                                          "region": {
+                                            "type": "string",
+                                            "example": "west"
+                                          },
+                                          "env": {
+                                            "type": "string",
+                                            "example": "prod"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "headroomCost": {
+                                    "type": "number",
+                                    "format": "float",
+                                    "example": 0
+                                  },
+                                  "idleCost": {
+                                    "type": "number",
+                                    "format": "float",
+                                    "example": 216.10321
                                   }
                                 }
-                              ]
+                              }
                             }
                           }
                         }
@@ -30111,30 +30214,39 @@
                           ],
                           "properties": {
                             "subnetIds": {
-                              "type": "array of string",
+                              "type": "array",
                               "description": "A comma-separated list of subnet identifiers for the Ocean cluster. Subnet IDs should be configured with auto assign public IP.\n",
-                              "example": [
-                                "subnet-4c1d1538",
-                                "subnet-2791bb61"
-                              ]
+                              "items": {
+                                "type": "string",
+                                "example": [
+                                  "subnet-4c1d1538",
+                                  "subnet-2791bb61"
+                                ]
+                              }
                             },
                             "instanceTypes": {
                               "type": "object",
                               "description": "The type of instances that may or may not be a part of the Ocean cluster.",
                               "properties": {
                                 "whitelist": {
-                                  "type": "array of string",
+                                  "type": "array",
                                   "description": "Instance types allowed in the Ocean cluster. Cannot be configured if blacklist is configured.\n",
-                                  "example": [
-                                    "c4.2xlarge",
-                                    "c4.xlarge",
-                                    "c4.4xlarge",
-                                    "c4.8xlarge"
-                                  ]
+                                  "items": {
+                                    "type": "string",
+                                    "example": [
+                                      "c4.2xlarge",
+                                      "c4.xlarge",
+                                      "c4.4xlarge",
+                                      "c4.8xlarge"
+                                    ]
+                                  }
                                 },
                                 "blacklist": {
-                                  "type": "array of string",
-                                  "description": "Instance types to avoid launching in the Ocean cluster. Cannot be configured if whitelist is configured.\n"
+                                  "type": "array",
+                                  "description": "Instance types to avoid launching in the Ocean cluster. Cannot be configured if whitelist is configured.\n",
+                                  "items": {
+                                    "type": "string"
+                                  }
                                 }
                               }
                             },
@@ -30155,15 +30267,19 @@
                                   "description": "ID of the image used to launch the instances."
                                 },
                                 "userData": {
-                                  "type": "base64",
+                                  "type": "string",
+                                  "format": "byte",
                                   "description": "The Base64-encoded MIME user data to make available to the instances."
                                 },
                                 "securityGroupIds": {
-                                  "type": "array of string",
+                                  "type": "array",
                                   "description": "One or more Security Group IDs.",
-                                  "example": [
-                                    "sg-c3d914b0"
-                                  ]
+                                  "items": {
+                                    "type": "string",
+                                    "example": [
+                                      "sg-c3d914b0"
+                                    ]
+                                  }
                                 },
                                 "iamInstanceProfile": {
                                   "type": "object",
@@ -30309,24 +30425,30 @@
                         "example": "This is why I deployed my cluster."
                       },
                       "launchSpecIds": {
-                        "type": "array of string",
+                        "type": "array",
                         "description": "List of launch specification IDs to be rolled. Each ID is a string. launchSpecIds can be null. Cannot be used together with instanceIds.",
-                        "example": [
-                          "ols-76694a7d",
-                          "ols-56694a76"
-                        ]
+                        "items": {
+                          "type": "string",
+                          "example": [
+                            "ols-76694a7d",
+                            "ols-56694a76"
+                          ]
+                        }
                       },
                       "disableLaunchSpecAutoScaling": {
-                        "type": "bool",
+                        "type": "boolean",
                         "example": true
                       },
                       "instanceIds": {
-                        "type": "array of string",
+                        "type": "array",
                         "description": "List of instance IDs to be rolled. Each ID is a string. instanceIds can be null. Cannot be used together with launchSpecIds.\n",
-                        "example": [
-                          "i-0003a99ffb566f039",
-                          "i-0567a99ffb566f765"
-                        ]
+                        "items": {
+                          "type": "string",
+                          "example": [
+                            "i-0003a99ffb566f039",
+                            "i-0567a99ffb566f765"
+                          ]
+                        }
                       }
                     }
                   }
@@ -30381,18 +30503,24 @@
                       "example": "o-12e31234"
                     },
                     "instanceIds": {
-                      "type": "array of string",
-                      "example": [
-                        "i-0003a99ffb566f039",
-                        "i-0567a99ffb566f765"
-                      ]
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "example": [
+                          "i-0003a99ffb566f039",
+                          "i-0567a99ffb566f765"
+                        ]
+                      }
                     },
                     "launchSpecIds": {
-                      "type": "array of string",
-                      "example": [
-                        "ols-76694a7d",
-                        "ols-56694a76"
-                      ]
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "example": [
+                          "ols-76694a7d",
+                          "ols-56694a76"
+                        ]
+                      }
                     },
                     "createdAt": {
                       "type": "string",
@@ -30502,18 +30630,24 @@
                             "example": "o-12e31234"
                           },
                           "instanceIds": {
-                            "type": "array of string",
-                            "example": [
-                              "i-0003a99ffb566f039",
-                              "i-0567a99ffb566f765"
-                            ]
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "example": [
+                                "i-0003a99ffb566f039",
+                                "i-0567a99ffb566f765"
+                              ]
+                            }
                           },
                           "launchSpecIds": {
-                            "type": "array of string",
-                            "example": [
-                              "ols-76694a7d",
-                              "ols-56694a76"
-                            ]
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "example": [
+                                "ols-76694a7d",
+                                "ols-56694a76"
+                              ]
+                            }
                           },
                           "createdAt": {
                             "type": "string",
@@ -30991,7 +31125,7 @@
                           "arn": {
                             "type": "string",
                             "example": "arn:aws:iam::123456781234:instance-profile/EKS-nodes-test-NodeInstanceProfile-ABCDEFGH123",
-                            "descritpion": "The iamRole arn. If set - do not set launchSpec.iamInstanceProfile.name"
+                            "description": "The iamRole arn. If set - do not set launchSpec.iamInstanceProfile.name"
                           },
                           "name": {
                             "type": "string",
@@ -31001,20 +31135,26 @@
                         }
                       },
                       "securityGroupIds": {
-                        "type": "array of string",
+                        "type": "array",
                         "description": "Set security groups. Each element in array should be security group ID",
-                        "example": [
-                          "sg-0ded3a2980208c30c",
-                          "sg-0ded3a2980208c30d"
-                        ]
+                        "items": {
+                          "type": "string",
+                          "example": [
+                            "sg-0ded3a2980208c30c",
+                            "sg-0ded3a2980208c30d"
+                          ]
+                        }
                       },
                       "instanceTypes": {
                         "type": "array",
                         "description": "A list of instance types allowed to be provisioned for pods pending for the launch specification.\\\nThe list overrides the list defined for the Ocean cluster. Can be null.\n",
-                        "example": [
-                          "c3.2xlarge",
-                          "c4.2xlarge"
-                        ]
+                        "items": {
+                          "type": "string",
+                          "example": [
+                            "c3.2xlarge",
+                            "c4.2xlarge"
+                          ]
+                        }
                       },
                       "rootVolumeSize": {
                         "type": "integer",
@@ -31073,12 +31213,15 @@
                         ]
                       },
                       "subnetIds": {
-                        "type": "array of string",
+                        "type": "array",
                         "description": "Set subnets in launchSpec. Each element in array should be subnet ID",
-                        "example": [
-                          "subnet-123",
-                          "subnet-456"
-                        ]
+                        "items": {
+                          "type": "string",
+                          "example": [
+                            "subnet-123",
+                            "subnet-456"
+                          ]
+                        }
                       },
                       "elasticIpPool": {
                         "type": "object",
@@ -31355,11 +31498,14 @@
                       "example": "ami-0ce21b51cb55a48b8"
                     },
                     "securityGroupIds": {
-                      "type": "array of string",
-                      "example": [
-                        "subnet-00cab2dd9f40a9883",
-                        "subnet-0df9d512c7cbbd9e1"
-                      ]
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "example": [
+                          "subnet-00cab2dd9f40a9883",
+                          "subnet-0df9d512c7cbbd9e1"
+                        ]
+                      }
                     },
                     "tags": {
                       "type": "object",
@@ -31445,12 +31591,14 @@
                             ],
                             "properties": {
                               "cpuHour": {
-                                "type": "float",
+                                "type": "number",
+                                "format": "float",
                                 "example": 0.015,
                                 "description": "The cost per cpu unit (core) hour for the cluster.\n"
                               },
                               "memoryHour": {
-                                "type": "float",
+                                "type": "number",
+                                "format": "float",
                                 "example": 0.002,
                                 "description": "The cost per memory unit (GiB) hour for the cluster.\n"
                               }
@@ -31548,11 +31696,13 @@
                               "type": "object",
                               "properties": {
                                 "cpuHour": {
-                                  "type": "float",
+                                  "type": "number",
+                                  "format": "float",
                                   "example": 0.015
                                 },
                                 "memoryHour": {
-                                  "type": "float",
+                                  "type": "number",
+                                  "format": "float",
                                   "example": 0.002
                                 }
                               }
@@ -35363,8 +35513,7 @@
             "in": "path",
             "name": "accountId",
             "example": "act-123abc",
-            "description": "Account ID\n",
-            "required": false
+            "description": "Account ID\n"
           }
         ],
         "requestBody": {
@@ -35872,28 +36021,26 @@
                                 "items": {
                                   "type": "array",
                                   "description": "Array of data objects\n",
-                                  "items": [
-                                    {
-                                      "type": "object",
-                                      "properties": {
-                                        "token": {
-                                          "type": "string",
-                                          "description": "Token",
-                                          "example": "f872e7b157866a36229d915aa21cf430f661234568703fd"
-                                        },
-                                        "name": {
-                                          "type": "string",
-                                          "description": "Name",
-                                          "example": "TestApi1"
-                                        },
-                                        "id": {
-                                          "type": "string",
-                                          "description": "ID",
-                                          "example": "pu-6a6976ab"
-                                        }
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "token": {
+                                        "type": "string",
+                                        "description": "Token",
+                                        "example": "f872e7b157866a36229d915aa21cf430f661234568703fd"
+                                      },
+                                      "name": {
+                                        "type": "string",
+                                        "description": "Name",
+                                        "example": "TestApi1"
+                                      },
+                                      "id": {
+                                        "type": "string",
+                                        "description": "ID",
+                                        "example": "pu-6a6976ab"
                                       }
                                     }
-                                  ]
+                                  }
                                 },
                                 "count": {
                                   "type": "integer",
@@ -35974,60 +36121,7 @@
                                   "description": "Array of data objects\n",
                                   "items": [
                                     {
-                                      "type": "object",
-                                      "properties": {
-                                        "id": {
-                                          "type": "string",
-                                          "description": "ID",
-                                          "example": "pu_968465"
-                                        },
-                                        "userName": {
-                                          "type": "string",
-                                          "description": "User Name",
-                                          "example": "pu_name"
-                                        },
-                                        "description": {
-                                          "type": "string",
-                                          "description": "Description",
-                                          "example": "test programmatic"
-                                        },
-                                        "accounts": {
-                                          "type": "array",
-                                          "description": "All the accounts the programmatic user will have access to. Cannot be empty.",
-                                          "items": [
-                                            {
-                                              "type": "object",
-                                              "properties": {
-                                                "id": {
-                                                  "type": "string",
-                                                  "description": "Account ID the programmatic user will have access to.",
-                                                  "example": "act-123"
-                                                },
-                                                "role": {
-                                                  "type": "string",
-                                                  "description": "Role to be associated with the programmatic user for this account. Valid values are \"editor\" and \"viewer\".",
-                                                  "example": "editor"
-                                                }
-                                              }
-                                            },
-                                            {
-                                              "type": "object",
-                                              "properties": {
-                                                "id": {
-                                                  "type": "string",
-                                                  "description": "Account ID the programmatic user will have access to.",
-                                                  "example": "act-1234"
-                                                },
-                                                "role": {
-                                                  "type": "string",
-                                                  "description": "Role to be associated with the programmatic user for this account. Valid values are \"editor\" and \"viewer\".",
-                                                  "example": "viewer"
-                                                }
-                                              }
-                                            }
-                                          ]
-                                        }
-                                      }
+                                      "$ref": "#/paths/~1setup~1user~1programmatic~1%7BuserId%7D/put/responses/200/content/application~1json/schema/allOf/0/allOf/1/properties/response/properties/items/items"
                                     },
                                     {
                                       "type": "object",
@@ -36052,10 +36146,10 @@
                                           "description": "All the accounts the programmatic user will have access to. Cannot be empty.",
                                           "items": [
                                             {
-                                              "$ref": "#/paths/~1setup~1user~1programmatic/get/responses/200/content/application~1json/schema/allOf/0/allOf/1/properties/response/properties/items/items/0/properties/accounts/items/1"
+                                              "$ref": "#/paths/~1setup~1user~1programmatic~1%7BuserId%7D/put/responses/200/content/application~1json/schema/allOf/0/allOf/1/properties/response/properties/items/items/properties/accounts/items/1"
                                             },
                                             {
-                                              "$ref": "#/paths/~1setup~1user~1programmatic/get/responses/200/content/application~1json/schema/allOf/0/allOf/1/properties/response/properties/items/items/0/properties/accounts/items/0"
+                                              "$ref": "#/paths/~1setup~1user~1programmatic~1%7BuserId%7D/put/responses/200/content/application~1json/schema/allOf/0/allOf/1/properties/response/properties/items/items/properties/accounts/items/0"
                                             }
                                           ]
                                         }
@@ -36199,11 +36293,62 @@
                                 "items": {
                                   "type": "array",
                                   "description": "Array of data objects\n",
-                                  "items": [
-                                    {
-                                      "$ref": "#/paths/~1setup~1user~1programmatic/get/responses/200/content/application~1json/schema/allOf/0/allOf/1/properties/response/properties/items/items/0"
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "id": {
+                                        "type": "string",
+                                        "description": "ID",
+                                        "example": "pu_968465"
+                                      },
+                                      "userName": {
+                                        "type": "string",
+                                        "description": "User Name",
+                                        "example": "pu_name"
+                                      },
+                                      "description": {
+                                        "type": "string",
+                                        "description": "Description",
+                                        "example": "test programmatic"
+                                      },
+                                      "accounts": {
+                                        "type": "array",
+                                        "description": "All the accounts the programmatic user will have access to. Cannot be empty.",
+                                        "items": [
+                                          {
+                                            "type": "object",
+                                            "properties": {
+                                              "id": {
+                                                "type": "string",
+                                                "description": "Account ID the programmatic user will have access to.",
+                                                "example": "act-123"
+                                              },
+                                              "role": {
+                                                "type": "string",
+                                                "description": "Role to be associated with the programmatic user for this account. Valid values are \"editor\" and \"viewer\".",
+                                                "example": "editor"
+                                              }
+                                            }
+                                          },
+                                          {
+                                            "type": "object",
+                                            "properties": {
+                                              "id": {
+                                                "type": "string",
+                                                "description": "Account ID the programmatic user will have access to.",
+                                                "example": "act-1234"
+                                              },
+                                              "role": {
+                                                "type": "string",
+                                                "description": "Role to be associated with the programmatic user for this account. Valid values are \"editor\" and \"viewer\".",
+                                                "example": "viewer"
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
                                     }
-                                  ]
+                                  }
                                 },
                                 "count": {
                                   "type": "integer",
@@ -36287,11 +36432,9 @@
                                 "items": {
                                   "type": "array",
                                   "description": "Array of data objects\n",
-                                  "items": [
-                                    {
-                                      "$ref": "#/paths/~1setup~1user~1programmatic/get/responses/200/content/application~1json/schema/allOf/0/allOf/1/properties/response/properties/items/items/0"
-                                    }
-                                  ]
+                                  "items": {
+                                    "$ref": "#/paths/~1setup~1user~1programmatic~1%7BuserId%7D/put/responses/200/content/application~1json/schema/allOf/0/allOf/1/properties/response/properties/items/items"
+                                  }
                                 },
                                 "count": {
                                   "type": "integer",
@@ -36691,9 +36834,11 @@
           {
             "in": "query",
             "name": "cloudAccountId",
-            "example": 634245686616,
-            "description": "Will list only the Spot accounts connected to the specified account ID.\n",
-            "required": false
+            "schema": {
+              "type": "string",
+              "example": 634245686616,
+              "description": "Will list only the Spot accounts connected to the specified account ID.\n"
+            }
           }
         ],
         "responses": {
@@ -36901,16 +37046,22 @@
                                       "actions": {
                                         "type": "array",
                                         "description": "Set a list of required actions for this permissions statement. full list of actions can be found - https://docs.spot.io/account-user-management/user-management/access-policies-actions/",
-                                        "example": [
-                                          "ocean:importCluster"
-                                        ]
+                                        "items": {
+                                          "type": "string",
+                                          "example": [
+                                            "ocean:importCluster"
+                                          ]
+                                        }
                                       },
                                       "resources": {
                                         "type": "array",
                                         "description": "Set a list of resources IDs. In order to include all resources in this statement - use \"*\"",
-                                        "example": [
-                                          "*"
-                                        ]
+                                        "items": {
+                                          "type": "string",
+                                          "example": [
+                                            "*"
+                                          ]
+                                        }
                                       }
                                     }
                                   },
@@ -36925,16 +37076,22 @@
                                       "actions": {
                                         "type": "array",
                                         "description": "Set a list of required actions for this permissions statement. full list of actions can be found - https://docs.spot.io/account-user-management/user-management/access-policies-actions/",
-                                        "example": [
-                                          "emr:scale"
-                                        ]
+                                        "items": {
+                                          "type": "string",
+                                          "example": [
+                                            "emr:scale"
+                                          ]
+                                        }
                                       },
                                       "resources": {
                                         "type": "array",
                                         "description": "Set a list of resources IDs. In order to include all resources in this statement - use \"*\"",
-                                        "example": [
-                                          "*"
-                                        ]
+                                        "items": {
+                                          "type": "string",
+                                          "example": [
+                                            "*"
+                                          ]
+                                        }
                                       }
                                     }
                                   }
@@ -37206,16 +37363,22 @@
                                                     "actions": {
                                                       "type": "array",
                                                       "description": "Set a list of required actions for this permissions statement. full list of actions can be found - https://docs.spot.io/account-user-management/user-management/access-policies-actions/",
-                                                      "example": [
-                                                        "ocean:importCluster"
-                                                      ]
+                                                      "items": {
+                                                        "type": "string",
+                                                        "example": [
+                                                          "ocean:importCluster"
+                                                        ]
+                                                      }
                                                     },
                                                     "resources": {
                                                       "type": "array",
                                                       "description": "Set a list of resources IDs. In order to include all resources in this statement - use \"*\"",
-                                                      "example": [
-                                                        "*"
-                                                      ]
+                                                      "items": {
+                                                        "type": "string",
+                                                        "example": [
+                                                          "*"
+                                                        ]
+                                                      }
                                                     }
                                                   }
                                                 },
@@ -37230,16 +37393,22 @@
                                                     "actions": {
                                                       "type": "array",
                                                       "description": "Set a list of required actions for this permissions statement. full list of actions can be found - https://docs.spot.io/account-user-management/user-management/access-policies-actions/",
-                                                      "example": [
-                                                        "emr:scale"
-                                                      ]
+                                                      "items": {
+                                                        "type": "string",
+                                                        "example": [
+                                                          "emr:scale"
+                                                        ]
+                                                      }
                                                     },
                                                     "resources": {
                                                       "type": "array",
                                                       "description": "Set a list of resources IDs. In order to include all resources in this statement - use \"*\"",
-                                                      "example": [
-                                                        "*"
-                                                      ]
+                                                      "items": {
+                                                        "type": "string",
+                                                        "example": [
+                                                          "*"
+                                                        ]
+                                                      }
                                                     }
                                                   }
                                                 }
@@ -37397,7 +37566,10 @@
                                         },
                                         "policyIds": {
                                           "type": "array",
-                                          "description": "Array of policy IDs"
+                                          "description": "Array of policy IDs",
+                                          "items": {
+                                            "type": "string"
+                                          }
                                         }
                                       }
                                     },
@@ -37421,7 +37593,10 @@
                                         },
                                         "policyIds": {
                                           "type": "array",
-                                          "description": "Array of policy IDs"
+                                          "description": "Array of policy IDs",
+                                          "items": {
+                                            "type": "string"
+                                          }
                                         }
                                       }
                                     },
@@ -37445,7 +37620,10 @@
                                         },
                                         "policyIds": {
                                           "type": "array",
-                                          "description": "Array of policy IDs"
+                                          "description": "Array of policy IDs",
+                                          "items": {
+                                            "type": "string"
+                                          }
                                         }
                                       }
                                     }
@@ -38522,8 +38700,8 @@
                               "properties": {
                                 "maxScaleDownPercentage": {
                                   "type": "integer",
-                                  "min": 1,
-                                  "max": 100,
+                                  "minimum": 1,
+                                  "maximum": 100,
                                   "description": "Would represent the maximum % to scale-down.",
                                   "example": 30
                                 }
@@ -38619,12 +38797,15 @@
                                   "example": true
                                 },
                                 "timeWindows": {
-                                  "type": "array of string",
+                                  "type": "array",
                                   "description": "Set time windows for shutdown hours. specify a list of 'timeWindows' with at least one time window Each string is in the format of - ddd:hh:mm-ddd:hh:mm ddd = day of week = Sun | Mon | Tue | Wed | Thu | Fri | Sat hh = hour 24 = 0 -23 mm = minute = 0 - 59. Time windows should not overlap. required on cluster.scheduling.isEnabled = True.\n",
-                                  "example": [
-                                    "Fri:15:30-Wed:14:30",
-                                    "Wed:15:30-Thu:18:30"
-                                  ]
+                                  "items": {
+                                    "type": "string",
+                                    "example": [
+                                      "Fri:15:30-Wed:14:30",
+                                      "Wed:15:30-Thu:18:30"
+                                    ]
+                                  }
                                 }
                               }
                             },
@@ -38672,12 +38853,15 @@
                               "type": "object",
                               "properties": {
                                 "approvedImages": {
-                                  "type": "array of string",
+                                  "type": "array",
                                   "description": "Set white list of repositories for container images.",
-                                  "example": [
-                                    "gce.io/*",
-                                    "docker.*"
-                                  ]
+                                  "items": {
+                                    "type": "string",
+                                    "example": [
+                                      "gce.io/*",
+                                      "docker.*"
+                                    ]
+                                  }
                                 }
                               }
                             }
@@ -38885,7 +39069,7 @@
                           ],
                           "properties": {
                             "networkInterfaces": {
-                              "type": "array",
+                              "type": "object",
                               "description": "Settings for network interfaces\n",
                               "required": [
                                 "accessConfigs",
@@ -38966,18 +39150,24 @@
                             "availabilityZones": {
                               "type": "array",
                               "description": "Availability zone/s used by the Ocean cluster.",
-                              "example": "us-west1-a"
+                              "items": {
+                                "type": "string",
+                                "example": "us-west1-a"
+                              }
                             },
                             "instanceTypes": {
                               "type": "object",
                               "description": "The type of instances that may or may not be a part of the Ocean cluster.",
                               "properties": {
                                 "whitelist": {
-                                  "type": "array of string",
+                                  "type": "array",
                                   "description": "Instance types allowed in the Ocean cluster.\n",
-                                  "example": [
-                                    "n1-standard-2"
-                                  ]
+                                  "items": {
+                                    "type": "string",
+                                    "example": [
+                                      "n1-standard-2"
+                                    ]
+                                  }
                                 }
                               }
                             },
@@ -38997,7 +39187,7 @@
                                 },
                                 "metadata": {
                                   "type": "object",
-                                  "descritpion": "Set array of cluster metadata\n",
+                                  "description": "Set array of cluster metadata\n",
                                   "properties": {
                                     "key": {
                                       "type": "string",
@@ -39012,11 +39202,14 @@
                                   }
                                 },
                                 "tags": {
-                                  "type": "array of string",
+                                  "type": "array",
                                   "description": "Array of tags to instances launched in Ocean cluster",
-                                  "example": [
-                                    "gke-test-native-vpc-5cb557f7-node"
-                                  ]
+                                  "items": {
+                                    "type": "string",
+                                    "example": [
+                                      "gke-test-native-vpc-5cb557f7-node"
+                                    ]
+                                  }
                                 },
                                 "ipForwarding": {
                                   "type": "boolean",
@@ -39032,7 +39225,7 @@
                                   "example": "265168459660-compute@developer.gserviceaccount.com"
                                 },
                                 "labels": {
-                                  "type": "array of object",
+                                  "type": "array",
                                   "description": "Set labels on cluster. Can set up to 60 labels\n",
                                   "items": {
                                     "type": "object",
@@ -39399,7 +39592,7 @@
                             "example": 8
                           },
                           "metadata": {
-                            "type": "array of object",
+                            "type": "array",
                             "required": [
                               "key",
                               "value"
@@ -39724,7 +39917,9 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": "launchSpec",
+                "required": [
+                  "launchSpec"
+                ],
                 "properties": {
                   "launchSpec": {
                     "type": "object",
@@ -39751,7 +39946,7 @@
                         "example": 8
                       },
                       "metadata": {
-                        "type": "array of object",
+                        "type": "array",
                         "required": [
                           "key",
                           "value"
@@ -39972,20 +40167,26 @@
                         "example": "This is why I deployed my cluster."
                       },
                       "launchSpecIds": {
-                        "type": "array of string",
+                        "type": "array",
                         "description": "List of launch specification IDs to be rolled. Each ID is a string. launchSpecIds can be null. Cannot be used together with instanceName.\n",
-                        "example": [
-                          "ols-76694a7d",
-                          "ols-56694a76"
-                        ]
+                        "items": {
+                          "type": "string",
+                          "example": [
+                            "ols-76694a7d",
+                            "ols-56694a76"
+                          ]
+                        }
                       },
                       "instanceNames": {
-                        "type": "array of string",
+                        "type": "array",
                         "description": "List of instance names to be rolled. Each name is a string. instanceNames can be null. Cannot be used together with launchSpecId\n",
-                        "example": [
-                          "i-0003a99ffb566f039",
-                          "i-0567a99ffb566f765"
-                        ]
+                        "items": {
+                          "type": "string",
+                          "example": [
+                            "i-0003a99ffb566f039",
+                            "i-0567a99ffb566f765"
+                          ]
+                        }
                       }
                     }
                   }
@@ -40040,14 +40241,20 @@
                       }
                     },
                     "instanceNames": {
-                      "type": "array of string",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
                       "example": [
                         "sin-0a4becc0-sig-6952238d",
                         "sin-0542ecc0-sig-695223r4"
                       ]
                     },
                     "launchSpecIds": {
-                      "type": "array of string",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
                       "example": [
                         "ols-76694a7d",
                         "ols-56694a76"
@@ -40157,11 +40364,14 @@
                                   "example": "o-30681b13"
                                 },
                                 "launchSpecIds": {
-                                  "type": "array of string",
-                                  "example": [
-                                    "ols-76694a7d",
-                                    "ols-56694a76"
-                                  ]
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string",
+                                    "example": [
+                                      "ols-76694a7d",
+                                      "ols-56694a76"
+                                    ]
+                                  }
                                 },
                                 "createdAt": {
                                   "type": "string",
@@ -40214,11 +40424,14 @@
                                   "example": "o-30681b13"
                                 },
                                 "instanceNames": {
-                                  "type": "array of string",
-                                  "example": [
-                                    "sin-0a4becc0-sig-6952238d",
-                                    "sin-0542ecc0-sig-695223r4"
-                                  ]
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string",
+                                    "example": [
+                                      "sin-0a4becc0-sig-6952238d",
+                                      "sin-0542ecc0-sig-695223r4"
+                                    ]
+                                  }
                                 },
                                 "createdAt": {
                                   "type": "string",
@@ -40517,7 +40730,10 @@
                                   "description": "The type of instances that may or may not be a part of the Ocean cluster.",
                                   "properties": {
                                     "whitelist": {
-                                      "type": "array of string",
+                                      "type": "array",
+                                      "items": {
+                                        "type": "string"
+                                      },
                                       "description": "Instance types allowed in the Ocean cluster.\n",
                                       "example": [
                                         "n1-standard-2"
@@ -40535,7 +40751,7 @@
                                     },
                                     "metadata": {
                                       "type": "object",
-                                      "descritpion": "Set array of cluster metadata\n",
+                                      "description": "Set array of cluster metadata\n",
                                       "properties": {
                                         "key": {
                                           "type": "string",
@@ -40550,11 +40766,12 @@
                                       }
                                     },
                                     "tags": {
-                                      "type": "array of string",
+                                      "type": "array",
                                       "description": "Array of tags to instances launched in Ocean cluster",
-                                      "example": [
-                                        "gke-test-native-vpc-5cb557f7-node"
-                                      ]
+                                      "items": {
+                                        "type": "string",
+                                        "example": "gke-test-native-vpc-5cb557f7-node"
+                                      }
                                     },
                                     "ipForwarding": {
                                       "type": "boolean",
@@ -40565,7 +40782,7 @@
                                       "example": "265168459660-compute@developer.gserviceaccount.com"
                                     },
                                     "labels": {
-                                      "type": "array of object",
+                                      "type": "array",
                                       "description": "Set labels on cluster. Can set up to 60 labels\n",
                                       "items": {
                                         "type": "object",
@@ -40590,9 +40807,12 @@
                                 },
                                 "availabilityZones": {
                                   "type": "array",
-                                  "example": [
-                                    "us-central1-a"
-                                  ]
+                                  "items": {
+                                    "type": "string",
+                                    "example": [
+                                      "us-central1-a"
+                                    ]
+                                  }
                                 }
                               }
                             },
