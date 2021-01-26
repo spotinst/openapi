@@ -15,7 +15,6 @@ properties:
         description: >
           AWS Elastigroup Name
         example: "my-Elastigroup"
-        required: true
       description:
         type: string
         description: >
@@ -133,22 +132,22 @@ properties:
               type: object
               properties:
                 shouldPersistPrivateIp:
-                  item: boolean
+                  type: boolean
                   description: |
                     Should the instance maintain its private IP
                   example: true
                 shouldPersistRootDevice:
-                  item: boolean
+                  type: boolean
                   description: |
                     Should the instance maintain its root device volumes
                   example: true
                 shouldPersistBlockDevices:
-                  item: boolean
+                  type: boolean
                   description: |
                     Should the instance maintain its Data volumes
                   example: true
                 blockDevicesMode:
-                  item: string
+                  type: string
                   description: |
                     Determine the way we attach the data volumes to the data devices
                   enum: [ reattach, onLaunch ]
@@ -231,12 +230,16 @@ properties:
                 type: array
                 description: |
                   Available Spot Instance types
-                example: [ "c3.large", "c4.large", "m3.large", "r3.large" ]
+                items:
+                  type: string
+                  example: [ "c3.large", "c4.large", "m3.large", "r3.large" ]
               preferredSpot:
                 type: array
                 description: |
                   Prioritize a subset of spot instance types. Must be a subset of the selected spot instance types.
-                example: [ "c4.large" ]
+                items:
+                  type: string
+                  example: [ "c4.large" ]
               weights:
                 type: array
                 description: |
@@ -253,13 +256,15 @@ properties:
                       type: integer
                       description: |
                         The weight
-                      exmample: 8
+                      example: 8
           subnetIds:
             type: array
             description: |
               A comma-separated list of subnet identifiers for your group.
               When this parameter is set, compute.availabilityZones should be left unused.
-            example: [ "subnet-4c1d1538", "subnet-2791bb61", "subnet-703a6f58", "subnet-c62846fc" ]
+            items:
+              type: string
+              example: [ "subnet-4c1d1538", "subnet-2791bb61", "subnet-703a6f58", "subnet-c62846fc" ]
           availabilityZones:
             type: array
             description: |
@@ -279,7 +284,9 @@ properties:
                   type: array
                   description: |
                     A comma-separated list of subnet identifiers for your group.
-                  example: [ "subnet-4333093a" ]
+                  items:
+                    type: string
+                    example: [ "subnet-4333093a" ]
                 placementGroupName:
                   type: string
                   description: |
@@ -292,7 +299,9 @@ properties:
               If no markets are available in the Preferred AZs, Spot instances are launched in the non-preferred AZs.
               * Must be a sublist of compute.AvailabilityZones
               * strategy.availabilityVsCost must not be equalAzDistribution
-            example: [ "us-east-1a","us-east-1b" ]
+            items:
+              type: string
+              example: [ "us-east-1a","us-east-1b" ]
           launchSpecification:
             type: object
             required:
@@ -641,6 +650,29 @@ properties:
                     type: string
                     description: Required for IMDSv2. Can’t be null in Create or Update. Values can be "optional" or "required".
                     example: optional
+                  httpPutResponseHopLimit:
+                    type: integer
+                    example: "33"
+                    description: |
+                      An integer within 1,64 range (including).
+                      The desired HTTP PUT response hop limit for instance metadata requests.
+                      The larger the number, the further instance metadata requests can travel.
+              cpuOptions:
+                title: CPU options
+                type: object
+                description: Optional field. The CPU options for the instances that are launched within the group.
+                required:
+                  - threadsPerCore
+                properties:
+                  threadsPerCore:
+                    title: thread per core
+                    type: integer
+                    example: "1"
+                    description: |
+                      The number of threads per CPU core.
+                      To disable multithreading for the instances, specify a value of 1 .
+                      Otherwise, specify the default value of 2 .
+
       scaling:
         type: object
         title: Elastigroup Scaling
@@ -677,14 +709,17 @@ properties:
                 enum: [ seconds , microseconds , milliseconds , bytes , kilobytes , megabytes , gigabytes , terabytes , bits , kilobits , megabits , gigabits , terabits , percent , count , bytes/second , kilobytes/second , megabytes/second , gigabytes/second , terabytes/second , bits/second , kilobits/second , megabits/second , gigabits/second , terabits/second , count/second , none ]
                 example: "percent"
               threshold:
-                type: double
+                type: integer
                 description: |
                   The value against which the specified statistic is compared
                 example: 90
               action:
                 type: object
+                example: "adjustment"
                 description: |
-                  The action to take when scale up is needed
+                  The action to take when scale up is needed.
+                  A mandatory field, that should be filled with one of the following:
+                  "adjustment", "percentageAdjustment", "setMaxTarget", "setMinTarget", "updateCapacity".
                 properties:
                   type:
                     type: string
@@ -794,14 +829,17 @@ properties:
                 enum: [ seconds , microseconds , milliseconds , bytes , kilobytes , megabytes , gigabytes , terabytes , bits , kilobits , megabits , gigabits , terabits , percent , count , bytes/second , kilobytes/second , megabytes/second , gigabytes/second , terabytes/second , bits/second , kilobits/second , megabits/second , gigabits/second , terabits/second , count/second , none ]
                 example: "percent"
               threshold:
-                type: double
+                type: integer
                 description: |
                   The value against which the specified statistic is compared
                 example: 90
               action:
                 type: object
+                example: "adjustment"
                 description: |
-                  The action to take when scale up is needed
+                  The action to take when scale up is needed.
+                  A mandatory field, that should be filled with one of the following:
+                  "adjustment", "percentageAdjustment", "setMaxTarget", "setMinTarget", "updateCapacity".
                 properties:
                   type:
                     type: string
@@ -884,7 +922,7 @@ properties:
             properties:
               source:
                 title: Source
-                desctiption: "The source of the metric Supported values: “cloudWatch”, “spectrum”"
+                description: "The source of the metric Supported values: “cloudWatch”, “spectrum”"
                 type: string
                 example: spectrum
               policyName:
@@ -1026,6 +1064,241 @@ properties:
                   Rancher version
                 example: "1"
                 default: "1"
+              secretKey:
+                type: string
+                example: SECRET
+              version:
+                type: string
+                example: 1
+          kubernetes:
+            type: object
+            properties:
+              integrationMode:
+                type: string
+                example: pod
+              clusterIdentifier:
+                type: string
+                example: test-k8s
+              autoScale:
+                type: object
+                properties:
+                  isEnabled:
+                    type: boolean
+                    example: true
+                    default: true
+                  cooldown:
+                    type: integer
+                    example: 300
+                  down:
+                    type: object
+                    description: >
+                      Auto Scaling scale down operations.
+                    properties:
+                      evaluationPeriods:
+                        type: integer
+                        example: 5
+                      maxScaleDownPercentage:
+                        type: integer
+                        description: |
+                          The maximum % of nodes that will be scaled down at once out of the total amount of potential nodes to scale down.
+                          example: if 10 nodes can be scaled down, only 5 will be given 50% in this parameter.
+                          the other 50% will be scaled down in the next autoscaling iteration.
+                        example: 70
+                      headroom:
+                        type: object
+                        description: >
+                          Spare resource capacity management enabling fast assignment of Pods without waiting for new resources to launch.
+                        properties:
+                          cpuPerUnit:
+                            type: integer
+                            description: >
+                              Optionally configure the number of CPUs to allocate per headroom unit. CPUs are denoted in CPU units, where 1024 units = 1 vCPU.
+                            example: 2048
+                          memoryPerUnit:
+                            type: integer
+                            description: >
+                              Optionally configure the amount of memory (MiB) to allocate per headroom unit.
+                            example: 3
+                          numOfUnits:
+                            type: integer
+                            description: >
+                              The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.
+                            example: 2
+                          gpuPerUnit:
+                            type: integer
+                            example: 2
+                  labels:
+                    type: array
+                    description:
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          type: string
+                          example: group, kops.k8s.io/instancegroup
+                        value:
+                          type: string
+                          example: microservices
+                  isAutoConfig:
+                    type: boolean
+                    example: false
+                    default: false
+          mesosphere:
+            type: object
+            properties:
+              apiServer:
+                type: string
+                example: 1.2.3.4
+          mlbRuntime:
+            type: object
+            properties:
+              deploymentId:
+                type: string
+                example: dp-rm0f5b912345
+          nomad:
+            type: object
+            properties:
+              masterHost:
+                type: string
+                example: https://master.host.com
+              masterPort:
+                type: integer
+                example: 443
+              autoScale:
+                type: object
+                properties:
+                  isEnabled:
+                    type: boolean
+                    description: >
+                      Enable the Autoscaler.
+                    example: true
+                  cooldown:
+                    type: integer
+                    description: >
+                      Cooldown period between scaling actions. Value should be cooldown period in seconds, greater than 180
+                    example: 180
+                  down:
+                    type: object
+                    description: >
+                      Auto Scaling scale down operations.
+                    properties:
+                      evaluationPeriods:
+                        type: integer
+                        example: 3
+                  headroom:
+                    type: object
+                    description: >
+                      Spare resource capacity management enabling fast assignment of Pods without waiting for new resources to launch.
+                    properties:
+                      cpuPerUnit:
+                        type: integer
+                        description: >
+                          Optionally configure the number of CPUs to allocate per headroom unit. CPUs are denoted in CPU units, where 1024 units = 1 vCPU.
+                        example: 2048
+                      memoryPerUnit:
+                        type: integer
+                        description: >
+                          Optionally configure the amount of memory (MiB) to allocate per headroom unit.
+                        example: 3
+                      numOfUnits:
+                        type: integer
+                        description: >
+                          The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.
+                        example: 2
+                  constraints:
+                    type: array
+                    description:
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          type: string
+                          example: ${node.class}
+                        value:
+                          type: string
+                          example: value
+              aclToken:
+                type: string
+                example: 123
+              tlsConfig:
+                type: object
+                description:  |
+                  Configuration object for TLS integration. (optional)
+                properties:
+                  tlsEnabled:
+                    type: boolean
+                    example: true
+                    description: |
+                      When true, all communication to the master is with TLS. (required)
+                  privateKey:
+                    type: string
+                    example: "PRIVATE KEY CERTIFICATE STR"
+                    description: |
+                      A generated client private key. (required)
+                  certificate:
+                    type: string
+                    example: "PUBLIC KEY CERTIFICATE STR"
+                    description: |
+                      The certificates chain, first the client certificate then the ca certificate. (required)
+          chef:
+            type: object
+            properties:
+              chefServer:
+                type: string
+                example: https://master.host.com
+              organization:
+                type: string
+                example: ORGNAME
+              chefVersion:
+                type: string
+                example: 12.1
+              user:
+                type: string
+                example: User
+              pemKey:
+                type: string
+                example: Key
+          rightScale:
+            type: object
+            properties:
+              accountId:
+                type: string
+                example: ID
+              refreshToken:
+                type: string
+                example: TOKEN
+              region:
+                type: string
+                example: us-east-1
+          opsWorks:
+            type: object
+            properties:
+              layerId:
+                type: string
+                example: 00d9m815-8aac-62b7-cc01-123456, xxxxxx-xxxxxxxx, xxxxxxx-xxxxxxxxxx
+              stackType:
+                type: string
+                example: CLASSIC
+          codeDeploy:
+            type: object
+            properties:
+              cleanUpOnFailure:
+                type: boolean
+                example: false
+              terminateInstanceOnFailure:
+                type: boolean
+                example: false
+              deploymentGroups:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    applicationName:
+                      type: string
+                      example: test-app
+                    deploymentGroupName:
+                      type: string
+                      example: test-grp
           route53:
             type: object
             description: |
@@ -1095,6 +1368,45 @@ properties:
               environmentId:
                 type: string
                 example: e-12345
+              deploymentPreferences:
+                type: object
+                properties:
+                  automaticRoll:
+                    type: boolean
+                    example: true
+                  batchSizePercentage:
+                    type: integer
+                    example: 50
+                  gracePeriod:
+                    type: integer
+                    example: 600
+                  strategy:
+                    type: object
+                    properties:
+                      action:
+                        type: string
+                        example: REPLACE_SERVER
+                      shouldDrainInstances:
+                        type: boolean
+                        example: true
+              managedActions:
+                type: object
+                properties:
+                  platformUpdate:
+                    type: object
+                    properties:
+                      performAt:
+                        type: string
+                        example: timeWindow
+                      timeWindow:
+                        type: string
+                        example: Mon:23:50-Tue:00:20
+                      updateLevel:
+                        type: string
+                        example: patch
+                      instanceRefreshEnabled:
+                        type: boolean
+                        example: true
           ecs:
             type: object
             description: |
@@ -1112,7 +1424,9 @@ properties:
                 properties:
                   jobQueueNames:
                     type: array
-                    example: ["dumpy-big-processing"]
+                    items:
+                      type: string
+                      example: ["dumpy-big-processing"]
               optimizeImages:
                     type: object
                     properties:
@@ -1141,5 +1455,7 @@ properties:
                           example: "Mon:03:00-Wed:02:30"
           dockerSwarm:
             $ref: "../schemas/dockerSwarm.yaml"
+#          datadog:
+ #           $ref: "../schemas/datadog.yaml"
 
 

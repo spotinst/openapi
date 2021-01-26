@@ -34,25 +34,29 @@ properties:
           arn:
             type: string
             example: "arn:aws:iam::123456781234:instance-profile/EKS-nodes-test-NodeInstanceProfile-ABCDEFGH123"
-            descritpion: The iamRole arn. If set - do not set launchSpec.iamInstanceProfile.name
+            description: The iamRole arn. If set - do not set launchSpec.iamInstanceProfile.name
           name:
             type: string
             description: The iamRole name. If set - do not set launchSpec.iamInstanceProfile.arn
             example: EKS-nodes-test
       securityGroupIds:
-        type: array of string
+        type: array
         description: Set security groups. Each element in array should be security group ID
-        example:
-          - "sg-0ded3a2980208c30c"
-          - "sg-0ded3a2980208c30d"
+        items:
+          type: string
+          example:
+            - "sg-0ded3a2980208c30c"
+            - "sg-0ded3a2980208c30d"
       instanceTypes:
         type: array
         description: |
           A list of instance types allowed to be provisioned for pods pending for the launch specification.\
           The list overrides the list defined for the Ocean cluster. Can be null.
-        example:
-          - "c3.2xlarge"
-          - "c4.2xlarge"
+        items:
+          type: string
+          example:
+            - "c3.2xlarge"
+            - "c4.2xlarge"
       rootVolumeSize:
         type: integer
         description: Set root volume size (in GB). This field and blockDeviceMappings cannot be used in the same spec.
@@ -107,11 +111,13 @@ properties:
             value: taintValue
             effect: NoSchedule
       subnetIds:
-        type: array of string
+        type: array
         description: Set subnets in launchSpec. Each element in array should be subnet ID
-        example:
-          - subnet-123
-          - subnet-456
+        items:
+          type: string
+          example:
+            - subnet-123
+            - subnet-456
       elasticIpPool:
         type: object
         description: Assign an Elastic IP to the instances spun by the launch spec. Can be null.
@@ -162,19 +168,22 @@ properties:
                     How much GPU allocate for headroom unit
                   example: 0
       tags:
-        type: object
-        description: List of kay-value pairs of tags
-        properties:
-          - type: object
-            properties:
-              tagKey:
-                type: string
-                description: Set the tag key
-                example: Creator
-              tagValue:
-                type: string
-                description: Set the tag value
-                example: John Doe
+        type: array
+        description: |
+          List of kay-value pairs of tags.
+        items:
+          type: object
+          properties:
+            tagKey:
+              type: string
+              description: |
+                Set the tag key.
+              example: "Creator"
+            tagValue:
+              type: string
+              description: |
+                Set the tag value.
+              example: "John Doe"
       blockDeviceMappings:
         type: array
         description: |
@@ -279,4 +288,10 @@ properties:
         type: boolean
         description: Configure public IP address allocation
         default: false
+        example: false
+      restrictScaleDown:
+        type: boolean
+        description: |
+          When set to “True”, VNG nodes will be treated as if all pods running have the [restrict-scale-down label](https://docs.spot.io/ocean/features/labels-and-taints).
+          Therefore, Ocean will not scale nodes down unless empty.
         example: false
