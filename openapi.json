@@ -93,6 +93,14 @@
       }
     },
     {
+      "name": "Ocean AKS",
+      "description": "Ocean - Serverless containers for for Azure Kubernetes Service",
+      "externalDocs": {
+        "description": "Ocean Concepts and Tutorials",
+        "url": "https://docs.spot.io/ocean/"
+      }
+    },
+    {
       "name": "Ocean On-Premise",
       "description": "Ocean On-Premise API - Understand cost drivers within you on-premise clusters and compare the costs to the Ocean Cloud.",
       "externalDocs": {
@@ -171,6 +179,7 @@
         "Ocean AWS",
         "Ocean ECS",
         "Ocean GKE",
+        "Ocean AKS",
         "Ocean On-Premise"
       ]
     },
@@ -31101,12 +31110,12 @@
           },
           {
             "in": "query",
-            "name": "OCEAN_ID",
+            "name": "oceanId",
             "schema": {
               "type": "string"
             },
             "required": true,
-            "example": "o-abcd1234",
+            "example": "o-12345abc",
             "description": "The ID of the Ocean cluster.\n"
           }
         ],
@@ -41218,6 +41227,1459 @@
                       }
                     }
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/azure/k8s/cluster": {
+      "summary": "Ocean for AKS",
+      "get": {
+        "summary": "List Clusters",
+        "description": "List the configurations for all Ocean cluster in the specified account.\n",
+        "operationId": "oceanAKSClusterList",
+        "tags": [
+          "Ocean AKS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean AKS Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/azure/k8s/cluster"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1azure~1k8s~1cluster~1%7BoceanClusterId%7D/put/requestBody/content/application~1json/schema/allOf/0"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:azure:k8s"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/azure/k8s/cluster/{oceanClusterId}": {
+      "get": {
+        "summary": "Get Cluster",
+        "description": "Get the configurations for a specified Ocean cluster.\n",
+        "operationId": "oceanAKSClusterGet",
+        "tags": [
+          "Ocean AKS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean AKS Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/azure/k8s/cluster/o-12345abc"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1azure~1k8s~1cluster~1%7BoceanClusterId%7D/put/requestBody/content/application~1json/schema/allOf/0"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:azure:k8s"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update Cluster",
+        "description": "All Ocean parameters are updatable, excluding aks and controllerClusterId.\n<br />\nThis API supports partial updates, so specific fields can be updated separately.\n",
+        "operationId": "oceanAKSClusterUpdate",
+        "tags": [
+          "Ocean AKS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          },
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "cluster"
+                    ],
+                    "properties": {
+                      "cluster": {
+                        "type": "object",
+                        "description": "The Ocean cluster.\n",
+                        "required": [
+                          "name",
+                          "controllerClusterId",
+                          "aks",
+                          "virtualNodeGroupTemplate"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "readOnly": true,
+                            "example": "o-134abcd",
+                            "description": "Ocean cluster ID.\n"
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "test",
+                            "description": "Add a name for the Ocean cluster.\n"
+                          },
+                          "controllerClusterId": {
+                            "type": "string",
+                            "example": "test-123124",
+                            "description": "Enter a unique Ocean cluster identifier.\n"
+                          },
+                          "aks": {
+                            "type": "object",
+                            "required": [
+                              "name",
+                              "resourceGroupName"
+                            ],
+                            "description": "AKS cluster configuration\n",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "description": "Required on cluster.aks object.\n",
+                                "example": "test-cluster"
+                              },
+                              "resourceGroupName": {
+                                "type": "string",
+                                "description": "Required on cluster.aks object.\n",
+                                "example": "TestResourceGroup"
+                              }
+                            }
+                          },
+                          "autoScaler": {
+                            "type": "object",
+                            "title": "auto-scaler",
+                            "description": "The Ocean Kubernetes Autoscaler object.\n",
+                            "properties": {
+                              "isEnabled": {
+                                "type": "boolean",
+                                "description": "Enable the Ocean Kubernetes Autoscaler.\n",
+                                "default": true,
+                                "example": true
+                              },
+                              "resourceLimits": {
+                                "type": "object",
+                                "description": "Optionally set upper and lower bounds on the resource usage of the cluster.\n",
+                                "properties": {
+                                  "maxVcpu": {
+                                    "type": "integer",
+                                    "description": "The maximum cpu in vCpu units that can be allocated to the cluster.\n",
+                                    "example": 750
+                                  },
+                                  "maxMemoryGib": {
+                                    "type": "integer",
+                                    "description": "The maximum memory in GiB units that can be allocated to the cluster.\n",
+                                    "example": 1500
+                                  }
+                                }
+                              },
+                              "down": {
+                                "type": "object",
+                                "description": "Auto Scaling scale down operations.\n",
+                                "properties": {
+                                  "maxScaleDownPercentage": {
+                                    "type": "double",
+                                    "minimum": 0.1,
+                                    "maximum": 100,
+                                    "description": "Would represent the maximum % to scale-down.",
+                                    "example": 30
+                                  }
+                                }
+                              },
+                              "headroom": {
+                                "type": "object",
+                                "description": "Spare resource capacity management enabling fast assignment of Pods without waiting for new resources to launch.\n",
+                                "properties": {
+                                  "automatic": {
+                                    "type": "object",
+                                    "description": "Automatic headroom configuration.\n",
+                                    "properties": {
+                                      "isEnabled": {
+                                        "type": "boolean",
+                                        "description": "Enable automatic headroom. When set to true, Ocean configures and optimizes headroom automatically.\n",
+                                        "default": true,
+                                        "example": true
+                                      },
+                                      "percentage": {
+                                        "type": "integer",
+                                        "description": "Optionally set a number between 0-100 to control the percentage of total cluster resources dedicated to headroom.\nRelevant when isEnabled=true.\n",
+                                        "example": 5
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "strategy": {
+                            "type": "object",
+                            "title": "Ocean AKS Strategy",
+                            "description": "The Ocean AKS Strategy object.\n",
+                            "properties": {
+                              "spotPercentage": {
+                                "type": "integer",
+                                "description": "Percentage of Spot-VMs to maintain.\n",
+                                "example": 50,
+                                "default": 100
+                              },
+                              "fallbackToOd": {
+                                "type": "boolean",
+                                "description": "If no spot instance markets are available, enable Ocean to launch on-demand instances instead.\n",
+                                "example": true,
+                                "default": true
+                              }
+                            }
+                          },
+                          "health": {
+                            "type": "object",
+                            "title": "Ocean AKS Health",
+                            "description": "The Ocean AKS Health object.\n",
+                            "properties": {
+                              "gracePeriod": {
+                                "type": "integer",
+                                "default": 600,
+                                "example": 600,
+                                "description": "The amount of time to wait, in seconds, from the moment the instance has launched before monitoring its health checks.\n"
+                              }
+                            }
+                          },
+                          "virtualNodeGroupTemplate": {
+                            "type": "object",
+                            "title": "Ocean AKS Virtual Node Group Template",
+                            "description": "A default template object for all future Ocean AKS Virtual Node Groups.\n",
+                            "required": [
+                              "launchSpecification"
+                            ],
+                            "properties": {
+                              "vmSizes": {
+                                "type": "object",
+                                "description": "The types of virtual machines that may or may not be a part of the Ocean cluster.\n",
+                                "properties": {
+                                  "whitelist": {
+                                    "type": "array",
+                                    "description": "VM types allowed in the Ocean cluster.\n",
+                                    "items": {
+                                      "type": "string",
+                                      "example": "standard_ds2_v2"
+                                    }
+                                  }
+                                }
+                              },
+                              "launchSpecification": {
+                                "type": "object",
+                                "required": [
+                                  "resourceGroupName",
+                                  "image",
+                                  "network",
+                                  "login",
+                                  "loadBalancersConfig"
+                                ],
+                                "properties": {
+                                  "resourceGroupName": {
+                                    "type": "string",
+                                    "description": "This Azure resource group to launch VMs into. Cannot be updated.\n",
+                                    "example": "azureResourceGroup"
+                                  },
+                                  "customData": {
+                                    "type": "string",
+                                    "format": "byte",
+                                    "description": "Must contain a valid Base64 encoded string.\n",
+                                    "example": "IyEvYmluL2Jhc2gKZWNobyAidGVzdCI="
+                                  },
+                                  "image": {
+                                    "type": "object",
+                                    "required": [
+                                      "marketplace"
+                                    ],
+                                    "description": "Image of VM. An image is a template for creating new VMs.\\\nChoose from Azure image catalogue (marketplace).\n",
+                                    "properties": {
+                                      "marketplace": {
+                                        "type": "object",
+                                        "required": [
+                                          "publisher",
+                                          "offer",
+                                          "sku",
+                                          "version"
+                                        ],
+                                        "description": "Select an image from Azure's Marketplace image catalogue.\n",
+                                        "properties": {
+                                          "publisher": {
+                                            "type": "string",
+                                            "description": "Image publisher.\n",
+                                            "example": "OpenLogic"
+                                          },
+                                          "offer": {
+                                            "type": "string",
+                                            "description": "Name of image to use.\n",
+                                            "example": "CentOS"
+                                          },
+                                          "sku": {
+                                            "type": "string",
+                                            "description": "Image's Stock Keeping Unit, which is the specific version of the image.\n",
+                                            "example": 7.3
+                                          },
+                                          "version": {
+                                            "type": "string",
+                                            "description": "Image's version. if version not provided we use \"latest\".\n",
+                                            "default": "lastest",
+                                            "example": "7.3-1611"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "network": {
+                                    "title": "Network",
+                                    "description": "Define the Virtual Network and Subnet for your Elastigroup.\n",
+                                    "type": "object",
+                                    "required": [
+                                      "resourceGroupName",
+                                      "virtualNetworkName",
+                                      "networkInterfaces"
+                                    ],
+                                    "properties": {
+                                      "resourceGroupName": {
+                                        "title": "Resource Group Name",
+                                        "description": "Vnet resource group name.\n",
+                                        "type": "string",
+                                        "example": "subnetResourceGroup"
+                                      },
+                                      "virtualNetworkName": {
+                                        "title": "Virtual Network Name",
+                                        "description": "Virtual network.\n",
+                                        "type": "string",
+                                        "example": "vname"
+                                      },
+                                      "networkInterfaces": {
+                                        "title": "Network Interfaces",
+                                        "description": "A list of virtual network interfaces.\\\nThe publicIpSku must be identical between all the network interfaces.\\\nOne network interface must be set as the primary.\n",
+                                        "type": "array",
+                                        "items": {
+                                          "type": "object",
+                                          "required": [
+                                            "isPrimary",
+                                            "subnetName",
+                                            "assignPublicIp",
+                                            "securityGroup",
+                                            "enableIPForwarding"
+                                          ],
+                                          "properties": {
+                                            "isPrimary": {
+                                              "title": "Is Primary Criteria",
+                                              "description": "Defines whether the network interface is primary or not.\n",
+                                              "type": "boolean",
+                                              "example": true
+                                            },
+                                            "subnetName": {
+                                              "title": "Subnet Name",
+                                              "description": "Subnet name.\n",
+                                              "type": "string",
+                                              "example": "testSubnet"
+                                            },
+                                            "assignPublicIp": {
+                                              "title": "Assign Publick IP",
+                                              "description": "Assign public IP.\n",
+                                              "type": "boolean",
+                                              "example": true
+                                            },
+                                            "publicIpSku": {
+                                              "title": null,
+                                              "description": "Required if assignPublicIp=true. Supported values:\n+ Standard\n+ Basic\n",
+                                              "type": "string",
+                                              "example": "Standard"
+                                            },
+                                            "securityGroup": {
+                                              "title": "Security Group",
+                                              "description": "Security Group",
+                                              "type": "array",
+                                              "items": {
+                                                "type": "object",
+                                                "required": [
+                                                  "name",
+                                                  "resourceGroupName"
+                                                ],
+                                                "properties": {
+                                                  "name": {
+                                                    "title": "Name",
+                                                    "description": "Requires valid security group name. Required if security group is specified.\n",
+                                                    "type": "string",
+                                                    "example": "test"
+                                                  },
+                                                  "resourceGroupName": {
+                                                    "title": "Resource Group Name",
+                                                    "description": "Requires valid resource group name. Required if security group is specified.\n",
+                                                    "type": "string",
+                                                    "example": "test"
+                                                  }
+                                                }
+                                              }
+                                            },
+                                            "enableIPForwarding": {
+                                              "title": "Enable IP Forwarding",
+                                              "description": "Enable IP Forwarding\n",
+                                              "type": "boolean",
+                                              "example": true
+                                            },
+                                            "additionalIpConfigurations": {
+                                              "title": "Additional IP Configurations",
+                                              "description": "Additional configuration of network interface.\\\nThe name fields between all the additionalIpConfigurations must be unique.\n",
+                                              "type": "array",
+                                              "items": {
+                                                "type": "object",
+                                                "required": [
+                                                  "name"
+                                                ],
+                                                "properties": {
+                                                  "name": {
+                                                    "title": "Name",
+                                                    "description": "Required if additionalConfiguration has been specified.\n",
+                                                    "type": "string",
+                                                    "example": "test"
+                                                  },
+                                                  "privateIpAddressVersion": {
+                                                    "title": "Private IP Address Version",
+                                                    "description": "Supported values:\n+ IPv4\n+ IPv6\n",
+                                                    "default": "IPv4"
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "login": {
+                                    "type": "object",
+                                    "required": [
+                                      "sshPublicKey",
+                                      "userName"
+                                    ],
+                                    "description": "Set admin access for accessing your VMs.\n",
+                                    "properties": {
+                                      "sshPublicKey": {
+                                        "type": "string",
+                                        "description": "SSH public key for admin access to Linux VMs.\n",
+                                        "example": "ssh-rsa"
+                                      },
+                                      "userName": {
+                                        "type": "string",
+                                        "description": "User name for admin access to VMs.\n",
+                                        "example": "spotuser"
+                                      }
+                                    }
+                                  },
+                                  "loadBalancersConfig": {
+                                    "type": "object",
+                                    "description": "Configure Load Balancers.\n",
+                                    "properties": {
+                                      "loadBalancers": {
+                                        "type": "array",
+                                        "description": "Array of load balancer objects.\n",
+                                        "items": {
+                                          "type": "object",
+                                          "required": [
+                                            "type",
+                                            "resourceGroupName",
+                                            "name",
+                                            "loadBalancerSku",
+                                            "backendPoolNames"
+                                          ],
+                                          "properties": {
+                                            "type": {
+                                              "type": "string",
+                                              "description": "The type of load balancer.\n",
+                                              "enum": [
+                                                "loadBalancer"
+                                              ],
+                                              "example": "loadBalancer"
+                                            },
+                                            "resourceGroupName": {
+                                              "type": "string",
+                                              "description": "The Resource Group name of the Load Balancer.\n",
+                                              "example": "testResourceGroup"
+                                            },
+                                            "name": {
+                                              "type": "string",
+                                              "description": "Name of the Load Balancer.\n",
+                                              "example": "testLoadBalancer"
+                                            },
+                                            "loadBalancerSku": {
+                                              "type": "string",
+                                              "description": "Possible values are:\n  * Standard\n  * Basic\n",
+                                              "example": "Standard"
+                                            },
+                                            "backendPoolNames": {
+                                              "type": "array",
+                                              "description": "Names of the Backend Pools to register the Cluster VMs to.\\\nEach Backend Pool is a separate load balancer.\n",
+                                              "example": [
+                                                "testBackendPool1",
+                                                "testBackendPool2"
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "tags": {
+                                    "type": "array",
+                                    "description": "A maximum of 10, unique, Key-Value pairs for VM tags in the cluster.\n",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "tagKey": {
+                                          "type": "string",
+                                          "description": "Tag Key for Vms in the cluster.\n",
+                                          "example": "env"
+                                        },
+                                        "tagValue": {
+                                          "type": "string",
+                                          "description": "Tag Value for VMs in the cluster.\n",
+                                          "example": "staging"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "extensions": {
+                                    "type": "array",
+                                    "description": "List of azure extensions objects.\n",
+                                    "items": {
+                                      "type": "object",
+                                      "required": [
+                                        "name",
+                                        "type",
+                                        "publisher",
+                                        "apiVersion",
+                                        "minorVersionAutoUpgrade"
+                                      ],
+                                      "properties": {
+                                        "name": {
+                                          "type": "string",
+                                          "description": "Required on compute.launchSpecification.extensions object.\n",
+                                          "required": true,
+                                          "example": "extensionName"
+                                        },
+                                        "type": {
+                                          "type": "string",
+                                          "required": true,
+                                          "description": "Required on compute.launchSpecification.extensions object.\n",
+                                          "example": "customScript"
+                                        },
+                                        "publisher": {
+                                          "type": "string",
+                                          "description": "Required on compute.launchSpecification.extensions object.\n",
+                                          "required": true,
+                                          "example": "Microsoft.Azure.Extensions"
+                                        },
+                                        "apiVersion": {
+                                          "type": "string",
+                                          "description": "The API version of the extension. Required if extension specified.\n",
+                                          "example": 2
+                                        },
+                                        "minorVersionAutoUpgrade": {
+                                          "type": "boolean",
+                                          "required": true,
+                                          "description": "Required on compute.launchSpecification.extensions object.\n",
+                                          "example": true
+                                        },
+                                        "publicSettings": {
+                                          "type": "object",
+                                          "description": "Object for public settings\n"
+                                        },
+                                        "protectedSettings": {
+                                          "type": "object",
+                                          "description": "Object for protected settings\n"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "osDisk": {
+                                    "type": "object",
+                                    "required": [
+                                      "sizeGB"
+                                    ],
+                                    "description": "Specify OS disk specification other than default.\n",
+                                    "properties": {
+                                      "type": {
+                                        "type": "string",
+                                        "description": "The type of the OS disk.\n",
+                                        "enum": [
+                                          "Standard_LRS",
+                                          "Premium_LRS",
+                                          "StandardSSD_LRS"
+                                        ],
+                                        "example": "Standard_LRS"
+                                      },
+                                      "sizeGB": {
+                                        "type": "integer",
+                                        "description": "The size of the OS disk in GB, Required if dataDisks is specified.\n",
+                                        "minimum": 1,
+                                        "maximum": 1023,
+                                        "example": 30
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "readOnly": true,
+                            "format": "date-time",
+                            "example": "2021-03-17T08:13:08.000Z",
+                            "description": "A timestamp of the Ocean creation\n"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "readOnly": true,
+                            "format": "date-time",
+                            "example": "2021-03-17T15:06:13.000Z",
+                            "description": "A timestamp of the latest Ocean update\n"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ocean AKS Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/azure/k8s/cluster/o-12345abc"
+                            },
+                            "method": {
+                              "example": "PUT"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1azure~1k8s~1cluster~1%7BoceanClusterId%7D/put/requestBody/content/application~1json/schema/allOf/0"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:azure:k8s"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Cluster",
+        "description": "Delete a specified Ocean cluster.\n",
+        "operationId": "oceanAKSClusterDelete",
+        "tags": [
+          "Ocean AKS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean AKS Delete Cluster Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/azure/k8s/cluster/o-12345abc"
+                            },
+                            "method": {
+                              "example": "DELETE"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/azure/k8s/cluster/{oceanClusterId}/detachVms": {
+      "put": {
+        "summary": "Detach VMs",
+        "description": "Scale down specific virtual machines in Ocean cluster.\n",
+        "operationId": "oceanAzureDetachVms",
+        "tags": [
+          "Ocean AKS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "vmsToDetach"
+                ],
+                "type": "object",
+                "properties": {
+                  "vmsToDetach": {
+                    "type": "array",
+                    "description": "Array of virtual machine names to detach.\n",
+                    "items": {
+                      "type": "string",
+                      "example": "vm-0fbd69f960db"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ocean AKS Detach Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/azure/k8s/cluster/o-12345abc/detachVms"
+                            },
+                            "method": {
+                              "example": "PUT"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "detachedVms": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "vmName": {
+                                          "type": "string",
+                                          "example": "vm-12345"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:azure:k8s:cluster:detachVms"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/azure/k8s/virtualNodeGroup": {
+      "post": {
+        "summary": "Create Virtual Node Group",
+        "description": "Create a virtual node group.\n",
+        "operationId": "oceanAKSVirtualNodeGroupCreate",
+        "tags": [
+          "Ocean AKS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/paths/~1ocean~1azure~1k8s~1virtualNodeGroup~1%7BvirtualNodeGroupId%7D/put/requestBody/content/application~1json/schema"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ocean Virtual Node Group Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/azure/k8s/virtualNodeGroup"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1azure~1k8s~1virtualNodeGroup~1%7BvirtualNodeGroupId%7D/put/requestBody/content/application~1json/schema"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:azure:k8s:virtualNodeGroup"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "get": {
+        "summary": "List Virtual Node Groups",
+        "description": "List the configurations for all virtual node groups for the account/cluster.\n",
+        "operationId": "oceanAKSVirtualNodeGroupList",
+        "tags": [
+          "Ocean AKS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec/get/parameters/1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean Virtual Node Group Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/azure/k8s/virtualNodeGroup"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1azure~1k8s~1virtualNodeGroup~1%7BvirtualNodeGroupId%7D/put/requestBody/content/application~1json/schema"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:azure:k8s:virtualNodeGroup"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/azure/k8s/virtualNodeGroup/{virtualNodeGroupId}": {
+      "get": {
+        "summary": "Get Virtual Node Group",
+        "description": "Get the configuration of a specified virtual node group.\n",
+        "operationId": "oceanAKSVirtualNodeGroupGet",
+        "tags": [
+          "Ocean AKS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "in": "path",
+            "name": "virtualNodeGroupId",
+            "example": "vng-12345abc",
+            "description": "Ocean Virtual Node Group ID.\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean Virtual Node Group Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/azure/k8s/virtualNodeGroup/vng-12345abc"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1azure~1k8s~1virtualNodeGroup~1%7BvirtualNodeGroupId%7D/put/requestBody/content/application~1json/schema"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:azure:k8s:virtualNodeGroup"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update Virtual Node Group",
+        "description": "All virtual node group parameters are updatable.\n",
+        "operationId": "oceanAKSVirtualNodeGroupUpdate",
+        "tags": [
+          "Ocean AKS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1azure~1k8s~1virtualNodeGroup~1%7BvirtualNodeGroupId%7D/get/parameters/1"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "virtualNodeGroup": {
+                    "type": "object",
+                    "title": "Ocean AKS Virtual Node Group",
+                    "required": [
+                      "name",
+                      "oceanId"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "readOnly": true,
+                        "example": "vng-12345abc",
+                        "description": "Virtual node group ID.\n"
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "testVng",
+                        "description": "Set name for the virtual node group.\n"
+                      },
+                      "oceanId": {
+                        "type": "string",
+                        "example": "o-13245abc",
+                        "description": "The Ocean cluster ID.\n"
+                      },
+                      "resourceLimits": {
+                        "type": "object",
+                        "properties": {
+                          "maxInstanceCount": {
+                            "description": "Option to set a maximum number of instances per virtual node group.\\\nIf set, value must be greater than or equal to 0.\n",
+                            "type": "integer",
+                            "example": 5
+                          }
+                        }
+                      },
+                      "labels": {
+                        "type": "array",
+                        "description": "An array of labels to add to the virtual node group.\\\nCustom user labels only, no K8s built in labels or Spot internal labels.\n",
+                        "items": {
+                          "type": "object",
+                          "required": [
+                            "key"
+                          ],
+                          "properties": {
+                            "key": {
+                              "type": "string",
+                              "description": "Set label key.\\\nMay not be one of the following:\n* \"kubernetes.io/hostname\"\n* \"failure-domain.beta.kubernetes.io/zone\"\n* \"topology.kubernetes.io/zone\"\n* \"failure-domain.beta.kubernetes.io/region\"\n* \"topology.kubernetes.io/region\"\n* \"beta.kubernetes.io/instance-type\"\n* \"node.kubernetes.io/instance-type\"\n* \"beta.kubernetes.io/os\"\n* \"kubernetes.io/os\"\n* \"beta.kubernetes.io/arch\"\n* \"kubernetes.io/arch\"\n* \"spotinst.io/node-lifecycle\"\n* \"spotinst.io/gpu-type\"\n"
+                            },
+                            "value": {
+                              "type": "string",
+                              "description": "Set label value\n"
+                            }
+                          }
+                        },
+                        "example": [
+                          {
+                            "key": "env",
+                            "value": "test"
+                          }
+                        ]
+                      },
+                      "taints": {
+                        "type": "array",
+                        "description": "Add taints to virtual node group.\n",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "key": {
+                              "type": "string",
+                              "description": "Set taint key.\n"
+                            },
+                            "value": {
+                              "type": "string",
+                              "description": "Set taint value.\n"
+                            },
+                            "effect": {
+                              "type": "string",
+                              "description": "Set taint effect.\n",
+                              "enum": [
+                                "NoSchedule",
+                                "PreferNoSchedule",
+                                "NoExecute",
+                                "PreferNoExecute"
+                              ]
+                            }
+                          }
+                        },
+                        "example": [
+                          {
+                            "key": "taintKey",
+                            "value": "taintValue",
+                            "effect": "NoSchedule"
+                          }
+                        ]
+                      },
+                      "autoScale": {
+                        "type": "object",
+                        "properties": {
+                          "headrooms": {
+                            "type": "array",
+                            "description": "A List of headroom objects. Define custom headroom per virtual node group.\\\nA maximum of 30 objects is allowed.\\\nAt least one of: [cpuPerUnit, memoryPerUnit, gpuPerUnit] must be set.\n",
+                            "items": {
+                              "type": "object",
+                              "required": [
+                                "numOfUnits"
+                              ],
+                              "properties": {
+                                "cpuPerUnit": {
+                                  "type": "integer",
+                                  "description": "Configure the number of CPUs to allocate for the headroom.\nCPUs are denoted in millicores, where 1000 millicores = 1 vCPU.\n",
+                                  "example": 1000
+                                },
+                                "memoryPerUnit": {
+                                  "type": "integer",
+                                  "description": "Configure the amount of memory (MiB) to allocate the headroom.\n",
+                                  "example": 2048
+                                },
+                                "gpuPerUnit": {
+                                  "type": "integer",
+                                  "description": "How many GPU cores should be allocated for headroom unit.\n",
+                                  "example": 0
+                                },
+                                "numOfUnits": {
+                                  "type": "integer",
+                                  "description": "The number of headroom units to maintain, where each unit has the defined CPU, memory and GPU.\n",
+                                  "example": 3
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "launchSpecification": {
+                        "type": "object",
+                        "properties": {
+                          "osDisk": {
+                            "type": "object",
+                            "required": [
+                              "sizeGB"
+                            ],
+                            "description": "Specify OS disk specification other than default.\n",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "description": "The type of the OS disk.\n",
+                                "enum": [
+                                  "Standard_LRS",
+                                  "Premium_LRS",
+                                  "StandardSSD_LRS"
+                                ],
+                                "example": "Standard_LRS"
+                              },
+                              "sizeGB": {
+                                "type": "integer",
+                                "description": "The size of the OS disk in GB, Required if dataDisks is specified.\n",
+                                "minimum": 1,
+                                "maximum": 1023,
+                                "example": 30
+                              }
+                            }
+                          },
+                          "tags": {
+                            "type": "array",
+                            "description": "A maximum of 10, unique, Key-Value pairs for VM tags in the virtual node group.\n",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "tagKey": {
+                                  "type": "string",
+                                  "description": "Tag Key for Vms in the cluster.\n",
+                                  "example": "env"
+                                },
+                                "tagValue": {
+                                  "type": "string",
+                                  "description": "Tag Value for VMs in the cluster.\n",
+                                  "example": "staging"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "readOnly": true,
+                        "format": "date-time",
+                        "example": "2021-03-17T08:13:08.000Z",
+                        "description": "A timestamp of the virtual node group creation.\n"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "readOnly": true,
+                        "format": "date-time",
+                        "example": "2021-03-17T15:06:13.000Z",
+                        "description": "A timestamp of the latest virtual node group update.\n"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ocean Virtual Node Group Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/azure/k8s/virtualNodeGroup/vng-12345abc"
+                            },
+                            "method": {
+                              "example": "PUT"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1azure~1k8s~1virtualNodeGroup~1%7BvirtualNodeGroupId%7D/put/requestBody/content/application~1json/schema"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:azure:k8s:virtualNodeGroup"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Virtual Node Group",
+        "description": "Delete a specified virtual node group in an Ocean cluster.\n",
+        "operationId": "oceanAKSVirtualNodeGroupDelete",
+        "tags": [
+          "Ocean AKS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1azure~1k8s~1virtualNodeGroup~1%7BvirtualNodeGroupId%7D/get/parameters/1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean AKS Delete Cluster Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/azure/k8s/virtualNodeGroup/vng-12345abc"
+                            },
+                            "method": {
+                              "example": "DELETE"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
                 }
               }
             }
