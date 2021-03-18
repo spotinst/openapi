@@ -1,0 +1,59 @@
+type: object
+title: auto-scaler
+description: |
+  The Ocean Kubernetes Autoscaler object.
+properties:
+  isEnabled:
+    type: boolean
+    description: |
+      Enable the Ocean Kubernetes Autoscaler.
+    default: true
+    example: true
+  resourceLimits:
+    type: object
+    description: |
+      Optionally set upper and lower bounds on the resource usage of the cluster.
+    properties:
+      maxVcpu:
+        type: integer
+        description: |
+          The maximum cpu in vCpu units that can be allocated to the cluster.
+        example: 750
+      maxMemoryGib:
+        type: integer
+        description: |
+          The maximum memory in GiB units that can be allocated to the cluster.
+        example: 1500
+  down:
+    type: object
+    description: |
+      Auto Scaling scale down operations.
+    properties:
+      maxScaleDownPercentage:
+        type: double
+        minimum: 0.1
+        maximum: 100
+        description: Would represent the maximum % to scale-down.
+        example: 30
+  headroom:
+    type: object
+    description: |
+      Spare resource capacity management enabling fast assignment of Pods without waiting for new resources to launch.
+    properties:
+      automatic:
+        type: object
+        description: |
+          Automatic headroom configuration.
+        properties:
+          isEnabled:
+            type: boolean
+            description: |
+              Enable automatic headroom. When set to true, Ocean configures and optimizes headroom automatically.
+            default: true
+            example: true
+          percentage:
+            type: integer
+            description: |
+              Optionally set a number between 0-100 to control the percentage of total cluster resources dedicated to headroom.
+              Relevant when isEnabled=true.
+            example: 5
