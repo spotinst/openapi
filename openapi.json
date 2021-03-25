@@ -38149,7 +38149,7 @@
     "/setup/credentials/aws": {
       "post": {
         "summary": "Set Credentials for AWS",
-        "description": "Link a Spot account to an AWS Cloud account.",
+        "description": "Link a Spot account to an AWS Cloud account. \\\nPlease create external id using spot api (see /setup/credentials/aws/externalId) \\\nand use it when creating the AWS role and then call this route with your AWS role's arn to link it to your spot account\n",
         "operationId": "OrganizationsAndAccountsSetCloudCredentialsForAWS",
         "tags": [
           "Accounts"
@@ -38176,12 +38176,6 @@
                             "type": "string",
                             "description": "Provide the IAM Role ARN connected to another AWS account 922761411349 and with the latest Spot Policy - https://docs.spot.io/administration/api/spot-policy-in-aws",
                             "example": "arn:aws:iam::1234567890:role/Spot_Iam_Role",
-                            "required": true
-                          },
-                          "externalId": {
-                            "type": "string",
-                            "description": "Provide the External ID used while setting up the IAM Role. This should be a random string of your choice.",
-                            "example": "1a2b3c4d5e6f7g8h9i0g",
                             "required": true
                           }
                         }
@@ -38249,6 +38243,134 @@
                                       "description": "HTTP status message for the respective status code\n"
                                     }
                                   }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/setup/credentials/aws/externalId": {
+      "post": {
+        "summary": "Create AWS account external id",
+        "description": "Create aws account external id \\\nYou should use the external id when creating your AWS role for your spot account \\\nand after you create the role you need to call [set-aws-credentials Set Credentials for AWS](https://docs.spot.io/api/#operation/OrganizationsAndAccountsSetCloudCredentialsForAWS) \\\nto link your AWS account with your spot account\n",
+        "operationId": "OrganizationsAndAccountsCreateAWSAccountExternalId",
+        "tags": [
+          "Accounts"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Create AWS Acccount External Id Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "allOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "request": {
+                              "type": "object",
+                              "description": "Original request properties\n",
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "example": "46642c7d-bc29-417d-8ce4-79626f00c63c",
+                                  "description": "Unique ID associated with this request\n"
+                                },
+                                "url": {
+                                  "type": "string",
+                                  "example": "/setup/credentials/aws/externalId?accountId=act-123456",
+                                  "description": "The URL that was used for the request\n"
+                                },
+                                "method": {
+                                  "type": "string",
+                                  "example": "POST",
+                                  "description": "The HTTP **METHOD** used for the request\n"
+                                },
+                                "timestamp": {
+                                  "type": "string",
+                                  "example": "2018-11-19T13:49:11.911Z",
+                                  "description": "When the request was received by Spot\n"
+                                }
+                              }
+                            },
+                            "response": {
+                              "type": "object",
+                              "description": "Response package that includes, status, type and any relevant data.\n",
+                              "properties": {
+                                "status": {
+                                  "type": "object",
+                                  "properties": {
+                                    "code": {
+                                      "type": "integer",
+                                      "example": 200,
+                                      "description": "HTTP status code assigned to this response\n"
+                                    },
+                                    "message": {
+                                      "type": "string",
+                                      "example": "OK",
+                                      "description": "HTTP status message for the respective status code\n"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "response": {
+                              "type": "object",
+                              "properties": {
+                                "kind": {
+                                  "type": "string",
+                                  "example": "spotinst:setup:aws:externalId",
+                                  "description": "The data type of each item in the response\n"
+                                },
+                                "items": {
+                                  "type": "array",
+                                  "description": "Array of data objects\n",
+                                  "items": [
+                                    {
+                                      "type": "object",
+                                      "properties": {
+                                        "externalId": {
+                                          "type": "string",
+                                          "description": "Token",
+                                          "example": "SpotinstAwsAccountExternalId"
+                                        },
+                                        "maxValidUntil": {
+                                          "type": "string",
+                                          "description": "Max Valid Until",
+                                          "example": "2021-03-18T16:11:04.402Z"
+                                        }
+                                      }
+                                    }
+                                  ]
+                                },
+                                "count": {
+                                  "type": "integer",
+                                  "example": 1,
+                                  "description": "Size of the data object array\n"
                                 }
                               }
                             }
