@@ -25839,6 +25839,200 @@
         }
       }
     },
+    "/ocean/aws/ecs/cluster/{EcsClusterName}/import": {
+      "post": {
+        "summary": "Import Cluster",
+        "description": "Create Ocean cluster object from an existing ECS cluster with at least one container instance to be used as input for create cluster.<br> **This route will not register the ECS cluster to Ocean.**\n",
+        "operationId": "OceanECSClusterImport",
+        "tags": [
+          "Ocean ECS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "in": "path",
+            "name": "EcsClusterName",
+            "example": "ecsName",
+            "description": "ECS Cluster name\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "region"
+                    ],
+                    "properties": {
+                      "region": {
+                        "type": "string",
+                        "example": "us-east-1",
+                        "description": "The region that the ECS cluster is running at.\n"
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "oceanName",
+                        "description": "The name for the new Ocean cluster object. <br> If the name is not provided the default will be *Ocean_{EcsClusterName}*\n"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Import Ocean ECS Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/aws/ecs/cluster/my-ECS-cluster-name/import"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "required": [
+                                  "cluster"
+                                ],
+                                "properties": {
+                                  "cluster": {
+                                    "type": "object",
+                                    "title": "ECS Ocean",
+                                    "properties": {
+                                      "name": {
+                                        "type": "string",
+                                        "example": "my-Ocean-ECS-cluster",
+                                        "description": "The name of the Ocean cluster provided in the request, if not provided in the import request it will be Ocean_{EcsClusterName}.\n"
+                                      },
+                                      "clusterName": {
+                                        "type": "string",
+                                        "example": "my-ECS-cluster-name",
+                                        "description": "ECS cluster name\n"
+                                      },
+                                      "region": {
+                                        "type": "string",
+                                        "example": "us-east-1",
+                                        "description": "The region for the Ocean cluster to run - the same as the provided ECS cluster).\n"
+                                      },
+                                      "compute": {
+                                        "type": "object",
+                                        "title": "Ocean Compute",
+                                        "properties": {
+                                          "subnetIds": {
+                                            "type": "array",
+                                            "description": "A comma-separated list of subnet identifiers for the Ocean cluster. Subnet IDs should be configured with auto assign public IP.\n",
+                                            "items": {
+                                              "type": "string",
+                                              "example": "subnet-1234abcd"
+                                            }
+                                          },
+                                          "launchSpecification": {
+                                            "type": "object",
+                                            "description": "Launch specifications allow you to configure multiple workload types on the same ocean cluster.\n",
+                                            "properties": {
+                                              "imageId": {
+                                                "type": "string",
+                                                "example": "ami-123456789abcdefgh"
+                                              },
+                                              "securityGroupIds": {
+                                                "type": "array",
+                                                "description": "One or more Security Group IDs.\n",
+                                                "items": {
+                                                  "type": "string",
+                                                  "example": "sg-abcdefgh123456789"
+                                                }
+                                              },
+                                              "keyPair": {
+                                                "type": "string",
+                                                "example": "dev-keypair"
+                                              },
+                                              "userData": {
+                                                "type": "string",
+                                                "example": "userData"
+                                              },
+                                              "iamInstanceProfile": {
+                                                "type": "object",
+                                                "description": "The instance profile iamRole.\n",
+                                                "properties": {
+                                                  "arn": {
+                                                    "type": "string",
+                                                    "description": "The iamRole arn.\n",
+                                                    "example": "my-arn"
+                                                  }
+                                                }
+                                              },
+                                              "tags": {
+                                                "type": "object",
+                                                "description": "AWS tags from EC2 instance registered as container instance.\n",
+                                                "properties": {
+                                                  "tagKey": {
+                                                    "type": "string",
+                                                    "example": "env"
+                                                  },
+                                                  "tagValue": {
+                                                    "type": "string",
+                                                    "example": "dev"
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:aws:ecs"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/ocean/aws/ecs/cluster/{OCEAN_ID}/log": {
       "summary": "Ocean for AWS ECS",
       "get": {
