@@ -41567,6 +41567,137 @@
         }
       }
     },
+    "/ocean/gcp/k8s/launchSpec/{OCEAN_LAUNCH_SPEC_ID}/launchNodes": {
+      "post": {
+        "summary": "Launch Nodes In VNG",
+        "description": "Launch nodes in Virtual Node Group.\n",
+        "operationId": "oceanGkeLaunchSpecLaunchNodes",
+        "tags": [
+          "Ocean GKE"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec~1%7BOCEAN_LAUNCH_SPEC_ID%7D/get/parameters/1"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "launchRequest": {
+                        "type": "object",
+                        "title": "Ocean GKE Virtual Node Group Launch Request",
+                        "required": [
+                          "amount"
+                        ],
+                        "properties": {
+                          "amount": {
+                            "description": "The amount of nodes to launch.\n",
+                            "type": "integer",
+                            "example": 5
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ocean Virtual Node Group Launch Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/gcp/k8s/launchSpec/ols-12345abc/launchNodes"
+                            },
+                            "method": {
+                              "example": "PUT"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "launchSpecId": {
+                              "type": "string",
+                              "example": "ols-f73821bc"
+                            },
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "newInstances": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "instanceName": {
+                                          "type": "string",
+                                          "example": "sin-00b61aa5dde4-oesg-97499562",
+                                          "description": "Name of the launched instance\n"
+                                        },
+                                        "availabilityZone": {
+                                          "type": "string",
+                                          "example": "us-west-2b",
+                                          "description": "The availability zone the instance launched in\n"
+                                        },
+                                        "instanceType": {
+                                          "type": "string",
+                                          "example": "c3.xlarge",
+                                          "description": "Type of the launched instance\n"
+                                        },
+                                        "lifeCycle": {
+                                          "type": "string",
+                                          "example": "Preemptible",
+                                          "description": "Preemptible or On Demand\n"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:gcp:k8s:launchSpec:launchNodes"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/ocean/azure/k8s/cluster": {
       "summary": "Ocean for AKS",
       "post": {
@@ -43382,6 +43513,259 @@
                             },
                             "kind": {
                               "example": "spotinst:ocean:azure:k8s:virtualNodeGroup:launchVms"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/aws/k8s/launchSpec/{launchSpecId}/launchNodes": {
+      "put": {
+        "summary": "Launch Nodes In VNG",
+        "description": "Launch nodes in Virtual Node Group.\n",
+        "operationId": "OceanAWSK8sLaunchSpecLaunchNodes",
+        "tags": [
+          "Ocean AWS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec~1%7BOCEAN_LAUNCH_SPEC_ID%7D/get/parameters/1"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "launchRequest": {
+                    "type": "object",
+                    "title": "Ocean AWS Virtual Node Group Launch Request",
+                    "required": [
+                      "amount"
+                    ],
+                    "properties": {
+                      "amount": {
+                        "description": "The amount of nodes to launch.\n",
+                        "type": "integer",
+                        "example": 5
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ocean Virtual Node Group Launch Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/aws/k8s/launchSpec/ols-12345abc/launchNodes"
+                            },
+                            "method": {
+                              "example": "PUT"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "launchSpecId": {
+                              "type": "string",
+                              "example": "ols-f73821bc"
+                            },
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "newInstances": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "instanceId": {
+                                          "type": "string",
+                                          "example": "i-08d53d2a1dcede08f",
+                                          "description": "Id of the launched instance\n"
+                                        },
+                                        "availabilityZone": {
+                                          "type": "string",
+                                          "example": "us-west-2b",
+                                          "description": "The availability zone the instance launched in\n"
+                                        },
+                                        "instanceType": {
+                                          "type": "string",
+                                          "example": "c3.xlarge",
+                                          "description": "Type of the launched instance\n"
+                                        },
+                                        "lifeCycle": {
+                                          "type": "string",
+                                          "example": "spot"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:aws:k8s:launchSpec:launchNodes"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/aws/ecs/launchSpec/{launchSpecId}/launchContainerInstances": {
+      "put": {
+        "summary": "Launch Container Instances In Launch Spec",
+        "description": "Launch container instances in launch spec.\n",
+        "operationId": "OceanAWSEcsLaunchSpecLaunchNodes",
+        "tags": [
+          "Ocean ECS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec~1%7BOCEAN_LAUNCH_SPEC_ID%7D/get/parameters/1"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "launchRequest": {
+                    "type": "object",
+                    "title": "Ocean ECS Launch Spec Launch Request",
+                    "required": [
+                      "amount"
+                    ],
+                    "properties": {
+                      "amount": {
+                        "description": "The amount of container instances to launch.\n",
+                        "type": "integer",
+                        "example": 5
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ocean Launch Spec Launch Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/aws/ecs/launchSpec/ols-12345abc/launchContainerInstances"
+                            },
+                            "method": {
+                              "example": "PUT"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "launchSpecId": {
+                              "type": "string",
+                              "example": "ols-f73821bc"
+                            },
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "newInstances": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "instanceId": {
+                                          "type": "string",
+                                          "example": "i-08d53d2a1dcede08f",
+                                          "description": "Id of the launched instance\n"
+                                        },
+                                        "availabilityZone": {
+                                          "type": "string",
+                                          "example": "us-west-2b",
+                                          "description": "The availability zone the instance launched in\n"
+                                        },
+                                        "instanceType": {
+                                          "type": "string",
+                                          "example": "c3.xlarge",
+                                          "description": "Type of the launched instance\n"
+                                        },
+                                        "lifeCycle": {
+                                          "type": "string",
+                                          "example": "spot",
+                                          "description": "Spot or On Demand\n"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:aws:ecs:launchSpec:launchContainerInstances"
                             }
                           }
                         }
