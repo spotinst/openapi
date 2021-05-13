@@ -1,299 +1,330 @@
 type: object
+description: |
+  AWS Cluster Launch Specification
+required:
+  - oceanId
 properties:
-  launchSpec:
+  id:
+    type: string
+    readOnly: true
+    example: ols-12345abc
+    description: |
+      Launch Spec ID.
+  oceanId:
+    type: string
+    example: "o-123"
+    description: |
+      The Ocean cluster ID. Required for Launch Spec creation.
+  name:
+    type: string
+    example: "specialty.nodes.spotk8s.com"
+    description: |
+      Set Launch Specification name.
+  imageId:
+    type: string
+    example: "ami-ID"
+    description: |
+      Set image ID. Can be null.
+  userData:
+    type: string
+    example: "dsa89d7uosduxq98sau9s8aux9s8aux09q0qu09axsuix0s9qas09xz"
+    description: |
+      Set user data script in Base64-encoded MIME.
+  iamInstanceProfile:
     type: object
-    title: AWS Cluster
-    required:
-      - oceanId
+    title: auto-scaler
+    description: |
+      The instance profile iamRole object.
     properties:
-      oceanId:
+      arn:
         type: string
-        example: "o-123"
-        description: >
-          The Ocean cluster ID. required for launchSpec create.
+        example: "arn:aws:iam::123456781234:instance-profile/EKS-nodes-test-NodeInstanceProfile-ABCDEFGH123"
+        description: |
+          The iamRole arn. If set - do not set launchSpec.iamInstanceProfile.name
       name:
         type: string
-        example: "specialty.nodes.spotk8s.com"
-        description: >
-          Set Launch Specification name
-      imageId:
-        type: string
-        example: "ami-ID"
-        description: >
-          Set image ID. Can be null
-      userData:
-        type: string
-        example: "dsa89d7uosduxq98sau9s8aux9s8aux09q0qu09axsuix0s9qas09xz"
-        description: >
-          Set user data script in Base64-encoded MIME
-      iamInstanceProfile:
-        type: object
-        title: auto-scaler
-        description: The instance profile iamRole object
-        properties:
-          arn:
-            type: string
-            example: "arn:aws:iam::123456781234:instance-profile/EKS-nodes-test-NodeInstanceProfile-ABCDEFGH123"
-            description: The iamRole arn. If set - do not set launchSpec.iamInstanceProfile.name
-          name:
-            type: string
-            description: The iamRole name. If set - do not set launchSpec.iamInstanceProfile.arn
-            example: EKS-nodes-test
-      securityGroupIds:
-        type: array
-        description: Set security groups. Each element in array should be security group ID
-        items:
-          type: string
-          example:
-            - "sg-0ded3a2980208c30c"
-            - "sg-0ded3a2980208c30d"
-      instanceTypes:
-        type: array
         description: |
-          A list of instance types allowed to be provisioned for pods pending for the launch specification.\
-          The list overrides the list defined for the Ocean cluster. Can be null.
-        items:
+          The iamRole name. If set - do not set launchSpec.iamInstanceProfile.arn
+        example: EKS-nodes-test
+  securityGroupIds:
+    type: array
+    description: |
+      Set security groups. Each element in array should be security group ID
+    items:
+      type: string
+      example:
+        - "sg-0ded3a2980208c30c"
+        - "sg-0ded3a2980208c30d"
+  instanceTypes:
+    type: array
+    description: |
+      A list of instance types allowed to be provisioned for pods pending for the launch specification.\
+      The list overrides the list defined for the Ocean cluster. Can be null.
+    items:
+      type: string
+      example:
+        - "c3.2xlarge"
+        - "c4.2xlarge"
+  rootVolumeSize:
+    type: integer
+    description: |
+      Set root volume size (in GB). This field and blockDeviceMappings cannot be used in the same spec.
+    example: 8
+  labels:
+    type: array
+    description: |
+      An array of labels to add to the Launch Spec instances. Custom user labels only,
+      no K8s built in labels or Spot internal labels.
+    items:
+      type: object
+      properties:
+        key:
           type: string
-          example:
-            - "c3.2xlarge"
-            - "c4.2xlarge"
-      rootVolumeSize:
+          description: |
+            Set label key.\
+            May not be one of the following:
+            * kubernetes.io/hostname"
+            * "failure-domain.beta.kubernetes.io/zone"
+            * "topology.kubernetes.io/zone"
+            * "failure-domain.beta.kubernetes.io/region"
+            * "topology.kubernetes.io/region"
+            * "beta.kubernetes.io/instance-type"
+            * "node.kubernetes.io/instance-type"
+            * "beta.kubernetes.io/os"
+            * "kubernetes.io/os"
+            * "beta.kubernetes.io/arch"
+            * "kubernetes.io/arch"
+            * "spotinst.io/node-lifecycle"'
+        value:
+          type: string
+          description: |
+            Set label value.
+    example:
+      - key: "env"
+        value: "test"
+  taints:
+    type: array
+    description: |
+      Add taints to Launch Spec.
+    items:
+      type: object
+      properties:
+        key:
+          type: string
+          description: |
+            Set taint key.
+        value:
+          type: string
+          description: |
+            Set taint value.
+        effect:
+          type: string
+          description: |
+            Set taint effect.
+    example:
+      - key: taintKey
+        value: taintValue
+        effect: NoSchedule
+  subnetIds:
+    type: array
+    description: |
+      Set subnets in launchSpec. Each element in array should be subnet ID.
+    items:
+      type: string
+      example:
+        - subnet-123
+        - subnet-456
+  elasticIpPool:
+    type: object
+    description: |
+      Assign an Elastic IP to the instances spun by the launch spec. Can be null.
+    properties:
+      tagSelector:
+        type: object
+        description: |
+          Key-value object, which defines an Elastic IP from the customer pool. Can be null.
+        properties:
+          tagKey:
+            type: string
+            description: |
+              Elastic IP tag key. The launch spec will consider all elastic IPs tagged with this tag as a part of the elastic IP pool to use.
+            example: color
+          tagValue:
+            type: string
+            description: |
+              Elastic IP tag value. Can be null.
+            example: orange
+  autoScale:
+    type: object
+    properties:
+      headrooms:
+        description: |
+          Set custom headroom per launch spec. provide a list of launchSpec.autoscale.headrooms objects.
+        type: array
+        items:
+          type: object
+          properties:
+            cpuPerUnit:
+              description: |
+                Configure the number of CPUs to allocate the headroom. CPUs are denoted in millicores, where 1000 millicores = 1 vCPU.
+              type: integer
+              example: 1024
+            memoryPerUnit:
+              description: |
+                Configure the amount of memory (MiB) to allocate the headroom.
+              type: integer
+              example: 512
+            numOfUnits:
+              description: |
+                The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.
+              type: integer
+              example: 2
+            gpuPerUnit:
+              type: integer
+              description: |
+                How much GPU allocate for headroom unit.
+              example: 0
+  tags:
+    type: array
+    description: |
+      List of kay-value pairs of tags.
+    items:
+      type: object
+      properties:
+        tagKey:
+          type: string
+          description: |
+            Set the tag key.
+          example: "Creator"
+        tagValue:
+          type: string
+          description: |
+            Set the tag value.
+          example: "John Doe"
+  blockDeviceMappings:
+    type: array
+    description: |
+      Block devices that are exposed to the instance. You can specify virtual devices and EBS volumes.\
+      This parameter and rootVolumeSize cannot be in the spec at the same time.\
+      This parameter can be null, but if not null, it must contain at least one block device.
+    items:
+      type: object
+      properties:
+        deviceName:
+          type: string
+          description: |
+            Set device name.
+          example: "/dev/xvda"
+        ebs:
+          type: object
+          description: |
+            Set EBS properties.
+          properties:
+            throughput:
+              type: integer
+              minimum: 125
+              maximum: 1000
+              example: 125
+              description: |
+                The amount of data transferred to or from a storage device per second, you can use this param just in a case that volumetype=‘gp3’.
+            deleteOnTermination:
+              type: boolean
+              description: |
+                Flag to delete the EBS on instance termination.
+              example: false
+            encrypted:
+              type: boolean
+              example: false
+            iops:
+              type: integer
+              description: |
+                Must be greater than or equal to 0.
+              example: 1
+            kmsKeyId:
+              type: string
+              example: "alias/aws/ebs"
+            snapshotId:
+              type: string
+              example: "snap-abcdefghi111110"
+            volumeType:
+              type: string
+              description: |
+                Set volume type.
+              example: "gp2"
+            volumeSize:
+              type: integer
+              description: |
+                Set volume size (in GB). When using this property, you cannot use dynamicVolumeSize.\
+                You must use one of the other. Volume size should be greater or equal than the size configured in the AMI.
+            dynamicVolumeSize:
+              type: object
+              required:
+                - baseSize
+                - resource
+              description: |
+                Set dynamic volume size properties. When using this object, you cannot use volumeSize.\
+                You must use one or the other.
+              properties:
+                baseSize:
+                  type: integer
+                  description: |
+                    Initial size per volume.
+                  example: 50
+                resource:
+                  type: string
+                  example: "CPU"
+                sizePerResourceUnit:
+                  type: integer
+                  description: |
+                    Additional size per resource unit (in GB).\
+                    For example: if baseSize=50, and sizePerResourceUnit=20, and an instance with 2 CPU is launched - its disk size will be: 90GB.
+                  example: 20
+  resourceLimits:
+    type: object
+    properties:
+      maxInstanceCount:
+        description: |
+          Option to set a maximum number of instances per launch specification.\
+          Can be null. If set, value must be greater than or equal to 0.
         type: integer
-        description: Set root volume size (in GB). This field and blockDeviceMappings cannot be used in the same spec.
-        example: 8
-      labels:
-        type: array
-        description: 'An array of labels to add to the Launch Spec instances. Custom user labels only,
-          no K8s built in labels or Spot internal labels.'
-        items:
-          type: object
-          properties:
-            key:
-              type: string
-              description: |
-                Set label key.\
-                May not be one of the following:
-                * kubernetes.io/hostname"
-                * "failure-domain.beta.kubernetes.io/zone"
-                * "topology.kubernetes.io/zone"
-                * "failure-domain.beta.kubernetes.io/region"
-                * "topology.kubernetes.io/region"
-                * "beta.kubernetes.io/instance-type"
-                * "node.kubernetes.io/instance-type"
-                * "beta.kubernetes.io/os"
-                * "kubernetes.io/os"
-                * "beta.kubernetes.io/arch"
-                * "kubernetes.io/arch"
-                * "spotinst.io/node-lifecycle"'
-            value:
-              type: string
-              description: Set label value
-        example:
-          - key: "env"
-            value: "test"
-      taints:
-        type: array
-        description: Add taints to Launch Spec
-        items:
-          type: object
-          properties:
-            key:
-              type: string
-              description: Set taint key
-            value:
-              type: string
-              description: Set taint value
-            effect:
-              type: string
-              description: Set taint effect
-        example:
-          - key: taintKey
-            value: taintValue
-            effect: NoSchedule
-      subnetIds:
-        type: array
-        description: Set subnets in launchSpec. Each element in array should be subnet ID
-        items:
-          type: string
-          example:
-            - subnet-123
-            - subnet-456
-      elasticIpPool:
-        type: object
-        description: Assign an Elastic IP to the instances spun by the launch spec. Can be null.
-        properties:
-          tagSelector:
-            type: object
-            description: >
-              Key-value object, which defines an Elastic IP from the customer pool. Can be null.
-            properties:
-              tagKey:
-                type: string
-                description: >
-                  Elastic IP tag key. The launch spec will consider all elastic IPs tagged with this tag as a part of the elastic IP pool to use.
-                example: color
-              tagValue:
-                type: string
-                description: >
-                  Elastic IP tag value. Can be null.
-                example: orange
-      autoScale:
-        type: object
-        properties:
-          headrooms:
-            description: |
-              Set custom headroom per launch spec. provide a list of launchSpec.autoscale.headrooms objects
-            type: array
-            items:
-              type: object
-              properties:
-                cpuPerUnit:
-                  description: |
-                    Configure the number of CPUs to allocate the headroom. CPUs are denoted in millicores, where 1000 millicores = 1 vCPU
-                  type: integer
-                  example: 1024
-                memoryPerUnit:
-                  description: |
-                    Configure the amount of memory (MiB) to allocate the headroom.
-                  type: integer
-                  example: 512
-                numOfUnits:
-                  description: |
-                    The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.
-                  type: integer
-                  example: 2
-                gpuPerUnit:
-                  type: integer
-                  description: |
-                    How much GPU allocate for headroom unit
-                  example: 0
-      tags:
-        type: array
+        example: 5
+  strategy:
+    type: object
+    description: |
+      LaunchSpec Strategy
+    properties:
+      spotPercentage:
+        type: integer
         description: |
-          List of kay-value pairs of tags.
-        items:
-          type: object
-          properties:
-            tagKey:
-              type: string
-              description: |
-                Set the tag key.
-              example: "Creator"
-            tagValue:
-              type: string
-              description: |
-                Set the tag value.
-              example: "John Doe"
-      blockDeviceMappings:
-        type: array
-        description: |
-          Block devices that are exposed to the instance. You can specify virtual devices and EBS volumes.\
-          This parameter and rootVolumeSize cannot be in the spec at the same time.\
-          This parameter can be null, but if not null, it must contain at least one block device.
-        items:
-          type: object
-          properties:
-            deviceName:
-              type: string
-              description: |
-                Set device name.
-              example: "/dev/xvda"
-            ebs:
-              type: object
-              description: |
-                Set EBS properties.
-              properties:
-                throughput:
-                  type: integer
-                  minimum: 125
-                  maximum: 1000
-                  example: 125
-                  description: |
-                    The amount of data transferred to or from a storage device per second, you can use this param just in a case that volumetype=‘gp3’.
-                deleteOnTermination:
-                  type: boolean
-                  description: |
-                    Flag to delete the EBS on instance termination.
-                  example: false
-                encrypted:
-                  type: boolean
-                  example: false
-                iops:
-                  type: integer
-                  description: |
-                    Must be greater than or equal to 0.
-                  example: 1
-                kmsKeyId:
-                  type: string
-                  example: "alias/aws/ebs"
-                snapshotId:
-                  type: string
-                  example: "snap-abcdefghi111110"
-                volumeType:
-                  type: string
-                  description: |
-                    Set volume type.
-                  example: "gp2"
-                volumeSize:
-                  type: integer
-                  description: |
-                    Set volume size (in GB). When using this property, you cannot use dynamicVolumeSize.\
-                    You must use one of the other. Volume size should be greater or equal than the size configured in the AMI.
-                dynamicVolumeSize:
-                  type: object
-                  required:
-                    - baseSize
-                    - resource
-                  description: |
-                    Set dynamic volume size properties. When using this object, you cannot use volumeSize.\
-                    You must use one or the other.
-                  properties:
-                    baseSize:
-                      type: integer
-                      description: |
-                        Initial size per volume.
-                      example: 50
-                    resource:
-                      type: string
-                      example: "CPU"
-                    sizePerResourceUnit:
-                      type: integer
-                      description: |
-                        Additional size per resource unit (in GB).\
-                        For example: if baseSize=50, and sizePerResourceUnit=20, and an instance with 2 CPU is launched - its disk size will be: 90GB
-                      example: 20
-
-      resourceLimits:
-        type: object
-        properties:
-          maxInstanceCount:
-            description: |
-              Option to set a maximum number of instances per launch specification.\
-              Can be null. If set, value must be greater than or equal to 0.
-            type: integer
-            example: 5
-      strategy:
-        type: object
-        description: |
-          LaunchSpec Strategy
-        properties:
-          spotPercentage:
-            type: integer
-            description: |
-              The desired percentage of the Spot instances out of all running instances. Defaults to 100 when not set.\
-              Only available when the field is **not** set in the cluster direcly (Ocean.Strategy.spotPercentage)
-            minimum: 0
-            maximum: 100
-            example: 70
-            default: 100
-      associatePublicIpAddress:
-        type: boolean
-        description: Configure public IP address allocation
-        default: false
-        example: false
-      restrictScaleDown:
-        type: boolean
-        description: |
-          When set to “True”, VNG nodes will be treated as if all pods running have the [restrict-scale-down label](https://docs.spot.io/ocean/features/labels-and-taints).
-          Therefore, Ocean will not scale nodes down unless empty.
-        example: false
+          The desired percentage of the Spot instances out of all running instances. Defaults to 100 when not set.\
+          Only available when the field is **not** set in the cluster direcly (Ocean.Strategy.spotPercentage)
+        minimum: 0
+        maximum: 100
+        example: 70
+        default: 100
+  associatePublicIpAddress:
+    type: boolean
+    description: |
+      Configure public IP address allocation.
+    default: false
+    example: false
+  restrictScaleDown:
+    type: boolean
+    description: |
+      When set to “True”, VNG nodes will be treated as if all pods running have the [restrict-scale-down label](https://docs.spot.io/ocean/features/labels-and-taints).
+      Therefore, Ocean will not scale nodes down unless empty.
+    example: false
+  createdAt:
+    type: string
+    readOnly: true
+    format: date-time
+    example: "2021-03-17T08:13:08.000Z"
+    description: |
+      A timestamp of the VNG creation.
+  updatedAt:
+    type: string
+    readOnly: true
+    format: date-time
+    example: "2021-03-17T15:06:13.000Z"
+    description: |
+      A timestamp of the latest VNG update.
