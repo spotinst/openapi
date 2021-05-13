@@ -17,6 +17,82 @@ put:
             - $ref: "../schemas/suspendGroupVm-update.yaml"
   responses:
     200:
-      $ref: "../../../../../../api/commons/responses/responseItemWrapper.yaml"
+      content:
+        application/json:
+          schema:
+            allOf:
+              - type: object
+                properties:
+                  request:
+                    type: object
+                    description: |
+                      Original request properties
+                    properties:
+                      id:
+                        type: string
+                        description: |
+                          Unique ID associated with this request
+                      url:
+                        type: string
+                        description: |
+                          The URL that was used for the request
+                      method:
+                        type: string
+                        description: |
+                          The HTTP **METHOD** used for the request
+                      timestamp:
+                        type: string
+                        description: |
+                          When the request was received by Spot
+
+                    example:
+                      id: "ff3e1e5b-91b8-42fa-8267-b988efc7f662"
+                      url: "/azure/compute/group/sig-123123/vmHealthiness"
+                      method: GET
+                      timestamp: 2015-06-29T13:01:55.060Z
+
+                  response:
+                    type: object
+                    description: |
+                      Response package that includes, status, type and any relevant data.
+                    properties:
+                      status:
+                        type: object
+                        properties:
+                          code:
+                            type: integer
+                            description: |
+                              HTTP status code assigned to this response
+                          message:
+                            type: string
+                            description: |
+                              HTTP status message for the respective status code
+                      kind:
+                        type: string
+                        description: |
+                          The data type of each item in the response
+                      items:
+                        type: array
+                        description: |
+                          Array of data objects
+                        items:
+                          $ref: "../schemas/suspendGroupVm-update.yaml"
+                      count:
+                        type: integer
+                        description: |
+                              Size of the data object array
+
+
+                    example:
+                      status:
+                        code: 200
+                        message: "ok"
+                      kind: "spotinst:azure:compute:group:something"
+                      items:
+                        - name: autoHealing
+                          ttlInMinute: 120
+                        - name: signalTimeout
+                      count: 2
+
     400:
       description: "Bad Request"
