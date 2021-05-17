@@ -25541,7 +25541,7 @@
                                   },
                                   "value": {
                                     "type": "string",
-                                    "axample": "the_value"
+                                    "example": "the_value"
                                   }
                                 }
                               },
@@ -25795,17 +25795,19 @@
                                             },
                                             "dynamicVolumeSize": {
                                               "type": "object",
+                                              "required": [
+                                                "baseSize",
+                                                "resource"
+                                              ],
                                               "description": "Set dynamic volume size properties. When using this object, you cannot use volumeSize. You must use one or the other.\n",
                                               "properties": {
                                                 "baseSize": {
                                                   "type": "integer",
-                                                  "required": true,
                                                   "description": "Initial size per volume.\n",
                                                   "example": 50
                                                 },
                                                 "resource": {
                                                   "type": "string",
-                                                  "required": true,
                                                   "example": "CPU"
                                                 },
                                                 "sizePerResourceUnit": {
@@ -26203,7 +26205,7 @@
         }
       }
     },
-    "/ocean/aws/ecs/cluster/{OCEAN_ID}/log": {
+    "/ocean/aws/ecs/cluster/{oceanClusterId}/log": {
       "summary": "Ocean for AWS ECS",
       "get": {
         "summary": "Fetch Elastilog",
@@ -26214,7 +26216,7 @@
         ],
         "parameters": [
           {
-            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
           },
           {
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
@@ -26240,30 +26242,30 @@
           {
             "in": "query",
             "name": "LIMIT",
-            "description": "Maximum number of lines to extract in a response. Default: 500\n",
+            "description": "Maximum number of lines to extract in a response.\n",
             "schema": {
-              "type": "integer"
+              "type": "integer",
+              "maximum": 1000,
+              "default": 500
             },
             "required": false,
-            "default": 500,
-            "max": 1000,
             "example": 200
           },
           {
             "in": "query",
             "name": "SEVERITY",
-            "description": "Severity of log entries to extract. Valid Values: ALL, INFO, DEBUG, WARN. Default: ALL\n",
+            "description": "Severity of log entries to extract.\n",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "ALL",
+                "INFO",
+                "DEBUG",
+                "WARN"
+              ],
+              "default": "ALL"
             },
             "required": false,
-            "default": "ALL",
-            "enum": [
-              "ALL",
-              "INFO",
-              "DEBUG",
-              "WARN"
-            ],
             "example": "INFO"
           },
           {
@@ -26767,7 +26769,14 @@
             "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BOCEAN_ID%7D~1roll~1%7BROLL_ID%7D/get/parameters/2"
+            "in": "path",
+            "name": "ROLL_ID",
+            "example": "scr-12345abc",
+            "description": "Ocean Cluster Roll ID\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
           }
         ],
         "requestBody": {
@@ -26825,7 +26834,7 @@
             "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BOCEAN_ID%7D~1roll~1%7BROLL_ID%7D/get/parameters/2"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1roll~1%7BROLL_ID%7D/put/parameters/2"
           }
         ],
         "responses": {
@@ -26859,10 +26868,17 @@
                 "allOf": [
                   {
                     "type": "object",
-                    "required": true,
+                    "required": [
+                      "launchSpec"
+                    ],
                     "properties": {
                       "launchSpec": {
                         "type": "object",
+                        "required": [
+                          "oceanId",
+                          "name",
+                          "imageId"
+                        ],
                         "properties": {
                           "id": {
                             "type": "string",
@@ -26871,19 +26887,16 @@
                           },
                           "oceanId": {
                             "type": "string",
-                            "required": true,
                             "description": "The Ocean cluster ID. required for launchSpec create.\n",
                             "example": "o-1234abcd"
                           },
                           "name": {
                             "type": "string",
-                            "required": true,
                             "description": "Set launch specifications name\n",
                             "example": "mySpecLauncher"
                           },
                           "imageId": {
                             "type": "string",
-                            "required": true,
                             "description": "Set image ID. Can be null\n",
                             "example": "img2"
                           },
@@ -26923,18 +26936,16 @@
                             "items": {
                               "oneOf": [
                                 {
-                                  "arn": null,
                                   "title": "arn",
                                   "type": "string",
                                   "description": "The iamRole arn. If set - do not set launchSpec.iamInstanceProfile.name\n",
                                   "example": "arn:aws:iam::123456789123:instance-profile"
                                 },
                                 {
-                                  "name": null,
                                   "title": "name",
                                   "type": "string",
                                   "description": "The iamRole name. If set - do not set launchSpec.iamInstanceProfile.arn\n",
-                                  "example": "my-iamInstance-Ptofile"
+                                  "example": "my-iamInstance-Profile"
                                 }
                               ]
                             }
@@ -26944,16 +26955,18 @@
                             "type": "array",
                             "items": {
                               "type": "object",
+                              "required": [
+                                "key",
+                                "value"
+                              ],
                               "properties": {
                                 "key": {
                                   "description": "Set attribute's key.\n",
-                                  "required": true,
                                   "type": "string",
                                   "example": "key1"
                                 },
                                 "value": {
                                   "description": "Set attribute's value.\n",
-                                  "required": true,
                                   "type": "string",
                                   "example": "value1"
                                 }
@@ -27063,17 +27076,19 @@
                                     },
                                     "dynamicVolumeSize": {
                                       "type": "object",
+                                      "required": [
+                                        "baseSize",
+                                        "resource"
+                                      ],
                                       "description": "Set dynamic volume size properties. When using this object, you cannot use volumeSize. You must use one or the other.\n",
                                       "properties": {
                                         "baseSize": {
                                           "type": "integer",
-                                          "required": true,
                                           "description": "Initial size per volume.\n",
                                           "example": 50
                                         },
                                         "resource": {
                                           "type": "string",
-                                          "required": true,
                                           "example": "CPU"
                                         },
                                         "sizePerResourceUnit": {
@@ -27179,7 +27194,7 @@
         }
       }
     },
-    "/ocean/aws/ecs/launchSpec/{OCEAN_LAUNCH_SPEC_ID}": {
+    "/ocean/aws/ecs/launchSpec/{oceanLaunchSpecId}": {
       "get": {
         "summary": "Get Launch Spec",
         "description": "Get a specific custom launch configuration for an Ocean cluster in the specified account.\n",
@@ -27193,7 +27208,7 @@
           },
           {
             "in": "path",
-            "name": "OCEAN_LAUNCH_SPEC_ID",
+            "name": "oceanLaunchSpecId",
             "description": "Ocean cluster launchSpec ID.\n",
             "schema": {
               "type": "string"
@@ -27222,14 +27237,16 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec~1%7BOCEAN_LAUNCH_SPEC_ID%7D/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec~1%7BoceanLaunchSpecId%7D/get/parameters/1"
           },
           {
             "in": "query",
             "name": "deleteContainerInstances",
-            "type": "boolean",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
             "description": "When set to \"true\", all instances belonging to the deleted launch specification will be drained, detached, and terminated.\n",
-            "default": false,
             "example": true
           }
         ],
@@ -27254,7 +27271,7 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec~1%7BOCEAN_LAUNCH_SPEC_ID%7D/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec~1%7BoceanLaunchSpecId%7D/get/parameters/1"
           },
           {
             "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/put/parameters/2"
@@ -27406,7 +27423,7 @@
         }
       }
     },
-    "/ocean/aws/ecs/cluster/{OCEAN_CLUSTER_ID}/fargateMigration/serviceDiscovery": {
+    "/ocean/aws/ecs/cluster/{oceanClusterId}/fargateMigration/serviceDiscovery": {
       "get": {
         "summary": "Get Fargate Services Discovery",
         "description": "Get existing Fargate services in the ECS cluster.\n",
@@ -27582,28 +27599,30 @@
                 "allOf": [
                   {
                     "type": "object",
+                    "required": [
+                      "oceanClusterName",
+                      "ecsClusterName",
+                      "region",
+                      "services"
+                    ],
                     "properties": {
                       "oceanClusterName": {
                         "type": "string",
-                        "required": true,
                         "description": "Name of the cluster in new Ocean object.",
                         "example": "fargate-import-ocean"
                       },
                       "ecsClusterName": {
                         "type": "string",
-                        "required": true,
                         "description": "Name of the cluster in ECS.",
                         "example": "fargateTestCluster"
                       },
                       "region": {
                         "type": "string",
-                        "required": true,
                         "description": "Name of the AWS region the ECS cluster is in.",
                         "example": "us-west-1"
                       },
                       "services": {
                         "type": "array",
-                        "required": true,
                         "description": "Name of the ECS Fargate service to be imported.",
                         "items": {
                           "type": "array",
@@ -29321,7 +29340,7 @@
         }
       }
     },
-    "/ocean/aws/k8s/cluster/{OCEAN_ID}": {
+    "/ocean/aws/k8s/cluster/{oceanClusterId}": {
       "delete": {
         "summary": "Delete Cluster",
         "description": "Delete an existing Ocean cluster.\n",
@@ -29334,11 +29353,11 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
           },
           {
             "in": "path",
-            "name": "OCEAN_ID",
+            "name": "oceanClusterId",
             "schema": {
               "type": "string"
             },
@@ -29368,7 +29387,14 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/get/parameters/1"
+            "in": "path",
+            "name": "oceanClusterId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "o-abcd1234",
+            "description": "The ID of the Ocean cluster.\n"
           }
         ],
         "responses": {
@@ -29390,7 +29416,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "OCEAN_ID",
+            "name": "oceanClusterId",
             "schema": {
               "type": "string"
             },
@@ -29405,10 +29431,10 @@
             "in": "query",
             "name": "autoApplyTags",
             "example": "true",
-            "default": "false",
             "description": "Optionally update instance tags on the fly without rolling the cluster.\n",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "default": "false"
             }
           }
         ],
@@ -29436,7 +29462,7 @@
         }
       }
     },
-    "/ocean/aws/k8s/cluster/{OCEAN_ID}/controllerHeartbeat": {
+    "/ocean/aws/k8s/cluster/{oceanClusterId}/controllerHeartbeat": {
       "get": {
         "summary": "Get Heartbeat Status",
         "description": "Get Ocean cluster's controller heartbeat status. <br /> The response would return the heartbeat status and last heartbeat timestamp.\"\n",
@@ -29449,7 +29475,7 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
           }
         ],
         "responses": {
@@ -29561,19 +29587,19 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/2"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1log/get/parameters/2"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/3"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1log/get/parameters/3"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/4"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1log/get/parameters/4"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/5"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1log/get/parameters/5"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/6"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1log/get/parameters/6"
           }
         ],
         "responses": {
@@ -29690,7 +29716,8 @@
           {
             "in": "query",
             "name": "autoScalingGroupName",
-            "description": "The autoscaling group name.\n",
+            "example": "myAutoScalingGroup",
+            "description": "The ASG name.\n",
             "schema": {
               "type": "string"
             },
@@ -29701,104 +29728,139 @@
             "name": "region",
             "example": "us-east-1",
             "description": "Region name of the ASG.\n",
-            "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "required": true
           }
         ],
         "responses": {
           "200": {
-            "description": "Ocean Import ASG Response",
+            "description": "Ocean Import ASG to Ocean Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "name": {
-                      "type": "string",
-                      "example": "TestASG1"
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
                     },
-                    "controllerClusterId": {
-                      "type": "string",
-                      "example": "ocean-ed609402-8557-4d18-818a-e549333cc11e"
-                    },
-                    "region": {
-                      "type": "string",
-                      "example": "us-west-2"
-                    },
-                    "capacity": {
+                    {
                       "type": "object",
                       "properties": {
-                        "minimum": {
-                          "type": "integer",
-                          "example": 0
-                        },
-                        "maximum": {
-                          "type": "integer",
-                          "example": 1000
-                        },
-                        "target": {
-                          "type": "integer",
-                          "example": 1
-                        }
-                      }
-                    },
-                    "compute": {
-                      "type": "object",
-                      "properties": {
-                        "subnetIds": {
-                          "type": "array",
-                          "items": {
-                            "type": "string",
-                            "example": [
-                              "subnet-00cab2dd9f40a9883",
-                              "subnet-0df9d512c7cbbd9e1"
-                            ]
-                          }
-                        },
-                        "launchSpecification": {
+                        "request": {
                           "type": "object",
                           "properties": {
-                            "securityGroupIds": {
+                            "url": {
+                              "example": "/ocean/aws/k8s/cluster/autoScalingGroup/import"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
                               "type": "array",
                               "items": {
-                                "type": "string",
-                                "example": [
-                                  "sg-03ccf232a2bf0f4ea"
-                                ]
-                              }
-                            },
-                            "keyPair": {
-                              "type": "string",
-                              "example": "testteamkp"
-                            },
-                            "imageId": {
-                              "type": "string",
-                              "example": "ami-0ce21b51cb31a54b8"
-                            },
-                            "tags": {
-                              "type": "object",
-                              "properties": {
-                                "tagKey": {
-                                  "type": "string",
-                                  "example": "AmazonECSManaged"
-                                },
-                                "tagValue": {
-                                  "type": "string",
-                                  "example": ""
+                                "type": "object",
+                                "description": "Ocean Import ASG Response.\n",
+                                "properties": {
+                                  "name": {
+                                    "type": "string",
+                                    "example": "TestASG1"
+                                  },
+                                  "controllerClusterId": {
+                                    "type": "string",
+                                    "example": "ocean-ed609402-8557-4d18-818a-e549333cc11e"
+                                  },
+                                  "region": {
+                                    "type": "string",
+                                    "example": "us-west-2"
+                                  },
+                                  "capacity": {
+                                    "type": "object",
+                                    "properties": {
+                                      "minimum": {
+                                        "type": "integer",
+                                        "example": 0
+                                      },
+                                      "maximum": {
+                                        "type": "integer",
+                                        "example": 1000
+                                      },
+                                      "target": {
+                                        "type": "integer",
+                                        "example": 1
+                                      }
+                                    }
+                                  },
+                                  "compute": {
+                                    "type": "object",
+                                    "properties": {
+                                      "subnetIds": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "string",
+                                          "example": [
+                                            "subnet-00cab2dd9f40a9883",
+                                            "subnet-0df9d512c7cbbd9e1"
+                                          ]
+                                        }
+                                      },
+                                      "launchSpecification": {
+                                        "type": "object",
+                                        "properties": {
+                                          "securityGroupIds": {
+                                            "type": "array",
+                                            "items": {
+                                              "type": "string",
+                                              "example": [
+                                                "sg-03ccf232a2bf0f4ea"
+                                              ]
+                                            }
+                                          },
+                                          "keyPair": {
+                                            "type": "string",
+                                            "example": "testteamkp"
+                                          },
+                                          "imageId": {
+                                            "type": "string",
+                                            "example": "ami-0ce21b51cb31a54b8"
+                                          },
+                                          "tags": {
+                                            "type": "object",
+                                            "properties": {
+                                              "tagKey": {
+                                                "type": "string",
+                                                "example": "AmazonECSManaged"
+                                              },
+                                              "tagValue": {
+                                                "type": "string",
+                                                "example": ""
+                                              }
+                                            }
+                                          },
+                                          "associatePublicIpAddress": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
                                 }
                               }
                             },
-                            "associatePublicIpAddress": {
-                              "type": "boolean",
-                              "example": "false"
+                            "kind": {
+                              "example": "spotinst:ocean:aws:k8s"
                             }
                           }
                         }
                       }
                     }
-                  }
+                  ]
                 }
               }
             }
@@ -29825,7 +29887,13 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster~1%7BOCEAN_ID%7D~1rightSizing~1suggestion/post/parameters/1"
+            "in": "query",
+            "name": "namespace",
+            "description": "For K8S, namespace is an optional query param which filters the retrieved resources\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
           }
         ],
         "requestBody": {
@@ -29835,7 +29903,66 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster~1%7BOCEAN_ID%7D~1rightSizing~1suggestion/post/requestBody/content/application~1json/schema/allOf/0"
+                    "type": "object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Optional - may be null.\n",
+                        "properties": {
+                          "namespaces": {
+                            "type": "array",
+                            "description": "Optional - may be null. If exists - should contain at least 1 item.\n",
+                            "items": {
+                              "type": "string",
+                              "example": [
+                                "sparkSpace",
+                                "kube-system"
+                              ]
+                            }
+                          },
+                          "attribute": {
+                            "type": "object",
+                            "description": "Optional - may be null.\n",
+                            "required": [
+                              "type",
+                              "key"
+                            ],
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "label",
+                                  "annotation"
+                                ],
+                                "example": "label"
+                              },
+                              "key": {
+                                "type": "string",
+                                "description": "May be any string, but shouldn't be empty.\n",
+                                "example": "app"
+                              },
+                              "operator": {
+                                "type": "string",
+                                "description": "Optional - may be null.\n",
+                                "enum": [
+                                  "Equals",
+                                  "notEquals",
+                                  "exists",
+                                  "doesNotExist"
+                                ],
+                                "default": "Equals",
+                                "example": "Equals"
+                              },
+                              "value": {
+                                "type": "string",
+                                "description": "Required whenever the operator is \"equals\" or \"notEquals\". |\nIf exists, may be any string.\n",
+                                "example": "redis"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
                   }
                 ]
               }
@@ -29850,354 +29977,138 @@
                 "schema": {
                   "allOf": [
                     {
-                      "allOf": [
-                        {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
                           "type": "object",
                           "properties": {
-                            "request": {
-                              "type": "object",
-                              "description": "Original request properties\n",
-                              "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "example": "46642c7d-bc29-417d-8ce4-79626f00c63c",
-                                  "description": "Unique ID associated with this request\n"
-                                },
-                                "url": {
-                                  "type": "string",
-                                  "example": "/ocean/aws/k8s/cluster/o-abcd1234/rightSizing/suggestion",
-                                  "description": "The URL that was used for the request\n"
-                                },
-                                "method": {
-                                  "type": "string",
-                                  "example": "POST",
-                                  "description": "The HTTP **METHOD** used for the request\n"
-                                },
-                                "timestamp": {
-                                  "type": "string",
-                                  "example": "2016-01-21T17:12:51.451Z",
-                                  "description": "When the request was received by Spot\n"
-                                }
-                              }
+                            "url": {
+                              "example": "/ocean/aws/k8s/cluster/o-abcd1234/rightSizing/suggestion"
                             },
-                            "response": {
-                              "type": "object",
-                              "description": "Response package that includes, status, type and any relevant data.\n",
-                              "properties": {
-                                "status": {
-                                  "type": "object",
-                                  "properties": {
-                                    "code": {
-                                      "type": "integer",
-                                      "example": 200,
-                                      "description": "HTTP status code assigned to this response\n"
-                                    },
-                                    "message": {
-                                      "type": "string",
-                                      "example": "OK",
-                                      "description": "HTTP status message for the respective status code\n"
-                                    }
-                                  }
-                                }
-                              }
+                            "method": {
+                              "example": "POST"
                             }
                           }
                         },
-                        {
+                        "response": {
                           "type": "object",
                           "properties": {
-                            "response": {
-                              "type": "object",
-                              "properties": {
-                                "kind": {
-                                  "type": "string",
-                                  "example": "spotinst:ocean:aws:k8s:cluster:rightSizing:suggestion",
-                                  "description": "The data type of each item in the response\n"
-                                },
-                                "items": {
-                                  "type": "array",
-                                  "description": "Array of data objects\n",
-                                  "items": {
-                                    "allOf": [
-                                      {
-                                        "type": "object",
-                                        "properties": {
-                                          "resourceName": {
-                                            "type": "string",
-                                            "example": "redis-controller"
-                                          },
-                                          "resourceType": {
-                                            "type": "string",
-                                            "example": "deployment"
-                                          },
-                                          "namespace": {
-                                            "type": "string",
-                                            "example": "kube-system"
-                                          },
-                                          "suggestedCPU": {
-                                            "type": "integer",
-                                            "example": 4
-                                          },
-                                          "suggestedMemory": {
-                                            "type": "integer",
-                                            "example": 19
-                                          },
-                                          "requestedCPU": {
-                                            "type": "integer",
-                                            "example": 50
-                                          },
-                                          "requestedMemory": {
-                                            "type": "integer",
-                                            "example": 50
-                                          },
-                                          "containers": {
-                                            "type": "array",
-                                            "items": {
-                                              "allOf": [
-                                                {
-                                                  "type": "object",
-                                                  "properties": {
-                                                    "name": {
-                                                      "type": "string",
-                                                      "example": "dnsmasq"
-                                                    },
-                                                    "requestedCPU": {
-                                                      "type": "integer",
-                                                      "example": 10
-                                                    },
-                                                    "suggestedCPU": {
-                                                      "type": "integer",
-                                                      "example": 2
-                                                    },
-                                                    "requestedMemory": {
-                                                      "type": "integer",
-                                                      "example": 40
-                                                    },
-                                                    "suggestedMemory": {
-                                                      "type": "integer",
-                                                      "example": 15
-                                                    }
-                                                  }
-                                                },
-                                                {
-                                                  "type": "object",
-                                                  "properties": {
-                                                    "name": {
-                                                      "type": "string",
-                                                      "example": "sidecar"
-                                                    },
-                                                    "requestedCPU": {
-                                                      "type": "integer",
-                                                      "example": 40
-                                                    },
-                                                    "suggestedCPU": {
-                                                      "type": "integer",
-                                                      "example": 2
-                                                    },
-                                                    "requestedMemory": {
-                                                      "type": "integer",
-                                                      "example": 10
-                                                    },
-                                                    "suggestedMemory": {
-                                                      "type": "integer",
-                                                      "example": 4
-                                                    }
-                                                  }
-                                                }
-                                              ]
-                                            }
-                                          },
-                                          "type": "object",
-                                          "properties": {
-                                            "resourceName": {
-                                              "type": "string",
-                                              "example": "test-redis"
-                                            },
-                                            "resourceType": {
-                                              "type": "string",
-                                              "example": "deployment"
-                                            },
-                                            "namespace": {
-                                              "type": "string",
-                                              "example": "sparkSpace"
-                                            },
-                                            "suggestedCPU": {
-                                              "type": "integer",
-                                              "example": 2
-                                            },
-                                            "suggestedMemory": {
-                                              "type": "integer",
-                                              "example": 20
-                                            },
-                                            "requestedCPU": {
-                                              "type": "integer",
-                                              "example": 50
-                                            },
-                                            "requestedMemory": {
-                                              "type": "integer",
-                                              "example": 30
-                                            },
-                                            "containers": {
-                                              "type": "array",
-                                              "items": {
-                                                "allOf": [
-                                                  {
-                                                    "type": "object",
-                                                    "properties": {
-                                                      "name": {
-                                                        "type": "string",
-                                                        "example": "dns-controller"
-                                                      },
-                                                      "requestedCPU": {
-                                                        "type": "integer",
-                                                        "example": 20
-                                                      },
-                                                      "suggestedCPU": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                      },
-                                                      "requestedMemory": {
-                                                        "type": "integer",
-                                                        "example": 20
-                                                      },
-                                                      "suggestedMemory": {
-                                                        "type": "integer",
-                                                        "example": 15
-                                                      }
-                                                    }
-                                                  },
-                                                  {
-                                                    "type": "object",
-                                                    "properties": {
-                                                      "name": {
-                                                        "type": "string",
-                                                        "example": "kubedns"
-                                                      },
-                                                      "requestedCPU": {
-                                                        "type": "integer",
-                                                        "example": 30
-                                                      },
-                                                      "suggestedCPU": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                      },
-                                                      "requestedMemory": {
-                                                        "type": "integer",
-                                                        "example": 10
-                                                      },
-                                                      "suggestedMemory": {
-                                                        "type": "integer",
-                                                        "example": 5
-                                                      }
-                                                    }
-                                                  }
-                                                ]
-                                              }
-                                            }
-                                          }
-                                        }
-                                      },
-                                      {
-                                        "type": "object",
-                                        "properties": {
-                                          "resourceName": {
-                                            "type": "string",
-                                            "example": "test-redis"
-                                          },
-                                          "resourceType": {
-                                            "type": "string",
-                                            "example": "deployment"
-                                          },
-                                          "namespace": {
-                                            "type": "string",
-                                            "example": "sparkSpace"
-                                          },
-                                          "suggestedCPU": {
-                                            "type": "integer",
-                                            "example": 2
-                                          },
-                                          "suggestedMemory": {
-                                            "type": "integer",
-                                            "example": 20
-                                          },
-                                          "requestedCPU": {
-                                            "type": "integer",
-                                            "example": 50
-                                          },
-                                          "requestedMemory": {
-                                            "type": "integer",
-                                            "example": 30
-                                          },
-                                          "containers": {
-                                            "type": "array",
-                                            "items": [
-                                              {
-                                                "type": "object",
-                                                "properties": {
-                                                  "name": {
-                                                    "type": "string",
-                                                    "example": "dns-controller"
-                                                  },
-                                                  "requestedCPU": {
-                                                    "type": "integer",
-                                                    "example": 20
-                                                  },
-                                                  "suggestedCPU": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                  },
-                                                  "requestedMemory": {
-                                                    "type": "integer",
-                                                    "example": 20
-                                                  },
-                                                  "suggestedMemory": {
-                                                    "type": "integer",
-                                                    "example": 15
-                                                  }
-                                                }
-                                              },
-                                              {
-                                                "type": "object",
-                                                "properties": {
-                                                  "name": {
-                                                    "type": "string",
-                                                    "example": "kubedns"
-                                                  },
-                                                  "requestedCPU": {
-                                                    "type": "integer",
-                                                    "example": 30
-                                                  },
-                                                  "suggestedCPU": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                  },
-                                                  "requestedMemory": {
-                                                    "type": "integer",
-                                                    "example": 10
-                                                  },
-                                                  "suggestedMemory": {
-                                                    "type": "integer",
-                                                    "example": 5
-                                                  }
-                                                }
-                                              }
-                                            ]
-                                          }
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "resourceName": {
+                                    "type": "string"
+                                  },
+                                  "resourceType": {
+                                    "type": "string"
+                                  },
+                                  "namespace": {
+                                    "type": "string"
+                                  },
+                                  "suggestedCPU": {
+                                    "type": "integer"
+                                  },
+                                  "suggestedMemory": {
+                                    "type": "integer"
+                                  },
+                                  "requestedCPU": {
+                                    "type": "integer"
+                                  },
+                                  "requestedMemory": {
+                                    "type": "integer"
+                                  },
+                                  "containers": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "name": {
+                                          "type": "string"
+                                        },
+                                        "requestedCPU": {
+                                          "type": "integer"
+                                        },
+                                        "suggestedCPU": {
+                                          "type": "integer"
+                                        },
+                                        "requestedMemory": {
+                                          "type": "integer"
+                                        },
+                                        "suggestedMemory": {
+                                          "type": "integer"
                                         }
                                       }
-                                    ]
+                                    }
                                   }
-                                },
-                                "count": {
-                                  "type": "integer",
-                                  "example": 1,
-                                  "description": "Size of the data object array\n"
                                 }
-                              }
+                              },
+                              "example": [
+                                {
+                                  "resourceName": "redis-controller",
+                                  "resourceType": "deployment",
+                                  "namespace": "kube-system",
+                                  "suggestedCPU": 4,
+                                  "suggestedMemory": 19,
+                                  "requestedCPU": 50,
+                                  "requestedMemory": 50,
+                                  "containers": [
+                                    {
+                                      "name": "dnsmasq",
+                                      "requestedCPU": 10,
+                                      "suggestedCPU": 2,
+                                      "requestedMemory": 40,
+                                      "suggestedMemory": 15
+                                    },
+                                    {
+                                      "name": "sidecar",
+                                      "requestedCPU": 40,
+                                      "suggestedCPU": 2,
+                                      "requestedMemory": 10,
+                                      "suggestedMemory": 4
+                                    }
+                                  ]
+                                },
+                                {
+                                  "resourceName": "test-redis",
+                                  "resourceType": "deployment",
+                                  "namespace": "sparkSpace",
+                                  "suggestedCPU": 2,
+                                  "suggestedMemory": 20,
+                                  "requestedCPU": 50,
+                                  "requestedMemory": 30,
+                                  "containers": [
+                                    {
+                                      "name": "dns-controller",
+                                      "requestedCPU": 20,
+                                      "suggestedCPU": 1,
+                                      "requestedMemory": 20,
+                                      "suggestedMemory": 15
+                                    },
+                                    {
+                                      "name": "kubedns",
+                                      "requestedCPU": 30,
+                                      "suggestedCPU": 1,
+                                      "requestedMemory": 10,
+                                      "suggestedMemory": 5
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            "count": {
+                              "example": 2
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:aws:k8s:cluster:rightSizing:suggestion"
                             }
                           }
                         }
-                      ]
+                      }
                     }
                   ]
                 }
@@ -30224,10 +30135,10 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/3"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1log/get/parameters/3"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/2"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1log/get/parameters/2"
           },
           {
             "in": "query",
@@ -30362,7 +30273,7 @@
                                             "example": "cpu-deployment-check5"
                                           },
                                           "namespace": {
-                                            "type": "stirng",
+                                            "type": "string",
                                             "example": "default"
                                           },
                                           "cost": {
@@ -30421,7 +30332,7 @@
                                             "example": "cpu-deployment-check5"
                                           },
                                           "namespace": {
-                                            "type": "stirng",
+                                            "type": "string",
                                             "example": "default"
                                           },
                                           "cost": {
@@ -30480,7 +30391,7 @@
                                             "example": "cpu-deployment-check5"
                                           },
                                           "namespace": {
-                                            "type": "stirng",
+                                            "type": "string",
                                             "example": "default"
                                           },
                                           "cost": {
@@ -30539,7 +30450,7 @@
                                             "example": "cpu-deployment-check5"
                                           },
                                           "namespace": {
-                                            "type": "stirng",
+                                            "type": "string",
                                             "example": "default"
                                           },
                                           "cost": {
@@ -30603,7 +30514,7 @@
                                         "example": "cpu-deployment-check5"
                                       },
                                       "namespace": {
-                                        "type": "stirng",
+                                        "type": "string",
                                         "example": "default"
                                       },
                                       "cost": {
@@ -30950,7 +30861,7 @@
         }
       }
     },
-    "/ocean/aws/k8s/cluster/{OCEAN_ID}/roll": {
+    "/ocean/aws/k8s/cluster/{oceanClusterId}/roll": {
       "summary": "Ocean for AWS",
       "post": {
         "summary": "Initiate Roll",
@@ -30964,7 +30875,7 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
           }
         ],
         "requestBody": {
@@ -31118,7 +31029,7 @@
           },
           {
             "in": "path",
-            "name": "OCEAN_ID",
+            "name": "oceanClusterId",
             "schema": {
               "type": "string"
             },
@@ -31236,7 +31147,7 @@
         }
       }
     },
-    "/ocean/aws/k8s/cluster/{OCEAN_ID}/roll/{ROLL_ID}": {
+    "/ocean/aws/k8s/cluster/{oceanClusterId}/roll/{ROLL_ID}": {
       "summary": "Ocean for AWS",
       "put": {
         "summary": "Update Roll",
@@ -31251,7 +31162,7 @@
           },
           {
             "in": "path",
-            "name": "OCEAN_ID",
+            "name": "oceanClusterId",
             "schema": {
               "type": "string"
             },
@@ -31365,7 +31276,7 @@
           },
           {
             "in": "path",
-            "name": "OCEAN_ID",
+            "name": "oceanClusterId",
             "schema": {
               "type": "string"
             },
@@ -31374,19 +31285,12 @@
             "description": "The ID of the Ocean\n"
           },
           {
-            "in": "path",
-            "name": "ROLL_ID",
-            "example": "scr-12345abc",
-            "description": "Ocean Cluster Roll ID\n",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1roll~1%7BROLL_ID%7D/put/parameters/2"
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BOCEAN_ID%7D~1roll/post/responses/200"
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D~1roll/post/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -31395,7 +31299,6 @@
       }
     },
     "/ocean/aws/k8s/launchSpec": {
-      "summary": "Ocean for AWS",
       "post": {
         "summary": "Create Virtual Node Group",
         "description": "Create a Virtual Node Group.\n",
@@ -31411,12 +31314,11 @@
             "in": "query",
             "name": "initialNodes",
             "example": 1,
-            "default": null,
             "description": "When set to an integer greater than 0, a corresponding amount of nodes will be launched from the created virtual node group.\n",
             "schema": {
-              "type": "integer"
-            },
-            "required": false
+              "type": "integer",
+              "default": null
+            }
           }
         ],
         "requestBody": {
@@ -31426,7 +31328,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec~1%7BOCEAN_LAUNCH_SPEC_ID%7D/put/requestBody/content/application~1json/schema"
+                    "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec~1%7BoceanLaunchSpecId%7D/put/requestBody/content/application~1json/schema"
                   }
                 ]
               }
@@ -31435,7 +31337,48 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec/get/responses/200"
+            "description": "Ocean Launch Spec Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/aws/k8s/launchSpec"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec~1%7BoceanLaunchSpecId%7D/put/requestBody/content/application~1json/schema/properties/launchSpec"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:aws:k8s:launchSpec"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -31444,6 +31387,7 @@
       },
       "get": {
         "summary": "List Virtual Node Groups",
+        "description": "List the configurations of all virtual node groups for the cluster.\n",
         "operationId": "OceanAWSLaunchSpecList",
         "tags": [
           "Ocean AWS"
@@ -31465,7 +31409,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Ocean Response",
+            "description": "Ocean Launch Spec Response",
             "content": {
               "application/json": {
                 "schema": {
@@ -31476,30 +31420,28 @@
                     {
                       "type": "object",
                       "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/aws/k8s/launchSpec"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
                         "response": {
                           "type": "object",
-                          "description": "response body\n",
                           "properties": {
                             "items": {
                               "type": "array",
-                              "allOf": [
-                                {
-                                  "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec~1%7BOCEAN_LAUNCH_SPEC_ID%7D/put/requestBody/content/application~1json/schema"
-                                },
-                                {
-                                  "type": "object",
-                                  "properties": {
-                                    "createdAt": {
-                                      "type": "string",
-                                      "example": "2018-11-05T12:55:50.000+0000"
-                                    },
-                                    "updatedAt": {
-                                      "type": "string",
-                                      "example": "2018-11-05T12:58:15.000+0000"
-                                    }
-                                  }
-                                }
-                              ]
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec~1%7BoceanLaunchSpecId%7D/put/requestBody/content/application~1json/schema/properties/launchSpec"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:aws:k8s:launchSpec"
                             }
                           }
                         }
@@ -31516,8 +31458,7 @@
         }
       }
     },
-    "/ocean/aws/k8s/launchSpec/{OCEAN_LAUNCH_SPEC_ID}": {
-      "summary": "Ocean for AWS",
+    "/ocean/aws/k8s/launchSpec/{oceanLaunchSpecId}": {
       "delete": {
         "summary": "Delete Virtual Node Group",
         "description": "Delete a specified launch specification in an Ocean cluster.\n",
@@ -31530,89 +31471,56 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec~1%7BOCEAN_LAUNCH_SPEC_ID%7D/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec~1%7BoceanLaunchSpecId%7D/get/parameters/1"
           },
           {
             "in": "query",
             "name": "deleteNodes",
             "example": true,
-            "default": false,
             "description": "When set to \"true\", all instances belonging to the deleted launch specification will be drained, detached, and terminated.\n",
             "schema": {
-              "type": "boolean"
-            },
-            "required": false
+              "type": "boolean",
+              "default": false
+            }
           },
           {
             "in": "query",
             "name": "forceDelete",
             "example": true,
-            "default": null,
             "description": "When set to \"true\", delete even if it is the only custom launch spec remaining, and default launch spec has useAsTemlateOnly = true.\n",
             "schema": {
-              "type": "boolean"
-            },
-            "required": false
+              "type": "boolean",
+              "default": null
+            }
           }
         ],
         "responses": {
           "200": {
+            "description": "Ocean Launch Specification Delete Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "request": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "string",
-                          "example": "a608777a-a1c5-4f34-b30b-3f7355e3926b"
-                        },
-                        "url": {
-                          "type": "string",
-                          "example": "/ocean/aws/k8s/cluster/o-12we32df?accountId=act-7461123d"
-                        },
-                        "method": {
-                          "type": "string",
-                          "example": "DELETE"
-                        },
-                        "timestamp": {
-                          "type": "string",
-                          "example": "2019-06-18T07:59:45.892Z"
-                        }
-                      }
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
                     },
-                    "response": {
+                    {
                       "type": "object",
                       "properties": {
-                        "status": {
+                        "request": {
                           "type": "object",
                           "properties": {
-                            "code": {
-                              "type": "integer",
-                              "example": 200
+                            "url": {
+                              "example": "/ocean/aws/k8s/launchSpec/ols-12345abc"
                             },
-                            "message": {
-                              "type": "string",
-                              "example": "OK"
+                            "method": {
+                              "example": "DELETE"
                             }
                           }
-                        },
-                        "kind": {
-                          "type": "string",
-                          "example": "spotinst:ocean:aws:k8s"
-                        },
-                        "items": {
-                          "type": "array"
-                        },
-                        "count": {
-                          "type": "integer",
-                          "example": 0
                         }
                       }
                     }
-                  }
+                  ]
                 }
               }
             }
@@ -31634,18 +31542,17 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec~1%7BOCEAN_LAUNCH_SPEC_ID%7D/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec~1%7BoceanLaunchSpecId%7D/get/parameters/1"
           },
           {
-            "in": "path",
+            "in": "query",
             "name": "autoApplyTags",
             "example": true,
-            "default": false,
-            "description": "Ocean cluster launchSpec ID. Can get launchSpec ID with get call.\n",
+            "description": "Optionally update resource tags on the fly without performing a roll.\n",
             "schema": {
-              "type": "boolean"
-            },
-            "required": false
+              "type": "boolean",
+              "default": false
+            }
           }
         ],
         "requestBody": {
@@ -31654,54 +31561,63 @@
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "launchSpec"
+                ],
                 "properties": {
                   "launchSpec": {
                     "type": "object",
-                    "title": "AWS Cluster",
+                    "description": "AWS Cluster Launch Specification\n",
                     "required": [
                       "oceanId"
                     ],
                     "properties": {
+                      "id": {
+                        "type": "string",
+                        "readOnly": true,
+                        "example": "ols-12345abc",
+                        "description": "Launch Spec ID.\n"
+                      },
                       "oceanId": {
                         "type": "string",
                         "example": "o-123",
-                        "description": "The Ocean cluster ID. required for launchSpec create.\n"
+                        "description": "The Ocean cluster ID. Required for Launch Spec creation.\n"
                       },
                       "name": {
                         "type": "string",
                         "example": "specialty.nodes.spotk8s.com",
-                        "description": "Set Launch Specification name\n"
+                        "description": "Set Launch Specification name.\n"
                       },
                       "imageId": {
                         "type": "string",
                         "example": "ami-ID",
-                        "description": "Set image ID. Can be null\n"
+                        "description": "Set image ID. Can be null.\n"
                       },
                       "userData": {
                         "type": "string",
                         "example": "dsa89d7uosduxq98sau9s8aux9s8aux09q0qu09axsuix0s9qas09xz",
-                        "description": "Set user data script in Base64-encoded MIME\n"
+                        "description": "Set user data script in Base64-encoded MIME.\n"
                       },
                       "iamInstanceProfile": {
                         "type": "object",
                         "title": "auto-scaler",
-                        "description": "The instance profile iamRole object",
+                        "description": "The instance profile iamRole object.\n",
                         "properties": {
                           "arn": {
                             "type": "string",
                             "example": "arn:aws:iam::123456781234:instance-profile/EKS-nodes-test-NodeInstanceProfile-ABCDEFGH123",
-                            "description": "The iamRole arn. If set - do not set launchSpec.iamInstanceProfile.name"
+                            "description": "The iamRole arn. If set - do not set launchSpec.iamInstanceProfile.name\n"
                           },
                           "name": {
                             "type": "string",
-                            "description": "The iamRole name. If set - do not set launchSpec.iamInstanceProfile.arn",
+                            "description": "The iamRole name. If set - do not set launchSpec.iamInstanceProfile.arn\n",
                             "example": "EKS-nodes-test"
                           }
                         }
                       },
                       "securityGroupIds": {
                         "type": "array",
-                        "description": "Set security groups. Each element in array should be security group ID",
+                        "description": "Set security groups. Each element in array should be security group ID\n",
                         "items": {
                           "type": "string",
                           "example": [
@@ -31723,12 +31639,12 @@
                       },
                       "rootVolumeSize": {
                         "type": "integer",
-                        "description": "Set root volume size (in GB). This field and blockDeviceMappings cannot be used in the same spec.",
+                        "description": "Set root volume size (in GB). This field and blockDeviceMappings cannot be used in the same spec.\n",
                         "example": 8
                       },
                       "labels": {
                         "type": "array",
-                        "description": "An array of labels to add to the Launch Spec instances. Custom user labels only, no K8s built in labels or Spot internal labels.",
+                        "description": "An array of labels to add to the Launch Spec instances. Custom user labels only,\nno K8s built in labels or Spot internal labels.\n",
                         "items": {
                           "type": "object",
                           "properties": {
@@ -31738,7 +31654,7 @@
                             },
                             "value": {
                               "type": "string",
-                              "description": "Set label value"
+                              "description": "Set label value.\n"
                             }
                           }
                         },
@@ -31751,21 +31667,21 @@
                       },
                       "taints": {
                         "type": "array",
-                        "description": "Add taints to Launch Spec",
+                        "description": "Add taints to Launch Spec.\n",
                         "items": {
                           "type": "object",
                           "properties": {
                             "key": {
                               "type": "string",
-                              "description": "Set taint key"
+                              "description": "Set taint key.\n"
                             },
                             "value": {
                               "type": "string",
-                              "description": "Set taint value"
+                              "description": "Set taint value.\n"
                             },
                             "effect": {
                               "type": "string",
-                              "description": "Set taint effect"
+                              "description": "Set taint effect.\n"
                             }
                           }
                         },
@@ -31779,7 +31695,7 @@
                       },
                       "subnetIds": {
                         "type": "array",
-                        "description": "Set subnets in launchSpec. Each element in array should be subnet ID",
+                        "description": "Set subnets in launchSpec. Each element in array should be subnet ID.\n",
                         "items": {
                           "type": "string",
                           "example": [
@@ -31790,7 +31706,7 @@
                       },
                       "elasticIpPool": {
                         "type": "object",
-                        "description": "Assign an Elastic IP to the instances spun by the launch spec. Can be null.",
+                        "description": "Assign an Elastic IP to the instances spun by the launch spec. Can be null.\n",
                         "properties": {
                           "tagSelector": {
                             "type": "object",
@@ -31814,13 +31730,13 @@
                         "type": "object",
                         "properties": {
                           "headrooms": {
-                            "description": "Set custom headroom per launch spec. provide a list of launchSpec.autoscale.headrooms objects\n",
+                            "description": "Set custom headroom per launch spec. provide a list of launchSpec.autoscale.headrooms objects.\n",
                             "type": "array",
                             "items": {
                               "type": "object",
                               "properties": {
                                 "cpuPerUnit": {
-                                  "description": "Configure the number of CPUs to allocate the headroom. CPUs are denoted in millicores, where 1000 millicores = 1 vCPU\n",
+                                  "description": "Configure the number of CPUs to allocate the headroom. CPUs are denoted in millicores, where 1000 millicores = 1 vCPU.\n",
                                   "type": "integer",
                                   "example": 1024
                                 },
@@ -31836,7 +31752,7 @@
                                 },
                                 "gpuPerUnit": {
                                   "type": "integer",
-                                  "description": "How much GPU allocate for headroom unit\n",
+                                  "description": "How much GPU allocate for headroom unit.\n",
                                   "example": 0
                                 }
                               }
@@ -31918,22 +31834,24 @@
                                 },
                                 "dynamicVolumeSize": {
                                   "type": "object",
+                                  "required": [
+                                    "baseSize",
+                                    "resource"
+                                  ],
                                   "description": "Set dynamic volume size properties. When using this object, you cannot use volumeSize.\\\nYou must use one or the other.\n",
                                   "properties": {
                                     "baseSize": {
                                       "type": "integer",
-                                      "required": true,
                                       "description": "Initial size per volume.\n",
                                       "example": 50
                                     },
                                     "resource": {
                                       "type": "string",
-                                      "required": true,
                                       "example": "CPU"
                                     },
                                     "sizePerResourceUnit": {
                                       "type": "integer",
-                                      "description": "Additional size per resource unit (in GB).\\\nFor example: if baseSize=50, and sizePerResourceUnit=20, and an instance with 2 CPU is launched - its disk size will be: 90GB\n",
+                                      "description": "Additional size per resource unit (in GB).\\\nFor example: if baseSize=50, and sizePerResourceUnit=20, and an instance with 2 CPU is launched - its disk size will be: 90GB.\n",
                                       "example": 20
                                     }
                                   }
@@ -31969,7 +31887,7 @@
                       },
                       "associatePublicIpAddress": {
                         "type": "boolean",
-                        "description": "Configure public IP address allocation",
+                        "description": "Configure public IP address allocation.\n",
                         "default": false,
                         "example": false
                       },
@@ -31977,6 +31895,20 @@
                         "type": "boolean",
                         "description": "When set to “True”, VNG nodes will be treated as if all pods running have the [restrict-scale-down label](https://docs.spot.io/ocean/features/labels-and-taints).\nTherefore, Ocean will not scale nodes down unless empty.\n",
                         "example": false
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "readOnly": true,
+                        "format": "date-time",
+                        "example": "2021-03-17T08:13:08.000Z",
+                        "description": "A timestamp of the VNG creation.\n"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "readOnly": true,
+                        "format": "date-time",
+                        "example": "2021-03-17T15:06:13.000Z",
+                        "description": "A timestamp of the latest VNG update.\n"
                       }
                     }
                   }
@@ -31987,7 +31919,48 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec/get/responses/200"
+            "description": "Ocean Launch Spec Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/aws/k8s/launchSpec/ols-12345abc"
+                            },
+                            "method": {
+                              "example": "PUT"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec~1%7BoceanLaunchSpecId%7D/put/requestBody/content/application~1json/schema/properties/launchSpec"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:aws:k8s:launchSpec"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -32005,12 +31978,53 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec~1%7BOCEAN_LAUNCH_SPEC_ID%7D/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec~1%7BoceanLaunchSpecId%7D/get/parameters/1"
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec/get/responses/200"
+            "description": "Ocean Launch Spec Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/aws/k8s/launchSpec/ols-12345abc"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec~1%7BoceanLaunchSpecId%7D/put/requestBody/content/application~1json/schema/properties/launchSpec"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:aws:k8s:launchSpec"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -32018,9 +32032,9 @@
         }
       }
     },
-    "/ocean/aws/k8s/launchspec/autoScalingGroup/import": {
+    "/ocean/aws/k8s/launchSpec/autoScalingGroup/import": {
       "summary": "Ocean for AWS",
-      "delete": {
+      "post": {
         "summary": "Import ASG To Ocean Virtual Node Group",
         "description": "Returns an Ocean Virtual Node Group (VNG) spec by a given AWS autoscaling group (ASG). The returned value (\"Imported VNG\") can then be used as input to the Create Virtual Node Group API in order to create an actual VNG in your Ocean cluster.\n",
         "operationId": "oceanAwsImportAsgToLaunchSpec",
@@ -32032,61 +32046,90 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec/get/parameters/1"
           },
           {
-            "in": "path",
-            "name": "autoScalingGroupName",
-            "description": "The ASG name.\n",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1autoScalingGroup~1import/post/parameters/1"
           }
         ],
         "responses": {
           "200": {
+            "description": "Ocean Import ASG to Launch Spec Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "oceanId": {
-                      "type": "string",
-                      "example": "o-500a5d5a"
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
                     },
-                    "name": {
-                      "type": "string",
-                      "example": "TestTeam1"
-                    },
-                    "imageId": {
-                      "type": "string",
-                      "example": "ami-0ce21b51cb55a48b8"
-                    },
-                    "securityGroupIds": {
-                      "type": "array",
-                      "items": {
-                        "type": "string",
-                        "example": [
-                          "subnet-00cab2dd9f40a9883",
-                          "subnet-0df9d512c7cbbd9e1"
-                        ]
-                      }
-                    },
-                    "tags": {
+                    {
                       "type": "object",
                       "properties": {
-                        "tagKey": {
-                          "type": "string",
-                          "example": "AmazonECSManaged"
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/aws/k8s/launchSpec/autoScalingGroup/import"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
                         },
-                        "tagValue": {
-                          "type": "string",
-                          "example": ""
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "description": "Ocean Import ASG to Launch Spec Response.\n",
+                                "properties": {
+                                  "oceanId": {
+                                    "type": "string",
+                                    "example": "o-500a5d5a"
+                                  },
+                                  "name": {
+                                    "type": "string",
+                                    "example": "TestTeam1"
+                                  },
+                                  "imageId": {
+                                    "type": "string",
+                                    "example": "ami-0ce21b51cb55a48b8"
+                                  },
+                                  "securityGroupIds": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string",
+                                      "example": [
+                                        "sg-03ccf232a2bf0f4ea"
+                                      ]
+                                    }
+                                  },
+                                  "tags": {
+                                    "type": "object",
+                                    "properties": {
+                                      "tagKey": {
+                                        "type": "string",
+                                        "example": "AmazonECSManaged"
+                                      },
+                                      "tagValue": {
+                                        "type": "string",
+                                        "example": ""
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:aws:k8s:launchSpec"
+                            }
+                          }
                         }
                       }
                     }
-                  }
+                  ]
                 }
               }
             }
@@ -32300,7 +32343,7 @@
         }
       }
     },
-    "/ocean/onPrem/k8s/cluster/{CLUSTER_ID}": {
+    "/ocean/onPrem/k8s/cluster/{oceanClusterId}": {
       "delete": {
         "summary": "Delete Cluster",
         "description": "Delete an Ocean On-Prem cluster entity in Spot Ocean. This **DOES NOT** affect your on-prem cluster.\n",
@@ -32313,14 +32356,7 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "in": "path",
-            "name": "CLUSTER_ID",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "example": "o-1abcd124",
-            "description": "The ID of the Ocean cluster to delete.\n"
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
           }
         ],
         "responses": {
@@ -32344,7 +32380,7 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
           }
         ],
         "responses": {
@@ -32365,7 +32401,7 @@
         ],
         "parameters": [
           {
-            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
           },
           {
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
@@ -39394,7 +39430,7 @@
                             "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster/post/responses/200/content/application~1json/schema/allOf/0/properties/security"
                           },
                           "compute": {
-                            "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster~1%7BOCEAN_CLUSTER_ID%7D/put/responses/200/content/application~1json/schema/allOf/0/properties/compute"
+                            "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster~1%7BoceanClusterId%7D/put/responses/200/content/application~1json/schema/allOf/0/properties/compute"
                           }
                         }
                       }
@@ -39558,7 +39594,7 @@
                               ],
                               "properties": {
                                 "isEnabled": {
-                                  "type": "boolaen",
+                                  "type": "boolean",
                                   "description": "Flag to enable / disable the shutdown hours mechanism. When turned to false, the mechanism is deactivated and the cluster remains in its current state.\n",
                                   "example": true
                                 },
@@ -39676,35 +39712,37 @@
                           "properties": {
                             "items": {
                               "type": "array",
-                              "allOf": [
-                                {
-                                  "type": "object",
-                                  "properties": {
-                                    "autoScaler": {
-                                      "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster/post/responses/200/content/application~1json/schema/allOf/0/properties/autoScaler"
-                                    },
-                                    "capacity": {
-                                      "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster/post/responses/200/content/application~1json/schema/allOf/0/properties/capacity"
-                                    },
-                                    "compute": {
-                                      "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster~1%7BOCEAN_CLUSTER_ID%7D/put/responses/200/content/application~1json/schema/allOf/0/properties/compute"
+                              "items": {
+                                "allOf": [
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "autoScaler": {
+                                        "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster/post/responses/200/content/application~1json/schema/allOf/0/properties/autoScaler"
+                                      },
+                                      "capacity": {
+                                        "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster/post/responses/200/content/application~1json/schema/allOf/0/properties/capacity"
+                                      },
+                                      "compute": {
+                                        "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster~1%7BoceanClusterId%7D/put/responses/200/content/application~1json/schema/allOf/0/properties/compute"
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "createdAt": {
+                                        "type": "string",
+                                        "example": "2018-11-05T12:55:50.000+0000"
+                                      },
+                                      "updatedAt": {
+                                        "type": "string",
+                                        "example": "2018-11-05T12:58:15.000+0000"
+                                      }
                                     }
                                   }
-                                },
-                                {
-                                  "type": "object",
-                                  "properties": {
-                                    "createdAt": {
-                                      "type": "string",
-                                      "example": "2018-11-05T12:55:50.000+0000"
-                                    },
-                                    "updatedAt": {
-                                      "type": "string",
-                                      "example": "2018-11-05T12:58:15.000+0000"
-                                    }
-                                  }
-                                }
-                              ]
+                                ]
+                              }
                             }
                           }
                         }
@@ -39721,7 +39759,7 @@
         }
       }
     },
-    "/ocean/gcp/k8s/cluster/{OCEAN_CLUSTER_ID}": {
+    "/ocean/gcp/k8s/cluster/{oceanClusterId}": {
       "delete": {
         "summary": "Delete Cluster",
         "description": "Delete a specified Ocean cluster.\n",
@@ -39734,7 +39772,7 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
           }
         ],
         "responses": {
@@ -39758,7 +39796,7 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
           }
         ],
         "responses": {
@@ -39779,7 +39817,7 @@
         ],
         "parameters": [
           {
-            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
           },
           {
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
@@ -40014,7 +40052,7 @@
                                   "example": 100
                                 },
                                 "shieldedInstanceConfig": {
-                                  "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec~1%7BOCEAN_LAUNCH_SPEC_ID%7D/put/requestBody/content/application~1json/schema/properties/launchSpec/properties/shieldedInstanceConfig"
+                                  "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec~1%7BoceanLaunchSpecId%7D/put/requestBody/content/application~1json/schema/properties/launchSpec/properties/shieldedInstanceConfig"
                                 }
                               }
                             }
@@ -40033,7 +40071,7 @@
         }
       }
     },
-    "/ocean/gcp/k8s/cluster/{OCEAN_ID}/log": {
+    "/ocean/gcp/k8s/cluster/{oceanClusterId}/log": {
       "summary": "Ocean for GKE",
       "get": {
         "summary": "Fetch Elastilog",
@@ -40044,25 +40082,25 @@
         ],
         "parameters": [
           {
-            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
           },
           {
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/2"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1log/get/parameters/2"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/3"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1log/get/parameters/3"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/4"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1log/get/parameters/4"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/5"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1log/get/parameters/5"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BOCEAN_ID%7D~1log/get/parameters/6"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1log/get/parameters/6"
           }
         ],
         "responses": {
@@ -40164,7 +40202,7 @@
         }
       }
     },
-    "/ocean/gcp/k8s/cluster/{OCEAN_ID}/rightSizing/suggestion": {
+    "/ocean/gcp/k8s/cluster/{oceanClusterId}/rightSizing/suggestion": {
       "post": {
         "summary": "Fetch Right Sizing Recommendations",
         "description": "Get right-sizing recommendations for an Ocean cluster and filter them according to namespace or label.\n",
@@ -40177,13 +40215,10 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "in": "query",
-            "name": "namespace",
-            "description": "For K8S, namespace is an optional query param which filters the retrieved resources\n",
-            "schema": {
-              "type": "string"
-            },
-            "required": false
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D~1rightSizing~1suggestion/post/parameters/2"
           }
         ],
         "requestBody": {
@@ -40193,67 +40228,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "type": "object",
-                    "properties": {
-                      "filter": {
-                        "type": "object",
-                        "description": "Optional - may be null.\n",
-                        "properties": {
-                          "namespaces": {
-                            "type": "array",
-                            "description": "Optional - may be null. If exists - should contain at least 1 item.\n",
-                            "items": {
-                              "type": "string",
-                              "example": [
-                                "sparkSpace",
-                                "kube-system"
-                              ]
-                            }
-                          },
-                          "attribute": {
-                            "type": "object",
-                            "description": "Optional - may be null.\n",
-                            "required": [
-                              "type",
-                              "key"
-                            ],
-                            "properties": {
-                              "type": {
-                                "type": "string",
-                                "required": true,
-                                "enum": [
-                                  "label",
-                                  "annotation"
-                                ],
-                                "example": "label"
-                              },
-                              "key": {
-                                "type": "string",
-                                "description": "May be any string, but shouldn't be empty.\n",
-                                "example": "app"
-                              },
-                              "operator": {
-                                "type": "string",
-                                "description": "Optional - may be null.\n",
-                                "enum": [
-                                  "Equals",
-                                  "notEquals",
-                                  "exists",
-                                  "doesNotExist"
-                                ],
-                                "default": "Equals",
-                                "example": "Equals"
-                              },
-                              "value": {
-                                "type": "string",
-                                "description": "Required whenever the operator is \"equals\" or \"notEquals\". |\nIf exists, may be any string.\n",
-                                "example": "redis"
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
+                    "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D~1rightSizing~1suggestion/post/requestBody/content/application~1json/schema/allOf/0"
                   }
                 ]
               }
@@ -40290,72 +40265,57 @@
                         },
                         "items": {
                           "type": "array",
-                          "items": [
-                            {
-                              "type": "object",
-                              "properties": {
-                                "resourceName": {
-                                  "type": "string",
-                                  "example": "dns-controller"
-                                },
-                                "resourceType": {
-                                  "type": "string",
-                                  "example": "deployment"
-                                },
-                                "namespace": {
-                                  "type": "string",
-                                  "example": "kube-system"
-                                },
-                                "suggestedCPU": {
-                                  "type": "integer",
-                                  "example": 1
-                                },
-                                "suggestedMemory": {
-                                  "type": "integer",
-                                  "example": 19
-                                },
-                                "requestedCPU": {
-                                  "type": "integer",
-                                  "example": 50
-                                },
-                                "requestedMemory": {
-                                  "type": "integer",
-                                  "example": 50
-                                }
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "resourceName": {
+                                "type": "string",
+                                "example": "dns-controller"
+                              },
+                              "resourceType": {
+                                "type": "string",
+                                "example": "deployment"
+                              },
+                              "namespace": {
+                                "type": "string",
+                                "example": "kube-system"
+                              },
+                              "suggestedCPU": {
+                                "type": "integer",
+                                "example": 1
+                              },
+                              "suggestedMemory": {
+                                "type": "integer",
+                                "example": 19
+                              },
+                              "requestedCPU": {
+                                "type": "integer",
+                                "example": 50
+                              },
+                              "requestedMemory": {
+                                "type": "integer",
+                                "example": 50
                               }
+                            }
+                          },
+                          "example": [
+                            {
+                              "resourceName": "dns-controller",
+                              "resourceType": "deployment",
+                              "namespace": "kube-system",
+                              "suggestedCPU": 1,
+                              "suggestedMemory": 19,
+                              "requestedCPU": 50,
+                              "requestedMemory": 50
                             },
                             {
-                              "type": "object",
-                              "properties": {
-                                "resourceName": {
-                                  "type": "string",
-                                  "example": "kube-dns"
-                                },
-                                "resourceType": {
-                                  "type": "string",
-                                  "example": "daemonSet"
-                                },
-                                "namespace": {
-                                  "type": "string",
-                                  "example": "kube-system"
-                                },
-                                "suggestedCPU": {
-                                  "type": "integer",
-                                  "example": 2
-                                },
-                                "suggestedMemory": {
-                                  "type": "integer",
-                                  "example": 20
-                                },
-                                "requestedCPU": {
-                                  "type": "integer",
-                                  "example": 10
-                                },
-                                "requestedMemory": {
-                                  "type": "integer",
-                                  "example": 30
-                                }
-                              }
+                              "resourceName": "kube-dns",
+                              "resourceType": "daemonSet",
+                              "namespace": "kube-system",
+                              "suggestedCPU": 2,
+                              "suggestedMemory": 20,
+                              "requestedCPU": 10,
+                              "requestedMemory": 30
                             }
                           ]
                         },
@@ -40448,34 +40408,29 @@
                               "value"
                             ],
                             "description": "Add metadata to cluster\n",
-                            "items": [
-                              {
-                                "type": "object",
-                                "properties": {
-                                  "key": {
-                                    "type": "string",
-                                    "description": "Set metadata's key. Required on launchSpec.metadata",
-                                    "example": "key1"
-                                  },
-                                  "value": {
-                                    "type": "string",
-                                    "description": "Set metadata's name. Required on launchSpec.metadata",
-                                    "example": "value1"
-                                  }
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "key": {
+                                  "type": "string",
+                                  "description": "Set metadata's key. Required on launchSpec.metadata",
+                                  "example": "key1"
+                                },
+                                "value": {
+                                  "type": "string",
+                                  "description": "Set metadata's name. Required on launchSpec.metadata",
+                                  "example": "value1"
                                 }
+                              }
+                            },
+                            "example": [
+                              {
+                                "key": "key1",
+                                "value": "value1"
                               },
                               {
-                                "type": "object",
-                                "properties": {
-                                  "key": {
-                                    "type": "string",
-                                    "example": "key2"
-                                  },
-                                  "value": {
-                                    "type": "string",
-                                    "example": "value2"
-                                  }
-                                }
+                                "key": "key2",
+                                "value": "value2"
                               }
                             ]
                           },
@@ -40588,10 +40543,10 @@
                             "example": false
                           },
                           "shieldedInstanceConfig": {
-                            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec~1%7BOCEAN_LAUNCH_SPEC_ID%7D/put/requestBody/content/application~1json/schema/properties/launchSpec/properties/shieldedInstanceConfig"
+                            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec~1%7BoceanLaunchSpecId%7D/put/requestBody/content/application~1json/schema/properties/launchSpec/properties/shieldedInstanceConfig"
                           },
                           "strategy": {
-                            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec~1%7BOCEAN_LAUNCH_SPEC_ID%7D/put/requestBody/content/application~1json/schema/properties/launchSpec/properties/strategy"
+                            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec~1%7BoceanLaunchSpecId%7D/put/requestBody/content/application~1json/schema/properties/launchSpec/properties/strategy"
                           }
                         }
                       }
@@ -40622,14 +40577,7 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "in": "path",
-            "name": "OCEAN_ID",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "example": "o-abcd1234",
-            "description": "The ID of the Ocean cluster.\n"
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec/get/parameters/1"
           }
         ],
         "responses": {
@@ -40651,24 +40599,27 @@
                           "properties": {
                             "items": {
                               "type": "array",
-                              "allOf": [
-                                {
-                                  "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/post/requestBody/content/application~1json/schema/allOf/0"
-                                },
-                                {
-                                  "type": "object",
-                                  "properties": {
-                                    "createdAt": {
-                                      "type": "string",
-                                      "example": "2018-11-05T12:55:50.000+0000"
-                                    },
-                                    "updatedAt": {
-                                      "type": "string",
-                                      "example": "2018-11-05T12:58:15.000+0000"
+                              "items": {
+                                "type": "object",
+                                "allOf": [
+                                  {
+                                    "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/post/requestBody/content/application~1json/schema/allOf/0"
+                                  },
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "createdAt": {
+                                        "type": "string",
+                                        "example": "2018-11-05T12:55:50.000+0000"
+                                      },
+                                      "updatedAt": {
+                                        "type": "string",
+                                        "example": "2018-11-05T12:58:15.000+0000"
+                                      }
                                     }
                                   }
-                                }
-                              ]
+                                ]
+                              }
                             }
                           }
                         }
@@ -40685,7 +40636,7 @@
         }
       }
     },
-    "/ocean/gcp/k8s/launchSpec/{OCEAN_LAUNCH_SPEC_ID}": {
+    "/ocean/gcp/k8s/launchSpec/{oceanLaunchSpecId}": {
       "summary": "Ocean for GKE",
       "delete": {
         "summary": "Delete Launch Spec",
@@ -40699,10 +40650,10 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec~1%7BOCEAN_LAUNCH_SPEC_ID%7D/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec~1%7BoceanLaunchSpecId%7D/get/parameters/1"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec~1%7BOCEAN_LAUNCH_SPEC_ID%7D/delete/parameters/2"
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec~1%7BoceanLaunchSpecId%7D/delete/parameters/2"
           }
         ],
         "responses": {
@@ -40774,7 +40725,7 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec~1%7BOCEAN_LAUNCH_SPEC_ID%7D/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec~1%7BoceanLaunchSpecId%7D/get/parameters/1"
           }
         ],
         "requestBody": {
@@ -40818,34 +40769,29 @@
                           "value"
                         ],
                         "description": "Add metadata to cluster\n",
-                        "items": [
-                          {
-                            "type": "object",
-                            "properties": {
-                              "key": {
-                                "type": "string",
-                                "description": "Set metadata's key. Required on launchSpec.metadata",
-                                "example": "key1"
-                              },
-                              "value": {
-                                "type": "string",
-                                "description": "Set metadata's name. Required on launchSpec.metadata",
-                                "example": "value1"
-                              }
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "key": {
+                              "type": "string",
+                              "description": "Set metadata's key. Required on launchSpec.metadata",
+                              "example": "key1"
+                            },
+                            "value": {
+                              "type": "string",
+                              "description": "Set metadata's name. Required on launchSpec.metadata",
+                              "example": "value1"
                             }
+                          }
+                        },
+                        "example": [
+                          {
+                            "key": "key1",
+                            "value": "value1"
                           },
                           {
-                            "type": "object",
-                            "properties": {
-                              "key": {
-                                "type": "string",
-                                "example": "key2"
-                              },
-                              "value": {
-                                "type": "string",
-                                "example": "value2"
-                              }
-                            }
+                            "key": "key2",
+                            "value": "value2"
                           }
                         ]
                       },
@@ -41010,7 +40956,7 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec~1%7BOCEAN_LAUNCH_SPEC_ID%7D/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec~1%7BoceanLaunchSpecId%7D/get/parameters/1"
           }
         ],
         "responses": {
@@ -41023,7 +40969,7 @@
         }
       }
     },
-    "/ocean/gcp/k8s/cluster/{OCEAN_CLUSTER_ID}/roll": {
+    "/ocean/gcp/k8s/cluster/{oceanClusterId}/roll": {
       "summary": "Ocean for GKE",
       "post": {
         "summary": "Initiate Roll",
@@ -41037,7 +40983,7 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
           }
         ],
         "requestBody": {
@@ -41185,7 +41131,7 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
           }
         ],
         "responses": {
@@ -41217,128 +41163,66 @@
                         },
                         "items": {
                           "type": "array",
-                          "items": [
-                            {
-                              "type": "object",
-                              "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "example": "scr-5aaf854e"
-                                },
-                                "status": {
-                                  "type": "string",
-                                  "example": "IN_PROGRESS"
-                                },
-                                "currentBatch": {
-                                  "type": "integer",
-                                  "example": 2
-                                },
-                                "numOfBatches": {
-                                  "type": "integer",
-                                  "example": 2
-                                },
-                                "comment": {
-                                  "type": "string",
-                                  "example": "This is why I deployed my cluster."
-                                },
-                                "progress": {
-                                  "type": "object",
-                                  "properties": {
-                                    "unit": {
-                                      "type": "string",
-                                      "example": "percentage"
-                                    },
-                                    "value": {
-                                      "type": "integer",
-                                      "example": 0
-                                    }
-                                  }
-                                },
-                                "oceanId": {
-                                  "type": "string",
-                                  "example": "o-30681b13"
-                                },
-                                "launchSpecIds": {
-                                  "type": "array",
-                                  "items": {
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "example": "scr-5aaf854e"
+                              },
+                              "status": {
+                                "type": "string",
+                                "example": "IN_PROGRESS"
+                              },
+                              "currentBatch": {
+                                "type": "integer",
+                                "example": 2
+                              },
+                              "numOfBatches": {
+                                "type": "integer",
+                                "example": 2
+                              },
+                              "comment": {
+                                "type": "string",
+                                "example": "This is why I deployed my cluster."
+                              },
+                              "progress": {
+                                "type": "object",
+                                "properties": {
+                                  "unit": {
                                     "type": "string",
-                                    "example": [
-                                      "ols-76694a7d",
-                                      "ols-56694a76"
-                                    ]
+                                    "example": "percentage"
+                                  },
+                                  "value": {
+                                    "type": "integer",
+                                    "example": 0
                                   }
-                                },
-                                "createdAt": {
-                                  "type": "string",
-                                  "example": "2019-03-24T15:46:09.000Z"
-                                },
-                                "updatedAt": {
-                                  "type": "string",
-                                  "example": "2019-03-24T15:46:09.000Z"
                                 }
-                              }
-                            },
-                            {
-                              "type": "object",
-                              "properties": {
-                                "id": {
+                              },
+                              "oceanId": {
+                                "type": "string",
+                                "example": "o-30681b13"
+                              },
+                              "launchSpecIds": {
+                                "type": "array",
+                                "items": {
                                   "type": "string",
-                                  "example": "scr-5aaf854e"
-                                },
-                                "status": {
-                                  "type": "string",
-                                  "example": "IN_PROGRESS"
-                                },
-                                "currentBatch": {
-                                  "type": "integer",
-                                  "example": 2
-                                },
-                                "numOfBatches": {
-                                  "type": "integer",
-                                  "example": 2
-                                },
-                                "comment": {
-                                  "type": "string",
-                                  "example": "This is why I deployed my cluster."
-                                },
-                                "progress": {
-                                  "type": "object",
-                                  "properties": {
-                                    "unit": {
-                                      "type": "string",
-                                      "example": "percentage"
-                                    },
-                                    "value": {
-                                      "type": "integer",
-                                      "example": 0
-                                    }
-                                  }
-                                },
-                                "oceanId": {
-                                  "type": "string",
-                                  "example": "o-30681b13"
-                                },
-                                "instanceNames": {
-                                  "type": "array",
-                                  "items": {
-                                    "type": "string",
-                                    "example": [
-                                      "sin-0a4becc0-sig-6952238d",
-                                      "sin-0542ecc0-sig-695223r4"
-                                    ]
-                                  }
-                                },
-                                "createdAt": {
-                                  "type": "string",
-                                  "example": "2019-03-24T15:46:09.000Z"
-                                },
-                                "updatedAt": {
-                                  "type": "string",
-                                  "example": "2019-03-24T15:46:09.000Z"
+                                  "example": [
+                                    "ols-76694a7d",
+                                    "ols-56694a76"
+                                  ]
                                 }
+                              },
+                              "createdAt": {
+                                "type": "string",
+                                "example": "2019-03-24T15:46:09.000Z"
+                              },
+                              "updatedAt": {
+                                "type": "string",
+                                "example": "2019-03-24T15:46:09.000Z"
                               }
                             }
-                          ]
+                          }
                         }
                       }
                     }
@@ -41353,7 +41237,7 @@
         }
       }
     },
-    "/ocean/gcp/k8s/cluster/{OCEAN_CLUSTER_ID}/roll/{ROLL_ID}": {
+    "/ocean/gcp/k8s/cluster/{oceanClusterId}/roll/{ROLL_ID}": {
       "summary": "Ocean for GKE",
       "put": {
         "summary": "Update Roll",
@@ -41367,10 +41251,10 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BOCEAN_ID%7D~1roll~1%7BROLL_ID%7D/get/parameters/2"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1roll~1%7BROLL_ID%7D/put/parameters/2"
           }
         ],
         "requestBody": {
@@ -41461,15 +41345,15 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BOCEAN_ID%7D~1roll~1%7BROLL_ID%7D/get/parameters/2"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1roll~1%7BROLL_ID%7D/put/parameters/2"
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster~1%7BOCEAN_CLUSTER_ID%7D~1roll/post/responses/200"
+            "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster~1%7BoceanClusterId%7D~1roll/post/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -41738,7 +41622,7 @@
         }
       }
     },
-    "/ocean/gcp/k8s/launchSpec/{OCEAN_LAUNCH_SPEC_ID}/launchNodes": {
+    "/ocean/gcp/k8s/launchSpec/{oceanLaunchSpecId}/launchNodes": {
       "post": {
         "summary": "Launch Nodes In VNG",
         "description": "Launch nodes in Virtual Node Group.\n",
@@ -41751,7 +41635,7 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec~1%7BOCEAN_LAUNCH_SPEC_ID%7D/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec~1%7BoceanLaunchSpecId%7D/get/parameters/1"
           }
         ],
         "requestBody": {
@@ -41973,7 +41857,8 @@
                                 "description": "Auto Scaling scale down operations.\n",
                                 "properties": {
                                   "maxScaleDownPercentage": {
-                                    "type": "double",
+                                    "type": "number",
+                                    "format": "double",
                                     "minimum": 0.1,
                                     "maximum": 100,
                                     "description": "Would represent the maximum % to scale-down.",
@@ -42173,13 +42058,13 @@
                                               "example": "testSubnet"
                                             },
                                             "assignPublicIp": {
-                                              "title": "Assign Publick IP",
+                                              "title": "Assign Public IP",
                                               "description": "Assign public IP.\n",
                                               "type": "boolean",
                                               "example": true
                                             },
                                             "publicIpSku": {
-                                              "title": null,
+                                              "title": "Public IP SKU",
                                               "description": "Required if assignPublicIp=true. Supported values:\n+ Standard\n+ Basic\n",
                                               "type": "string",
                                               "example": "Standard"
@@ -42306,10 +42191,13 @@
                                             "backendPoolNames": {
                                               "type": "array",
                                               "description": "Names of the Backend Pools to register the Cluster VMs to.\\\nEach Backend Pool is a separate load balancer.\n",
-                                              "example": [
-                                                "testBackendPool1",
-                                                "testBackendPool2"
-                                              ]
+                                              "items": {
+                                                "type": "string",
+                                                "example": [
+                                                  "testBackendPool1",
+                                                  "testBackendPool2"
+                                                ]
+                                              }
                                             }
                                           }
                                         }
@@ -42354,19 +42242,16 @@
                                         "name": {
                                           "type": "string",
                                           "description": "Required on compute.launchSpecification.extensions object.\n",
-                                          "required": true,
                                           "example": "extensionName"
                                         },
                                         "type": {
                                           "type": "string",
-                                          "required": true,
                                           "description": "Required on compute.launchSpecification.extensions object.\n",
                                           "example": "customScript"
                                         },
                                         "publisher": {
                                           "type": "string",
                                           "description": "Required on compute.launchSpecification.extensions object.\n",
-                                          "required": true,
                                           "example": "Microsoft.Azure.Extensions"
                                         },
                                         "apiVersion": {
@@ -42376,7 +42261,6 @@
                                         },
                                         "minorVersionAutoUpgrade": {
                                           "type": "boolean",
-                                          "required": true,
                                           "description": "Required on compute.launchSpecification.extensions object.\n",
                                           "example": true
                                         },
@@ -43550,7 +43434,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Ocean AKS Delete Cluster Response",
+            "description": "Ocean AKS Virtual Node Group Delete Response",
             "content": {
               "application/json": {
                 "schema": {
@@ -43700,7 +43584,7 @@
         }
       }
     },
-    "/ocean/aws/k8s/launchSpec/{launchSpecId}/launchNodes": {
+    "/ocean/aws/k8s/launchSpec/{oceanLaunchSpecId}/launchNodes": {
       "put": {
         "summary": "Launch Nodes In VNG",
         "description": "Launch nodes in Virtual Node Group.\n",
@@ -43713,7 +43597,7 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec~1%7BOCEAN_LAUNCH_SPEC_ID%7D/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec~1%7BoceanLaunchSpecId%7D/get/parameters/1"
           }
         ],
         "requestBody": {
@@ -43826,7 +43710,7 @@
         }
       }
     },
-    "/ocean/aws/ecs/launchSpec/{launchSpecId}/launchContainerInstances": {
+    "/ocean/aws/ecs/launchSpec/{oceanLaunchSpecId}/launchContainerInstances": {
       "put": {
         "summary": "Launch Container Instances In Launch Spec",
         "description": "Launch container instances in launch spec.\n",
@@ -43839,7 +43723,7 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec~1%7BOCEAN_LAUNCH_SPEC_ID%7D/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec~1%7BoceanLaunchSpecId%7D/get/parameters/1"
           }
         ],
         "requestBody": {
