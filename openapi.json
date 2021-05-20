@@ -20762,6 +20762,106 @@
         }
       }
     },
+    "/azure/compute/group/{groupId}/vmHealthiness": {
+      "get": {
+        "summary": "Vm Healthiness",
+        "description": "Get a list of vms with health status.",
+        "operationId": "elastigroupAzureVmHealthiness",
+        "tags": [
+          "Elastigroup Azure Spot VMs"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "in": "path",
+            "name": "groupId",
+            "example": "sig-123123",
+            "description": "Elastigroup's ID\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vm Healthiness Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/azure/compute/group/sig-123123/vmHealthiness"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "vmName": {
+                                    "type": "string",
+                                    "description": "Vm Name",
+                                    "example": "vm-123456789"
+                                  },
+                                  "lifeCycle": {
+                                    "type": "string",
+                                    "description": "Life Cycle",
+                                    "enum": [
+                                      "SPOT",
+                                      "ON_DEMAND"
+                                    ],
+                                    "example": "SPOT"
+                                  },
+                                  "healthStatus": {
+                                    "type": "string",
+                                    "description": "Health Status",
+                                    "enum": [
+                                      "HEALTHY",
+                                      "UNHEALTHY",
+                                      "UNKNOWN"
+                                    ],
+                                    "example": "HEALTHY"
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:azure:compute:group:vmHealthiness"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/azure/compute/group/{groupId}/suspend": {
       "put": {
         "summary": "Suspend Group",
@@ -20779,44 +20879,52 @@
           }
         ],
         "requestBody": {
-          "required": false,
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "allOf": [
                   {
                     "type": "object",
+                    "title": "Create Elastigroup Azure Spot VMs Process Suspensions",
+                    "required": [
+                      "processes"
+                    ],
                     "properties": {
                       "processes": {
                         "type": "array",
-                        "items": [
-                          {
-                            "type": "object",
-                            "properties": {
-                              "name": {
-                                "type": "string",
-                                "example": "signalTimeout"
-                              },
-                              "ttlInMinutes": {
-                                "type": "string",
-                                "description": "The duration in minutes which the process is suspended for",
-                                "example": 180
-                              }
+                        "description": "List of processes to create or update their suspensions\n",
+                        "items": {
+                          "type": "object",
+                          "required": [
+                            "name"
+                          ],
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "description": "Process name to create signal timeout\n",
+                              "enum": [
+                                "autoHealing",
+                                "signalTimeout",
+                                "autoScale",
+                                "scaleDown",
+                                "syncStrategy"
+                              ]
+                            },
+                            "ttlInMinutes": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "description": "The duration in minutes which the process is suspended for; \\\nif not provided, then it will remain suspended until resumed\n"
                             }
+                          }
+                        },
+                        "example": [
+                          {
+                            "name": "autoHealing",
+                            "ttlInMinute": 120
                           },
                           {
-                            "type": "object",
-                            "properties": {
-                              "name": {
-                                "type": "string",
-                                "example": "syncStrategy"
-                              },
-                              "ttlInMinutes": {
-                                "type": "string",
-                                "description": "The duration in minutes which the process is suspended for",
-                                "example": 180
-                              }
-                            }
+                            "name": "signalTimeout"
                           }
                         ]
                       }
@@ -20829,7 +20937,34 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/paths/~1azure~1compute~1group~1%7BgroupId%7D~1resume/put/responses/200"
+            "description": "Spot Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/azure/compute/group/sig-12345/suspend?accountId=act-123456789"
+                            },
+                            "method": {
+                              "example": "PUT"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -20854,34 +20989,46 @@
           }
         ],
         "requestBody": {
-          "required": false,
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "allOf": [
                   {
                     "type": "object",
+                    "title": "Resume Elastigroup Azure Spot VMs processes",
+                    "required": [
+                      "processes"
+                    ],
                     "properties": {
                       "processes": {
                         "type": "array",
-                        "items": [
-                          {
-                            "type": "object",
-                            "properties": {
-                              "name": {
-                                "type": "string",
-                                "example": "signalTimeout"
-                              }
+                        "description": "List of processes to cancel their suspensions\n",
+                        "items": {
+                          "type": "object",
+                          "required": [
+                            "name"
+                          ],
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "description": "Process name to create signal timeout\n",
+                              "enum": [
+                                "autoHealing",
+                                "signalTimeout",
+                                "autoScale",
+                                "scaleDown",
+                                "syncStrategy"
+                              ]
                             }
+                          }
+                        },
+                        "example": [
+                          {
+                            "name": "syncStrategy"
                           },
                           {
-                            "type": "object",
-                            "properties": {
-                              "name": {
-                                "type": "string",
-                                "example": "syncStrategy"
-                              }
-                            }
+                            "name": "signalTimeout"
                           }
                         ]
                       }
@@ -20898,7 +21045,27 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/azure/compute/group/sig-12345/resume?accountId=act-123456789"
+                            },
+                            "method": {
+                              "example": "PUT"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
                 }
               }
             }
