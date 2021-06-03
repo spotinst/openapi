@@ -770,7 +770,7 @@ properties:
                           title:
                           description: Required if assignPublicIp=true values=[STANDARD/BASIC]
                           type: string
-                          example:
+                          example: STANDARD
                         securityGroup:
                           title: Security Group
                           description: Security Group
@@ -787,17 +787,21 @@ properties:
                               type: string
                               example: test
                         publicIps:
-                          description: List of objects, In create group, cannot be empty.
+                          description: Defined a pool of Public Ips (from Azure), that will be associated to the network interface.
+                                    We will associate one public ip per instance until the pool is exhausted, in which case, we will create a new one.
                           type: array
                           items:
                             type: object
+                            required:
+                              - resourceGroupName
+                              - name
                             properties:
                               resourceGroupName:
-                                description: Cannot be empty.
+                                description: The resource group of the public ip.
                                 type: string
                                 example: resourceGroup
                               name:
-                                description: Cannot be empty.
+                                description: The name of the public ip.
                                 type: string
                                 example: name
                         enableIPForwarding:
@@ -837,7 +841,23 @@ properties:
                               - 172.23.5.8
                               - 172.23.5.9
                               - 172.23.5.10
-
+                        applicationSecurityGroups:
+                          description: List of Application Security Groups that will be associated to the primary ip configration of the network interface.
+                          type: array
+                          items:
+                            type: object
+                            required:
+                              - resourceGroupName
+                              - name
+                            properties:
+                              resourceGroupName:
+                                description: The resource group of the Application Security Group.
+                                type: string
+                                example: AsgResourceGroup
+                              name:
+                                description: The name of the Application Security group
+                                type: string
+                                example: AsgName
 
 
               extensions:
