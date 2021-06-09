@@ -1,0 +1,42 @@
+put:
+  summary: "Update Capacity"
+  description:
+    Update the capacity of an Elastigroup
+  operationId: "elastigroupAzureSpotUpdateCapacity"
+  tags:
+    - Elastigroup Azure Spot VMs
+  parameters:
+    - $ref: "../../../../../commons/parameters/groupId.yaml"
+    - $ref: "../../../../../commons/parameters/accountId.yaml"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          allOf:
+            - capacity:
+              type: object
+              title: "Elastigroup Capacity"
+              description: |
+                Capacity of Elastigroup.
+              properties:
+                target:
+                  type: integer
+                  description: |
+                    Desired number of VMs for Elastigroup to maintain.
+                  example: 8
+                minimum:
+                  type: integer
+                  example: 2
+                  description: >
+                    Minimum number of VMs.
+                maximum:
+                  type: "integer"
+                  example: 10
+                  description: >
+                    Maximum number of VMs.
+  responses:
+    200:
+      $ref: "../responses/groupCapacity.yaml"
+    400:
+      description: "Bad Request"
