@@ -761,6 +761,61 @@ properties:
                     description: |
                       The upper limit number of instances that you can scale up to. Optional, required if using `updateCapacity` as action type and neither `target` nor `minimum` are not defined
                     example: 5
+              stepAdjustments:
+                type: array
+                description: |
+                  The list of steps to define actions to take based on different thresholds.
+                  When set, policy-level threshold and action cannot be specified.
+                  If specified, at least one step should be defined.
+                items:
+                  type: object
+                  properties:
+                    action:
+                      type: object
+                      description: |
+                        The action to take when scale up according to step's threshold is needed.
+                        A mandatory field, that should be filled with one of the following:
+                        "adjustment", "percentageAdjustment", "setMinTarget", "updateCapacity".
+                      properties:
+                        type:
+                          type: string
+                          description: |
+                            The type of the action to take when scale up is needed.
+                          enum: [ adjustment , updateCapacity setMinTarget , percentageAdjustment ]
+                          example: "adjustment"
+                        adjustment:
+                          type: integer
+                          description: |
+                            The number / percentage associated with the specified adjustment type.
+                            Required if using `adjustment` or `percentageAdjustment` as action type
+                          example: 2
+                        minTargetCapacity:
+                          type: integer
+                          description: |
+                            The desired target capacity of a group.
+                            Required if using `setMinTarget` as action type
+                          example: 2
+                        target:
+                          type: integer
+                          description: |
+                            The desired number of instances. Required if using `updateCapacity` as action type and neither `minimum` nor `maximum` are defined.
+                          example: 2
+                        minimum:
+                          type: integer
+                          description: |
+                            The lower limit number of instances that you can scale down to. Optional, required if using `updateCapacity` as action type and neither `target` nor `maximum` are defined
+                          example: 1
+                        maximum:
+                          type: integer
+                          description: |
+                            The upper limit number of instances that you can scale up to. Optional, required if using `updateCapacity` as action type and neither `target` nor `minimum` are defined
+                          example: 4
+                    threshold:
+                      type: integer
+                      description: |
+                        The value against which the specified statistic is compared in order
+                        to determine if a step should be applied.
+                      example: 40
               namespace:
                 type: string
                 description: |
@@ -881,6 +936,61 @@ properties:
                     description: |
                       The upper limit number of instances that you can scale up to. Optional, required if using `updateCapacity` as action type and neither `target` nor `minimum` are not defined
                     example: 5
+              stepAdjustments:
+                type: array
+                description: |
+                  The list of steps to define actions to take based on different thresholds.
+                  When set, policy-level threshold and action cannot be specified.
+                  If specified, at least one step should be defined.
+                items:
+                  type: object
+                  properties:
+                    action:
+                      type: object
+                      description: |
+                        The action to take when scale down according to step's threshold is needed.
+                        A mandatory field, that should be filled with one of the following:
+                        "adjustment", "percentageAdjustment", "setMaxTarget", "updateCapacity".
+                      properties:
+                        type:
+                          type: string
+                          description: |
+                            The type of the action to take when scale down is needed.
+                          enum: [ adjustment , updateCapacity, setMaxTarget , percentageAdjustment ]
+                          example: "adjustment"
+                        adjustment:
+                          type: integer
+                          description: |
+                            The number / percentage associated with the specified adjustment type.
+                            Required if using `adjustment` or `percentageAdjustment` as action type
+                          example: 1
+                        maxTargetCapacity:
+                          type: integer
+                          description: |
+                            The desired target capacity of.
+                            Required if using `setMaxTarget` as action type
+                          example: 1
+                        target:
+                          type: integer
+                          description: |
+                            The desired number of instances. Required if using `updateCapacity` as action type and neither `minimum` nor `maximum` are defined.
+                          example: 1
+                        minimum:
+                          type: integer
+                          description: |
+                            The lower limit number of instances that you can scale down to. Optional, required if using `updateCapacity` as action type and neither `target` nor `maximum` are defined
+                          example: 0
+                        maximum:
+                          type: integer
+                          description: |
+                            The upper limit number of instances that you can scale up to. Optional, required if using `updateCapacity` as action type and neither `target` nor `minimum` are defined
+                          example: 5
+                    threshold:
+                      type: integer
+                      description: |
+                        The value against which the specified statistic is compared in order
+                        to determine if a step should be applied.
+                      example: 10
               namespace:
                 type: string
                 description: |
