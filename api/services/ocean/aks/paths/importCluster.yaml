@@ -1,0 +1,34 @@
+post:
+  summary: "Import Cluster"
+  description: |
+    The Cluster Import API call returns a JSON formatted Ocean cluster spec for a given AKS cluster and import identifier.
+    The returned spec is ready to use in the [Ocean AKS Cluster Create](https://docs.spot.io/api/#operation/oceanAKSClusterCreate) API call.
+
+    Prerequisites:
+    1. To initiate the import from AKS process, run the following script on a machine with the kubectl command-line tool installed and configured (Ensure the correct context is set in kube config.)
+
+    ```
+    curl -fsSL https://spotinst-public.s3.amazonaws.com/integrations/kubernetes/aks/spot-aks-connector/init.sh | \
+    bash -s acd-12345678
+    ```
+
+    * The import identifier has the prefix “acd-“ followed by eight characters. Use the same identifier as input for this API call.
+    * Learn more about the [Import from AKS](https://docs.spot.io/ocean/getting-started/aks?id=import-process-overview) process.
+  operationId: "oceanAKSClusterImport"
+  tags:
+    - "Ocean AKS"
+  parameters:
+    - $ref: "../../commons/parameters/acdIdentifier.yaml"
+    - $ref: "../../../../commons/parameters/accountId.yaml"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          allOf:
+            - $ref: "../schemas/oceanImport.yaml"
+  responses:
+    200:
+      $ref: "../responses/oceanClusterImport.yaml"
+    400:
+      description: "Bad Request"

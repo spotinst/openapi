@@ -128,13 +128,13 @@ properties:
                   type: string
                   example: testSubnet
                 assignPublicIp:
-                  title: Assign Publick IP
+                  title: Assign Public IP
                   description: |
                     Assign public IP.
                   type: boolean
                   example: true
                 publicIpSku:
-                  title:
+                  title: Public IP SKU
                   description: |
                     Required if assignPublicIp=true. Supported values:
                     + Standard
@@ -144,25 +144,23 @@ properties:
                 securityGroup:
                   title: Security Group
                   description: Security Group
-                  type: array
-                  items:
-                    type: object
-                    required:
-                      - name
-                      - resourceGroupName
-                    properties:
-                      name:
-                        title: Name
-                        description: |
-                          Requires valid security group name. Required if security group is specified.
-                        type: string
-                        example: test
-                      resourceGroupName:
-                        title: Resource Group Name
-                        description: |
-                          Requires valid resource group name. Required if security group is specified.
-                        type: string
-                        example: test
+                  type: object
+                  required:
+                    - name
+                    - resourceGroupName
+                  properties:
+                    name:
+                      title: Name
+                      description: |
+                        Requires valid security group name. Required if security group is specified.
+                      type: string
+                      example: test
+                    resourceGroupName:
+                      title: Resource Group Name
+                      description: |
+                        Requires valid resource group name. Required if security group is specified.
+                      type: string
+                      example: test
                 enableIPForwarding:
                   title: Enable IP Forwarding
                   description: |
@@ -203,6 +201,7 @@ properties:
         properties:
           sshPublicKey:
             type: string
+            writeOnly: true
             description: |
               SSH public key for admin access to Linux VMs.
             example: ssh-rsa
@@ -257,9 +256,11 @@ properties:
                   description: |
                     Names of the Backend Pools to register the Cluster VMs to.\
                     Each Backend Pool is a separate load balancer.
-                  example:
-                    - testBackendPool1
-                    - testBackendPool2
+                  items:
+                    type: string
+                    example:
+                      - testBackendPool1
+                      - testBackendPool2
       tags:
         type: array
         description: |
@@ -296,11 +297,9 @@ properties:
               type: string
               description: |
                 Required on compute.launchSpecification.extensions object.
-              required: true
               example: extensionName
             type:
               type: string
-              required: true
               description: |
                 Required on compute.launchSpecification.extensions object.
               example: customScript
@@ -308,7 +307,6 @@ properties:
               type: string
               description: |
                 Required on compute.launchSpecification.extensions object.
-              required: true
               example: Microsoft.Azure.Extensions
             apiVersion:
               type: string
@@ -317,7 +315,6 @@ properties:
               example: 2.0
             minorVersionAutoUpgrade:
               type: boolean
-              required: true
               description: |
                 Required on compute.launchSpecification.extensions object.
               example: true
