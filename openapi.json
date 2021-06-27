@@ -6366,24 +6366,195 @@
                                 "type": "object",
                                 "title": "BootstrapActions Object",
                                 "description": "Describe bootstrap actions. For more information please see: [Advanced - Using Bootstrap And Configuration Files](https://docs.spot.io/elastigroup/tools-integrations/elastic-mapreduce/advanced-import-use-bootstrap-and-configuration-files)\n",
-                                "properties": {
-                                  "file": {
+                                "oneOf": [
+                                  {
                                     "type": "object",
-                                    "description": "Bootstrap file information",
+                                    "title": "Configurations object",
+                                    "required": [
+                                      "file"
+                                    ],
                                     "properties": {
-                                      "bucket": {
-                                        "type": "string",
-                                        "description": "The S3 bucket name",
-                                        "example": "emr-test"
-                                      },
-                                      "key": {
-                                        "type": "string",
-                                        "description": "The S3 Bucket key",
-                                        "example": "MyFile.json"
+                                      "file": {
+                                        "type": "object",
+                                        "description": "Bootstraps file for the group",
+                                        "properties": {
+                                          "bucket": {
+                                            "type": "string",
+                                            "description": "The S3 bucket name",
+                                            "example": "emr-test"
+                                          },
+                                          "key": {
+                                            "type": "string",
+                                            "description": "The S3 Bucket key",
+                                            "example": "MyFile.json"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "type": "object",
+                                    "title": "Json Configuration Object",
+                                    "required": [
+                                      "jsonConfiguration"
+                                    ],
+                                    "properties": {
+                                      "jsonConfiguration": {
+                                        "type": "array",
+                                        "description": "Bootstraps configuration for the group",
+                                        "items": {
+                                          "type": "object",
+                                          "required": [
+                                            "name",
+                                            "scriptBootstrapAction"
+                                          ],
+                                          "properties": {
+                                            "name": {
+                                              "type": "string",
+                                              "description": "The name of bootstrap action"
+                                            },
+                                            "scriptBootstrapAction": {
+                                              "required": [
+                                                "path"
+                                              ],
+                                              "type": "object",
+                                              "description": "The script run by the bootstrap action.",
+                                              "properties": {
+                                                "path": {
+                                                  "type": "string",
+                                                  "description": "The S3 bucket name",
+                                                  "example": "emr-test"
+                                                },
+                                                "args": {
+                                                  "type": "array",
+                                                  "description": "A list of command line arguments to pass to the bootstrap action script.",
+                                                  "items": {
+                                                    "type": "string",
+                                                    "example": "instance.isMaster=true"
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
                                       }
                                     }
                                   }
-                                }
+                                ]
+                              },
+                              "steps": {
+                                "type": "object",
+                                "title": "Steps Object",
+                                "description": "Describe emr steps. For more information please see: [Advanced - Using Bootstrap And Configuration Files](https://docs.spot.io/elastigroup/tools-integrations/elastic-mapreduce/advanced-import-use-bootstrap-and-configuration-files)\n",
+                                "oneOf": [
+                                  {
+                                    "type": "object",
+                                    "title": "Configurations object",
+                                    "required": [
+                                      "file"
+                                    ],
+                                    "properties": {
+                                      "file": {
+                                        "type": "object",
+                                        "description": "Steps file for the group",
+                                        "properties": {
+                                          "bucket": {
+                                            "type": "string",
+                                            "description": "The S3 bucket name",
+                                            "example": "emr-test"
+                                          },
+                                          "key": {
+                                            "type": "string",
+                                            "description": "The S3 Bucket key",
+                                            "example": "MyFile.json"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "type": "object",
+                                    "title": "Json Configuration Object",
+                                    "required": [
+                                      "jsonConfiguration"
+                                    ],
+                                    "properties": {
+                                      "jsonConfiguration": {
+                                        "type": "array",
+                                        "description": "Steps configuration for the group",
+                                        "items": {
+                                          "type": "object",
+                                          "required": [
+                                            "name",
+                                            "stepConfig"
+                                          ],
+                                          "properties": {
+                                            "name": {
+                                              "type": "string",
+                                              "description": "The name of configured step",
+                                              "example": "stepName"
+                                            },
+                                            "actionOnFailure": {
+                                              "type": "string",
+                                              "description": "Valid values \"TERMINATE_JOB_FLOW\", \"TERMINATE_CLUSTER\", \"CANCEL_AND_WAIT\", \"CONTINUE\"",
+                                              "example": "CONTINUE"
+                                            },
+                                            "stepConfig": {
+                                              "required": [
+                                                "jar"
+                                              ],
+                                              "type": "object",
+                                              "description": "The JAR file used for the step.",
+                                              "properties": {
+                                                "args": {
+                                                  "type": "array",
+                                                  "description": "A list of command line arguments passed to the JAR file's main function when executed.",
+                                                  "example": "-input",
+                                                  "items": {
+                                                    "type": "string"
+                                                  }
+                                                },
+                                                "jar": {
+                                                  "type": "string",
+                                                  "description": "A path to a JAR file run during the step.",
+                                                  "example": "emr-test"
+                                                },
+                                                "mainClass": {
+                                                  "type": "string",
+                                                  "description": "The name of the main class in the specified Java file.",
+                                                  "example": "mainClass"
+                                                },
+                                                "properties": {
+                                                  "type": "array",
+                                                  "description": "A list of Java properties that are set when the step runs.",
+                                                  "items": {
+                                                    "type": "object",
+                                                    "required": [
+                                                      "key",
+                                                      "value"
+                                                    ],
+                                                    "properties": {
+                                                      "key": {
+                                                        "type": "string",
+                                                        "description": "The unique identifier of a key-value pair.",
+                                                        "example": "key"
+                                                      },
+                                                      "value": {
+                                                        "type": "string",
+                                                        "description": "The value part of the identified key.",
+                                                        "example": "value"
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                ]
                               },
                               "instanceGroups": {
                                 "type": "array",
@@ -6576,10 +6747,10 @@
                                             {
                                               "type": "object",
                                               "title": "Json Configuration Object",
-                                              "description": "EMR cluster configuration in JSON format. You can use `jsonConfiguration` or `file`, but not both. Can be used in `masterGroup`, `coreGroup`, and `taskGroup`.\n",
-                                              "requierd": [
+                                              "required": [
                                                 "jsonConfiguration"
                                               ],
+                                              "description": "EMR cluster configuration in JSON format. You can use `jsonConfiguration` or `file`, but not both. Can be used in `masterGroup`, `coreGroup`, and `taskGroup`.\n",
                                               "properties": {
                                                 "jsonConfiguration": {
                                                   "type": "object",
