@@ -44189,6 +44189,191 @@
         }
       }
     },
+    "/ocean/azure/k8s/cluster/{oceanClusterId}/rightSizing/suggestion": {
+      "post": {
+        "summary": "Fetch Right Sizing Recommendations",
+        "description": "Get right-sizing recommendations for an Ocean cluster and filter them according to namespace or label.\n",
+        "operationId": "oceanAzureFilterRightSizingWithFilter",
+        "tags": [
+          "Ocean AKS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          },
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D~1rightSizing~1suggestion/post/parameters/2"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D~1rightSizing~1suggestion/post/requestBody/content/application~1json/schema/allOf/0"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ocean RightSizing Recommendation Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/azure/k8s/cluster/o-abcd1234/rightSizing/suggestion"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "resourceName": {
+                                    "type": "string"
+                                  },
+                                  "resourceType": {
+                                    "type": "string"
+                                  },
+                                  "namespace": {
+                                    "type": "string"
+                                  },
+                                  "suggestedCPU": {
+                                    "type": "integer"
+                                  },
+                                  "suggestedMemory": {
+                                    "type": "integer"
+                                  },
+                                  "requestedCPU": {
+                                    "type": "integer"
+                                  },
+                                  "requestedMemory": {
+                                    "type": "integer"
+                                  },
+                                  "containers": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "name": {
+                                          "type": "string"
+                                        },
+                                        "requestedCPU": {
+                                          "type": "integer"
+                                        },
+                                        "suggestedCPU": {
+                                          "type": "integer"
+                                        },
+                                        "requestedMemory": {
+                                          "type": "integer"
+                                        },
+                                        "suggestedMemory": {
+                                          "type": "integer"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "example": [
+                                {
+                                  "resourceName": "redis-controller",
+                                  "resourceType": "deployment",
+                                  "namespace": "kube-system",
+                                  "suggestedCPU": 4,
+                                  "suggestedMemory": 19,
+                                  "requestedCPU": 50,
+                                  "requestedMemory": 50,
+                                  "containers": [
+                                    {
+                                      "name": "dnsmasq",
+                                      "requestedCPU": 10,
+                                      "suggestedCPU": 2,
+                                      "requestedMemory": 40,
+                                      "suggestedMemory": 15
+                                    },
+                                    {
+                                      "name": "sidecar",
+                                      "requestedCPU": 40,
+                                      "suggestedCPU": 2,
+                                      "requestedMemory": 10,
+                                      "suggestedMemory": 4
+                                    }
+                                  ]
+                                },
+                                {
+                                  "resourceName": "test-redis",
+                                  "resourceType": "deployment",
+                                  "namespace": "sparkSpace",
+                                  "suggestedCPU": 2,
+                                  "suggestedMemory": 20,
+                                  "requestedCPU": 50,
+                                  "requestedMemory": 30,
+                                  "containers": [
+                                    {
+                                      "name": "dns-controller",
+                                      "requestedCPU": 20,
+                                      "suggestedCPU": 1,
+                                      "requestedMemory": 20,
+                                      "suggestedMemory": 15
+                                    },
+                                    {
+                                      "name": "kubedns",
+                                      "requestedCPU": 30,
+                                      "suggestedCPU": 1,
+                                      "requestedMemory": 10,
+                                      "suggestedMemory": 5
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            "count": {
+                              "example": 2
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:azure:k8s:cluster:rightSizing:suggestion"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/ocean/aws/k8s/launchSpec/{oceanLaunchSpecId}/launchNodes": {
       "put": {
         "summary": "Launch Nodes in VNG",
