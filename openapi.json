@@ -16217,16 +16217,16 @@
                               "properties": {
                                 "items": {
                                   "type": "array",
-                                  "description": "Array of data objects\n"
+                                  "description": "Array of data objects.\n"
                                 },
                                 "count": {
                                   "type": "integer",
                                   "example": 1,
-                                  "description": "Size of the data object array\n"
+                                  "description": "Size of the data object array.\n"
                                 },
                                 "kind": {
                                   "type": "string",
-                                  "description": "The data type of each item in the response\n"
+                                  "description": "The data type of each item in the response.\n"
                                 }
                               }
                             }
@@ -22518,31 +22518,31 @@
                       "properties": {
                         "request": {
                           "type": "object",
-                          "description": "Original request properties\n",
+                          "description": "Original request properties.\n",
                           "properties": {
                             "id": {
                               "type": "string",
                               "example": "e593ff58-067d-4340-92f9-8b1c0bad70d7",
-                              "description": "Unique ID associated with this request\n"
+                              "description": "Unique identifier associated with this request.\n"
                             },
                             "url": {
                               "type": "string",
-                              "description": "The URL that was used for the request\n"
+                              "description": "The URL that was used for the request.\n"
                             },
                             "method": {
                               "type": "string",
-                              "description": "The HTTP **METHOD** used for the request\n"
+                              "description": "The HTTP **METHOD** used for the request.\n"
                             },
                             "timestamp": {
                               "type": "string",
                               "example": "2018-06-20T11:35:01.745Z",
-                              "description": "When the request was received by Spot\n"
+                              "description": "When the request was received by Spot.\n"
                             }
                           }
                         },
                         "response": {
                           "type": "object",
-                          "description": "Response package that includes, status, type and any relevant data.\n",
+                          "description": "Response package that includes status, type, and any relevant data.\n",
                           "properties": {
                             "status": {
                               "type": "object",
@@ -22550,12 +22550,12 @@
                                 "code": {
                                   "type": "integer",
                                   "example": 200,
-                                  "description": "HTTP status code assigned to this response\n"
+                                  "description": "HTTP status code assigned to this response.\n"
                                 },
                                 "message": {
                                   "type": "string",
                                   "example": "OK",
-                                  "description": "HTTP status message for the respective status code\n"
+                                  "description": "HTTP status message for the respective status code.\n"
                                 }
                               }
                             }
@@ -30062,13 +30062,14 @@
         }
       }
     },
-    "/ocean/aws/k8s/cluster/{oceanClusterId}/controllerHeartbeat": {
+    "/ocean/k8s/cluster/{oceanClusterId}/controllerHeartbeat": {
       "get": {
         "summary": "Get Heartbeat Status",
         "description": "Get the heartbeat status of the Ocean Controller for the cluster. <br /> The response returns the heartbeat status and the last heartbeat timestamp.\"\n",
         "operationId": "oceanAwsGetHeartbeatStatus",
         "tags": [
-          "Ocean AWS"
+          "Ocean AWS",
+          "Ocean GKE"
         ],
         "parameters": [
           {
@@ -30084,75 +30085,52 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "request": {
-                      "type": "object",
-                      "description": "Original request properties\n",
-                      "properties": {
-                        "id": {
-                          "type": "string",
-                          "example": "e593ff58-067d-4340-92f9-8b1c0bad70d7",
-                          "description": "Unique identifier associated with this request\n"
-                        },
-                        "url": {
-                          "type": "string",
-                          "description": "The URL that was used for the request\n"
-                        },
-                        "method": {
-                          "type": "string",
-                          "description": "The HTTP **METHOD** used for the request\n"
-                        },
-                        "timestamp": {
-                          "type": "string",
-                          "example": "2018-06-20T11:35:01.745Z",
-                          "description": "When the request was received by Spot\n"
-                        }
-                      }
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
                     },
-                    "response": {
+                    {
                       "type": "object",
-                      "description": "Response package that includes status, type, and any relevant data.\n",
                       "properties": {
-                        "status": {
+                        "request": {
                           "type": "object",
                           "properties": {
-                            "code": {
-                              "type": "integer",
-                              "example": "200",
-                              "description": "HTTP status code assigned to this response\n"
+                            "url": {
+                              "example": "/ocean/k8s/cluster/o-e0a2bd7c/controllerHeartbeat"
                             },
-                            "message": {
-                              "type": "string",
-                              "example": "OK",
-                              "description": "HTTP status message for the respective status code\n"
+                            "method": {
+                              "example": "GET"
                             }
                           }
                         },
-                        "kind": {
-                          "type": "string",
-                          "example": "spotinst:ocean:k8s:cluster:controllerHeartbeat"
-                        },
-                        "items": {
+                        "response": {
                           "type": "object",
                           "properties": {
-                            "status": {
-                              "type": "string",
-                              "example": "ACTIVE"
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "title": "Controller Heartbeat",
+                                "properties": {
+                                  "status": {
+                                    "type": "string",
+                                    "example": "ACTIVE"
+                                  },
+                                  "lastHeartbeat": {
+                                    "type": "string",
+                                    "example": "2019-11-24T14:33:00.746Z"
+                                  }
+                                }
+                              }
                             },
-                            "lastHeartbeat": {
-                              "type": "string",
-                              "example": "2019-11-24T14:33:00.746Z"
+                            "kind": {
+                              "example": "spotinst:ocean:k8s:cluster:controllerHeartbeat"
                             }
                           }
-                        },
-                        "count": {
-                          "type": "integer",
-                          "example": "1"
                         }
                       }
                     }
-                  }
+                  ]
                 }
               }
             }
