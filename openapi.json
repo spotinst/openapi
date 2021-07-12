@@ -18393,50 +18393,89 @@
                                     "example": ""
                                   },
                                   "image": {
+                                    "title": "Image",
+                                    "description": "Image of VM. An image is a template for creating new VMs. Choose from Azure image catalogue (marketplace) or use a custom image or chosen from shared gallery image.",
                                     "type": "object",
-                                    "description": "Image of VM. An image is a template for creating new VMs.\\\nChoose from Azure image catalogue (marketplace) or use a custom image.\n",
                                     "properties": {
                                       "marketplace": {
+                                        "title": "Marketplace",
                                         "type": "object",
-                                        "description": "* Select an image from Azure's Marketplace image catalogue\n* Required if custom image isn't specified.\n",
+                                        "description": "Select an image from Azure's Marketplace image catalogue. Cannot be used with `custom` or `gallery`. <a style=color:red;>Required if custom or gallery image are not specified.</a>",
                                         "properties": {
                                           "publisher": {
+                                            "title": "Publisher",
+                                            "description": "Image publisher.  <a style=color:red;>Required if marketplace image is specified.</a>",
                                             "type": "string",
-                                            "description": "*Image publisher.\n*Required if marketplace image is specified.\n",
                                             "example": "OpenLogic"
                                           },
                                           "offer": {
+                                            "title": "Offer",
+                                            "desription": "Name of image to use.  <a style=color:red;>Required if marketplace image is specified.</a>",
                                             "type": "string",
-                                            "description": "*Name of image to use.\n*Required if marketplace image is specified.\n",
                                             "example": "CentOS"
                                           },
                                           "sku": {
+                                            "title": "Stock Keeping Unit",
+                                            "description": "Image's Stock Keeping Unit, which is the specific version of the image.  <a style=color:red;>Required if marketplace image is specified.</a>",
                                             "type": "string",
-                                            "description": "*Image's Stock Keeping Unit, which is the specific version of the image.\n*Required if marketplace image is specified.\n",
                                             "example": "7.3"
                                           },
                                           "version": {
+                                            "title": "Version",
+                                            "description": "Image's version. if version not provided we use 'latest'",
                                             "type": "string",
-                                            "description": "Image's version. if version not provided we use \"latest\"\n",
-                                            "default": "lastest",
-                                            "example": "7.3-1611"
+                                            "example": "7.3-1611",
+                                            "default": "latest"
                                           }
                                         }
                                       },
                                       "custom": {
+                                        "title": "Custom",
                                         "type": "object",
-                                        "writeOnly": true,
-                                        "description": "*Custom image to launch Elastigroup with. *Required if marketplace image isn't specified.\n",
+                                        "description": "Custom image to launch Elastigroup with. Cannot be used with `marketplace` or `gallery`. <a style=color:red;>Required if marketplace or gallery image are not specified.</a>",
                                         "properties": {
                                           "resourceGroupName": {
+                                            "title": "Resource Group Name",
+                                            "description": "Name of Resource Group for custom image.  <a style=color:red;>Required if custom image is specified.</a>",
                                             "type": "string",
-                                            "description": "*Name of Resource Group for custom image.\n*Required if custom image is specified.\n",
                                             "example": "spotinst-azure"
                                           },
                                           "name": {
+                                            "title": "Image Name",
+                                            "description": "Name of the custom image.  <a style=color:red;>Required if custom image is specified.</a>",
                                             "type": "string",
-                                            "description": "* Name of the custom image.\n* Required if custom image is specified.\n",
                                             "example": "custom-image-name"
+                                          }
+                                        }
+                                      },
+                                      "gallery": {
+                                        "title": "Gallery",
+                                        "type": "object",
+                                        "description": "Gallery image to launch Elastigroup with. Cannot be used with `marketplace` or `custom`. <a style=color:red;>Required if marketplace or custom image are not specified.</a>",
+                                        "properties": {
+                                          "resourceGroupName": {
+                                            "title": "Resource Group Name",
+                                            "description": "Name of Resource Group for custom image.  <a style=color:red;>Required if gallery image is specified.</a>",
+                                            "type": "string",
+                                            "example": "spotinst-azure"
+                                          },
+                                          "galleryName": {
+                                            "title": "Gallery Name",
+                                            "description": "Name of the gallery.  <a style=color:red;>Required if gallery image is specified.</a>",
+                                            "type": "string",
+                                            "example": "gallery-name"
+                                          },
+                                          "imageName": {
+                                            "title": "Image Name",
+                                            "description": "Name of the gallery image.  <a style=color:red;>Required if gallery image is specified.</a>",
+                                            "type": "string",
+                                            "example": "gallery-image-name"
+                                          },
+                                          "version": {
+                                            "title": "Version",
+                                            "description": "Image's version. Can be in the format x.x.x or 'latest'. <a style=color:red;>Required if gallery image is specified.</a>",
+                                            "type": "string",
+                                            "example": "0.0.1"
                                           }
                                         }
                                       }
@@ -18598,7 +18637,7 @@
                                   },
                                   "login": {
                                     "type": "object",
-                                    "description": "Set admin access for accessing your VMs. Password/SSH is required for Linux.\n",
+                                    "description": "Set admin access for accessing your VMs. Password/SSH is required for Linux. <a style=color:red;>Required null if specialized image is set.</a>",
                                     "properties": {
                                       "userName": {
                                         "type": "string",
@@ -19770,19 +19809,18 @@
                                 "required": [
                                   "image",
                                   "network",
-                                  "subnetName",
-                                  "login"
+                                  "subnetName"
                                 ],
                                 "properties": {
                                   "image": {
                                     "title": "Image",
-                                    "description": "Image of VM. An image is a template for creating new VMs. Choose from Azure image catalogue (marketplace) or use a custom image.",
+                                    "description": "Image of VM. An image is a template for creating new VMs. Choose from Azure image catalogue (marketplace) or use a custom image or chosen from shared gallery image.",
                                     "type": "object",
                                     "properties": {
                                       "marketplace": {
                                         "title": "Marketplace",
                                         "type": "object",
-                                        "description": "Select an image from Azure's Marketplace image catalogue.  <a style=color:red;>Required if custom image isn't specified.</a>",
+                                        "description": "Select an image from Azure's Marketplace image catalogue. Cannot be used with `custom` or `gallery`. <a style=color:red;>Required if custom or gallery image are not specified.</a>",
                                         "properties": {
                                           "publisher": {
                                             "title": "Publisher",
@@ -19814,7 +19852,7 @@
                                       "custom": {
                                         "title": "Custom",
                                         "type": "object",
-                                        "description": "Custom image to launch Elastigroup with. Cannot be used with `marketplace`  <a style=color:red;>Required if marketplace image isn't specified.</a>",
+                                        "description": "Custom image to launch Elastigroup with. Cannot be used with `marketplace` or `gallery`. <a style=color:red;>Required if marketplace or gallery image are not specified.</a>",
                                         "properties": {
                                           "resourceGroupName": {
                                             "title": "Resource Group Name",
@@ -19827,6 +19865,37 @@
                                             "description": "Name of the custom image.  <a style=color:red;>Required if custom image is specified.</a>",
                                             "type": "string",
                                             "example": "custom-image-name"
+                                          }
+                                        }
+                                      },
+                                      "gallery": {
+                                        "title": "Gallery",
+                                        "type": "object",
+                                        "description": "Gallery image to launch Elastigroup with. Cannot be used with `marketplace` or `custom`. <a style=color:red;>Required if marketplace or custom image are not specified.</a>",
+                                        "properties": {
+                                          "resourceGroupName": {
+                                            "title": "Resource Group Name",
+                                            "description": "Name of Resource Group for custom image.  <a style=color:red;>Required if gallery image is specified.</a>",
+                                            "type": "string",
+                                            "example": "spotinst-azure"
+                                          },
+                                          "galleryName": {
+                                            "title": "Gallery Name",
+                                            "description": "Name of the gallery.  <a style=color:red;>Required if gallery image is specified.</a>",
+                                            "type": "string",
+                                            "example": "gallery-name"
+                                          },
+                                          "imageName": {
+                                            "title": "Image Name",
+                                            "description": "Name of the gallery image.  <a style=color:red;>Required if gallery image is specified.</a>",
+                                            "type": "string",
+                                            "example": "gallery-image-name"
+                                          },
+                                          "version": {
+                                            "title": "Version",
+                                            "description": "Image's version. Can be in the format x.x.x or 'latest'. <a style=color:red;>Required if gallery image is specified.</a>",
+                                            "type": "string",
+                                            "example": "0.0.1"
                                           }
                                         }
                                       }
@@ -20251,7 +20320,7 @@
                                   },
                                   "login": {
                                     "title": "Login",
-                                    "description": "Set admin access for accessing your VMs.",
+                                    "description": "Set admin access for accessing your VMs. <a style=color:red;>Required if custom, marketplace or generalized gallery image are specified. If specialized image is set, Login should not be defined</a>",
                                     "type": "array",
                                     "items": {
                                       "type": "object",
@@ -20512,25 +20581,25 @@
                                           },
                                           "image": {
                                             "type": "object",
-                                            "description": "Image of VM. An image is a template for creating new VMs.\\\nChoose from Azure image catalogue (marketplace) or use a custom image.\n",
+                                            "description": "Image of VM. An image is a template for creating new VMs.\n",
                                             "properties": {
                                               "marketplace": {
                                                 "type": "object",
-                                                "description": "Select an image from Azure's Marketplace image catalogue\\\nRequired if custom image isn't specified.\n",
+                                                "description": "Select an image from Azure's Marketplace image catalogue\\\nRequired if custom image or gallery image are not specified.\n",
                                                 "properties": {
                                                   "publisher": {
                                                     "type": "string",
-                                                    "description": "Image publisher.\\\nRequired if marketplace image is specified.\n",
+                                                    "description": "Image publisher.\n",
                                                     "example": "OpenLogic"
                                                   },
                                                   "offer": {
                                                     "type": "string",
-                                                    "description": "Name of image to use.\\\nRequired if marketplace image is specified.\n",
+                                                    "description": "Name of image to use.\n",
                                                     "example": "CentOS"
                                                   },
                                                   "sku": {
                                                     "type": "string",
-                                                    "description": "Image's Stock Keeping Unit, which is the specific version of the image.\\\nRequired if marketplace image is specified.\n",
+                                                    "description": "Image's Stock Keeping Unit, which is the specific version of the image.\n",
                                                     "example": "7.3"
                                                   },
                                                   "version": {
@@ -20543,18 +20612,48 @@
                                               },
                                               "custom": {
                                                 "type": "object",
-                                                "writeOnly": true,
-                                                "description": "Custom image to launch Elastigroup with.\\\nRequired if marketplace image isn't specified.\n",
+                                                "description": "Custom image to launch Elastigroup with.\n",
                                                 "properties": {
                                                   "resourceGroupName": {
                                                     "type": "string",
-                                                    "description": "Name of Resource Group for custom image.\\\nRequired if custom image is specified.\n",
+                                                    "description": "Name of Resource Group for custom image.\n",
                                                     "example": "spotinst-azure"
                                                   },
                                                   "name": {
                                                     "type": "string",
-                                                    "description": "Name of the custom image.\\\nRequired if custom image is specified.\n",
+                                                    "description": "Name of the custom image.\n",
                                                     "example": "custom-image-name"
+                                                  }
+                                                }
+                                              },
+                                              "gallery": {
+                                                "title": "Gallery",
+                                                "type": "object",
+                                                "description": "Gallery image to launch Elastigroup with. Required if custom image or marketplace image are not specified.\n",
+                                                "properties": {
+                                                  "resourceGroupName": {
+                                                    "title": "Resource Group Name",
+                                                    "description": "Name of Resource Group for custom image\n",
+                                                    "type": "string",
+                                                    "example": "spotinst-azure"
+                                                  },
+                                                  "galleryName": {
+                                                    "title": "Gallery Name",
+                                                    "description": "Name of the gallery.\n",
+                                                    "type": "string",
+                                                    "example": "gallery-name"
+                                                  },
+                                                  "imageName": {
+                                                    "title": "Image Name",
+                                                    "description": "Name of the gallery image.\n",
+                                                    "type": "string",
+                                                    "example": "gallery-image-name"
+                                                  },
+                                                  "version": {
+                                                    "title": "Version",
+                                                    "description": "Image's version. Can be in the format x.x.x or 'latest'.\n",
+                                                    "type": "string",
+                                                    "example": "0.0.1"
                                                   }
                                                 }
                                               }
@@ -21311,7 +21410,8 @@
                                 "signalTimeout",
                                 "autoScale",
                                 "scaleDown",
-                                "syncStrategy"
+                                "syncStrategy",
+                                "preventiveReplacement"
                               ]
                             },
                             "ttlInMinutes": {
@@ -21421,7 +21521,8 @@
                                 "signalTimeout",
                                 "autoScale",
                                 "scaleDown",
-                                "syncStrategy"
+                                "syncStrategy",
+                                "preventiveReplacement"
                               ]
                             }
                           }
