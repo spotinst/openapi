@@ -2,9 +2,9 @@ summary: Ocean for AWS
 post:
   summary: "Initiate Roll"
   description: >
-    Roll an entire Ocean cluster or roll subsets of the cluster by specifying launchSpecIds or instanceIds. Performing this request will start the roll immediately, by defined batches.
+    Roll an entire Ocean cluster or roll subsets of the cluster by specifying launchSpecIds or instanceIds. Performing this request will start the roll immediately and run it in defined batches.
 
-    Note that the first response for a successful request will notify for starting a roll. In order to check the status of a roll, you can use the GET Roll API.
+    Note that the first response for a successful request will indicate the start of a roll. In order to check the status of a roll, you can use the GET Roll API.
   operationId: "oceanAwsRollInit"
   tags:
     - "Ocean AWS"
@@ -26,16 +26,16 @@ post:
                batchSizePercentage:
                  type: integer
                  description: >
-                   Value in % to set size of batch in roll. Valid values are 0-100
+                   Value in % to set size of batch in roll. Valid values are 0-100.
                  example: 20
                comment:
                  description: >
-                   Add a comment description for the roll. comment should be limit to 256 chars.
+                   Add a comment description for the roll. The comment is limited to 256 chars.
                  type: string
                  example: "This is why I deployed my cluster."
                launchSpecIds:
                  type: array
-                 description: List of launch specification IDs to be rolled. Each ID is a string. launchSpecIds can be null. Cannot be used together with instanceIds.
+                 description: List of launch specification IDs to be rolled. Each ID is a string. LaunchSpecIds can be null, and cannot be used together with instanceIds.
                  items:
                    type: string
                    example:
@@ -45,11 +45,11 @@ post:
                  type: boolean
                  example: true
                  description: >
-                   When set to True and launch spec IDs are defined to roll, the specified launch spec(s) will be blocked from scaling up (replacements will scale up in other launch specs that match the displaced pods instead). Meant for different use cases of 'migrating' nodes from one launch spec to another.
+                   When set to True and launch spec IDs are defined to roll, the specified launch spec(s) will be blocked from scaling up. (Replacements will scale up in other launch specs that match the displaced pods instead.) This is meant for different use cases of 'migrating' nodes from one launch spec to another.
                instanceIds:
                  type: array
                  description: >
-                   List of instance IDs to be rolled. Each ID is a string. instanceIds can be null. Cannot be used together with launchSpecIds.
+                   List of instance IDs to be rolled. Each ID is a string. InstanceIds can be null, and cannot be used together with launchSpecIds.
                  items:
                    type: string
                    example:
@@ -77,7 +77,7 @@ get:
       required: true
       example: o-1abcd124
       description: >
-        The ID of the Ocean
+        The identifier of the Ocean cluster
   responses:
     200:
       $ref: "../responses/clusterRollGetAllResponse.yaml"

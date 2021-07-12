@@ -7,7 +7,7 @@ properties:
   subnetIds:
     type: array
     description: >
-      A comma-separated list of subnet identifiers for the Ocean cluster. Subnet IDs should be configured with auto assign public IP.
+      A comma-separated list of subnet identifiers for the Ocean cluster. Subnet IDs should be configured with auto-assign public IP.
     items:
       type: string
       example:
@@ -21,7 +21,7 @@ properties:
         type: array
         description: >
           Instance types allowed in the Ocean cluster.
-          Cannot be configured if blacklist is configured.
+          Cannot be configured if a deny list is configured.
         items:
           type: string
           example:
@@ -33,7 +33,7 @@ properties:
         type: array
         description: >
           Instance types to avoid launching in the Ocean cluster.
-          Cannot be configured if whitelist is configured.
+          Cannot be configured if a permit list is configured.
         items:
           type: string
   launchSpecification:
@@ -45,7 +45,7 @@ properties:
       useAsTemplateOnly:
         type: boolean
         description: |
-          launch specification defined on the Ocean object will function **only** as a template for virtual node groups.
+          The launch specification defined on the Ocean object will function **only** as a template for virtual node groups.
         default: false
       imageId:
         type: string
@@ -53,10 +53,10 @@ properties:
       userData:
         type: string
         format: byte
-        description: The Base64-encoded MIME user data to make available to the instances.
+        description: The base 64 encoded MIME user data to make available to the instances.
       securityGroupIds:
         type: array
-        description: One or more Security Group IDs.
+        description: One or more security group identifiers.
         items:
           type: string
           example:
@@ -67,7 +67,7 @@ properties:
         properties:
           arn:
             type: string
-            description: The iamRole arn.
+            description: The iamRole ARN.
             example: "orform"
       keyPair:
         type: string
@@ -93,41 +93,43 @@ properties:
       loadBalancers:
         type: array
         description: |
-          Configure load balancers settings to Ocean cluster.
+          Configure load balancer settings for the Ocean cluster.
         items:
           type: object
           properties:
             type:
               type: string
               description: |
-                Type of LB to use. supported types are: "TARGET_GROUP" "CLASSIC".
+                Type of load balancer to use. Supported types are: "TARGET_GROUP" and "CLASSIC".
               example: "TARGET_GROUP"
             name:
               type: string
               description: |
-                If type is "CLASSIC" than name is required, otherwise it's optional.
+                If type is "CLASSIC" then a name is required. Otherwise Name is optional.
               example: "MyTargetGroup"
             arn:
               type: string
               description: |
-                If type is "TARGET_GROUP" than ARN is required.
+                If type is "TARGET_GROUP" then an ARN is required.
               example: "arn:aws:elasticloadbalancing:us-west-2:922761411234:targetgroup"
       associatePublicIpAddress:
         type: boolean
-        description: Configure public IP address allocation
+        description: Configure public IP address allocation.
         default: false
         example: false
       monitoring:
         type: boolean
         description: >
-          Enable detailed monitoring for cluster. Flag will enable Cloud Watch detailed detailed monitoring (one minute increments). Note: there are additional hourly costs for this service based on the region used
+          Enable detailed monitoring for cluster. Flag will enable CloudWatch detailed monitoring (one minute increments). There are additional hourly costs for this service based on the region used.
         example: true
       ebsOptimized:
         type: boolean
         description: >
-          Enable EBS optimized for cluster. Flag will enable optimized capacity for high bandwidth connectivity to the EB service for non EBS optimized instance types. For instances that are EBS optimized this flag will be ignored
+          Enable EBS optimization for the cluster. A flag will enable optimized capacity for high bandwidth connectivity to the EB service for non EBS optimized instance types. For instances that are EBS optimized, this flag will be ignored.
         example: true
       rootVolumeSize:
         type: integer
-        description: Set root volume size in GiB
+        description: Set root volume size in GiB.
         example: 73
+      instanceMetadataOptions:
+        $ref: "./oceanInstanceMetadataOptions.yaml"
