@@ -575,18 +575,17 @@ properties:
               - image
               - network
               - subnetName
-              - login
             properties:
               image:
                 title: Image
-                description: Image of VM. An image is a template for creating new VMs. Choose from Azure image catalogue (marketplace) or use a custom image.
+                description: Image of VM. An image is a template for creating new VMs. Choose from Azure image catalogue (marketplace) or use a custom image or chosen from shared gallery image.
                 type: object
                 properties:
                   marketplace:
                     title: Marketplace
                     type: object
                     description:
-                      "Select an image from Azure's Marketplace image catalogue.  <a style=color:red;>Required if custom image isn't specified.</a>"
+                      "Select an image from Azure's Marketplace image catalogue. Cannot be used with `custom` or `gallery`. <a style=color:red;>Required if custom or gallery image are not specified.</a>"
                     properties:
                       publisher:
                         title: Publisher
@@ -612,7 +611,7 @@ properties:
                   custom:
                     title: Custom
                     type: object
-                    description: "Custom image to launch Elastigroup with. Cannot be used with `marketplace`  <a style=color:red;>Required if marketplace image isn't specified.</a>"
+                    description: "Custom image to launch Elastigroup with. Cannot be used with `marketplace` or `gallery`. <a style=color:red;>Required if marketplace or gallery image are not specified.</a>"
                     properties:
                       resourceGroupName:
                         title: Resource Group Name
@@ -624,6 +623,31 @@ properties:
                         description: "Name of the custom image.  <a style=color:red;>Required if custom image is specified.</a>"
                         type: string
                         example: "custom-image-name"
+                  gallery:
+                    title: Gallery
+                    type: object
+                    description: "Gallery image to launch Elastigroup with. Cannot be used with `marketplace` or `custom`. <a style=color:red;>Required if marketplace or custom image are not specified.</a>"
+                    properties:
+                      resourceGroupName:
+                        title: Resource Group Name
+                        description: "Name of Resource Group for custom image.  <a style=color:red;>Required if gallery image is specified.</a>"
+                        type: string
+                        example: "spotinst-azure"
+                      galleryName:
+                        title: Gallery Name
+                        description: "Name of the gallery.  <a style=color:red;>Required if gallery image is specified.</a>"
+                        type: string
+                        example: "gallery-name"
+                      imageName:
+                        title: Image Name
+                        description: "Name of the gallery image.  <a style=color:red;>Required if gallery image is specified.</a>"
+                        type: string
+                        example: "gallery-image-name"
+                      version:
+                        title: Version
+                        description: "Image's version. Can be in the format x.x.x or 'latest'. <a style=color:red;>Required if gallery image is specified.</a>"
+                        type: string
+                        example: "0.0.1"
               loadBalancersConfig:
                 title: Load Balancer Configuration
                 description: Configure a Load Balancer
@@ -973,7 +997,7 @@ properties:
                 example: IyEvYmluL2Jhc2gKZWNobyAidGVzdCI=
               login:
                 title: Login
-                description: Set admin access for accessing your VMs.
+                description: "Set admin access for accessing your VMs. <a style=color:red;>Required if custom, marketplace or generalized gallery image are specified. If specialized image is set, Login should not be defined</a>"
                 type: array
                 items:
                   type: object
