@@ -109,6 +109,14 @@
       }
     },
     {
+      "name": "Ocean Insights",
+      "description": "Insights allows Spot users on AWS to connect a Kubernetes cluster and within minutes get the cluster analyzed with insights\nabout the current state of infrastructure in the cluster, and the potential effect of migrating the specific cluster into Ocean.\nThrough its powerful features, Ocean presents significant opportunities for infrastructure optimization and automation, which are on display in the Insights console.\nConnected to Kubernetes clusters and running a continuous analysis, Ocean Insights delivers a holistic picture of your cluster and workloads behavior, from expected cloud costs and resource utilization.\nThrough a simple UI, users will see a breakdown of potential savings when they first connect to Ocean Insights.\n",
+      "externalDocs": {
+        "description": "Ocean Insights",
+        "url": "https://docs.spot.io/ocean-insights/"
+      }
+    },
+    {
       "name": "EMR Scaler",
       "description": "AWS EMR Scaler",
       "externalDocs": {
@@ -180,7 +188,8 @@
         "Ocean ECS",
         "Ocean GKE",
         "Ocean AKS",
-        "Ocean On-Premise"
+        "Ocean On-Premise",
+        "Ocean Insights"
       ]
     },
     {
@@ -44852,6 +44861,350 @@
                             },
                             "kind": {
                               "example": "spotinst:ocean:aws:ecs:launchSpec:launchContainerInstances"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/insights/k8s/cluster": {
+      "summary": "Ocean Insights",
+      "post": {
+        "summary": "Create Insight Cluster",
+        "description": "Creates an Ocean Insight entity according to a given specification.\n\nPrerequisite:\n\nThe Ocean Controller is used to monitor the cluster resources and report back to Ocean. The Ocean Controller is required for Ocean Insights.<br />\n\nTo install the Ocean Controller, complete and run the following script on a machine with the kubectl command line tool installed and configured:\n\n```\n#!/usr/bin/env bash\ncurl -fsSL http://spotinst-public.s3.amazonaws.com/integrations/kubernetes/cluster-controller/scripts/init.sh | \\\nSPOTINST_TOKEN=<ENTER YOUR TOKEN HERE> \\\nSPOTINST_ACCOUNT=<ENTER YOUR SPOTINST ACCOUNT ID HERE> \\\nSPOTINST_CLUSTER_IDENTIFIER=<ENTER YOUR CLUSTER IDENTIFIER HERE> \\\nbash\n```\n",
+        "operationId": "OceanInsightsClusterCreate",
+        "tags": [
+          "Ocean Insights"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "cluster"
+                    ],
+                    "properties": {
+                      "cluster": {
+                        "type": "object",
+                        "title": "Ocean Insight",
+                        "required": [
+                          "name",
+                          "controllerClusterId"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "oic-12345abc",
+                            "readOnly": true,
+                            "description": "Ocean Insight Cluster ID.\n"
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "Ocean::my-ocean-insight-name",
+                            "description": "Add a name for the Ocean Insight cluster.\n"
+                          },
+                          "controllerClusterId": {
+                            "type": "string",
+                            "example": "oceanInsight.k8s",
+                            "description": "The reporting identifier for the Ocean Controller.\n"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "readOnly": true,
+                            "format": "date-time",
+                            "example": "2019-06-03T08:13:08.000Z",
+                            "description": "A timestamp of the Ocean insight creation.\n"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "readOnly": true,
+                            "format": "date-time",
+                            "example": "2019-06-10T15:06:13.000Z",
+                            "description": "A timestamp of the latest Ocean insight update.\n"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ocean Insight Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/insight/k8s/cluster"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1insights~1k8s~1cluster/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:insight:k8s"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "get": {
+        "summary": "List Clusters",
+        "description": "Get the configurations for all Ocean Insights clusters in the specified account.\n",
+        "operationId": "OceanInsightsClusterList",
+        "tags": [
+          "Ocean Insights"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean Insight Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/insight/k8s/cluster"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "description": "The Ocean Insight cluster.\n",
+                                "properties": {
+                                  "id": {
+                                    "type": "string",
+                                    "readOnly": true,
+                                    "example": "o-134abcd",
+                                    "description": "Ocean Insight cluster ID.\n"
+                                  },
+                                  "name": {
+                                    "type": "string",
+                                    "example": "test",
+                                    "description": "Ocean Insight cluster name.\n"
+                                  },
+                                  "controllerClusterId": {
+                                    "type": "string",
+                                    "example": "test-123124",
+                                    "description": "The reporting identifier for the Ocean Controller.\n"
+                                  },
+                                  "createdAt": {
+                                    "type": "string",
+                                    "readOnly": true,
+                                    "format": "date-time",
+                                    "example": "2021-03-17T08:13:08.000Z",
+                                    "description": "A timestamp of the Ocean creation.\n"
+                                  },
+                                  "updatedAt": {
+                                    "type": "string",
+                                    "readOnly": true,
+                                    "format": "date-time",
+                                    "example": "2021-03-17T15:06:13.000Z",
+                                    "description": "A timestamp of the latest Ocean update.\n"
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:insight:k8s"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/insights/k8s/cluster/{OCEAN_INSIGHT_ID}": {
+      "get": {
+        "summary": "Get Cluster",
+        "description": "Get the configurations for a specified Ocean Insight cluster.\n",
+        "operationId": "OceanInsightsClusterGet",
+        "tags": [
+          "Ocean Insights"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "in": "path",
+            "name": "OCEAN_INSIGHT_ID",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "oic-abcd1234",
+            "description": "The ID of the Ocean Insight cluster.\n"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean Insight Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/insight/k8s/cluster/oic-12345abc"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1insights~1k8s~1cluster/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:insight:k8s"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Insight Cluster",
+        "description": "Delete a specified Ocean Insight cluster.\n",
+        "operationId": "OceanInsightClusterDelete",
+        "tags": [
+          "Ocean Insights"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1insights~1k8s~1cluster~1%7BOCEAN_INSIGHT_ID%7D/get/parameters/1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean Insight Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/insight/k8s/cluster/oic-12345abc"
+                            },
+                            "method": {
+                              "example": "DELETE"
                             }
                           }
                         }
