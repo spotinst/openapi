@@ -27014,7 +27014,7 @@
               "type": "string"
             },
             "required": true,
-            "description": "Data values following either a date format (yyyy-mm-dd; 2016-11-20) or ms (1494751821472)\n"
+            "description": "Beginning date value using either the date format \"yyyy-mm-dd; 2016-11-20\" or ms \"1494751821472\".\n"
           },
           {
             "in": "query",
@@ -27023,7 +27023,7 @@
               "type": "string"
             },
             "required": true,
-            "description": "Data values following either a date format (yyyy-mm-dd; 2016-11-20) or ms (1494751821472)\n"
+            "description": "End date value using either the date format \"yyyy-mm-dd; 2016-11-20\" or ms \"1494751821472\".\n"
           },
           {
             "in": "query",
@@ -29815,6 +29815,7 @@
                     "properties": {
                       "cluster": {
                         "type": "object",
+                        "description": "The object specifying the configuration of the Ocean cluster.\n",
                         "title": "AWS Cluster",
                         "required": [
                           "name",
@@ -29840,23 +29841,23 @@
                           "autoScaler": {
                             "type": "object",
                             "title": "auto-scaler",
-                            "description": "The Ocean Kubernetes Autoscaler.",
+                            "description": "The automatic scaling mechanism used in Ocean for Kubernetes.",
                             "properties": {
                               "isEnabled": {
                                 "type": "boolean",
-                                "description": "Enable the Ocean Kubernetes Autoscaler.",
+                                "description": "Enable the Ocean Kubernetes autoscaler.",
                                 "default": true,
                                 "example": true
                               },
                               "cooldown": {
                                 "type": "integer",
-                                "description": "Cooldown period (in seconds) between scaling down actions.",
+                                "description": "A period of time (in seconds) that Ocean waits from the end of a scaling action until starting another scaling action.",
                                 "default": null,
                                 "example": 180
                               },
                               "resourceLimits": {
                                 "type": "object",
-                                "description": "Optionally set upper and lower bounds on the resource usage of the cluster.",
+                                "description": "Option to set upper and lower bounds on the resource usage of the cluster.",
                                 "properties": {
                                   "maxMemoryGib": {
                                     "type": "integer",
@@ -29872,11 +29873,11 @@
                               },
                               "down": {
                                 "type": "object",
-                                "description": "Auto Scaling scale down operations.",
+                                "description": "Autoscaling scale down operations.",
                                 "properties": {
                                   "maxScaleDownPercentage": {
                                     "type": "integer",
-                                    "description": "Represents the maximum % to scale-down. Number between 1-100.",
+                                    "description": "Represents the maximum percent of your instances to scale down in a single scale-down action. Number between 1-100.",
                                     "example": 60
                                   }
                                 }
@@ -29887,12 +29888,12 @@
                                 "properties": {
                                   "cpuPerUnit": {
                                     "type": "integer",
-                                    "description": "Optionally configure the number of CPUs to allocate the headroom. CPUs are denoted in millicores, where 1000 millicores = 1 vCPU.",
+                                    "description": "Option to configure the number of CPUs to allocate the headroom. CPUs are denoted in millicores, where 1000 millicores = 1 vCPU.",
                                     "example": 2000
                                   },
                                   "memoryPerUnit": {
                                     "type": "integer",
-                                    "description": "Optionally configure the amount of memory (MiB) to allocate the headroom.",
+                                    "description": "Option to configure the amount of memory (MiB) to allocate the headroom.",
                                     "example": 0
                                   },
                                   "gpuPerUnit": {
@@ -29915,7 +29916,7 @@
                               },
                               "autoHeadroomPercentage": {
                                 "type": "integer",
-                                "description": "Optionally set the auto headroom percentage. Set a number between 0-200 to control the headroom % from the cluster. Relevant when isAutoConfig=true.",
+                                "description": "Dynamic (automatic) buffer of spare capacity, i.e., vCPU, memory, and GPU resources. Expressed as a percent of the overall cluster capacity with valid values from 0-200. Optional. Relevant when isAutoConfig=true.",
                                 "example": null
                               },
                               "enableAutomaticAndManualHeadroom": {
@@ -29928,12 +29929,12 @@
                           "capacity": {
                             "type": "object",
                             "title": "Capacity Units",
-                            "description": "Capacity specifications for the Ocean cluster.",
+                            "description": "The overall capability of the Ocean cluster expressed as number of instances and specified with a minimum, a maximum, and a target number of running instances.",
                             "properties": {
                               "minimum": {
                                 "type": "integer",
                                 "example": 0,
-                                "description": "The bottom limit of instances that the cluster can scale down to.\n"
+                                "description": "The lower limit of instances that the cluster can scale down to.\n"
                               },
                               "maximum": {
                                 "type": "integer",
@@ -29951,6 +29952,7 @@
                           "strategy": {
                             "type": "object",
                             "title": "Ocean Cluster Strategy",
+                            "description": "An object defining the cluster strategy with regard to waiting periods and utilization of on-demand and reserved instances.\n",
                             "properties": {
                               "utilizeReservedInstances": {
                                 "type": "boolean",
@@ -29973,12 +29975,13 @@
                               "drainingTimeout": {
                                 "type": "integer",
                                 "example": 60,
-                                "description": "The draining timeout (in seconds) before terminating the instance. If no draining timeout is defined, the default draining timeout will be used.\n"
+                                "description": "The configurable amount of time that Ocean will wait for the draining process to complete before terminating an instance. If you have not defined a draining timeout, the default of 300 seconds will be used.\n"
                               }
                             }
                           },
                           "scheduling": {
                             "type": "object",
+                            "description": "An object used to define times for a task such as a shutdown to be activated.\n",
                             "title": "Elastigroup Scheduling",
                             "properties": {
                               "tasks": {
@@ -29995,7 +29998,7 @@
                                     "isEnabled": {
                                       "type": "boolean",
                                       "example": true,
-                                      "description": "Describes whether the task is enabled. When True, the task runs. When False, it does not run. Required for cluster.scheduling.tasks object.\n"
+                                      "description": "Describes whether the task is enabled. When True, the task runs. When False, it does not run. Required for cluster.scheduling.tasks.\n"
                                     },
                                     "cronExpression": {
                                       "type": "string",
@@ -30005,13 +30008,14 @@
                                     "taskType": {
                                       "type": "string",
                                       "example": "clusterRoll",
-                                      "description": "Valid values: \"clusterRoll\". Required for cluster.scheduling.tasks object.\n"
+                                      "description": "The activity that you are scheduling. Valid values: \"clusterRoll\". Required for cluster.scheduling.tasks.\n"
                                     }
                                   }
                                 }
                               },
                               "shutdownHours": {
                                 "type": "object",
+                                "description": "An object used to specify times that the nodes in the cluster will be taken down.\n",
                                 "title": "Shutdown Hours",
                                 "required": [
                                   "timeWindows"
@@ -30019,6 +30023,7 @@
                                 "properties": {
                                   "timeWindows": {
                                     "type": "array",
+                                    "description": "The times that the shutdown hours will apply.\n",
                                     "items": {
                                       "type": "string",
                                       "example": "Sat:08:00-Sun:08:00"
@@ -30036,6 +30041,7 @@
                           "security": {
                             "type": "object",
                             "title": "Security",
+                            "description": "Object for cluster security features.\n",
                             "properties": {
                               "containerImage": {
                                 "type": "object",
@@ -30239,7 +30245,7 @@
             "in": "query",
             "name": "autoApplyTags",
             "example": "true",
-            "description": "Optionally update instance tags on the fly without rolling the cluster.\n",
+            "description": "Option to update instance tags on the fly without rolling the cluster.\n",
             "schema": {
               "type": "string",
               "default": "false"
@@ -30937,7 +30943,7 @@
               "type": "string"
             },
             "required": false,
-            "description": "Aggregation period may be \"daily\" or null. If you use \"daily\" the costs will be broken into parts, e.g., the cost per each day in the period. If you don't pass the aggregation period, there will be only one cost per resource for the whole period.\n"
+            "description": "The time segment over which data is calculated and displayed. The period may be \"daily\" or null. If you use \"daily\" the costs will be broken into parts, e.g., the cost per each day in the period. Otherwise, there will be only one cost per resource for the whole period.\n"
           },
           {
             "in": "path",
@@ -31473,6 +31479,7 @@
                         "compute": {
                           "type": "object",
                           "title": "Ocean Compute",
+                          "description": "Compute specifications for the Ocean cluster.\n",
                           "required": [
                             "subnetIds",
                             "launchSpecification"
@@ -31517,6 +31524,7 @@
                             },
                             "launchSpecification": {
                               "type": "object",
+                              "description": "The default specification for nodes in the cluster. Used as a template for custom Virtual Node Groups to inherit values which are not explicitly defined in them, and as a default VNG when no other VNGs exist or match the workload requirements.\n",
                               "required": [
                                 "imageId",
                                 "securityGroupIds"
@@ -31524,7 +31532,7 @@
                               "properties": {
                                 "useAsTemplateOnly": {
                                   "type": "boolean",
-                                  "description": "The launch specification defined on the Ocean object will function **only** as a template for virtual node groups.\n",
+                                  "description": "The configuration specified on the Ocean object will function only as a template for virtual node groups.\n",
                                   "default": false
                                 },
                                 "imageId": {
@@ -31680,11 +31688,11 @@
                 "properties": {
                   "roll": {
                     "type": "object",
-                    "description": "Settings for roll operation\n",
+                    "description": "Object that specifies the parameters required to initiate a roll (also called a deployment).\n",
                     "properties": {
                       "batchSizePercentage": {
                         "type": "integer",
-                        "description": "Value in % to set size of batch in roll. Valid values are 0-100.\n",
+                        "description": "Value as a percent to set the size of a batch in a roll. Valid values are 0-100.\n",
                         "example": 20
                       },
                       "comment": {
@@ -31983,7 +31991,7 @@
                 "properties": {
                   "roll": {
                     "type": "object",
-                    "description": "Settings for roll operation\n",
+                    "description": "Object that specifies the parameters required to initiate a roll (also called a deployment).\n",
                     "properties": {
                       "status": {
                         "type": "string",
@@ -32448,7 +32456,7 @@
                       },
                       "labels": {
                         "type": "array",
-                        "description": "An array of labels to add to the Launch Spec instances. Only ustom user labels are allowed,\nno Kubernetes built-in labels or Spot internal labels.\n",
+                        "description": "An array of labels to add to the VNG nodes. Only custom user labels are allowed,\nand not Kubernetes built-in labels or Spot internal labels.\n",
                         "items": {
                           "type": "object",
                           "properties": {
@@ -32532,9 +32540,10 @@
                       },
                       "autoScale": {
                         "type": "object",
+                        "description": "Object specifying the automatic scaling of an Ocean VNG.\n",
                         "properties": {
                           "headrooms": {
-                            "description": "Set custom headroom per launch spec. Provide a list of headroom objects.\n",
+                            "description": "Specify the custom headroom per VNG. Provide a list of headroom objects.\n",
                             "type": "array",
                             "items": {
                               "type": "object",
@@ -32686,7 +32695,7 @@
                       },
                       "strategy": {
                         "type": "object",
-                        "description": "LaunchSpec Strategy\n",
+                        "description": "Similar to a strategy for an Ocean cluster, but applying only to a virtual node group.\n",
                         "properties": {
                           "spotPercentage": {
                             "type": "integer",
@@ -44655,6 +44664,7 @@
                   "launchRequest": {
                     "type": "object",
                     "title": "Ocean AWS Virtual Node Group Launch Request",
+                    "description": "Object specifying the details for the launch request.\n",
                     "required": [
                       "amount"
                     ],
