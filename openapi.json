@@ -1020,416 +1020,568 @@
                             "title": "Elastigroup Scaling",
                             "properties": {
                               "up": {
-                                "type": "object",
-                                "properties": {
-                                  "policyName": {
-                                    "type": "string",
-                                    "description": "The policy name\n",
-                                    "example": "my-up-policy"
-                                  },
-                                  "metricName": {
-                                    "type": "string",
-                                    "description": "The name of the metric.\n",
-                                    "default": "CPUUtilization",
-                                    "example": "CPUUtilization"
-                                  },
-                                  "statistic": {
-                                    "type": "string",
-                                    "description": "The metric statistics to return.\n",
-                                    "enum": [
-                                      "average",
-                                      "sum",
-                                      "sampleCount",
-                                      "maximum",
-                                      "minimum",
-                                      "percentile"
-                                    ],
-                                    "example": "average"
-                                  },
-                                  "extendedStatistic": {
-                                    "type": "string",
-                                    "description": "Percentile statistic. Valid values: p0.1 - p100\n",
-                                    "example": "p1.5"
-                                  },
-                                  "unit": {
-                                    "type": "string",
-                                    "description": "The unit for the alarm's associated metric.\n",
-                                    "enum": [
-                                      "seconds",
-                                      "microseconds",
-                                      "milliseconds",
-                                      "bytes",
-                                      "kilobytes",
-                                      "megabytes",
-                                      "gigabytes",
-                                      "terabytes",
-                                      "bits",
-                                      "kilobits",
-                                      "megabits",
-                                      "gigabits",
-                                      "terabits",
-                                      "percent",
-                                      "count",
-                                      "bytes/second",
-                                      "kilobytes/second",
-                                      "megabytes/second",
-                                      "gigabytes/second",
-                                      "terabytes/second",
-                                      "bits/second",
-                                      "kilobits/second",
-                                      "megabits/second",
-                                      "gigabits/second",
-                                      "terabits/second",
-                                      "count/second",
-                                      "none"
-                                    ],
-                                    "example": "percent"
-                                  },
-                                  "threshold": {
-                                    "type": "integer",
-                                    "description": "The value against which the specified statistic is compared\n",
-                                    "example": 90
-                                  },
-                                  "action": {
-                                    "type": "object",
-                                    "example": "adjustment",
-                                    "description": "The action to take when scale up is needed.\nA mandatory field, that should be filled with one of the following:\n\"adjustment\", \"percentageAdjustment\", \"setMaxTarget\", \"setMinTarget\", \"updateCapacity\".\n",
-                                    "properties": {
-                                      "type": {
-                                        "type": "string",
-                                        "description": "The type of the action to take when scale up is needed.\n",
-                                        "enum": [
-                                          "adjustment",
-                                          "updateCapacity setMinTarget",
-                                          "percentageAdjustment"
-                                        ],
-                                        "example": "updateCapacity"
-                                      },
-                                      "adjustment": {
-                                        "type": "integer",
-                                        "description": "The number / percentage associated with the specified adjustment type.\nRequired if using `adjustment` or `percentageAdjustment` as action type\n",
-                                        "example": 1
-                                      },
-                                      "minTargetCapacity": {
-                                        "type": "integer",
-                                        "description": "The number with the target capacity needed.\nRequired if using `setMinTarget` as action type\n",
-                                        "example": 1
-                                      },
-                                      "target": {
-                                        "type": "integer",
-                                        "description": "The desired number of instances. Required if using `updateCapacity` as action type and neither `minimum` nor `maximum` are not defined.\n",
-                                        "example": 1
-                                      },
-                                      "minimum": {
-                                        "type": "integer",
-                                        "description": "The lower limit number of instances that you can scale down to. Optional, required if using `updateCapacity` as action type and neither `target` nor `maximum` are not defined\n",
-                                        "example": 0
-                                      },
-                                      "maximum": {
-                                        "type": "integer",
-                                        "description": "The upper limit number of instances that you can scale up to. Optional, required if using `updateCapacity` as action type and neither `target` nor `minimum` are not defined\n",
-                                        "example": 5
-                                      }
-                                    }
-                                  },
-                                  "namespace": {
-                                    "type": "string",
-                                    "description": "The namespace for the alarm's associated metric.\n",
-                                    "default": "AWS/EC2"
-                                  },
-                                  "dimentions": {
-                                    "type": "array",
-                                    "description": "The dimensions for the alarm's associated metric.\nIf the user mentioned name as instanceId, there is NO value\n",
-                                    "items": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "title": "scale up config",
+                                  "required": [
+                                    "metricName",
+                                    "namespace"
+                                  ],
+                                  "properties": {
+                                    "policyName": {
+                                      "type": "string",
+                                      "description": "The policy name.\n",
+                                      "example": "my-up-policy"
+                                    },
+                                    "metricName": {
+                                      "type": "string",
+                                      "description": "The name of the metric.\n",
+                                      "default": "CPUUtilization",
+                                      "example": "CPUUtilization"
+                                    },
+                                    "statistic": {
+                                      "type": "string",
+                                      "description": "The metric statistics to return.\n",
+                                      "enum": [
+                                        "average",
+                                        "sum",
+                                        "sampleCount",
+                                        "maximum",
+                                        "minimum",
+                                        "percentile"
+                                      ],
+                                      "example": "average"
+                                    },
+                                    "extendedStatistic": {
+                                      "type": "string",
+                                      "description": "Percentile statistic. Valid values: p0.1 - p100.\n",
+                                      "example": "p1.5"
+                                    },
+                                    "unit": {
+                                      "type": "string",
+                                      "description": "The unit for the alarm's associated metric.\n",
+                                      "enum": [
+                                        "seconds",
+                                        "microseconds",
+                                        "milliseconds",
+                                        "bytes",
+                                        "kilobytes",
+                                        "megabytes",
+                                        "gigabytes",
+                                        "terabytes",
+                                        "bits",
+                                        "kilobits",
+                                        "megabits",
+                                        "gigabits",
+                                        "terabits",
+                                        "percent",
+                                        "count",
+                                        "bytes/second",
+                                        "kilobytes/second",
+                                        "megabytes/second",
+                                        "gigabytes/second",
+                                        "terabytes/second",
+                                        "bits/second",
+                                        "kilobits/second",
+                                        "megabits/second",
+                                        "gigabits/second",
+                                        "terabits/second",
+                                        "count/second",
+                                        "none"
+                                      ],
+                                      "example": "percent"
+                                    },
+                                    "threshold": {
+                                      "type": "integer",
+                                      "description": "The value against which the specified statistic is compared.\n",
+                                      "example": 90
+                                    },
+                                    "action": {
                                       "type": "object",
+                                      "description": "The action to take when scale up is needed.\nA mandatory field, that should be filled with one of the following:\n\"adjustment\", \"percentageAdjustment\", \"setMaxTarget\", \"setMinTarget\", \"updateCapacity\".\n",
                                       "properties": {
-                                        "name": {
+                                        "type": {
                                           "type": "string",
-                                          "example": "InstanceId"
+                                          "description": "The type of the action to take when scale up is needed.\n",
+                                          "enum": [
+                                            "adjustment",
+                                            "updateCapacity setMinTarget",
+                                            "percentageAdjustment"
+                                          ],
+                                          "example": "updateCapacity"
+                                        },
+                                        "adjustment": {
+                                          "type": "integer",
+                                          "description": "The number / percentage associated with the specified adjustment type.\nRequired if using `adjustment` or `percentageAdjustment` as action type\n",
+                                          "example": 1
+                                        },
+                                        "minTargetCapacity": {
+                                          "type": "integer",
+                                          "description": "The minimum target capacity.\nRequired if using `setMinTarget` as action type.\n",
+                                          "example": 1
+                                        },
+                                        "target": {
+                                          "type": "integer",
+                                          "description": "The desired number of instances. Required if using `updateCapacity` as action type and neither `minimum` nor `maximum` are defined.\n",
+                                          "example": 1
+                                        },
+                                        "minimum": {
+                                          "type": "integer",
+                                          "description": "The lower limit number of instances that you can scale down to. Optional, required if using `updateCapacity` as action type and neither `target` nor `maximum` are defined\n",
+                                          "example": 0
+                                        },
+                                        "maximum": {
+                                          "type": "integer",
+                                          "description": "The upper limit number of instances that you can scale up to. Optional, required if using `updateCapacity` as action type and neither `target` nor `minimum` are defined\n",
+                                          "example": 5
                                         }
                                       }
+                                    },
+                                    "namespace": {
+                                      "type": "string",
+                                      "description": "The namespace for the alarm's associated metric.\n",
+                                      "default": "AWS/EC2"
+                                    },
+                                    "dimensions": {
+                                      "type": "array",
+                                      "description": "The dimensions for the alarm's associated metric.\nWhen name is \"instanceId\", no value is needed.\n",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "name": {
+                                            "type": "string",
+                                            "example": "InstanceId"
+                                          },
+                                          "value": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "period": {
+                                      "type": "integer",
+                                      "description": "The period in seconds over which the statistic is applied.\n",
+                                      "example": 300
+                                    },
+                                    "evaluationPeriods": {
+                                      "type": "integer",
+                                      "description": "The number of periods over which data is compared to the specified threshold.\n",
+                                      "example": 1
+                                    },
+                                    "cooldown": {
+                                      "type": "integer",
+                                      "description": "The amount of time, in seconds, after a scaling activity completes before any further trigger-related scaling activities can start.\n",
+                                      "example": 300
+                                    },
+                                    "operator": {
+                                      "type": "string",
+                                      "description": "The operator to use in order to determine if the scaling policy is applicable.\n",
+                                      "enum": [
+                                        "gt",
+                                        "gte",
+                                        "lt",
+                                        "lte"
+                                      ],
+                                      "example": "gte"
+                                    },
+                                    "isEnabled": {
+                                      "type": "boolean",
+                                      "description": "Specifies whether the scaling policy described in this block is enabled.\n",
+                                      "default": true,
+                                      "example": true
                                     }
-                                  },
-                                  "period": {
-                                    "type": "integer",
-                                    "description": "The period in seconds over which the statistic is applied.\n",
-                                    "example": 300
-                                  },
-                                  "evaluationPeriods": {
-                                    "type": "integer",
-                                    "description": "The number of periods over which data is compared to the specified threshold.\n",
-                                    "example": 1
-                                  },
-                                  "cooldown": {
-                                    "type": "integer",
-                                    "description": "The amount of time, in seconds, after a scaling activity completes before any further trigger-related scaling activities can start.\n",
-                                    "example": 300
-                                  },
-                                  "operator": {
-                                    "type": "string",
-                                    "description": "The operator to use in order to determine if the scaling policy is applicable.\n",
-                                    "enum": [
-                                      "gt",
-                                      "gte",
-                                      "lt",
-                                      "lte"
-                                    ],
-                                    "example": "gte"
-                                  },
-                                  "isEnabled": {
-                                    "type": "boolean",
-                                    "description": "Specifies whether the scaling policy described in this block is enabled.\n",
-                                    "default": true,
-                                    "example": true
                                   }
                                 }
                               },
                               "down": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "title": "scale down config",
+                                  "properties": {
+                                    "policyName": {
+                                      "type": "string",
+                                      "description": "The policy name.\n",
+                                      "example": "my-down-policy"
+                                    },
+                                    "metricName": {
+                                      "type": "string",
+                                      "description": "The name of the metric.\n",
+                                      "default": "CPUUtilization",
+                                      "example": "CPUUtilization"
+                                    },
+                                    "statistic": {
+                                      "type": "string",
+                                      "description": "The metric statistics to return.\n",
+                                      "enum": [
+                                        "average",
+                                        "sum",
+                                        "sampleCount",
+                                        "maximum",
+                                        "minimum",
+                                        "percentile"
+                                      ],
+                                      "example": "average"
+                                    },
+                                    "extendedStatistic": {
+                                      "type": "string",
+                                      "description": "Percentile statistic. Valid values: p0.1 - p100.\n",
+                                      "example": "p1.5"
+                                    },
+                                    "unit": {
+                                      "type": "string",
+                                      "description": "The unit for the alarm's associated metric.\n",
+                                      "enum": [
+                                        "seconds",
+                                        "microseconds",
+                                        "milliseconds",
+                                        "bytes",
+                                        "kilobytes",
+                                        "megabytes",
+                                        "gigabytes",
+                                        "terabytes",
+                                        "bits",
+                                        "kilobits",
+                                        "megabits",
+                                        "gigabits",
+                                        "terabits",
+                                        "percent",
+                                        "count",
+                                        "bytes/second",
+                                        "kilobytes/second",
+                                        "megabytes/second",
+                                        "gigabytes/second",
+                                        "terabytes/second",
+                                        "bits/second",
+                                        "kilobits/second",
+                                        "megabits/second",
+                                        "gigabits/second",
+                                        "terabits/second",
+                                        "count/second",
+                                        "none"
+                                      ],
+                                      "example": "percent"
+                                    },
+                                    "threshold": {
+                                      "type": "integer",
+                                      "description": "The value against which the specified statistic is compared.\n",
+                                      "example": 90
+                                    },
+                                    "action": {
+                                      "type": "object",
+                                      "description": "The action to take when scale up is needed.\nA mandatory field, that should be filled with one of the following:\n\"adjustment\", \"percentageAdjustment\", \"setMaxTarget\", \"setMinTarget\", \"updateCapacity\".\n",
+                                      "properties": {
+                                        "type": {
+                                          "type": "string",
+                                          "description": "The type of the action to take when scale up is needed.\n",
+                                          "enum": [
+                                            "adjustment",
+                                            "updateCapacity setMinTarget",
+                                            "percentageAdjustment"
+                                          ],
+                                          "example": "updateCapacity"
+                                        },
+                                        "adjustment": {
+                                          "type": "integer",
+                                          "description": "The number / percentage associated with the specified adjustment type.\nRequired if using `adjustment` or `percentageAdjustment` as action type.\n",
+                                          "example": 1
+                                        },
+                                        "minTargetCapacity": {
+                                          "type": "integer",
+                                          "description": "The minimum target capacity.\nRequired if using `setMinTarget` as action type.\n",
+                                          "example": 1
+                                        },
+                                        "target": {
+                                          "type": "integer",
+                                          "description": "The desired number of instances. Required if using `updateCapacity` as action type and neither `minimum` nor `maximum` are defined.\n",
+                                          "example": 1
+                                        },
+                                        "minimum": {
+                                          "type": "integer",
+                                          "description": "The lower limit number of instances that you can scale down to. Optional, required if using `updateCapacity` as action type and neither minimum nor maximum are defined.\n",
+                                          "example": 0
+                                        },
+                                        "maximum": {
+                                          "type": "integer",
+                                          "description": "The upper limit number of instances that you can scale up to. Optional, required if using `updateCapacity` as action type and neither minimum nor maximum are defined.\n",
+                                          "example": 5
+                                        }
+                                      }
+                                    },
+                                    "namespace": {
+                                      "type": "string",
+                                      "description": "The namespace for the alarm's associated metric.\n",
+                                      "default": "AWS/EC2"
+                                    },
+                                    "dimensions": {
+                                      "type": "array",
+                                      "description": "The dimensions for the alarm's associated metric.\nWhen name is \"instanceId\", no value is needed.\n",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "name": {
+                                            "type": "string",
+                                            "example": "InstanceId"
+                                          },
+                                          "value": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "period": {
+                                      "type": "integer",
+                                      "description": "The period in seconds over which the statistic is applied.\n",
+                                      "example": 300
+                                    },
+                                    "evaluationPeriods": {
+                                      "type": "integer",
+                                      "description": "The number of periods over which data is compared to the specified threshold.\n",
+                                      "example": 1
+                                    },
+                                    "cooldown": {
+                                      "type": "integer",
+                                      "description": "The amount of time, in seconds, after a scaling activity completes and before any further trigger-related scaling activities can start.\n",
+                                      "example": 300
+                                    },
+                                    "operator": {
+                                      "type": "string",
+                                      "description": "The operator to use in order to determine if the scaling policy is applicable.\n",
+                                      "enum": [
+                                        "gt",
+                                        "gte",
+                                        "lt",
+                                        "lte"
+                                      ],
+                                      "example": "gte"
+                                    },
+                                    "isEnabled": {
+                                      "type": "boolean",
+                                      "description": "Specifies whether the scaling policy described in this block is enabled.\n",
+                                      "default": true,
+                                      "example": true
+                                    }
+                                  }
+                                }
+                              },
+                              "multipleMetrics": {
                                 "type": "object",
                                 "properties": {
-                                  "policyName": {
-                                    "type": "string",
-                                    "description": "The policy name\n",
-                                    "example": "my-down-policy"
-                                  },
-                                  "metricName": {
-                                    "type": "string",
-                                    "description": "The name of the metric.\n",
-                                    "default": "CPUUtilization",
-                                    "example": "CPUUtilization"
-                                  },
-                                  "statistic": {
-                                    "type": "string",
-                                    "description": "The metric statistics to return.\n",
-                                    "enum": [
-                                      "average",
-                                      "sum",
-                                      "sampleCount",
-                                      "maximum",
-                                      "minimum",
-                                      "percentile"
-                                    ],
-                                    "example": "average"
-                                  },
-                                  "extendedStatistic": {
-                                    "type": "string",
-                                    "description": "Percentile statistic. Valid values: p0.1 - p100\n",
-                                    "example": "p1.5"
-                                  },
-                                  "unit": {
-                                    "type": "string",
-                                    "description": "The unit for the alarm's associated metric.\n",
-                                    "enum": [
-                                      "seconds",
-                                      "microseconds",
-                                      "milliseconds",
-                                      "bytes",
-                                      "kilobytes",
-                                      "megabytes",
-                                      "gigabytes",
-                                      "terabytes",
-                                      "bits",
-                                      "kilobits",
-                                      "megabits",
-                                      "gigabits",
-                                      "terabits",
-                                      "percent",
-                                      "count",
-                                      "bytes/second",
-                                      "kilobytes/second",
-                                      "megabytes/second",
-                                      "gigabytes/second",
-                                      "terabytes/second",
-                                      "bits/second",
-                                      "kilobits/second",
-                                      "megabits/second",
-                                      "gigabits/second",
-                                      "terabits/second",
-                                      "count/second",
-                                      "none"
-                                    ],
-                                    "example": "percent"
-                                  },
-                                  "threshold": {
-                                    "type": "integer",
-                                    "description": "The value against which the specified statistic is compared\n",
-                                    "example": 90
-                                  },
-                                  "action": {
-                                    "type": "object",
-                                    "example": "adjustment",
-                                    "description": "The action to take when scale up is needed.\nA mandatory field, that should be filled with one of the following:\n\"adjustment\", \"percentageAdjustment\", \"setMaxTarget\", \"setMinTarget\", \"updateCapacity\".\n",
-                                    "properties": {
-                                      "type": {
-                                        "type": "string",
-                                        "description": "The type of the action to take when scale up is needed.\n",
-                                        "enum": [
-                                          "adjustment",
-                                          "updateCapacity setMinTarget",
-                                          "percentageAdjustment"
-                                        ],
-                                        "example": "updateCapacity"
-                                      },
-                                      "adjustment": {
-                                        "type": "integer",
-                                        "description": "The number / percentage associated with the specified adjustment type.\nRequired if using `adjustment` or `percentageAdjustment` as action type\n",
-                                        "example": 1
-                                      },
-                                      "minTargetCapacity": {
-                                        "type": "integer",
-                                        "description": "The number with the target capacity needed.\nRequired if using `setMinTarget` as action type\n",
-                                        "example": 1
-                                      },
-                                      "target": {
-                                        "type": "integer",
-                                        "description": "The desired number of instances. Required if using `updateCapacity` as action type and neither `minimum` nor `maximum` are not defined.\n",
-                                        "example": 1
-                                      },
-                                      "minimum": {
-                                        "type": "integer",
-                                        "description": "The lower limit number of instances that you can scale down to. Optional, required if using `updateCapacity` as action type and neither `target` nor `maximum` are not defined\n",
-                                        "example": 0
-                                      },
-                                      "maximum": {
-                                        "type": "integer",
-                                        "description": "The upper limit number of instances that you can scale up to. Optional, required if using `updateCapacity` as action type and neither `target` nor `minimum` are not defined\n",
-                                        "example": 5
-                                      }
-                                    }
-                                  },
-                                  "namespace": {
-                                    "type": "string",
-                                    "description": "The namespace for the alarm's associated metric.\n",
-                                    "default": "AWS/EC2"
-                                  },
-                                  "dimentions": {
+                                  "metrics": {
                                     "type": "array",
-                                    "description": "The dimensions for the alarm's associated metric.\nIf the user mentioned name as instanceId, there is NO value\n",
                                     "items": {
                                       "type": "object",
+                                      "title": "Metric config",
+                                      "required": [
+                                        "name",
+                                        "metricName",
+                                        "namespace"
+                                      ],
                                       "properties": {
                                         "name": {
                                           "type": "string",
-                                          "example": "InstanceId"
+                                          "description": "The metric name.\n",
+                                          "example": "metric1"
+                                        },
+                                        "metricName": {
+                                          "type": "string",
+                                          "description": "The name of the source metric.\n",
+                                          "example": "CPUUtilization"
+                                        },
+                                        "namespace": {
+                                          "type": "string",
+                                          "description": "The namespace for the alarm's associated metric.\n",
+                                          "default": "AWS/EC2"
+                                        },
+                                        "statistic": {
+                                          "type": "string",
+                                          "description": "The metric statistics to return.\n",
+                                          "enum": [
+                                            "average",
+                                            "sum",
+                                            "sampleCount",
+                                            "maximum",
+                                            "minimum",
+                                            "percentile"
+                                          ],
+                                          "example": "average"
+                                        },
+                                        "extendedStatistic": {
+                                          "type": "string",
+                                          "description": "Percentile statistic. Valid values: p0.1 - p100.\n",
+                                          "example": "p1.5"
+                                        },
+                                        "unit": {
+                                          "type": "string",
+                                          "description": "The unit for the alarm's associated metric.\n",
+                                          "enum": [
+                                            "seconds",
+                                            "microseconds",
+                                            "milliseconds",
+                                            "bytes",
+                                            "kilobytes",
+                                            "megabytes",
+                                            "gigabytes",
+                                            "terabytes",
+                                            "bits",
+                                            "kilobits",
+                                            "megabits",
+                                            "gigabits",
+                                            "terabits",
+                                            "percent",
+                                            "count",
+                                            "bytes/second",
+                                            "kilobytes/second",
+                                            "megabytes/second",
+                                            "gigabytes/second",
+                                            "terabytes/second",
+                                            "bits/second",
+                                            "kilobits/second",
+                                            "megabits/second",
+                                            "gigabits/second",
+                                            "terabits/second",
+                                            "count/second",
+                                            "none"
+                                          ],
+                                          "example": "percent"
+                                        },
+                                        "dimensions": {
+                                          "type": "array",
+                                          "description": "The dimensions for the alarm's associated metric.\nWhen name is \"instanceId\", no value is needed.\n",
+                                          "items": {
+                                            "type": "object",
+                                            "required": [
+                                              "name"
+                                            ],
+                                            "properties": {
+                                              "name": {
+                                                "type": "string",
+                                                "example": "InstanceId"
+                                              },
+                                              "value": {
+                                                "type": "string"
+                                              }
+                                            }
+                                          }
                                         }
                                       }
                                     }
                                   },
-                                  "period": {
-                                    "type": "integer",
-                                    "description": "The period in seconds over which the statistic is applied.\n",
-                                    "example": 300
-                                  },
-                                  "evaluationPeriods": {
-                                    "type": "integer",
-                                    "description": "The number of periods over which data is compared to the specified threshold.\n",
-                                    "example": 1
-                                  },
-                                  "cooldown": {
-                                    "type": "integer",
-                                    "description": "The amount of time, in seconds, after a scaling activity completes before any further trigger-related scaling activities can start.\n",
-                                    "example": 300
-                                  },
-                                  "operator": {
-                                    "type": "string",
-                                    "description": "The operator to use in order to determine if the scaling policy is applicable.\n",
-                                    "enum": [
-                                      "gt",
-                                      "gte",
-                                      "lt",
-                                      "lte"
-                                    ],
-                                    "example": "gte"
-                                  },
-                                  "isEnabled": {
-                                    "type": "boolean",
-                                    "description": "Specifies whether the scaling policy described in this block is enabled.\n",
-                                    "default": true,
-                                    "example": true
+                                  "expressions": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "title": "Expression config",
+                                      "required": [
+                                        "name",
+                                        "expression"
+                                      ],
+                                      "properties": {
+                                        "name": {
+                                          "type": "string",
+                                          "description": "The expression name.\n",
+                                          "example": "e1"
+                                        },
+                                        "expression": {
+                                          "type": "string",
+                                          "description": "An expression consisting of the metric names listed in the 'metrics' array.\n",
+                                          "example": "metric1+10"
+                                        }
+                                      }
+                                    }
                                   }
                                 }
                               },
                               "target": {
-                                "type": "object",
-                                "properties": {
-                                  "source": {
-                                    "title": "Source",
-                                    "description": "The source of the metric Supported values: “cloudWatch”, “spectrum”",
-                                    "type": "string",
-                                    "example": "spectrum"
-                                  },
-                                  "policyName": {
-                                    "type": "string",
-                                    "description": "The policy name\n",
-                                    "example": "my-up-policy"
-                                  },
-                                  "metricName": {
-                                    "type": "string",
-                                    "description": "The name of the metric.\n",
-                                    "default": "CPUUtilization",
-                                    "example": "CPUUtilization"
-                                  },
-                                  "statistic": {
-                                    "type": "string",
-                                    "description": "The metric statistics to return.\n",
-                                    "enum": [
-                                      "average",
-                                      "sum",
-                                      "sampleCount",
-                                      "maximum",
-                                      "minimum",
-                                      "percentile"
-                                    ],
-                                    "example": "average"
-                                  },
-                                  "unit": {
-                                    "type": "string",
-                                    "description": "The unit for the alarm's associated metric.\n",
-                                    "enum": [
-                                      "seconds",
-                                      "microseconds",
-                                      "milliseconds",
-                                      "bytes",
-                                      "kilobytes",
-                                      "megabytes",
-                                      "gigabytes",
-                                      "terabytes",
-                                      "bits",
-                                      "kilobits",
-                                      "megabits",
-                                      "gigabits",
-                                      "terabits",
-                                      "percent",
-                                      "count",
-                                      "bytes/second",
-                                      "kilobytes/second",
-                                      "megabytes/second",
-                                      "gigabytes/second",
-                                      "terabytes/second",
-                                      "bits/second",
-                                      "kilobits/second",
-                                      "megabits/second",
-                                      "gigabits/second",
-                                      "terabits/second",
-                                      "count/second",
-                                      "none"
-                                    ],
-                                    "example": "percent"
-                                  },
-                                  "namespace": {
-                                    "type": "string",
-                                    "description": "The namespace for the alarm's associated metric.\n",
-                                    "default": "AWS/EC2"
-                                  },
-                                  "target": {
-                                    "type": "integer",
-                                    "description": "The target value for the group\n",
-                                    "example": 1
-                                  },
-                                  "cooldown": {
-                                    "type": "integer",
-                                    "description": "The amount of time, in seconds, after a scaling activity completes before any further trigger-related scaling activities can start.\n",
-                                    "example": 300
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "title": "target scaling config",
+                                  "properties": {
+                                    "source": {
+                                      "title": "Source",
+                                      "description": "The source of the metric.\n",
+                                      "enum": [
+                                        "cloudWatch",
+                                        "spectrum"
+                                      ],
+                                      "type": "string",
+                                      "example": "spectrum"
+                                    },
+                                    "policyName": {
+                                      "type": "string",
+                                      "description": "The policy name\n",
+                                      "example": "my-up-policy"
+                                    },
+                                    "metricName": {
+                                      "type": "string",
+                                      "description": "The name of the metric.\n",
+                                      "default": "CPUUtilization",
+                                      "example": "CPUUtilization"
+                                    },
+                                    "statistic": {
+                                      "type": "string",
+                                      "description": "The metric statistics to return.\n",
+                                      "enum": [
+                                        "average",
+                                        "sum",
+                                        "sampleCount",
+                                        "maximum",
+                                        "minimum",
+                                        "percentile"
+                                      ],
+                                      "example": "average"
+                                    },
+                                    "unit": {
+                                      "type": "string",
+                                      "description": "The unit for the alarm's associated metric.\n",
+                                      "enum": [
+                                        "seconds",
+                                        "microseconds",
+                                        "milliseconds",
+                                        "bytes",
+                                        "kilobytes",
+                                        "megabytes",
+                                        "gigabytes",
+                                        "terabytes",
+                                        "bits",
+                                        "kilobits",
+                                        "megabits",
+                                        "gigabits",
+                                        "terabits",
+                                        "percent",
+                                        "count",
+                                        "bytes/second",
+                                        "kilobytes/second",
+                                        "megabytes/second",
+                                        "gigabytes/second",
+                                        "terabytes/second",
+                                        "bits/second",
+                                        "kilobits/second",
+                                        "megabits/second",
+                                        "gigabits/second",
+                                        "terabits/second",
+                                        "count/second",
+                                        "none"
+                                      ],
+                                      "example": "percent"
+                                    },
+                                    "namespace": {
+                                      "type": "string",
+                                      "description": "The namespace for the alarm's associated metric.\n",
+                                      "default": "AWS/EC2"
+                                    },
+                                    "target": {
+                                      "type": "integer",
+                                      "description": "The target value for the group.\n",
+                                      "example": 1
+                                    },
+                                    "cooldown": {
+                                      "type": "integer",
+                                      "description": "The amount of time, in seconds, after a scaling activity completes and before any further trigger-related scaling activities can start.\n",
+                                      "example": 300
+                                    }
                                   }
                                 }
                               }
@@ -3678,411 +3830,38 @@
                         "title": "Elastigroup Scaling",
                         "properties": {
                           "up": {
-                            "type": "object",
-                            "properties": {
-                              "policyName": {
-                                "type": "string",
-                                "description": "The policy name\n",
-                                "example": "my-up-policy"
-                              },
-                              "metricName": {
-                                "type": "string",
-                                "description": "The name of the metric.\n",
-                                "default": "CPUUtilization",
-                                "example": "CPUUtilization"
-                              },
-                              "statistic": {
-                                "type": "string",
-                                "description": "The metric statistics to return.\n",
-                                "enum": [
-                                  "average",
-                                  "sum",
-                                  "sampleCount",
-                                  "maximum",
-                                  "minimum",
-                                  "percentile"
-                                ],
-                                "example": "average"
-                              },
-                              "extendedStatistic": {
-                                "type": "string",
-                                "description": "Percentile statistic. Valid values: p0.1 - p100\n",
-                                "example": "p1.5"
-                              },
-                              "unit": {
-                                "type": "string",
-                                "description": "The unit for the alarm's associated metric.\n",
-                                "enum": [
-                                  "seconds",
-                                  "microseconds",
-                                  "milliseconds",
-                                  "bytes",
-                                  "kilobytes",
-                                  "megabytes",
-                                  "gigabytes",
-                                  "terabytes",
-                                  "bits",
-                                  "kilobits",
-                                  "megabits",
-                                  "gigabits",
-                                  "terabits",
-                                  "percent",
-                                  "count",
-                                  "bytes/second",
-                                  "kilobytes/second",
-                                  "megabytes/second",
-                                  "gigabytes/second",
-                                  "terabytes/second",
-                                  "bits/second",
-                                  "kilobits/second",
-                                  "megabits/second",
-                                  "gigabits/second",
-                                  "terabits/second",
-                                  "count/second",
-                                  "none"
-                                ],
-                                "example": "percent"
-                              },
-                              "threshold": {
-                                "type": "integer",
-                                "description": "The value against which the specified statistic is compared\n",
-                                "example": 90
-                              },
-                              "action": {
-                                "type": "object",
-                                "example": "adjustment",
-                                "description": "The action to take when scale up is needed.\nA mandatory field, that should be filled with one of the following:\n\"adjustment\", \"percentageAdjustment\", \"setMaxTarget\", \"setMinTarget\", \"updateCapacity\".\n",
-                                "properties": {
-                                  "type": {
-                                    "type": "string",
-                                    "description": "The type of the action to take when scale up is needed.\n",
-                                    "enum": [
-                                      "adjustment",
-                                      "updateCapacity setMinTarget",
-                                      "percentageAdjustment"
-                                    ],
-                                    "example": "updateCapacity"
-                                  },
-                                  "adjustment": {
-                                    "type": "integer",
-                                    "description": "The number / percentage associated with the specified adjustment type.\nRequired if using `adjustment` or `percentageAdjustment` as action type\n",
-                                    "example": 1
-                                  },
-                                  "minTargetCapacity": {
-                                    "type": "integer",
-                                    "description": "The number with the target capacity needed.\nRequired if using `setMinTarget` as action type\n",
-                                    "example": 1
-                                  },
-                                  "target": {
-                                    "type": "integer",
-                                    "description": "The desired number of instances. Required if using `updateCapacity` as action type and neither `minimum` nor `maximum` are not defined.\n",
-                                    "example": 1
-                                  },
-                                  "minimum": {
-                                    "type": "integer",
-                                    "description": "The lower limit number of instances that you can scale down to. Optional, required if using `updateCapacity` as action type and neither `target` nor `maximum` are not defined\n",
-                                    "example": 0
-                                  },
-                                  "maximum": {
-                                    "type": "integer",
-                                    "description": "The upper limit number of instances that you can scale up to. Optional, required if using `updateCapacity` as action type and neither `target` nor `minimum` are not defined\n",
-                                    "example": 5
-                                  }
-                                }
-                              },
-                              "namespace": {
-                                "type": "string",
-                                "description": "The namespace for the alarm's associated metric.\n",
-                                "default": "AWS/EC2"
-                              },
-                              "dimentions": {
-                                "type": "array",
-                                "description": "The dimensions for the alarm's associated metric.\nIf the user mentioned name as instanceId, there is NO value\n",
-                                "items": {
-                                  "type": "object",
-                                  "properties": {
-                                    "name": {
-                                      "type": "string",
-                                      "example": "InstanceId"
-                                    }
-                                  }
-                                }
-                              },
-                              "period": {
-                                "type": "integer",
-                                "description": "The period in seconds over which the statistic is applied.\n",
-                                "example": 300
-                              },
-                              "evaluationPeriods": {
-                                "type": "integer",
-                                "description": "The number of periods over which data is compared to the specified threshold.\n",
-                                "example": 1
-                              },
-                              "cooldown": {
-                                "type": "integer",
-                                "description": "The amount of time, in seconds, after a scaling activity completes before any further trigger-related scaling activities can start.\n",
-                                "example": 300
-                              },
-                              "operator": {
-                                "type": "string",
-                                "description": "The operator to use in order to determine if the scaling policy is applicable.\n",
-                                "enum": [
-                                  "gt",
-                                  "gte",
-                                  "lt",
-                                  "lte"
-                                ],
-                                "example": "gte"
-                              },
-                              "isEnabled": {
-                                "type": "boolean",
-                                "description": "Specifies whether the scaling policy described in this block is enabled.\n",
-                                "default": true,
-                                "example": true
-                              }
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/paths/~1aws~1ec2~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/scaling/properties/up/items"
                             }
                           },
                           "down": {
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/paths/~1aws~1ec2~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/scaling/properties/down/items"
+                            }
+                          },
+                          "multipleMetrics": {
                             "type": "object",
                             "properties": {
-                              "policyName": {
-                                "type": "string",
-                                "description": "The policy name\n",
-                                "example": "my-down-policy"
-                              },
-                              "metricName": {
-                                "type": "string",
-                                "description": "The name of the metric.\n",
-                                "default": "CPUUtilization",
-                                "example": "CPUUtilization"
-                              },
-                              "statistic": {
-                                "type": "string",
-                                "description": "The metric statistics to return.\n",
-                                "enum": [
-                                  "average",
-                                  "sum",
-                                  "sampleCount",
-                                  "maximum",
-                                  "minimum",
-                                  "percentile"
-                                ],
-                                "example": "average"
-                              },
-                              "extendedStatistic": {
-                                "type": "string",
-                                "description": "Percentile statistic. Valid values: p0.1 - p100\n",
-                                "example": "p1.5"
-                              },
-                              "unit": {
-                                "type": "string",
-                                "description": "The unit for the alarm's associated metric.\n",
-                                "enum": [
-                                  "seconds",
-                                  "microseconds",
-                                  "milliseconds",
-                                  "bytes",
-                                  "kilobytes",
-                                  "megabytes",
-                                  "gigabytes",
-                                  "terabytes",
-                                  "bits",
-                                  "kilobits",
-                                  "megabits",
-                                  "gigabits",
-                                  "terabits",
-                                  "percent",
-                                  "count",
-                                  "bytes/second",
-                                  "kilobytes/second",
-                                  "megabytes/second",
-                                  "gigabytes/second",
-                                  "terabytes/second",
-                                  "bits/second",
-                                  "kilobits/second",
-                                  "megabits/second",
-                                  "gigabits/second",
-                                  "terabits/second",
-                                  "count/second",
-                                  "none"
-                                ],
-                                "example": "percent"
-                              },
-                              "threshold": {
-                                "type": "integer",
-                                "description": "The value against which the specified statistic is compared\n",
-                                "example": 90
-                              },
-                              "action": {
-                                "type": "object",
-                                "example": "adjustment",
-                                "description": "The action to take when scale up is needed.\nA mandatory field, that should be filled with one of the following:\n\"adjustment\", \"percentageAdjustment\", \"setMaxTarget\", \"setMinTarget\", \"updateCapacity\".\n",
-                                "properties": {
-                                  "type": {
-                                    "type": "string",
-                                    "description": "The type of the action to take when scale up is needed.\n",
-                                    "enum": [
-                                      "adjustment",
-                                      "updateCapacity setMinTarget",
-                                      "percentageAdjustment"
-                                    ],
-                                    "example": "updateCapacity"
-                                  },
-                                  "adjustment": {
-                                    "type": "integer",
-                                    "description": "The number / percentage associated with the specified adjustment type.\nRequired if using `adjustment` or `percentageAdjustment` as action type\n",
-                                    "example": 1
-                                  },
-                                  "minTargetCapacity": {
-                                    "type": "integer",
-                                    "description": "The number with the target capacity needed.\nRequired if using `setMinTarget` as action type\n",
-                                    "example": 1
-                                  },
-                                  "target": {
-                                    "type": "integer",
-                                    "description": "The desired number of instances. Required if using `updateCapacity` as action type and neither `minimum` nor `maximum` are not defined.\n",
-                                    "example": 1
-                                  },
-                                  "minimum": {
-                                    "type": "integer",
-                                    "description": "The lower limit number of instances that you can scale down to. Optional, required if using `updateCapacity` as action type and neither `target` nor `maximum` are not defined\n",
-                                    "example": 0
-                                  },
-                                  "maximum": {
-                                    "type": "integer",
-                                    "description": "The upper limit number of instances that you can scale up to. Optional, required if using `updateCapacity` as action type and neither `target` nor `minimum` are not defined\n",
-                                    "example": 5
-                                  }
-                                }
-                              },
-                              "namespace": {
-                                "type": "string",
-                                "description": "The namespace for the alarm's associated metric.\n",
-                                "default": "AWS/EC2"
-                              },
-                              "dimentions": {
+                              "metrics": {
                                 "type": "array",
-                                "description": "The dimensions for the alarm's associated metric.\nIf the user mentioned name as instanceId, there is NO value\n",
                                 "items": {
-                                  "type": "object",
-                                  "properties": {
-                                    "name": {
-                                      "type": "string",
-                                      "example": "InstanceId"
-                                    }
-                                  }
+                                  "$ref": "#/paths/~1aws~1ec2~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/scaling/properties/multipleMetrics/properties/metrics/items"
                                 }
                               },
-                              "period": {
-                                "type": "integer",
-                                "description": "The period in seconds over which the statistic is applied.\n",
-                                "example": 300
-                              },
-                              "evaluationPeriods": {
-                                "type": "integer",
-                                "description": "The number of periods over which data is compared to the specified threshold.\n",
-                                "example": 1
-                              },
-                              "cooldown": {
-                                "type": "integer",
-                                "description": "The amount of time, in seconds, after a scaling activity completes before any further trigger-related scaling activities can start.\n",
-                                "example": 300
-                              },
-                              "operator": {
-                                "type": "string",
-                                "description": "The operator to use in order to determine if the scaling policy is applicable.\n",
-                                "enum": [
-                                  "gt",
-                                  "gte",
-                                  "lt",
-                                  "lte"
-                                ],
-                                "example": "gte"
-                              },
-                              "isEnabled": {
-                                "type": "boolean",
-                                "description": "Specifies whether the scaling policy described in this block is enabled.\n",
-                                "default": true,
-                                "example": true
+                              "expressions": {
+                                "type": "array",
+                                "items": {
+                                  "$ref": "#/paths/~1aws~1ec2~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/scaling/properties/multipleMetrics/properties/expressions/items"
+                                }
                               }
                             }
                           },
                           "target": {
-                            "type": "object",
-                            "properties": {
-                              "policyName": {
-                                "type": "string",
-                                "description": "The policy name\n",
-                                "example": "my-up-policy"
-                              },
-                              "metricName": {
-                                "type": "string",
-                                "description": "The name of the metric.\n",
-                                "default": "CPUUtilization",
-                                "example": "CPUUtilization"
-                              },
-                              "statistic": {
-                                "type": "string",
-                                "description": "The metric statistics to return.\n",
-                                "enum": [
-                                  "average",
-                                  "sum",
-                                  "sampleCount",
-                                  "maximum",
-                                  "minimum",
-                                  "percentile"
-                                ],
-                                "example": "average"
-                              },
-                              "unit": {
-                                "type": "string",
-                                "description": "The unit for the alarm's associated metric.\n",
-                                "enum": [
-                                  "seconds",
-                                  "microseconds",
-                                  "milliseconds",
-                                  "bytes",
-                                  "kilobytes",
-                                  "megabytes",
-                                  "gigabytes",
-                                  "terabytes",
-                                  "bits",
-                                  "kilobits",
-                                  "megabits",
-                                  "gigabits",
-                                  "terabits",
-                                  "percent",
-                                  "count",
-                                  "bytes/second",
-                                  "kilobytes/second",
-                                  "megabytes/second",
-                                  "gigabytes/second",
-                                  "terabytes/second",
-                                  "bits/second",
-                                  "kilobits/second",
-                                  "megabits/second",
-                                  "gigabits/second",
-                                  "terabits/second",
-                                  "count/second",
-                                  "none"
-                                ],
-                                "example": "percent"
-                              },
-                              "namespace": {
-                                "type": "string",
-                                "description": "The namespace for the alarm's associated metric.\n",
-                                "default": "AWS/EC2"
-                              },
-                              "target": {
-                                "type": "integer",
-                                "description": "The target value for the group\n",
-                                "example": 1
-                              },
-                              "cooldown": {
-                                "type": "integer",
-                                "description": "The amount of time, in seconds, after a scaling activity completes before any further trigger-related scaling activities can start.\n",
-                                "example": 300
-                              }
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/paths/~1aws~1ec2~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/scaling/properties/target/items"
                             }
                           }
                         }
