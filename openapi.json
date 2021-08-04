@@ -30427,6 +30427,38 @@
             "required": true
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "launchSpec": {
+                        "type": "object",
+                        "description": "The object specifying the configuration of the VNG.\n",
+                        "properties": {
+                          "instanceTypes": {
+                            "type": "array",
+                            "description": "List of possible instance types for the cluster.\n",
+                            "items": {
+                              "type": "string"
+                            },
+                            "example": [
+                              "c3.large",
+                              "m4.large"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Ocean Import ASG to Ocean Response",
@@ -32362,7 +32394,7 @@
                           "properties": {
                             "key": {
                               "type": "string",
-                              "description": "Set label key.\\\nThe following are not allowed:\n* kubernetes.io/hostname\"\n* \"failure-domain.beta.kubernetes.io/zone\"\n* \"topology.kubernetes.io/zone\"\n* \"failure-domain.beta.kubernetes.io/region\"\n* \"topology.kubernetes.io/region\"\n* \"beta.kubernetes.io/instance-type\"\n* \"node.kubernetes.io/instance-type\"\n* \"beta.kubernetes.io/os\"\n* \"kubernetes.io/os\"\n* \"beta.kubernetes.io/arch\"\n* \"kubernetes.io/arch\"\n* \"spotinst.io/node-lifecycle\"'\n"
+                              "description": "Set label key.\\\nThe following are not allowed:\n* \"kubernetes.io/hostname\"\n* \"failure-domain.beta.kubernetes.io/zone\"\n* \"topology.kubernetes.io/zone\"\n* \"failure-domain.beta.kubernetes.io/region\"\n* \"topology.kubernetes.io/region\"\n* \"beta.kubernetes.io/instance-type\"\n* \"node.kubernetes.io/instance-type\"\n* \"beta.kubernetes.io/os\"\n* \"kubernetes.io/os\"\n* \"beta.kubernetes.io/arch\"\n* \"kubernetes.io/arch\"\n* \"spotinst.io/node-lifecycle\"'\n"
                             },
                             "value": {
                               "type": "string",
@@ -32798,6 +32830,89 @@
             "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1autoScalingGroup~1import/post/parameters/1"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "launchSpec": {
+                        "type": "object",
+                        "description": "The object specifying the configuration of the VNG.\n",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "Set launch specification name.\n",
+                            "example": "specialty.nodes.spotk8s.com"
+                          },
+                          "labels": {
+                            "type": "array",
+                            "description": "An array of labels to add to the VNG nodes. Only custom user labels are allowed,\nand not Kubernetes built-in labels or Spot internal labels.\n",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "key": {
+                                  "type": "string",
+                                  "description": "Set label key. \\\nThe following are not allowed:\n* \"kubernetes.io/hostname\"\n* \"failure-domain.beta.kubernetes.io/zone\"\n* \"topology.kubernetes.io/zone\"\n* \"failure-domain.beta.kubernetes.io/region\"\n* \"topology.kubernetes.io/region\"\n* \"beta.kubernetes.io/instance-type\"\n* \"node.kubernetes.io/instance-type\"\n* \"beta.kubernetes.io/os\"\n* \"kubernetes.io/os\"\n* \"beta.kubernetes.io/arch\"\n* \"kubernetes.io/arch\"\n* \"spotinst.io/node-lifecycle\"\n"
+                                },
+                                "value": {
+                                  "type": "string",
+                                  "description": "Set label value.\n"
+                                }
+                              }
+                            },
+                            "example": [
+                              {
+                                "key": "env",
+                                "value": "test"
+                              }
+                            ]
+                          },
+                          "taints": {
+                            "type": "array",
+                            "description": "Add taints to Launch Spec.\n",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "key": {
+                                  "type": "string",
+                                  "description": "Set taint key.\n"
+                                },
+                                "value": {
+                                  "type": "string",
+                                  "description": "Set taint value.\n"
+                                },
+                                "effect": {
+                                  "type": "string",
+                                  "description": "Set taint effect.\n",
+                                  "enum": [
+                                    "NoSchedule",
+                                    "PreferNoSchedule",
+                                    "NoExecute",
+                                    "PreferNoExecute"
+                                  ]
+                                }
+                              }
+                            },
+                            "example": [
+                              {
+                                "key": "taintKey",
+                                "value": "taintValue",
+                                "effect": "NoSchedule"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Ocean Import ASG to Launch Spec Response",
