@@ -10,20 +10,20 @@ properties:
         type: string
         example: "o-1fff54ed"
         description: >
-          The Ocean cluster ID. required for launchSpec create.
+          The Ocean cluster identifier. Required to create the virtual node group.
       name:
         type: string
         example: "lp_name"
         description: >
-          Set name for the launch spec
+          Set name for the virtual node group.
       sourceImage:
         type: string
         example: "https://www.googleapis.com/compute/v1/projects/gke-node-images/global/images/container-v1-3-v20160517"
         description: >
-          Set image URL. Can be null
+          Set image URL. Can be null.
       rootVolumeSize:
         type: integer
-        description: Set root volume size (in GB)
+        description: Set root volume size (in GB).
         example: 8
       metadata:
         type: array
@@ -31,17 +31,17 @@ properties:
           - key
           - value
         description: >
-          Add metadata to cluster
+          Add metadata to the cluster.
         items:
           type: object
           properties:
             key:
               type: string
-              description: Set metadata's key. Required on launchSpec.metadata
+              description: Set the metadata key. Required for launchSpec.metadata.
               example: "key1"
             value:
               type: string
-              description: Set metadata's name. Required on launchSpec.metadata
+              description: Set the metadata name. Required for launchSpec.metadata.
               example: "value1"
         example:
           - key: "key1"
@@ -51,33 +51,32 @@ properties:
       instanceTypes:
         type: array
         description: >
-          A array of supported machine types for the Launch Spec. Can be null
+          An array of supported machine types for the virtual node group. Can be null.
         items:
           type: string
           example: "n1-standard-1, n1-standard-2"
       taints:
         type: array
-        description: Add taints to Launch Spec
+        description: Add taints to virtual node group.
         items:
           type: object
           properties:
             key:
               type: string
-              description: Set taint key
+              description: Set taint key.
             value:
               type: string
-              description: Set taint value
+              description: Set taint value.
             effect:
               type: string
-              description: Set taint effect
+              description: Set taint effect.
         example:
           - key: taintKey
             value: taintValue
             effect: NoSchedule
       labels:
         type: array
-        description: 'An array of labels to add to the Launch Spec. Custom user labels only,
-                no K8s built in labels or Spot internal labels.'
+        description: 'An array of labels to add to the virtual node group. Only custom user labels are allowed, and not Kubernetes built-in labels or Spot internal labels.'
         items:
           type: object
           properties:
@@ -85,7 +84,7 @@ properties:
               type: string
               description: |
                 Set label key.\
-                May not be one of the following:
+                The following are not allowed:
                 * "kubernetes.io/hostname"
                 * "failure-domain.beta.kubernetes.io/zone"
                 * "topology.kubernetes.io/zone"
@@ -101,7 +100,7 @@ properties:
                 * "spotinst.io/gpu-type"
             value:
               type: string
-              description: Set label value
+              description: Set label value.
         example:
           - key: "env"
             value: "test"
@@ -111,13 +110,13 @@ properties:
           headroom:
             type: object
             description: >
-              Set custom headroom per launch spec. provide list of launchSpec.autoScale.headrooms object
+              Set custom headroom per virtual node group. Provide a list of launchSpec.autoScale.headroom objects.
             properties:
               cpuPerUnit:
                 type: integer
                 description: >
-                  configure the number of CPUs to allocate the headroom.
-                  CPUs are denoted in millicores, where 1000 millicores = 1 vCPU
+                  Configure the number of CPUs to allocate the headroom.
+                  CPUs are denoted in millicores, where 1000 millicores = 1 vCPU.
                 example: 1000
               memoryPerUnit:
                 type: integer
@@ -127,7 +126,7 @@ properties:
               gpuPerUnit:
                 type: integer
                 description: >
-                  How much GPU allocate for headroom unit
+                  The amount of GPU allocate per headroom unit.
                 example: 0
               numOfUnits:
                 type: integer
@@ -139,18 +138,20 @@ properties:
         properties:
           maxInstanceCount:
             description: >
-              Option to set a maximum number of instances per launch specification.
+              Option to set a maximum number of nodes per virtual node group.
               Can be null.
-              If set, value must be greater than or equal to 0.
+              If set, the value must be greater than or equal to 0.
             type: integer
             example: 5
       restrictScaleDown:
         type: boolean
         description: |
-          When set to “True”, launch specification nodes will be treated as if all pods running have the [restrict-scale-down label](https://docs.spot.io/ocean/features/labels-and-taints).
-          Therefore, Ocean will not scale nodes down unless empty.
+          When set to True, VNG nodes will be treated as if all pods running have the [restrict-scale-down label](https://docs.spot.io/ocean/features/labels-and-taints).
+          Therefore, Ocean will not scale nodes down unless they are empty.
         example: false
       shieldedInstanceConfig:
         $ref: "./oceanShieldedInstanceConfig.yaml"
       strategy:
         $ref: "./oceanLaunchSpecStrategy.yaml"
+      storage:
+        $ref: "./oceanLaunchSpecStorage.yaml"

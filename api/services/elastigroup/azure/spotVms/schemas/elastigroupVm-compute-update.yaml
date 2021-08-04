@@ -32,60 +32,77 @@ properties:
           This value will hold the YML in base64 and will be added to the scaleSets
         example: ""
       image:
+        title: Image
+        description: Image of VM. An image is a template for creating new VMs. Choose from Azure image catalogue (marketplace) or use a custom image or chosen from shared gallery image.
         type: object
-        description: |
-          Image of VM. An image is a template for creating new VMs.\
-          Choose from Azure image catalogue (marketplace) or use a custom image.
         properties:
           marketplace:
+            title: Marketplace
             type: object
-            description: |
-              * Select an image from Azure's Marketplace image catalogue
-              * Required if custom image isn't specified.
+            description:
+              "Select an image from Azure's Marketplace image catalogue. Cannot be used with `custom` or `gallery`. <a style=color:red;>Required if custom or gallery image are not specified.</a>"
             properties:
               publisher:
+                title: Publisher
+                description: "Image publisher.  <a style=color:red;>Required if marketplace image is specified.</a>"
                 type: string
-                description: |
-                  *Image publisher.
-                  *Required if marketplace image is specified.
                 example: "OpenLogic"
               offer:
+                title: Offer
+                desription: "Name of image to use.  <a style=color:red;>Required if marketplace image is specified.</a>"
                 type: string
-                description: |
-                  *Name of image to use.
-                  *Required if marketplace image is specified.
                 example: "CentOS"
               sku:
+                title: Stock Keeping Unit
+                description: "Image's Stock Keeping Unit, which is the specific version of the image.  <a style=color:red;>Required if marketplace image is specified.</a>"
                 type: string
-                description: |
-                  *Image's Stock Keeping Unit, which is the specific version of the image.
-                  *Required if marketplace image is specified.
                 example: "7.3"
               version:
+                title: Version
+                description: "Image's version. if version not provided we use 'latest'"
                 type: string
-                description: |
-                  Image's version. if version not provided we use "latest"
-                default: "lastest"
                 example: "7.3-1611"
+                default: latest
           custom:
+            title: Custom
             type: object
-            writeOnly: true
-            description: >
-              *Custom image to launch Elastigroup with.
-              *Required if marketplace image isn't specified.
+            description: "Custom image to launch Elastigroup with. Cannot be used with `marketplace` or `gallery`. <a style=color:red;>Required if marketplace or gallery image are not specified.</a>"
             properties:
               resourceGroupName:
+                title: Resource Group Name
+                description: "Name of Resource Group for custom image.  <a style=color:red;>Required if custom image is specified.</a>"
                 type: string
-                description: |
-                  *Name of Resource Group for custom image.
-                  *Required if custom image is specified.
                 example: "spotinst-azure"
               name:
+                title: Image Name
+                description: "Name of the custom image.  <a style=color:red;>Required if custom image is specified.</a>"
                 type: string
-                description: |
-                  * Name of the custom image.
-                  * Required if custom image is specified.
                 example: "custom-image-name"
+          gallery:
+            title: Gallery
+            type: object
+            description: "Gallery image to launch Elastigroup with. Cannot be used with `marketplace` or `custom`. <a style=color:red;>Required if marketplace or custom image are not specified.</a>"
+            properties:
+              resourceGroupName:
+                title: Resource Group Name
+                description: "Name of Resource Group for custom image.  <a style=color:red;>Required if gallery image is specified.</a>"
+                type: string
+                example: "spotinst-azure"
+              galleryName:
+                title: Gallery Name
+                description: "Name of the gallery.  <a style=color:red;>Required if gallery image is specified.</a>"
+                type: string
+                example: "gallery-name"
+              imageName:
+                title: Image Name
+                description: "Name of the gallery image.  <a style=color:red;>Required if gallery image is specified.</a>"
+                type: string
+                example: "gallery-image-name"
+              version:
+                title: Version
+                description: "Image's version. Can be in the format x.x.x or 'latest'. <a style=color:red;>Required if gallery image is specified.</a>"
+                type: string
+                example: "0.0.1"
       network:
         title: Network
         description: Define the Virtual Network and Subnet for your Elastigroup.
@@ -193,10 +210,26 @@ properties:
 
                                       + IPv6"
                         default: IPv4
+                applicationSecurityGroups:
+                  description: List of Application Security Groups that will be associated to the primary ip configration of the network interface.
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - resourceGroupName
+                      - name
+                    properties:
+                      resourceGroupName:
+                        description: The resource group of the Application Security Group.
+                        type: string
+                        example: AsgResourceGroup
+                      name:
+                        description: The name of the Application Security group
+                        type: string
+                        example: AsgName
       login:
         type: object
-        description: |
-          Set admin access for accessing your VMs. Password/SSH is required for Linux.
+        description: "Set admin access for accessing your VMs. Password/SSH is required for Linux. <a style=color:red;>Required null if specialized image is set.</a>"
         properties:
           userName:
             type: string

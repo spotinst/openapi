@@ -26,6 +26,13 @@ properties:
         items:
           type: string
           example: "standard_a2_v2"
+      preferredSpotSizes:
+        type: string
+        description: |
+         Preffered Spot-VM sizes.
+        items:
+          type: string
+          example: "standard_a2_v2"
   os:
     type: string
     example: Linux
@@ -46,32 +53,28 @@ properties:
       image:
         type: object
         description: |
-          Image of VM. An image is a template for creating new VMs.\
-          Choose from Azure image catalogue (marketplace) or use a custom image.
+          Image of VM. An image is a template for creating new VMs.
         properties:
           marketplace:
             type: object
             description: |
               Select an image from Azure's Marketplace image catalogue\
-              Required if custom image isn't specified.
+              Required if custom image or gallery image are not specified.
             properties:
               publisher:
                 type: string
                 description: |
-                  Image publisher.\
-                  Required if marketplace image is specified.
+                  Image publisher.
                 example: "OpenLogic"
               offer:
                 type: string
                 description: |
-                  Name of image to use.\
-                  Required if marketplace image is specified.
+                  Name of image to use.
                 example: "CentOS"
               sku:
                 type: string
                 description: |
-                  Image's Stock Keeping Unit, which is the specific version of the image.\
-                  Required if marketplace image is specified.
+                  Image's Stock Keeping Unit, which is the specific version of the image.
                 example: "7.3"
               version:
                 type: string
@@ -81,23 +84,49 @@ properties:
                 example: "7.3-1611"
           custom:
             type: object
-            writeOnly: true
             description: |
-              Custom image to launch Elastigroup with.\
-              Required if marketplace image isn't specified.
+              Custom image to launch Elastigroup with.
             properties:
               resourceGroupName:
                 type: string
                 description: |
-                  Name of Resource Group for custom image.\
-                  Required if custom image is specified.
+                  Name of Resource Group for custom image.
                 example: "spotinst-azure"
               name:
                 type: string
                 description: |
-                  Name of the custom image.\
-                  Required if custom image is specified.
+                  Name of the custom image.
                 example: "custom-image-name"
+          gallery:
+            title: Gallery
+            type: object
+            description: |
+              Gallery image to launch Elastigroup with. Required if custom image or marketplace image are not specified.
+            properties:
+              resourceGroupName:
+                title: Resource Group Name
+                description: |
+                  Name of Resource Group for custom image
+                type: string
+                example: "spotinst-azure"
+              galleryName:
+                title: Gallery Name
+                description: |
+                  Name of the gallery.
+                type: string
+                example: "gallery-name"
+              imageName:
+                title: Image Name
+                description: |
+                  Name of the gallery image.
+                type: string
+                example: "gallery-image-name"
+              version:
+                title: Version
+                description: |
+                  Image's version. Can be in the format x.x.x or 'latest'.
+                type: string
+                example: "0.0.1"
       network:
         title: Network
         description: Define the Virtual Network and Subnet for your Elastigroup.
@@ -212,6 +241,24 @@ properties:
                     type: string
                     example:
                       - 172.23.4.20
+                applicationSecurityGroups:
+                  description: List of Application Security Groups that will be associated to the primary ip configration of the network interface.
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - resourceGroupName
+                      - name
+                    properties:
+                      resourceGroupName:
+                        description: The resource group of the Application Security Group.
+                        type: string
+                        example: AsgResourceGroup
+                      name:
+                        description: The name of the Application Security group
+                        type: string
+                        example: AsgName
+
       login:
         type: object
         description: |

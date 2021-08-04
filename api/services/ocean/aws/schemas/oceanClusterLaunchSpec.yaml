@@ -1,6 +1,6 @@
 type: object
 description: |
-  AWS Cluster Launch Specification
+  AWS Cluster Virtual Node Group (VNG).
 required:
   - oceanId
 properties:
@@ -9,27 +9,27 @@ properties:
     readOnly: true
     example: ols-12345abc
     description: |
-      Launch Spec ID.
+      The virtual node group identifier.
   oceanId:
     type: string
     example: "o-123"
     description: |
-      The Ocean cluster ID. Required for Launch Spec creation.
+      The Ocean cluster identifier. Required for Launch Spec creation.
   name:
     type: string
     example: "specialty.nodes.spotk8s.com"
     description: |
-      Set Launch Specification name.
+      Set launch specification name.
   imageId:
     type: string
     example: "ami-ID"
     description: |
-      Set image ID. Can be null.
+      Set image identifier. Can be null.
   userData:
     type: string
     example: "dsa89d7uosduxq98sau9s8aux9s8aux09q0qu09axsuix0s9qas09xz"
     description: |
-      Set user data script in Base64-encoded MIME.
+      Set user data script in base 64 encoded MIME.
   iamInstanceProfile:
     type: object
     title: auto-scaler
@@ -40,16 +40,16 @@ properties:
         type: string
         example: "arn:aws:iam::123456781234:instance-profile/EKS-nodes-test-NodeInstanceProfile-ABCDEFGH123"
         description: |
-          The iamRole arn. If set - do not set launchSpec.iamInstanceProfile.name
+          The iamRole ARN. If set, do not set launchSpec.iamInstanceProfile.name
       name:
         type: string
         description: |
-          The iamRole name. If set - do not set launchSpec.iamInstanceProfile.arn
+          The iamRole name. If set, do not set launchSpec.iamInstanceProfile.arn
         example: EKS-nodes-test
   securityGroupIds:
     type: array
     description: |
-      Set security groups. Each element in array should be security group ID
+      Set security groups. Each element in the array is a security group identifier.
     items:
       type: string
     example: ["sg-0ded3a2980208c30c", "sg-0ded3a2980208c30d"]
@@ -64,20 +64,20 @@ properties:
   preferredSpotTypes:
     type: array
     description: |
-      When Ocean scales up instances, it takes your preferred types into consideration while maintaining a variety of machine types running for optimized distribution. [ Learn More](https://docs.spot.io/ocean/features/launch-specifications?id=preferred-spot-instance-types-per-vng)
+      When Ocean scales up instances, it takes your preferred types into consideration while maintaining a variety of machine types running for optimized distribution. [Learn More](https://docs.spot.io/ocean/features/launch-specifications?id=preferred-spot-instance-types-per-vng)
     items:
       type: string
     example: ["c3.2xlarge", "c4.2xlarge"]
   rootVolumeSize:
     type: integer
     description: |
-      Set root volume size (in GB). This field and blockDeviceMappings cannot be used in the same spec.
+      Set root volume size (in GB). This field and blockDeviceMappings cannot be used in the same specification.
     example: 8
   labels:
     type: array
     description: |
-      An array of labels to add to the Launch Spec instances. Custom user labels only,
-      no K8s built in labels or Spot internal labels.
+      An array of labels to add to the VNG nodes. Only custom user labels are allowed,
+      and not Kubernetes built-in labels or Spot internal labels.
     items:
       type: object
       properties:
@@ -85,7 +85,7 @@ properties:
           type: string
           description: |
             Set label key.\
-            May not be one of the following:
+            The following are not allowed:
             * kubernetes.io/hostname"
             * "failure-domain.beta.kubernetes.io/zone"
             * "topology.kubernetes.io/zone"
@@ -131,14 +131,14 @@ properties:
   subnetIds:
     type: array
     description: |
-      Set subnets in launchSpec. Each element in array should be subnet ID.
+      Set subnets in launchSpec. Each element in the array is a subnet identifier.
     items:
       type: string
     example: ["subnet-123", "subnet-456"]
   elasticIpPool:
     type: object
     description: |
-      Assign an Elastic IP to the instances spun by the launch spec. Can be null.
+      Assign an Elastic IP to the instances launched by the launch spec. Can be null.
     properties:
       tagSelector:
         type: object
@@ -157,10 +157,12 @@ properties:
             example: orange
   autoScale:
     type: object
+    description: |
+      Object specifying the automatic scaling of an Ocean VNG.
     properties:
       headrooms:
         description: |
-          Set custom headroom per launch spec. provide a list of launchSpec.autoscale.headrooms objects.
+          Specify the custom headroom per VNG. Provide a list of headroom objects.
         type: array
         items:
           type: object
@@ -183,7 +185,7 @@ properties:
             gpuPerUnit:
               type: integer
               description: |
-                How much GPU allocate for headroom unit.
+                Amont of GPU to allocate for headroom unit.
               example: 0
   tags:
     type: array
@@ -227,7 +229,7 @@ properties:
               maximum: 1000
               example: 125
               description: |
-                The amount of data transferred to or from a storage device per second, you can use this param just in a case that volumetype=‘gp3’.
+                The amount of data transferred to or from a storage device per second. You can use this parameter only if volumetype=‘gp3’.
             deleteOnTermination:
               type: boolean
               description: |
@@ -257,7 +259,7 @@ properties:
               type: integer
               description: |
                 Set volume size (in GB). When using this property, you cannot use dynamicVolumeSize.\
-                You must use one of the other. Volume size should be greater or equal than the size configured in the AMI.
+                You must use one or the other. Volume size should be greater than or equal to the size configured in the AMI.
             dynamicVolumeSize:
               type: object
               required:
@@ -279,7 +281,7 @@ properties:
                   type: integer
                   description: |
                     Additional size per resource unit (in GB).\
-                    For example: if baseSize=50, and sizePerResourceUnit=20, and an instance with 2 CPU is launched - its disk size will be: 90GB.
+                    For example: if baseSize=50, and sizePerResourceUnit=20, and an instance with 2 CPU is launched, its disk size will be 90 GB.
                   example: 20
   resourceLimits:
     type: object
@@ -293,13 +295,13 @@ properties:
   strategy:
     type: object
     description: |
-      LaunchSpec Strategy
+      Similar to a strategy for an Ocean cluster, but applying only to a virtual node group.
     properties:
       spotPercentage:
         type: integer
         description: |
           The desired percentage of the Spot instances out of all running instances. Defaults to 100 when not set.\
-          Only available when the field is **not** set in the cluster direcly (Ocean.Strategy.spotPercentage)
+          Only available when the field is **not** set in the cluster directly (Ocean.Strategy.spotPercentage)
         minimum: 0
         maximum: 100
         example: 70
@@ -316,6 +318,8 @@ properties:
       When set to “True”, VNG nodes will be treated as if all pods running have the [restrict-scale-down label](https://docs.spot.io/ocean/features/labels-and-taints).
       Therefore, Ocean will not scale nodes down unless empty.
     example: false
+  instanceMetadataOptions:
+    $ref: "./oceanInstanceMetadataOptions.yaml"
   createdAt:
     type: string
     readOnly: true
