@@ -1138,6 +1138,61 @@
                                         }
                                       }
                                     },
+                                    "stepAdjustments": {
+                                      "type": "array",
+                                      "description": "The list of steps to define actions to take based on different thresholds.\nWhen set, policy-level threshold and action cannot be specified.\nIf specified, at least one step should be defined.\n",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "action": {
+                                            "type": "object",
+                                            "description": "The action to take when scale up according to step's threshold is needed.\nA mandatory field, that should be filled with one of the following:\n\"adjustment\", \"percentageAdjustment\", \"setMinTarget\", \"updateCapacity\".\n",
+                                            "properties": {
+                                              "type": {
+                                                "type": "string",
+                                                "description": "The type of the action to take when scale up is needed.\n",
+                                                "enum": [
+                                                  "adjustment",
+                                                  "updateCapacity setMinTarget",
+                                                  "percentageAdjustment"
+                                                ],
+                                                "example": "setMinTarget"
+                                              },
+                                              "adjustment": {
+                                                "type": "integer",
+                                                "description": "The number / percentage associated with the specified adjustment type.\nRequired if using `adjustment` or `percentageAdjustment` as action type\n",
+                                                "example": 2
+                                              },
+                                              "minTargetCapacity": {
+                                                "type": "integer",
+                                                "description": "The desired target capacity of a group.\nRequired if using `setMinTarget` as action type\n",
+                                                "example": 3
+                                              },
+                                              "target": {
+                                                "type": "integer",
+                                                "description": "The desired number of instances. Required if using `updateCapacity` as action type and neither `minimum` nor `maximum` are not defined.\n",
+                                                "example": 3
+                                              },
+                                              "minimum": {
+                                                "type": "integer",
+                                                "description": "The lower limit number of instances that you can scale down to. Optional, required if using `updateCapacity` as action type and neither `target` nor `maximum` are not defined\n",
+                                                "example": 4
+                                              },
+                                              "maximum": {
+                                                "type": "integer",
+                                                "description": "The upper limit number of instances that you can scale up to. Optional, required if using `updateCapacity` as action type and neither `target` nor `minimum` are not defined\n",
+                                                "example": 10
+                                              }
+                                            }
+                                          },
+                                          "threshold": {
+                                            "type": "integer",
+                                            "description": "The value against which the specified statistic is compared in order\nto determine if a step should be applied.\n",
+                                            "example": 50
+                                          }
+                                        }
+                                      }
+                                    },
                                     "namespace": {
                                       "type": "string",
                                       "description": "The namespace for the alarm's associated metric.\n",
@@ -1306,6 +1361,62 @@
                                           "type": "integer",
                                           "description": "The upper limit number of instances that you can scale up to. Optional, required if using `updateCapacity` as action type and neither minimum nor maximum are defined.\n",
                                           "example": 5
+                                        }
+                                      }
+                                    },
+                                    "stepAdjustments": {
+                                      "type": "array",
+                                      "description": "The list of steps to define actions to take based on different thresholds.\nWhen set, policy-level threshold and action cannot be specified.\nIf specified, at least one step should be defined.\n",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "action": {
+                                            "type": "object",
+                                            "description": "The action to take when scale down according to step's threshold is needed.\nA mandatory field, that should be filled with one of the following:\n\"adjustment\", \"percentageAdjustment\", \"setMaxTarget\", \"updateCapacity\".\n",
+                                            "properties": {
+                                              "type": {
+                                                "type": "string",
+                                                "description": "The type of the action to take when scale down is needed.\n",
+                                                "enum": [
+                                                  "adjustment",
+                                                  "updateCapacity",
+                                                  "setMaxTarget",
+                                                  "percentageAdjustment"
+                                                ],
+                                                "example": "percentageAdjustment"
+                                              },
+                                              "adjustment": {
+                                                "type": "integer",
+                                                "description": "The number / percentage associated with the specified adjustment type.\nRequired if using `adjustment` or `percentageAdjustment` as action type\n",
+                                                "example": 40
+                                              },
+                                              "maxTargetCapacity": {
+                                                "type": "integer",
+                                                "description": "The desired target capacity of.\nRequired if using `setMaxTarget` as action type\n",
+                                                "example": 1
+                                              },
+                                              "target": {
+                                                "type": "integer",
+                                                "description": "The desired number of instances. Required if using `updateCapacity` as action type and neither `minimum` nor `maximum` are defined.\n",
+                                                "example": 2
+                                              },
+                                              "minimum": {
+                                                "type": "integer",
+                                                "description": "The lower limit number of instances that you can scale down to. Optional, required if using `updateCapacity` as action type and neither `target` nor `maximum` are defined\n",
+                                                "example": 1
+                                              },
+                                              "maximum": {
+                                                "type": "integer",
+                                                "description": "The upper limit number of instances that you can scale up to. Optional, required if using `updateCapacity` as action type and neither `target` nor `minimum` are defined\n",
+                                                "example": 5
+                                              }
+                                            }
+                                          },
+                                          "threshold": {
+                                            "type": "integer",
+                                            "description": "The value against which the specified statistic is compared in order\nto determine if a step should be applied.\n",
+                                            "example": 10
+                                          }
                                         }
                                       }
                                     },
@@ -2882,15 +2993,25 @@
                                                       "description": "Unit",
                                                       "example": "percent"
                                                     },
-                                                    "threshold": {
-                                                      "type": "integer",
-                                                      "description": "Threshold",
-                                                      "example": 90
-                                                    },
-                                                    "adjustment": {
-                                                      "type": "integer",
-                                                      "description": "Adjustment",
-                                                      "example": 2
+                                                    "stepAdjustments": {
+                                                      "type": "array",
+                                                      "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "action": {
+                                                            "type": "object",
+                                                            "example": {
+                                                              "adjustment": "3",
+                                                              "type": "adjustment"
+                                                            }
+                                                          },
+                                                          "threshold": {
+                                                            "type": "integer",
+                                                            "description": "Step Threshold",
+                                                            "example": 30
+                                                          }
+                                                        }
+                                                      }
                                                     },
                                                     "namespace": {
                                                       "type": "string",
