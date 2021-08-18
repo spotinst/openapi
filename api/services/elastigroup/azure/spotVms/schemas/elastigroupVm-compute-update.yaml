@@ -22,6 +22,14 @@ properties:
         items:
           type: string
           example: "standard_a2_v2"
+      preferredSpotSizes:
+        type: array
+        description: |
+          Prioritize Spot VM sizes when launching Spot VMs for the group.
+          * Must be a sublist of compute.vmSizes.spotSizes
+        items:
+          type: string
+          example: "standard_a2_v2"
   launchSpecification:
     type: object
     properties:
@@ -445,6 +453,47 @@ properties:
           isEnabled: true
           type: unmanaged
           storageUri: "https://example.blob.core.windows.net/"
+      secrets:
+        type: array
+        description: |
+          "Set of certificates that should be installed onto the virtual machine"
+        items:
+          type: object
+        properties:
+          sourceVault:
+            type: object
+            required: true
+            description: |
+              The key vault reference contains all the required certificates
+            properties:
+              resourceGroupName:
+                type: string
+                required: true
+                description: |
+                  The resource group name of the key vault
+              name:
+                type: string
+                required: true
+                description: |
+                  The name of the key vault
+          vaultCertificates:
+            type: array
+            required: true
+            description: |
+              The required certificate references
+            items:
+              type: object
+            properties:
+              certificateUrl:
+                type: string
+                required: true
+                description: |
+                  The URL of the certificate under the key vault
+              certificateStore:
+                type: string
+                required: true
+                description: |
+                  The certificate store directory onto the virtual machine. The direcrory is created in the LocalMachine account
   zones:
     type: array
     description: List of Azure Availability Zones in the defined region; If not defined, Virtual machines will be launched regionally.
