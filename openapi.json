@@ -26563,6 +26563,33 @@
                               }
                             }
                           },
+                          "logging": {
+                            "type": "object",
+                            "title": "Logging configuration",
+                            "properties": {
+                              "export": {
+                                "type": "object",
+                                "title": "Logging Export Configuration.",
+                                "properties": {
+                                  "s3": {
+                                    "type": "object",
+                                    "title": "Logging S3 Export configuration.",
+                                    "description": "Exports your cluster's logs to the S3 bucket and subdir configured on the S3 [data integration](/#operation/DataIntegrationCreate) given.\nEach file contains logs of 3 minutes where each log is separated by a new line and saved as a JSON.\nThe file formats are `subdir`/`accountId`_`oceanId`_`oceanName`_`startTime`.log\nIf no subdir was configured, the files will be saved in the root of the bucket.\n",
+                                    "required": [
+                                      "id"
+                                    ],
+                                    "properties": {
+                                      "id": {
+                                        "type": "string",
+                                        "description": "The identifier of The S3 data integration to export the logs to.",
+                                        "example": "di-123"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
                           "createdAt": {
                             "type": "string",
                             "readOnly": true,
@@ -29963,6 +29990,9 @@
                           },
                           "compute": {
                             "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1import/post/responses/200/content/application~1json/schema/properties/items/properties/compute"
+                          },
+                          "logging": {
+                            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/properties/logging"
                           }
                         }
                       }
@@ -36112,6 +36142,551 @@
                 "type": "string",
                 "format": "binary",
                 "example": "id,accountId,accountName,resourceId,cloudProvider,instanceId,instanceType,region,useCase,lifeCycle,product,launchTime,terminationTime,runningHours,odHourlyPrice,odCost,actualCost,savings,reservationId 2439,act-abc12345,Demo,oesg-cc4740e1,AWS,i-00d67d5efc69e938d,r4.large,us-west-2,K8S,EXCESS,LINUX,2019-10-05T02:59:40.000Z,2019-10-05T03:15:12.000Z,1,0.133,0.133,0.0337,0.0993, 2576,act-abc12345,Demo,oesg-5feb10ab,AWS,i-01086811aefdc4959,c4.large,us-west-2,K8S,EXCESS,LINUX,2019-10-06T10:13:03.000Z,2019-10-06T19:07:05.000Z,9,0.1,0.9,0.279,0.621, 1760,act-abc12345,Demo,oesg-cc4740e1,AWS,i-01797b0ac578198fa,c3.large,us-west-2,K8S,EXCESS,LINUX,2019-08-27T06:41:14.000Z,2019-10-05T02:57:30.000Z,23.9997,0.105,2.52,0.7008,1.8192, 1761,act-abc12345,Demo,oesg-cc4740e1,AWS,i-02e460584769b3c28,r4.large,us-west-2,K8S,EXCESS,LINUX,2019-08-20T22:23:54.000Z,,23.9997,0.133,3.192,0.8088,2.3832,"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/insights/dataIntegration": {
+      "post": {
+        "summary": "Create Data Integration",
+        "description": "Create a new data integration, an object representing a connection to a third-party vendor to export to and import data from.\n",
+        "operationId": "DataIntegrationCreate",
+        "tags": [
+          "Insights Service"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "dataIntegration": {
+                    "type": "object",
+                    "required": [
+                      "vendor",
+                      "name",
+                      "config"
+                    ],
+                    "properties": {
+                      "vendor": {
+                        "type": "string",
+                        "description": "The vendor for the data integration. This value affects the expected `config`.",
+                        "enum": [
+                          "s3"
+                        ]
+                      },
+                      "name": {
+                        "description": "The name of the data integration.",
+                        "type": "string",
+                        "example": "my-s3-integration"
+                      },
+                      "config": {
+                        "description": "The config of this data integration. Depends on the value of `vendor`.",
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "title": "S3",
+                            "required": [
+                              "bucketName"
+                            ],
+                            "properties": {
+                              "bucketName": {
+                                "type": "string",
+                                "description": "The name of the bucket to use. Your spot IAM Role policy needs to include s3:putObject permissions for this bucket.\n**Can't be null**.\n",
+                                "example": "mybucket"
+                              },
+                              "subdir": {
+                                "description": "The subdirectory in which your files will be stored within the bucket. Adds the prefix `subdir/` to new objects' keys.\n**Can't be null or contain '/'**.\n",
+                                "type": "string",
+                                "example": "dev"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Create Data Integration Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/insights/dataIntegration"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1insights~1dataIntegration/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:dataIntegration"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "get": {
+        "summary": "List Data Integration",
+        "description": "List data integrations.\n",
+        "operationId": "dataIntegrationList",
+        "tags": [
+          "Insights Service"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "in": "query",
+            "name": "vendor",
+            "type": "string",
+            "description": "The vendor of the data integrations to list.",
+            "example": "s3",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "s3"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "name",
+            "type": "string",
+            "description": "The name of the data integrations to list.",
+            "example": "my-data-integration",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "type": "string",
+            "description": "The status of the data integrations to list.",
+            "example": "enabled",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "enabled",
+                "disabled"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "health",
+            "type": "string",
+            "description": "The health status of the data integrations to list.",
+            "example": "valid",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "valid",
+                "invalid",
+                "forbidden"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get Data Integration Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/insights/dataIntegration"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "required": [
+                                  "vendor",
+                                  "name",
+                                  "config"
+                                ],
+                                "properties": {
+                                  "id": {
+                                    "type": "string",
+                                    "description": "The identifier of the data integration.",
+                                    "example": "di-123"
+                                  },
+                                  "vendor": {
+                                    "type": "string",
+                                    "description": "The vendor for the data integration. This value affects the expected `config`.",
+                                    "enum": [
+                                      "s3"
+                                    ]
+                                  },
+                                  "name": {
+                                    "description": "The name of the data integration.",
+                                    "type": "string",
+                                    "example": "my-s3-integration"
+                                  },
+                                  "status": {
+                                    "type": "string",
+                                    "description": "Determines if this data integration is on or off.",
+                                    "enum": [
+                                      "enabled",
+                                      "disabled"
+                                    ]
+                                  },
+                                  "health": {
+                                    "type": "string",
+                                    "description": "The health of this data integration.",
+                                    "example": "valid"
+                                  },
+                                  "code": {
+                                    "type": "integer",
+                                    "description": "The HTTP status code representing the health.",
+                                    "example": 200
+                                  },
+                                  "message": {
+                                    "type": "string",
+                                    "description": "The message received from the vendor in the last health update.",
+                                    "example": "ok"
+                                  },
+                                  "lastHealthCheck": {
+                                    "type": "string",
+                                    "description": "The time the health was last updated in UTC.",
+                                    "example": "2021-08-1T10:00:00.000Z"
+                                  },
+                                  "config": {
+                                    "description": "The config of this data integration. Depends on the value of `vendor`.",
+                                    "oneOf": [
+                                      {
+                                        "$ref": "#/paths/~1insights~1dataIntegration/post/requestBody/content/application~1json/schema/properties/dataIntegration/properties/config/oneOf/0"
+                                      }
+                                    ]
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:dataIntegration"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/insights/dataIntegration/{dataIntegrationId}": {
+      "put": {
+        "summary": "Update Data Integration",
+        "description": "Update an existing data integration.\n",
+        "operationId": "updateDataIntegration",
+        "tags": [
+          "Insights Service"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "in": "path",
+            "name": "dataIntegrationId",
+            "example": "di-123abc",
+            "description": "Identifier of the data integration.\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "dataIntegration": {
+                    "type": "object",
+                    "required": [
+                      "vendor"
+                    ],
+                    "properties": {
+                      "vendor": {
+                        "type": "string",
+                        "description": "The vendor for the data integration. This value affects the expected `config`.\n**This value is immutable and must be the same as the existing data integration.**\n",
+                        "enum": [
+                          "s3"
+                        ]
+                      },
+                      "name": {
+                        "description": "The name of the data integration.",
+                        "type": "string",
+                        "example": "my-s3-integration"
+                      },
+                      "status": {
+                        "type": "string",
+                        "description": "Determines if this data integration is on or off.",
+                        "enum": [
+                          "enabled",
+                          "disabled"
+                        ]
+                      },
+                      "config": {
+                        "description": "The config of this data integration. Depends on the value of `vendor`.",
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "title": "S3",
+                            "properties": {
+                              "bucketName": {
+                                "type": "string",
+                                "description": "The name of the bucket to use. Your spot IAM Role policy needs to include s3:putObject permissions for this bucket.\n**Can't be null**.\n",
+                                "example": "mybucket"
+                              },
+                              "subdir": {
+                                "description": "The subdirectory in which your files will be stored within the bucket. Adds the prefix `subdir/` to new objects' keys.\n**Can't be null or contain '/'**.\n",
+                                "type": "string",
+                                "example": "dev"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Update Data Integration Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/insights/dataIntegration/di-123"
+                            },
+                            "method": {
+                              "example": "PUT"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1insights~1dataIntegration/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:dataIntegration"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get Data Integration",
+        "description": "Get an existing data integration.\n",
+        "operationId": "dataIntegrationGet",
+        "tags": [
+          "Insights Service"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1insights~1dataIntegration~1%7BdataIntegrationId%7D/put/parameters/1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get Data Integration Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/insights/dataIntegration/di-123"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1insights~1dataIntegration/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:dataIntegration"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Data Integration",
+        "description": "Delete an existing data integration.\n",
+        "operationId": "dataIntegrationDelete",
+        "tags": [
+          "Insights Service"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1insights~1dataIntegration~1%7BdataIntegrationId%7D/put/parameters/1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Delete Data Integration Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/insights/dataIntegration/di-123"
+                            },
+                            "method": {
+                              "example": "DELETE"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
               }
             }
           },
