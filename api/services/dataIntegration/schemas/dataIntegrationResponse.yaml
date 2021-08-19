@@ -1,0 +1,47 @@
+type: object
+required:
+  - vendor
+  - name
+  - config
+properties:
+  id:
+    type: string
+    description: The identifier of the data integration.
+    example: di-123
+  vendor:
+    type: string
+    description: The vendor for the data integration. This value affects the expected `config`.
+    enum:
+      - s3
+      #- datadog - NOT PUBLISHED YET
+  name:
+    description: The name of the data integration.
+    type: string
+    example: my-s3-integration
+  status:
+    type: string
+    description: Determines if this data integration is on or off.
+    enum:
+      - enabled
+      - disabled
+  health:
+    type: string
+    description: The health of this data integration.
+    example: valid
+  code:
+    type: integer
+    description: The HTTP status code representing the health.
+    example: 200
+  message:
+    type: string
+    description: The message received from the vendor in the last health update.
+    example: ok
+  lastHealthCheck:
+    type: string
+    description: The time the health was last updated in UTC.
+    example: "2021-08-1T10:00:00.000Z"
+  config:
+    description: The config of this data integration. Depends on the value of `vendor`.
+    oneOf:
+      - $ref: './s3DataIntegrationCreate.yaml'
+#      - $ref: './datadogDataIntegration.yaml' NOT PUBLISHED YET
