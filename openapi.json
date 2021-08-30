@@ -33533,6 +33533,207 @@
         }
       }
     },
+    "/ocean/aws/k8s/launchSpec/eksNodeGroup/import": {
+      "summary": "Ocean for EKS",
+      "post": {
+        "summary": "Import EKS Cluster Node Group To Ocean Virtual Node Group",
+        "description": "<ul> <li> Returns an Ocean Virtual Node Group (VNG) configuration based on a given AWS EKS Cluster Node Group.\n     The returned value (\"Imported VNG\") can then be used as input to the Create Virtual Node Group API in order to create an actual VNG in your Ocean cluster.</li>\n<li> Notes: <ul>\n            <li> Make sure to have the necessary permissions in your Spot policy: <b>eks:ListNodegroups, eks:DescribeNodegroup</b>.\n                 <a href=\"https://docs.spot.io/administration/api/spot-policy-in-aws?id=spot-policy-in-aws\">Click here for the full Spot policy.</a></li>\n            <li> <b>Exactly one of region or oceanId must be supplied</b> as query parameters.</li>\n            <ul>\n</li> <ul>\n",
+        "operationId": "oceanEksImportNodeGroupToLaunchSpec",
+        "tags": [
+          "Ocean AWS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "in": "query",
+            "name": "eksClusterName",
+            "example": "MyEksCluster",
+            "description": "Cluster name of the EKS cluster.\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "eksNodeGroupName",
+            "example": "MyEksClusterNodeGroup",
+            "description": "Node group name to import.\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "region",
+            "example": "us-east-1",
+            "description": "Region name of the EKS cluster's node group.\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "oceanId",
+            "example": "o-12345abc",
+            "description": "Identifier of the Ocean cluster.\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "launchSpec": {
+                        "type": "object",
+                        "description": "The object specifying the configuration of the VNG.\n",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "Set launch specification name.\n",
+                            "example": "specialty.nodes.spotk8s.com"
+                          },
+                          "labels": {
+                            "type": "array",
+                            "description": "An array of labels to add to the VNG nodes. Only custom user labels are allowed,\nand not Kubernetes built-in labels or Spot internal labels.\n",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "key": {
+                                  "type": "string",
+                                  "description": "Set label key. \\\nThe following are not allowed:\n* \"kubernetes.io/hostname\"\n* \"failure-domain.beta.kubernetes.io/zone\"\n* \"topology.kubernetes.io/zone\"\n* \"failure-domain.beta.kubernetes.io/region\"\n* \"topology.kubernetes.io/region\"\n* \"beta.kubernetes.io/instance-type\"\n* \"node.kubernetes.io/instance-type\"\n* \"beta.kubernetes.io/os\"\n* \"kubernetes.io/os\"\n* \"beta.kubernetes.io/arch\"\n* \"kubernetes.io/arch\"\n* \"spotinst.io/node-lifecycle\"\n"
+                                },
+                                "value": {
+                                  "type": "string",
+                                  "description": "Set label value.\n"
+                                }
+                              }
+                            },
+                            "example": [
+                              {
+                                "key": "env",
+                                "value": "test"
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ocean Import EKS Cluster Node Group to Launch Spec Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/aws/k8s/launchSpec/eksNodeGroup/import"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "description": "Ocean Import EKS Cluster Node Group to Launch Spec Response.\n",
+                                "properties": {
+                                  "oceanId": {
+                                    "type": "string",
+                                    "example": "o-500a5d5a"
+                                  },
+                                  "name": {
+                                    "type": "string",
+                                    "example": "TestTeam1"
+                                  },
+                                  "imageId": {
+                                    "type": "string",
+                                    "example": "ami-0ce21b51cb55a48b8"
+                                  },
+                                  "securityGroupIds": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string",
+                                      "example": "sg-03ccf232a2bf0f4ea"
+                                    }
+                                  },
+                                  "tags": {
+                                    "type": "array",
+                                    "description": "A maximum of 10 unique key-value pairs for VM tags in the virtual node group.\n",
+                                    "items": {
+                                      "type": "object",
+                                      "required": [
+                                        "tagKey"
+                                      ],
+                                      "properties": {
+                                        "tagKey": {
+                                          "type": "string",
+                                          "description": "Tag key for VMs in the cluster.\n",
+                                          "example": "env"
+                                        },
+                                        "tagValue": {
+                                          "type": "string",
+                                          "description": "Tag value for VMs in the cluster.\n",
+                                          "example": "staging"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "instanceMetadataOptions": {
+                                    "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/launchSpec/properties/instanceMetadataOptions"
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:aws:k8s:launchSpec"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/ocean/onPrem/k8s/cluster": {
       "summary": "Ocean for AWS",
       "post": {
