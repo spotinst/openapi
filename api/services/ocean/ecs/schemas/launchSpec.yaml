@@ -16,17 +16,17 @@ properties:
       oceanId:
         type: string
         description: >
-          The Ocean cluster ID. required for launchSpec create.
+          The Ocean cluster identifier. Required for to create a virtual node group.
         example: "o-1234abcd"
       name:
         type: string
         description: >
-          Set launch specifications name
+          User given name of the virtual node group.
         example: "mySpecLauncher"
       imageId:
         type: string
         description: >
-          Set image ID. Can be null
+          Set image identifier. Can be null.
         example: "img2"
       userData:
         type: string
@@ -37,43 +37,43 @@ properties:
       securityGroupIds:
         type: array
         description: >
-          Set security groups. Each element in array should be security group ID
+          Set security groups. Each element in array should be a security group identifier.
         items:
           type: string
           example: "sg1, sg3"
       instanceTypes:
         type: array
         description: >
-          A array of supported instance types for the Launch Spec
+          An array of supported instance types for the VNG.
         items:
           type: string
           example: "c3.2xlarge, c4.2xlarge"
       subnetIds:
         type: array
         description: >
-          Set subnets in launchSpec. Each element in the array should be a subnet ID.
+          Set the subnets in the VNG. Each element in the array should be a subnet identifier.
         items:
           type: string
           example: "subnet-01234566789abcdef, subnet-9876543210ghijkl"
       iamInstanceProfile:
         type: array
         description: >
-          The instance profile iamRole object
+          The instance profile iamRole object.
         items:
           oneOf:
             - title: 'arn'
               type: string
               description: >
-                The iamRole arn. If set - do not set launchSpec.iamInstanceProfile.name
+                The iamRole ARN. If set, do not set launchSpec.iamInstanceProfile.name
               example: "arn:aws:iam::123456789123:instance-profile"
             - title: 'name'
               type: string
               description: >
-                The iamRole name. If set - do not set launchSpec.iamInstanceProfile.arn
+                The iamRole name. If set, do not set launchSpec.iamInstanceProfile.arn
               example: 'my-iamInstance-Profile'
       attributes:
         description: >
-          Add attributes to cluster
+          Add attributes to the cluster.
         type: array
         items:
           type: object
@@ -83,12 +83,12 @@ properties:
           properties:
             key:
               description: >
-                Set attribute's key.
+                Give the attribute a key.
               type: string
               example: "key1"
             value:
               description: >
-                Set attribute's value.
+                Set the value of the attribute.
               type: string
               example: "value1"
       autoScale:
@@ -96,14 +96,14 @@ properties:
         properties:
           headrooms:
             description: >
-              Set custom headroom per launch spec. provide list of launchSpec.autoscale.headrooms object
+              Set custom headroom per VNG. Provide a list of launchSpec.autoscale.headroom objects.
             type: array
             items:
               type: object
               properties:
                 cpuPerUnit:
                   description: >
-                    Configure the number of CPUs to allocate the headroom. CPUs are denoted in millicores, where 1000 millicores = 1 vCPU
+                    Configure the number of CPUs to allocate the headroom. CPUs are denoted in millicores, where 1000 millicores = 1 vCPU.
                   type: integer
                   example: 1024
                 memoryPerUnit:
@@ -118,7 +118,7 @@ properties:
                   example: 2
       tags:
         description: >
-          List of kay-value pairs of tags
+          List of kay-value pairs of tags.
         type: array
         items:
           type: object
@@ -126,20 +126,20 @@ properties:
             tagKey:
               type: string
               description: >
-                Set the tag key
+                Set the tag key.
               example: "Creator"
             tagValue:
               type: string
               description: >
-                Set the tag value
+                Set the tag value.
               example: "John Doe"
       blockDeviceMappings:
         $ref: "../schemas/launchSpec-blockDeviceMappings.yaml"
       restrictScaleDown:
         type: boolean
         description: >
-          When set to “True”, launch specification container instances will be treated as if all tasks running have the [restrict-scale-down label](https://docs.spot.io/ocean/features/labels-and-taints).
-          Therefore, Ocean will not scale container instances down unless empty.
+          When set to True, the VNG container instances will be treated as if all tasks running have the [restrict-scale-down label](https://docs.spot.io/ocean/features/labels-and-taints).
+          Therefore, Ocean will not scale down container instances unless they are empty.
         example: false
       instanceMetadataOptions:
         $ref: "./oceanInstanceMetadataOptions.yaml"
@@ -153,4 +153,3 @@ properties:
         readOnly: true
         format: date-time
         example: "2019-06-10T15:06:13.000Z"
-

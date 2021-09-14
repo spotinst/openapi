@@ -21,12 +21,12 @@ post:
             roll:
               type: object
               description: >
-                Settings for roll operation
+                Object that specifies the parameters required to initiate a roll (also called a deployment).
               properties:
                batchSizePercentage:
                  type: integer
                  description: >
-                   Value in % to set size of batch in roll. Valid values are 0-100.
+                   Value as a percent to set the size of a batch in a roll. Valid values are 0-100.
                  example: 20
                comment:
                  description: >
@@ -35,7 +35,7 @@ post:
                  example: "This is why I deployed my cluster."
                launchSpecIds:
                  type: array
-                 description: List of launch specification IDs to be rolled. Each ID is a string. LaunchSpecIds can be null, and cannot be used together with instanceIds.
+                 description: List of virtual node group identifiers to be rolled. Each identifier is a string. LaunchSpecIds can be null, and cannot be used together with instanceIds.
                  items:
                    type: string
                    example:
@@ -45,16 +45,22 @@ post:
                  type: boolean
                  example: true
                  description: >
-                   When set to True and launch spec IDs are defined to roll, the specified launch spec(s) will be blocked from scaling up. (Replacements will scale up in other launch specs that match the displaced pods instead.) This is meant for different use cases of 'migrating' nodes from one launch spec to another.
+                   When set to True and virtual node group identifiers are defined to roll, the specified launch spec(s) will be blocked from scaling up. (Replacements will scale up in other launch specs that match the displaced pods instead.) This is meant for different use cases of 'migrating' nodes from one launch spec to another.
                instanceIds:
                  type: array
                  description: >
-                   List of instance IDs to be rolled. Each ID is a string. InstanceIds can be null, and cannot be used together with launchSpecIds.
+                   List of instance identifiers to be rolled. Each identifier is a string. InstanceIds can be null, and cannot be used together with launchSpecIds.
                  items:
                    type: string
                    example:
                      - i-0003a99ffb566f039
                      - i-0567a99ffb566f765
+               respectPdb:
+                 type: boolean
+                 example: true
+                 default: false
+                 description: >
+                   During the roll, if the parameter is set to True we honor PDB during the instance replacement.
   responses:
     200:
       $ref: "../responses/initiate-clusterRoll.yaml"

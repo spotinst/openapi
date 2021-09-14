@@ -4,6 +4,8 @@ required:
 properties:
   cluster:
     type: object
+    description: >
+      The object specifying the configuration of the Ocean cluster.
     title: AWS Cluster
     required:
       - name
@@ -28,21 +30,21 @@ properties:
       autoScaler:
         type: object
         title: auto-scaler
-        description: The Ocean Kubernetes Autoscaler.
+        description: The automatic scaling mechanism used in Ocean for Kubernetes.
         properties:
           isEnabled:
             type: boolean
-            description: Enable the Ocean Kubernetes Autoscaler.
+            description: Enable the Ocean Kubernetes autoscaler.
             default: true
             example: true
           cooldown:
             type: integer
-            description: Cooldown period (in seconds) between scaling down actions.
+            description: A period of time (in seconds) that Ocean waits from the end of a scaling action until starting another scaling action.
             default: null
             example: 180
           resourceLimits:
             type: object
-            description: Optionally set upper and lower bounds on the resource usage of the cluster.
+            description: Option to set upper and lower bounds on the resource usage of the cluster.
             properties:
               maxMemoryGib:
                 type: integer
@@ -54,11 +56,11 @@ properties:
                 example: 750
           down:
             type: object
-            description: Auto Scaling scale down operations.
+            description: Autoscaling scale down operations.
             properties:
               maxScaleDownPercentage:
                 type: integer
-                description: Represents the maximum % to scale-down. Number between 1-100.
+                description: Represents the maximum percent of your instances to scale down in a single scale-down action. Number between 1-100.
                 example: 60
           headroom:
             type: object
@@ -66,11 +68,11 @@ properties:
             properties:
               cpuPerUnit:
                 type: integer
-                description: Optionally configure the number of CPUs to allocate the headroom. CPUs are denoted in millicores, where 1000 millicores = 1 vCPU.
+                description: Option to configure the number of CPUs to allocate the headroom. CPUs are denoted in millicores, where 1000 millicores = 1 vCPU.
                 example: 2000
               memoryPerUnit:
                 type: integer
-                description: Optionally configure the amount of memory (MiB) to allocate the headroom.
+                description: Option to configure the amount of memory (MiB) to allocate the headroom.
                 example: 0
               gpuPerUnit:
                 type: integer
@@ -87,18 +89,24 @@ properties:
             example: false
           autoHeadroomPercentage:
             type: integer
-            description: Optionally set the auto headroom percentage. Set a number between 0-200 to control the headroom % from the cluster. Relevant when isAutoConfig=true.
+            description: Dynamic (automatic) buffer of spare capacity, i.e., vCPU, memory, and GPU resources. Expressed as a percent of the overall cluster capacity with valid values from 0-200. Optional. Relevant when isAutoConfig=true.
             example: null
+          enableAutomaticAndManualHeadroom:
+            type: boolean
+            description: >
+              When set to true, both automatic and per-VNG manual headroom to be saved concurrently and independently in the cluster.
+              prerequisite: isAutoConfig must be true
+            example: true
       capacity:
         type: object
         title: Capacity Units
-        description: Capacity specifications for the Ocean cluster.
+        description: The overall capability of the Ocean cluster expressed as number of instances and specified with a minimum, a maximum, and a target number of running instances.
         properties:
           minimum:
             type: integer
             example: 0
             description: >
-              The bottom limit of instances that the cluster can scale down to.
+              The lower limit of instances that the cluster can scale down to.
           maximum:
             type: integer
             default: 1000
@@ -118,3 +126,5 @@ properties:
         $ref: "../schemas/ocean-security.yaml"
       compute:
         $ref: "../schemas/ocean-compute.yaml"
+      logging:
+        $ref: "../../commons/schemas/logging.yaml"
