@@ -44862,6 +44862,577 @@
         }
       }
     },
+    "/ocean/azure/k8s/cluster/{oceanClusterId}/roll": {
+      "summary": "Ocean for AKS",
+      "post": {
+        "summary": "Initiate Roll",
+        "description": "Roll an entire Ocean cluster or roll subsets of the cluster by specifying virtualNodeGroupIds or vmNames. Performing this request will start the roll immediately and run it in defined batches.\nNote that the first response for a successful request will indicate the start of a roll. In order to check the status of a roll, you can use the GET Roll API.\n",
+        "operationId": "oceanAzureRollInit",
+        "tags": [
+          "Ocean AKS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "title": "Roll the entire cluster",
+                    "required": [
+                      "roll"
+                    ],
+                    "properties": {
+                      "roll": {
+                        "type": "object",
+                        "description": "Object that specifies the parameters required to initiate a roll (also called a deployment).\n",
+                        "properties": {
+                          "batchSizePercentage": {
+                            "type": "integer",
+                            "description": "The size of a batch in a roll, in percentage. Valid values are 0-100.\n",
+                            "example": 25
+                          },
+                          "comment": {
+                            "description": "Add a comment description for the roll. The comment is limited to 256 characters.\n",
+                            "type": "string",
+                            "example": "This is why I deployed my cluster."
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "title": "Roll specific VMs in the cluster",
+                    "required": [
+                      "roll"
+                    ],
+                    "properties": {
+                      "roll": {
+                        "type": "object",
+                        "description": "Object that specifies the parameters required to initiate a roll (also called a deployment).\n",
+                        "properties": {
+                          "batchSizePercentage": {
+                            "type": "integer",
+                            "description": "The size of a batch in a roll, in percentage. Valid values are 0-100.\n",
+                            "example": 25
+                          },
+                          "comment": {
+                            "description": "Add a comment description for the roll. The comment is limited to 256 characters.\n",
+                            "type": "string",
+                            "example": "This is why I deployed my cluster."
+                          },
+                          "vmNames": {
+                            "type": "array",
+                            "description": "List of vm identifiers to be rolled. Each identifier is a string. vmNames can be null, and cannot be used together with virtualNodeGroupIds.\n",
+                            "items": {
+                              "type": "string"
+                            },
+                            "example": [
+                              "vm-8f42d8217593",
+                              "vm-5da87fb0bd21",
+                              "vm-1e50f9fabf2f",
+                              "vm-9597db5ae6fe"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "title": "Roll specific Virtual Node Groups in the cluster",
+                    "required": [
+                      "roll"
+                    ],
+                    "properties": {
+                      "roll": {
+                        "type": "object",
+                        "description": "Object that specifies the parameters required to initiate a roll (also called a deployment).\n",
+                        "properties": {
+                          "batchSizePercentage": {
+                            "type": "integer",
+                            "description": "The size of a batch in a roll, in percentage. Valid values are 0-100.\n",
+                            "example": 25
+                          },
+                          "comment": {
+                            "description": "Add a comment description for the roll. The comment is limited to 256 characters.\n",
+                            "type": "string",
+                            "example": "This is why I deployed my cluster."
+                          },
+                          "virtualNodeGroupIds": {
+                            "type": "array",
+                            "description": "List of virtual node group identifiers to be rolled. Each identifier is a string. virtualNodeGroupIds can be null, and cannot be used together with vmNames.",
+                            "items": {
+                              "type": "string"
+                            },
+                            "example": [
+                              "vng-0950f269",
+                              "vng-0a8bc62a"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ocean AKS Create Cluster Roll Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/azure/k8s/cluster/o-12345abc/roll"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1azure~1k8s~1cluster~1%7BoceanClusterId%7D~1roll/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:azure:k8s:cluster:roll"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "get": {
+        "summary": "List Rolls",
+        "description": "Get status for all rolls of an Ocean cluster.\n",
+        "operationId": "oceanAzureRollList",
+        "tags": [
+          "Ocean AKS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean AKS List Cluster Rolls Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/azure/k8s/cluster/o-12345abc/roll"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string",
+                                    "description": "The identifier of the cluster roll.\n",
+                                    "example": "acr-5aaf854e"
+                                  },
+                                  "oceanId": {
+                                    "type": "string",
+                                    "description": "The identifier of the ocean cluster being rolled.\n",
+                                    "example": "o-12e31234"
+                                  },
+                                  "status": {
+                                    "type": "string",
+                                    "description": "The status of the roll.\n",
+                                    "enum": [
+                                      "IN_PROGRESS",
+                                      "COMPLETED",
+                                      "FAILED",
+                                      "STOPPED"
+                                    ],
+                                    "example": "IN_PROGRESS"
+                                  },
+                                  "currentBatch": {
+                                    "type": "integer",
+                                    "description": "The current batch being handled by the roll.\n",
+                                    "example": 2
+                                  },
+                                  "numOfBatches": {
+                                    "type": "integer",
+                                    "description": "The total number of batches in the roll.\n",
+                                    "example": 4
+                                  },
+                                  "comment": {
+                                    "type": "string",
+                                    "description": "A comment description for the roll.\n",
+                                    "example": "This is why I deployed my cluster."
+                                  },
+                                  "progress": {
+                                    "type": "object",
+                                    "description": "An object reflecting the progression of the roll.\n",
+                                    "properties": {
+                                      "unit": {
+                                        "type": "string",
+                                        "description": "The unit of the value field.\n",
+                                        "example": "percentage"
+                                      },
+                                      "value": {
+                                        "type": "integer",
+                                        "description": "The progress of the roll, in the units defined by the 'unit' field.\n",
+                                        "example": 25
+                                      },
+                                      "detailedStatus": {
+                                        "type": "object",
+                                        "description": "An object containing detailed information about the progress of the roll.\n",
+                                        "properties": {
+                                          "oldVms": {
+                                            "type": "array",
+                                            "description": "An array of objects containing detailed information about each VM handled by the roll.\n",
+                                            "items": {
+                                              "type": "object",
+                                              "properties": {
+                                                "vmName": {
+                                                  "type": "string",
+                                                  "description": "The identifier of the VM.\n"
+                                                },
+                                                "status": {
+                                                  "type": "string",
+                                                  "description": "The status of the VM according to the roll.\n",
+                                                  "enum": [
+                                                    "REPLACED",
+                                                    "TO_BE_REPLACED",
+                                                    "COULD_NOT_BE_REPLACED"
+                                                  ]
+                                                }
+                                              }
+                                            },
+                                            "example": [
+                                              {
+                                                "vmName": "vm-8f42d8217593",
+                                                "status": "REPLACED"
+                                              },
+                                              {
+                                                "vmName": "vm-5da87fb0bd21",
+                                                "status": "COULD_NOT_BE_REPLACED"
+                                              },
+                                              {
+                                                "vmName": "vm-1e50f9fabf2f",
+                                                "status": "TO_BE_REPLACED"
+                                              },
+                                              {
+                                                "vmName": "vm-9597db5ae6fe",
+                                                "status": "TO_BE_REPLACED"
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "vmNames": {
+                                    "type": "array",
+                                    "description": "A list of VM identifiers participating in the roll.\n",
+                                    "items": {
+                                      "type": "string"
+                                    },
+                                    "example": [
+                                      "vm-8f42d8217593",
+                                      "vm-5da87fb0bd21",
+                                      "vm-1e50f9fabf2f",
+                                      "vm-9597db5ae6fe"
+                                    ]
+                                  },
+                                  "virtualNodeGroupIds": {
+                                    "type": "array",
+                                    "description": "A list of virtual node group identifiers participating in the roll.\n",
+                                    "items": {
+                                      "type": "string"
+                                    },
+                                    "example": [
+                                      "vng-0950f269",
+                                      "vng-0a8bc62a"
+                                    ]
+                                  },
+                                  "createdAt": {
+                                    "type": "string",
+                                    "description": "The creation timestamp of the roll.\n",
+                                    "example": "2019-03-24T15:46:09.000Z"
+                                  },
+                                  "updatedAt": {
+                                    "type": "string",
+                                    "description": "The latest update timestamp of the roll.\n",
+                                    "example": "2019-03-24T15:46:09.000Z"
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:azure:k8s:cluster:roll"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/azure/k8s/cluster/{oceanClusterId}/roll/{clusterRollId}": {
+      "summary": "Ocean for AKS",
+      "put": {
+        "summary": "Update Roll",
+        "description": "Update a roll of an Ocean cluster.\n\n*Performing the request will stop the next batch in a roll.*\n",
+        "operationId": "oceanAzureRollUpdate",
+        "tags": [
+          "Ocean AKS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          },
+          {
+            "in": "path",
+            "name": "clusterRollId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "acr-12345abc",
+            "description": "Ocean cluster roll identifier.\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "roll"
+                    ],
+                    "properties": {
+                      "roll": {
+                        "type": "object",
+                        "description": "Object that specifies the roll parameters to update.\n",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "STOPPED"
+                            ],
+                            "description": "Set roll status. The only valid value is \"STOPPED\".\n",
+                            "example": "STOPPED"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ocean AKS Create Cluster Roll Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/azure/k8s/cluster/o-12345abc/roll/acr-12345abc"
+                            },
+                            "method": {
+                              "example": "PUT"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "allOf": [
+                                  {
+                                    "$ref": "#/paths/~1ocean~1azure~1k8s~1cluster~1%7BoceanClusterId%7D~1roll/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items"
+                                  },
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "status": {
+                                        "example": "STOPPED"
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:azure:k8s:cluster:roll"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get Roll",
+        "description": "Get status for a specific roll of an Ocean cluster.\n",
+        "operationId": "oceanAzureRollGetSingleRoll",
+        "tags": [
+          "Ocean AKS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1azure~1k8s~1cluster~1%7BoceanClusterId%7D~1roll~1%7BclusterRollId%7D/put/parameters/2"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean AKS Get Cluster Roll Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/azure/k8s/cluster/o-12345abc/roll/acr-12345abc"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1azure~1k8s~1cluster~1%7BoceanClusterId%7D~1roll/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:azure:k8s:cluster:roll"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/ocean/azure/k8s/cluster/aks/import/{acdIdentifier}": {
       "post": {
         "summary": "Import Cluster",
