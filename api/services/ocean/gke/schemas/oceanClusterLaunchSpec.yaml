@@ -1,176 +1,186 @@
 type: object
+description: |
+  AWS Cluster Virtual Node Group (VNG).
+required:
+  - oceanId
+  - sourceImage
 properties:
-  launchSpec:
-    type: object
-    title: GKE Cluster
+  oceanId:
+    type: string
+    example: "o-1fff54ed"
+    description: >
+      The Ocean cluster identifier. Required to create the virtual node group.
+  name:
+    type: string
+    example: "lp_name"
+    description: >
+      Set the name for the virtual node group.
+  sourceImage:
+    type: string
+    example: "https://www.googleapis.com/compute/v1/projects/gke-node-images/global/images/container-v1-3-v20160517"
+    description: >
+      Set the image URL. Can be null.
+  serviceAccount:
+    type: string
+    example: 265168459660-compute@developer.gserviceaccount.com
+    description: >
+      The account used by applications running on the VM to call GCP APIs.
+  rootVolumeSize:
+    type: integer
+    description: Set root volume size (in GB).
+    example: 8
+  rootVolumeType:
+    type: string
+    description: Set the root volume disk type.
+    example: "pd-standard"
+    enum: [pd-standard, pd-ssd]
+  metadata:
+    type: array
     required:
-      - oceanId
-      - sourceImage
-    properties:
-      oceanId:
-        type: string
-        example: "o-1fff54ed"
-        description: >
-          The Ocean cluster identifier. Required to create the virtual node group.
-      name:
-        type: string
-        example: "lp_name"
-        description: >
-          Set the name for the virtual node group.
-      sourceImage:
-        type: string
-        example: "https://www.googleapis.com/compute/v1/projects/gke-node-images/global/images/container-v1-3-v20160517"
-        description: >
-          Set the image URL. Can be null.
-      serviceAccount:
-        type: string
-        example: 265168459660-compute@developer.gserviceaccount.com
-        description: >
-          The account used by applications running on the VM to call GCP APIs.
-      rootVolumeSize:
-        type: integer
-        description: Set root volume size (in GB).
-        example: 8
-      rootVolumeType:
-        type: string
-        description: Set the root volume disk type.
-        example: "pd-standard"
-        enum: [pd-standard, pd-ssd]
-      metadata:
-        type: array
-        required:
-          - key
-          - value
-        description: >
-          Add metadata to the cluster.
-        items:
-          type: object
-          properties:
-            key:
-              type: string
-              description: Set the metadata key. Required for launchSpec.metadata.
-              example: "key1"
-            value:
-              type: string
-              description: Set the metadata name. Required for launchSpec.metadata.
-              example: "value1"
-        example:
-          - key: "key1"
-            value: "value1"
-          - key: "key2"
-            value: "value2"
-      instanceTypes:
-        type: array
-        description: >
-          An array of supported machine types for the virtual node group. Can be null.
-        items:
+      - key
+      - value
+    description: >
+      Add metadata to the cluster.
+    items:
+      type: object
+      properties:
+        key:
           type: string
-          example: "n1-standard-1, n1-standard-2"
-      taints:
+          description: Set the metadata key. Required for launchSpec.metadata.
+          example: "key1"
+        value:
+          type: string
+          description: Set the metadata name. Required for launchSpec.metadata.
+          example: "value1"
+    example:
+      - key: "key1"
+        value: "value1"
+      - key: "key2"
+        value: "value2"
+  instanceTypes:
+    type: array
+    description: >
+      An array of supported machine types for the virtual node group. Can be null.
+    items:
+      type: string
+      example: "n1-standard-1, n1-standard-2"
+  taints:
+    type: array
+    description: Add taints to the virtual node group.
+    items:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Set taint key.
+        value:
+          type: string
+          description: Set taint value.
+        effect:
+          type: string
+          description: Set taint effect.
+    example:
+      - key: taintKey
+        value: taintValue
+        effect: NoSchedule
+  labels:
+    type: array
+    description: 'An array of labels to add to the virtual node group. Only custom user labels are allowed, and not Kubernetes built-in labels or Spot internal labels.'
+    items:
+      type: object
+      properties:
+        key:
+          type: string
+          description: |
+            Set label key.\
+            The following are not allowed:
+            * "kubernetes.io/hostname"
+            * "failure-domain.beta.kubernetes.io/zone"
+            * "topology.kubernetes.io/zone"
+            * "failure-domain.beta.kubernetes.io/region"
+            * "topology.kubernetes.io/region"
+            * "beta.kubernetes.io/instance-type"
+            * "node.kubernetes.io/instance-type"
+            * "beta.kubernetes.io/os"
+            * "kubernetes.io/os"
+            * "beta.kubernetes.io/arch"
+            * "kubernetes.io/arch"
+            * "spotinst.io/node-lifecycle"
+            * "spotinst.io/gpu-type"
+        value:
+          type: string
+          description: Set label value.
+    example:
+      - key: "env"
+        value: "test"
+  autoScale:
+    type: object
+    properties:
+      headrooms:
         type: array
-        description: Add taints to the virtual node group.
+        description: >
+          Set custom headroom per virtual node group. Provide a list of launchSpec.autoScale.headroom objects.
         items:
           type: object
           properties:
-            key:
-              type: string
-              description: Set taint key.
-            value:
-              type: string
-              description: Set taint value.
-            effect:
-              type: string
-              description: Set taint effect.
-        example:
-          - key: taintKey
-            value: taintValue
-            effect: NoSchedule
-      labels:
-        type: array
-        description: 'An array of labels to add to the virtual node group. Only custom user labels are allowed, and not Kubernetes built-in labels or Spot internal labels.'
-        items:
-          type: object
-          properties:
-            key:
-              type: string
-              description: |
-                Set label key.\
-                The following are not allowed:
-                * "kubernetes.io/hostname"
-                * "failure-domain.beta.kubernetes.io/zone"
-                * "topology.kubernetes.io/zone"
-                * "failure-domain.beta.kubernetes.io/region"
-                * "topology.kubernetes.io/region"
-                * "beta.kubernetes.io/instance-type"
-                * "node.kubernetes.io/instance-type"
-                * "beta.kubernetes.io/os"
-                * "kubernetes.io/os"
-                * "beta.kubernetes.io/arch"
-                * "kubernetes.io/arch"
-                * "spotinst.io/node-lifecycle"
-                * "spotinst.io/gpu-type"
-            value:
-              type: string
-              description: Set label value.
-        example:
-          - key: "env"
-            value: "test"
-      autoScale:
-        type: object
-        properties:
-          headrooms:
-            type: array
-            description: >
-              Set custom headroom per virtual node group. Provide a list of launchSpec.autoScale.headroom objects.
-            items:
-              type: object
-              properties:
-                cpuPerUnit:
-                  type: integer
-                  description: >
-                    Configure the number of CPUs to allocate the headroom.
-                    CPUs are denoted in millicores, where 1000 millicores = 1 vCPU.
-                  example: 1000
-                memoryPerUnit:
-                  type: integer
-                  description: >
-                    Configure the amount of memory (MiB) to allocate the headroom.
-                  example: 2048
-                gpuPerUnit:
-                  type: integer
-                  description: >
-                    The amount of GPU to allocate per headroom unit.
-                  example: 0
-                numOfUnits:
-                  type: integer
-                  description: >
-                    The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.
-                  example: 3
-      resourceLimits:
-        type: object
-        properties:
-          maxInstanceCount:
-            description: >
-              Option to set a maximum number of instances per virtual node group.
-              Can be null.
-              If set, the value must be greater than or equal to 0.
-            type: integer
-            example: 5
-          minInstanceCount:
-            description: |
-              Option to set a minimum number of instances per virtual node group.\
-              Can be null. If set, value must be greater than or equal to 0.
-            type: integer
-            example: 2
-      restrictScaleDown:
-        type: boolean
+            cpuPerUnit:
+              type: integer
+              description: >
+                Configure the number of CPUs to allocate the headroom.
+                CPUs are denoted in millicores, where 1000 millicores = 1 vCPU.
+              example: 1000
+            memoryPerUnit:
+              type: integer
+              description: >
+                Configure the amount of memory (MiB) to allocate the headroom.
+              example: 2048
+            gpuPerUnit:
+              type: integer
+              description: >
+                The amount of GPU to allocate per headroom unit.
+              example: 0
+            numOfUnits:
+              type: integer
+              description: >
+                The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.
+              example: 3
+  resourceLimits:
+    type: object
+    properties:
+      maxInstanceCount:
+        description: >
+          Option to set a maximum number of instances per virtual node group.
+          Can be null.
+          If set, the value must be greater than or equal to 0.
+        type: integer
+        example: 5
+      minInstanceCount:
         description: |
-          When set to True, VNG nodes will be treated as if all pods running have the [restrict-scale-down label](https://docs.spot.io/ocean/features/labels-and-taints).
-          Therefore, Ocean will not scale nodes down unless they are empty.
-        example: false
-      shieldedInstanceConfig:
-        $ref: "./oceanShieldedInstanceConfig.yaml"
-      strategy:
-        $ref: "./oceanLaunchSpecStrategy.yaml"
-      storage:
-        $ref: "./oceanLaunchSpecStorage.yaml"
+          Option to set a minimum number of instances per virtual node group.\
+          Can be null. If set, value must be greater than or equal to 0.
+        type: integer
+        example: 2
+  restrictScaleDown:
+    type: boolean
+    description: |
+      When set to True, VNG nodes will be treated as if all pods running have the [restrict-scale-down label](https://docs.spot.io/ocean/features/labels-and-taints).
+      Therefore, Ocean will not scale nodes down unless they are empty.
+    example: false
+  shieldedInstanceConfig:
+    $ref: "./oceanShieldedInstanceConfig.yaml"
+  strategy:
+    $ref: "./oceanLaunchSpecStrategy.yaml"
+  storage:
+    $ref: "./oceanLaunchSpecStorage.yaml"
+  scheduling:
+    $ref: "./ocean-launch-spec-scheduling.yaml"
+  createdAt:
+    type: string
+    readOnly: true
+    format: date-time
+    example: "2019-06-03T08:13:08.000Z"
+  updatedAt:
+    type: string
+    readOnly: true
+    format: date-time
+    example: "2019-06-10T15:06:13.000Z"
