@@ -28110,6 +28110,7 @@
                     "properties": {
                       "launchSpec": {
                         "type": "object",
+                        "description": "AWS Cluster Virtual Node Group (VNG).\n",
                         "required": [
                           "oceanId",
                           "name",
@@ -28368,6 +28369,87 @@
                               }
                             }
                           },
+                          "scheduling": {
+                            "type": "object",
+                            "description": "An object used to define scheduled tasks such as a manual headroom update.\n",
+                            "title": "Ocean Scheduling",
+                            "properties": {
+                              "tasks": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "title": "Task Definition",
+                                  "required": [
+                                    "isEnabled",
+                                    "cronExpression",
+                                    "taskType"
+                                  ],
+                                  "properties": {
+                                    "isEnabled": {
+                                      "type": "boolean",
+                                      "example": true,
+                                      "description": "Describes whether the task is enabled. When True, the task runs. When False, it does not run. Required for launchSpec.scheduling.tasks.\n"
+                                    },
+                                    "cronExpression": {
+                                      "type": "string",
+                                      "example": "0 1 * * *",
+                                      "description": "A valid cron expression. For example : \" * * * * * \". The cron job runs in UTC time and is in Unix cron format. (See the Cron Expression Validator Script.)\n"
+                                    },
+                                    "taskType": {
+                                      "type": "string",
+                                      "example": "manualHeadroomUpdate",
+                                      "enum": [
+                                        "manualHeadroomUpdate"
+                                      ],
+                                      "description": "The activity that you are scheduling. Valid values: \"manualHeadroomUpdate\". Required for launchSpec.scheduling.tasks.\n"
+                                    },
+                                    "config": {
+                                      "description": "The config of this scheduled task. Depends on the value of `taskType`.",
+                                      "oneOf": [
+                                        {
+                                          "type": "object",
+                                          "title": "manualHeadroomUpdate",
+                                          "required": [
+                                            "headrooms"
+                                          ],
+                                          "properties": {
+                                            "headrooms": {
+                                              "description": "Set custom headroom per VNG. Provide a list of launchSpec.autoscale.headroom objects.\n",
+                                              "type": "array",
+                                              "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                  "cpuPerUnit": {
+                                                    "description": "Configure the number of CPUs to allocate the headroom. CPUs are denoted in millicores, where 1000 millicores = 1 vCPU.\n",
+                                                    "type": "integer"
+                                                  },
+                                                  "memoryPerUnit": {
+                                                    "description": "Configure the amount of memory (MiB) to allocate the headroom.\n",
+                                                    "type": "integer"
+                                                  },
+                                                  "numOfUnits": {
+                                                    "description": "The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.\n",
+                                                    "type": "integer"
+                                                  }
+                                                }
+                                              },
+                                              "example": [
+                                                {
+                                                  "cpuPerUnit": 1024,
+                                                  "memoryPerUnit": 512,
+                                                  "numOfUnits": 2
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
                           "createdAt": {
                             "type": "string",
                             "readOnly": true,
@@ -28391,7 +28473,48 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec/get/responses/200"
+            "description": "Ocean Launch Spec Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/aws/ecs/launchSpec"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/launchSpec"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:aws:ecs:launchSpec"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -28399,7 +28522,7 @@
         }
       },
       "get": {
-        "summary": "List Launch Specs",
+        "summary": "List VNGs",
         "description": "Get all the custom VNGs for all Ocean clusters in the specified account.\n",
         "operationId": "OceanECSLaunchSpecList",
         "tags": [
@@ -28412,7 +28535,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Ocean ECS VNG Response",
+            "description": "Ocean Launch Spec Response",
             "content": {
               "application/json": {
                 "schema": {
@@ -28423,21 +28546,28 @@
                     {
                       "type": "object",
                       "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/aws/ecs/launchSpec"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
                         "response": {
                           "type": "object",
                           "properties": {
                             "items": {
                               "type": "array",
                               "items": {
-                                "allOf": [
-                                  {
-                                    "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec/post/requestBody/content/application~1json/schema/allOf/0"
-                                  }
-                                ]
+                                "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/launchSpec"
                               }
                             },
                             "kind": {
-                              "example": "spotinst:ocean:aws:ecs"
+                              "example": "spotinst:ocean:aws:ecs:launchSpec"
                             }
                           }
                         }
@@ -28478,7 +28608,48 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec/get/responses/200"
+            "description": "Ocean Launch Spec Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/aws/ecs/launchSpec/ols-12345abc"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/launchSpec"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:aws:ecs:launchSpec"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -28512,7 +28683,34 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec/get/responses/200"
+            "description": "Ocean Launch Specification Delete Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/aws/ecs/launchSpec/ols-12345abc"
+                            },
+                            "method": {
+                              "example": "DELETE"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -28552,7 +28750,48 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec/get/responses/200"
+            "description": "Ocean Launch Spec Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/aws/ecs/launchSpec/ols-12345abc"
+                            },
+                            "method": {
+                              "example": "PUT"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1aws~1ecs~1launchSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/launchSpec"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:aws:ecs:launchSpec"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -33587,6 +33826,92 @@
                         "type": "boolean",
                         "description": "When set to “True”, VNG nodes will be treated as if all pods running have the [restrict-scale-down label](https://docs.spot.io/ocean/features/labels-and-taints).\nTherefore, Ocean will not scale nodes down unless empty.\n",
                         "example": false
+                      },
+                      "scheduling": {
+                        "type": "object",
+                        "description": "An object used to define scheduled tasks such as a manual headroom update.\n",
+                        "title": "Ocean Scheduling",
+                        "properties": {
+                          "tasks": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "title": "Task Definition",
+                              "required": [
+                                "isEnabled",
+                                "cronExpression",
+                                "taskType"
+                              ],
+                              "properties": {
+                                "isEnabled": {
+                                  "type": "boolean",
+                                  "example": true,
+                                  "description": "Describes whether the task is enabled. When True, the task runs. When False, it does not run. Required for launchSpec.scheduling.tasks.\n"
+                                },
+                                "cronExpression": {
+                                  "type": "string",
+                                  "example": "0 1 * * *",
+                                  "description": "A valid cron expression. For example : \" * * * * * \". The cron job runs in UTC time and is in Unix cron format. (See the Cron Expression Validator Script.)\n"
+                                },
+                                "taskType": {
+                                  "type": "string",
+                                  "example": "manualHeadroomUpdate",
+                                  "enum": [
+                                    "manualHeadroomUpdate"
+                                  ],
+                                  "description": "The activity that you are scheduling. Valid values: \"manualHeadroomUpdate\". Required for launchSpec.scheduling.tasks.\n"
+                                },
+                                "config": {
+                                  "description": "The config of this scheduled task. Depends on the value of `taskType`.",
+                                  "oneOf": [
+                                    {
+                                      "type": "object",
+                                      "title": "manualHeadroomUpdate",
+                                      "required": [
+                                        "headrooms"
+                                      ],
+                                      "properties": {
+                                        "headrooms": {
+                                          "description": "Set custom headroom per VNG. Provide a list of launchSpec.autoscale.headroom objects.\n",
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "cpuPerUnit": {
+                                                "description": "Configure the number of CPUs to allocate the headroom. CPUs are denoted in millicores, where 1000 millicores = 1 vCPU.\n",
+                                                "type": "integer"
+                                              },
+                                              "memoryPerUnit": {
+                                                "description": "Configure the amount of memory (MiB) to allocate the headroom.\n",
+                                                "type": "integer"
+                                              },
+                                              "numOfUnits": {
+                                                "description": "The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.\n",
+                                                "type": "integer"
+                                              },
+                                              "gpuPerUnit": {
+                                                "type": "integer",
+                                                "description": "Amont of GPU to allocate for headroom unit.\n"
+                                              }
+                                            }
+                                          },
+                                          "example": [
+                                            {
+                                              "cpuPerUnit": 1024,
+                                              "memoryPerUnit": 512,
+                                              "numOfUnits": 2,
+                                              "gpuPerUnit": 1
+                                            }
+                                          ]
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        }
                       },
                       "instanceMetadataOptions": {
                         "type": "object",
@@ -42911,10 +43236,13 @@
                 "allOf": [
                   {
                     "type": "object",
+                    "required": [
+                      "launchSpec"
+                    ],
                     "properties": {
                       "launchSpec": {
                         "type": "object",
-                        "title": "GKE Cluster",
+                        "description": "AWS Cluster Virtual Node Group (VNG).\n",
                         "required": [
                           "oceanId",
                           "sourceImage"
@@ -43108,6 +43436,21 @@
                           },
                           "storage": {
                             "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec~1%7BoceanLaunchSpecId%7D/put/requestBody/content/application~1json/schema/properties/launchSpec/properties/storage"
+                          },
+                          "scheduling": {
+                            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec~1%7BoceanLaunchSpecId%7D/put/requestBody/content/application~1json/schema/properties/launchSpec/properties/scheduling"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "readOnly": true,
+                            "format": "date-time",
+                            "example": "2019-06-03T08:13:08.000Z"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "readOnly": true,
+                            "format": "date-time",
+                            "example": "2019-06-10T15:06:13.000Z"
                           }
                         }
                       }
@@ -43120,7 +43463,48 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/get/responses/200"
+            "description": "Ocean Launch Spec Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/gcp/k8s/launchSpec"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/launchSpec"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:gcp:k8s:launchSpec"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -43143,7 +43527,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Ocean Response",
+            "description": "Ocean Launch Spec Response",
             "content": {
               "application/json": {
                 "schema": {
@@ -43154,33 +43538,28 @@
                     {
                       "type": "object",
                       "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/gcp/k8s/launchSpec"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
                         "response": {
                           "type": "object",
-                          "description": "Response body.\n",
                           "properties": {
                             "items": {
                               "type": "array",
                               "items": {
-                                "type": "object",
-                                "allOf": [
-                                  {
-                                    "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/post/requestBody/content/application~1json/schema/allOf/0"
-                                  },
-                                  {
-                                    "type": "object",
-                                    "properties": {
-                                      "createdAt": {
-                                        "type": "string",
-                                        "example": "2018-11-05T12:55:50.000+0000"
-                                      },
-                                      "updatedAt": {
-                                        "type": "string",
-                                        "example": "2018-11-05T12:58:15.000+0000"
-                                      }
-                                    }
-                                  }
-                                ]
+                                "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/launchSpec"
                               }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:gcp:k8s:launchSpec"
                             }
                           }
                         }
@@ -43219,52 +43598,31 @@
         ],
         "responses": {
           "200": {
-            "description": "Delete VNG Response",
+            "description": "Ocean Launch Specification Delete Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "request": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "string",
-                          "example": "a608777a-a1c5-4f34-b30b-3f7355e3926b"
-                        },
-                        "url": {
-                          "type": "string",
-                          "example": "/ocean/aws/k8s/cluster/o-12we32df?accountId=act-7461123d"
-                        },
-                        "method": {
-                          "type": "string",
-                          "example": "DELETE"
-                        },
-                        "timestamp": {
-                          "type": "string",
-                          "example": "2019-06-18T07:59:45.892Z"
-                        }
-                      }
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
                     },
-                    "response": {
+                    {
                       "type": "object",
                       "properties": {
-                        "status": {
+                        "request": {
                           "type": "object",
                           "properties": {
-                            "code": {
-                              "type": "integer",
-                              "example": 200
+                            "url": {
+                              "example": "/ocean/gcp/k8s/launchSpec/ols-12345abc"
                             },
-                            "message": {
-                              "type": "string",
-                              "example": "OK"
+                            "method": {
+                              "example": "DELETE"
                             }
                           }
                         }
                       }
                     }
-                  }
+                  ]
                 }
               }
             }
@@ -43506,6 +43864,92 @@
                             "example": 2
                           }
                         }
+                      },
+                      "scheduling": {
+                        "type": "object",
+                        "description": "An object used to define scheduled tasks such as a manual headroom update.\n",
+                        "title": "Ocean Scheduling",
+                        "properties": {
+                          "tasks": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "title": "Task Definition",
+                              "required": [
+                                "isEnabled",
+                                "cronExpression",
+                                "taskType"
+                              ],
+                              "properties": {
+                                "isEnabled": {
+                                  "type": "boolean",
+                                  "example": true,
+                                  "description": "Describes whether the task is enabled. When True, the task runs. When False, it does not run. Required for launchSpec.scheduling.tasks.\n"
+                                },
+                                "cronExpression": {
+                                  "type": "string",
+                                  "example": "0 1 * * *",
+                                  "description": "A valid cron expression. For example : \" * * * * * \". The cron job runs in UTC time and is in Unix cron format. (See the Cron Expression Validator Script.)\n"
+                                },
+                                "taskType": {
+                                  "type": "string",
+                                  "example": "manualHeadroomUpdate",
+                                  "enum": [
+                                    "manualHeadroomUpdate"
+                                  ],
+                                  "description": "The activity that you are scheduling. Valid values: \"manualHeadroomUpdate\". Required for launchSpec.scheduling.tasks.\n"
+                                },
+                                "config": {
+                                  "description": "The config of this scheduled task. Depends on the value of `taskType`.",
+                                  "oneOf": [
+                                    {
+                                      "type": "object",
+                                      "title": "manualHeadroomUpdate",
+                                      "required": [
+                                        "headrooms"
+                                      ],
+                                      "properties": {
+                                        "headrooms": {
+                                          "description": "Set custom headroom per VNG. Provide a list of launchSpec.autoscale.headroom objects.\n",
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "cpuPerUnit": {
+                                                "description": "Configure the number of CPUs to allocate the headroom. CPUs are denoted in millicores, where 1000 millicores = 1 vCPU.\n",
+                                                "type": "integer"
+                                              },
+                                              "memoryPerUnit": {
+                                                "description": "Configure the amount of memory (MiB) to allocate the headroom.\n",
+                                                "type": "integer"
+                                              },
+                                              "numOfUnits": {
+                                                "description": "The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.\n",
+                                                "type": "integer"
+                                              },
+                                              "gpuPerUnit": {
+                                                "type": "integer",
+                                                "description": "Amont of GPU to allocate for headroom unit.\n"
+                                              }
+                                            }
+                                          },
+                                          "example": [
+                                            {
+                                              "cpuPerUnit": 1024,
+                                              "memoryPerUnit": 512,
+                                              "gpuPerUnit": 0,
+                                              "numOfUnits": 1
+                                            }
+                                          ]
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        }
                       }
                     }
                   }
@@ -43516,7 +43960,48 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/get/responses/200"
+            "description": "Ocean Launch Spec Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/gcp/k8s/launchSpec/ols-12345abc"
+                            },
+                            "method": {
+                              "example": "PUT"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/launchSpec"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:gcp:k8s:launchSpec"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -43539,7 +44024,48 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/get/responses/200"
+            "description": "Ocean Launch Spec Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/gcp/k8s/launchSpec/ols-12345abc"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/launchSpec"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:gcp:k8s:launchSpec"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
