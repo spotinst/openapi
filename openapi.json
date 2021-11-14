@@ -117,6 +117,14 @@
       }
     },
     {
+      "name": "Ocean CD",
+      "description": "Ocean CD is a fully managed continuous delivery ('CD') solution for Kubernetes applications. Designed for end-to-end automation and verification of frequent application-deployment processes at scale.\nOcean CD architecture and API enable a simple and secured installation that seamlessly fits into any Kubernetes environment. Users get key features like granular visibility, SaaS logic that manage the rollout process, verifications of the applied workloads and automatic rollbacks.\nTo enable Ocean CD, install the controller with one simple command in the Kubernetes cluster and create the following entities using the API:\n* Environment\n* Microservice\n* Notification Provider\n* Rollout Spec\n",
+      "externalDocs": {
+        "description": "Ocean CD",
+        "url": "https://docs.spot.io/ocean-cd/"
+      }
+    },
+    {
       "name": "EMR Scaler",
       "description": "AWS EMR Scaler",
       "externalDocs": {
@@ -189,7 +197,8 @@
         "Ocean GKE",
         "Ocean AKS",
         "Ocean On-Premise",
-        "Ocean Insights"
+        "Ocean Insights",
+        "Ocean CD"
       ]
     },
     {
@@ -48477,6 +48486,1892 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/cd/cluster": {
+      "summary": "Ocean CD",
+      "get": {
+        "summary": "List Ocean CD Clusters",
+        "description": "List all Ocean CD clusters.\n",
+        "operationId": "OceanCDClusterList",
+        "tags": [
+          "Ocean CD"
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean CD Cluster Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "response": {
+                          "type": "object",
+                          "description": "response body\n",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "allOf": [
+                                  {
+                                    "type": "object",
+                                    "required": [
+                                      "cluster"
+                                    ],
+                                    "properties": {
+                                      "lastHeartbeatTime": {
+                                        "type": "string",
+                                        "example": "2018-11-05T12:55:50.000+0000",
+                                        "description": "Time stamp of latest time the controller sent heartbeat.\n"
+                                      },
+                                      "controllerInfo": {
+                                        "type": "object",
+                                        "title": "Ocean CD Controller Info",
+                                        "description": "Contains controller detailed information.\n",
+                                        "properties": {
+                                          "nodeName": {
+                                            "type": "string"
+                                          },
+                                          "controllerVersion": {
+                                            "type": "string"
+                                          },
+                                          "podName": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "clusterInfo": {
+                                        "type": "object",
+                                        "title": "Ocean CD Cluster Info",
+                                        "description": "Contains cluster detailed information.\n",
+                                        "properties": {
+                                          "kubernetesVersion": {
+                                            "type": "string"
+                                          },
+                                          "cloudProvider": {
+                                            "type": "string"
+                                          },
+                                          "kubernetesOrchestrator": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "notification": {
+                                        "type": "object",
+                                        "$ref": "#/paths/~1ocean~1cd~1cluster~1%7BclusterId%7D/put/requestBody/content/application~1json/schema/allOf/0/properties/notification"
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "id": {
+                                        "type": "string",
+                                        "example": "oceanCluster"
+                                      },
+                                      "createdAt": {
+                                        "type": "string",
+                                        "example": "2018-11-05T12:55:50.000+0000"
+                                      },
+                                      "updatedAt": {
+                                        "type": "string",
+                                        "example": "2018-11-05T12:58:15.000+0000"
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/cd/cluster/{clusterId}": {
+      "summary": "Ocean CD",
+      "get": {
+        "summary": "Get Ocean CD Cluster",
+        "description": "Get an existing Ocean CD cluster.\n",
+        "operationId": "OceanCDClusterGet",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "clusterId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "cluster-prod",
+            "description": "The identifier of the Ocean CD cluster\n"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/paths/~1ocean~1cd~1cluster/get/responses/200"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update Ocean CD Cluster",
+        "description": "Update Ocean CD cluster notification settings.\n",
+        "operationId": "OceanCDClusterUpdate",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "clusterId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "cluster-prod",
+            "description": "The identifier of the Ocean CD cluster\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "title": "Ocean CD Cluster Notification Request",
+                    "description": "Ocean CD cluster notification request entity.\n",
+                    "properties": {
+                      "notification": {
+                        "type": "object",
+                        "required": [
+                          "notification"
+                        ],
+                        "properties": {
+                          "minutesWithoutHeartbeat": {
+                            "type": "double",
+                            "example": 4,
+                            "description": "Number of minutes without receiving cluster controller heartbeat\n"
+                          },
+                          "providers": {
+                            "type": "array",
+                            "description": "List of notification provider names\n",
+                            "items": {
+                              "type": "string",
+                              "example": "provider1"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Ocean CD Cluster",
+        "description": "Delete an existing Ocean CD cluster.\n",
+        "operationId": "OceanCDClusterDelete",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "clusterId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "cluster-prod",
+            "description": "The identifier of the Ocean CD cluster\n"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/cd/environment": {
+      "summary": "Ocean CD",
+      "post": {
+        "summary": "Create Ocean CD Environment",
+        "description": "Create Ocean CD Environment.\n",
+        "operationId": "OceanCDEnvironmentCreate",
+        "tags": [
+          "Ocean CD"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "title": "Ocean CD Environemt Request",
+                    "description": "Ocean CD environment request.\n",
+                    "properties": {
+                      "environment": {
+                        "type": "object",
+                        "$ref": "#/paths/~1ocean~1cd~1environment/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/0"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/paths/~1ocean~1cd~1environment/get/responses/200"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "get": {
+        "summary": "List Ocean CD Environments",
+        "description": "List all Ocean CD environments.\n",
+        "operationId": "OceanCDEnvironmentList",
+        "tags": [
+          "Ocean CD"
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean CD Environment Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "response": {
+                          "type": "object",
+                          "description": "response body\n",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "allOf": [
+                                  {
+                                    "type": "object",
+                                    "title": "Ocean CD Environemt",
+                                    "description": "Ocean CD environment.\n",
+                                    "properties": {
+                                      "name": {
+                                        "type": "string",
+                                        "description": "Identifier name for the environment"
+                                      },
+                                      "clusterId": {
+                                        "type": "string",
+                                        "description": "Existing Ocean CD cluster identifier to apply this environment to"
+                                      },
+                                      "namespace": {
+                                        "type": "string",
+                                        "description": "Restrict the Environment for a specific kubernetes cluster namespace. If not configured will be applied for all cluster namespaces"
+                                      }
+                                    },
+                                    "required": [
+                                      "name",
+                                      "clusterId"
+                                    ]
+                                  },
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "createdAt": {
+                                        "type": "string",
+                                        "example": "2018-11-05T12:55:50.000+0000"
+                                      },
+                                      "updatedAt": {
+                                        "type": "string",
+                                        "example": "2018-11-05T12:58:15.000+0000"
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/cd/environment/{environmentName}": {
+      "summary": "Ocean CD",
+      "get": {
+        "summary": "Get Ocean CD Environment",
+        "description": "Get an existing Ocean CD environment.\n",
+        "operationId": "oceanCDEnvironmentGet",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "environmentName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "Prod",
+            "description": "The name identifier of the Ocean CD environment\n"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/paths/~1ocean~1cd~1environment/get/responses/200"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update Ocean CD Environment",
+        "description": "Full Update of Ocean CD environment configuration.\n*All non included fields will be nullified*\n",
+        "operationId": "OceanCDEnvironmentUpdate",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "environmentName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "prod",
+            "description": "The name identifier of the Ocean CD environment\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "environment": {
+                        "type": "object",
+                        "title": "Ocean CD Cluster Environemt",
+                        "properties": {
+                          "clusterId": {
+                            "type": "string"
+                          },
+                          "namespace": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "clusterId"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Patch Ocean CD Environment",
+        "description": "Partial update Ocean CD environment configuration.\n",
+        "operationId": "OceanCDEnvironmentPatch",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "environmentName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "prod",
+            "description": "The name identifier of the Ocean CD environment\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "environment": {
+                        "type": "object",
+                        "title": "Ocean CD Cluster Environemt",
+                        "properties": {
+                          "clusterId": {
+                            "type": "string"
+                          },
+                          "namespace": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Ocean CD Environment",
+        "description": "Delete an existing Ocean CD environment.\n",
+        "operationId": "OceanCDEnvironmentDelete",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "environmentName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "Prod",
+            "description": "The name identifier of the Ocean CD environment\n"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/cd/microservice": {
+      "summary": "Ocean CD",
+      "post": {
+        "summary": "Create Ocean CD Microservice",
+        "description": "Create Ocean CD microservice.\n",
+        "operationId": "OceanCDMicroserviceCreate",
+        "tags": [
+          "Ocean CD"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "title": "Ocean CD Microservice Request",
+                    "description": "Ocean CD microservice request entity.\n",
+                    "properties": {
+                      "microservice": {
+                        "type": "object",
+                        "$ref": "#/paths/~1ocean~1cd~1microservice/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/0"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/paths/~1ocean~1cd~1microservice/get/responses/200"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "get": {
+        "summary": "List Ocean CD Microservices",
+        "description": "List all Ocean CD microservices.\n",
+        "operationId": "OceanCDMicroserviceList",
+        "tags": [
+          "Ocean CD"
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean CD Microservice Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "response": {
+                          "type": "object",
+                          "description": "response body\n",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "allOf": [
+                                  {
+                                    "type": "object",
+                                    "title": "Ocean CD Microservice Entity",
+                                    "properties": {
+                                      "name": {
+                                        "type": "string",
+                                        "description": "The name identifier of the Ocean CD microservice"
+                                      },
+                                      "k8sResources": {
+                                        "type": "object",
+                                        "title": "Ocean CD K8S Resources",
+                                        "description": "Kubernetes resoucres to bind to the Microservice",
+                                        "properties": {
+                                          "workload": {
+                                            "type": "object",
+                                            "title": "Ocean CD K8S Workload",
+                                            "description": "Kubernetes workloads to bind to the Microservice",
+                                            "properties": {
+                                              "type": {
+                                                "type": "string",
+                                                "example": "deployment",
+                                                "description": "Kubernetes workload type",
+                                                "enum": [
+                                                  "deployment"
+                                                ]
+                                              },
+                                              "labels": {
+                                                "type": "array",
+                                                "items": {
+                                                  "$ref": "#/paths/~1ocean~1cd~1microservice~1%7BmicroserviceName%7D/patch/requestBody/content/application~1json/schema/allOf/0/properties/microservice/properties/k8sResources/properties/workload/properties/labels/items"
+                                                },
+                                                "description": "Set of k8s labels that are exisitng on the wanted workload (metadata.labels)"
+                                              },
+                                              "versionLabelKey": {
+                                                "type": "string",
+                                                "description": "Kubernetes label key name for identiying the microservice version, if not configured the image will be consider as the version"
+                                              }
+                                            },
+                                            "required": [
+                                              "type",
+                                              "labels"
+                                            ]
+                                          }
+                                        },
+                                        "required": [
+                                          "workload"
+                                        ]
+                                      }
+                                    },
+                                    "required": [
+                                      "name",
+                                      "k8sResources"
+                                    ]
+                                  },
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "createdAt": {
+                                        "type": "string",
+                                        "example": "2018-11-05T12:55:50.000+0000"
+                                      },
+                                      "updatedAt": {
+                                        "type": "string",
+                                        "example": "2018-11-05T12:58:15.000+0000"
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/cd/microservice/{microserviceName}": {
+      "summary": "Ocean CD",
+      "get": {
+        "summary": "Get Ocean CD Microservice",
+        "description": "Get an existing Ocean CD microservice.\n",
+        "operationId": "oceanCDMicroserviceGet",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "microserviceName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "inventory-service",
+            "description": "The name identifier of the Ocean CD microservice\n"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/paths/~1ocean~1cd~1microservice/get/responses/200"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update Ocean CD Microservice",
+        "description": "Full Update of Ocean CD microservice configuration.\n*All non included fields will be nullified*\n",
+        "operationId": "OceanCDMicroserviceUpdate",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "microserviceName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "inventory-service",
+            "description": "The name identifier of the Ocean CD microservice\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "title": "Ocean CD Microservice Request",
+                    "description": "Ocean CD microservice request.\n",
+                    "properties": {
+                      "microservice": {
+                        "type": "object",
+                        "title": "Ocean CD Microservice Entity",
+                        "properties": {
+                          "k8sResources": {
+                            "type": "object",
+                            "$ref": "#/paths/~1ocean~1cd~1microservice/post/requestBody/content/application~1json/schema/allOf/0/properties/microservice/properties/k8sResources"
+                          }
+                        },
+                        "required": [
+                          "k8sResources"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Patch Ocean CD Microservice",
+        "description": "Partial update Ocean CD microservice configuration.\n",
+        "operationId": "OceanCDMicroservicePatch",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "microserviceName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "inventory-service",
+            "description": "The name identifier of the Ocean CD microservice\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "title": "Ocean CD Microservice Request",
+                    "description": "Ocean CD microservice request entity.\n",
+                    "properties": {
+                      "microservice": {
+                        "type": "object",
+                        "title": "Ocean CD Microservice Entity",
+                        "description": "Represents Ocean CD microservice.\n",
+                        "properties": {
+                          "k8sResources": {
+                            "type": "object",
+                            "title": "Ocean CD K8S Resources",
+                            "description": "Kubernetes resoucres to bind to the Microservice",
+                            "properties": {
+                              "workload": {
+                                "type": "object",
+                                "title": "Ocean CD K8S Workload",
+                                "description": "Kubernetes workloads to bind to the Microservice",
+                                "properties": {
+                                  "type": {
+                                    "type": "string",
+                                    "example": "deployment",
+                                    "description": "Kubernetes workload type",
+                                    "enum": [
+                                      "deployment"
+                                    ]
+                                  },
+                                  "labels": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "title": "Ocean CD Label",
+                                      "description": "Represents k8s label key&value entry.\n",
+                                      "properties": {
+                                        "key": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      }
+                                    },
+                                    "description": "Set of k8s labels that are exisitng on the wanted workload (metadata.labels)"
+                                  },
+                                  "versionLabelKey": {
+                                    "type": "string",
+                                    "description": "Kubernetes label key name for identiying the microservice version, if not configured the image will be consider as the version"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Ocean CD Microservice",
+        "description": "Delete an existing Ocean CD microservice.\n",
+        "operationId": "OceanCDMicroserviceDelete",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "microserviceName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "inventory-service",
+            "description": "The name identifier of the Ocean CD microservice\n"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/cd/notificationProvider": {
+      "summary": "Ocean CD",
+      "post": {
+        "summary": "Create Ocean CD Notification Provider",
+        "description": "Create Ocean CD notification provider.\n",
+        "operationId": "OceanCDNotificationProviderCreate",
+        "tags": [
+          "Ocean CD"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "title": "Ocean CD Notification Provider Request",
+                    "description": "Ocean CD notification provider request.\n",
+                    "properties": {
+                      "notificationProvider": {
+                        "type": "object",
+                        "$ref": "#/paths/~1ocean~1cd~1notificationProvider/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/0"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/paths/~1ocean~1cd~1notificationProvider/get/responses/200"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "get": {
+        "summary": "List Ocean CD Notification Providers",
+        "description": "List all Ocean CD notification providers.\n",
+        "operationId": "OceanCDNotificationProviderList",
+        "tags": [
+          "Ocean CD"
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean CD Notification Provider Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "response": {
+                          "type": "object",
+                          "description": "response body\n",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "allOf": [
+                                  {
+                                    "type": "object",
+                                    "title": "Ocean CD Notification Provider",
+                                    "description": "Represents notification provider.\n",
+                                    "properties": {
+                                      "name": {
+                                        "type": "string",
+                                        "description": "The name identifier of the Ocean CD notification provider"
+                                      },
+                                      "description": {
+                                        "type": "string"
+                                      },
+                                      "webhook": {
+                                        "type": "object",
+                                        "title": "Ocean CD Webhook",
+                                        "description": "Represents webhook definition.\n",
+                                        "properties": {
+                                          "url": {
+                                            "type": "string"
+                                          }
+                                        },
+                                        "required": [
+                                          "url"
+                                        ]
+                                      }
+                                    },
+                                    "required": [
+                                      "name"
+                                    ]
+                                  },
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "createdAt": {
+                                        "type": "string",
+                                        "example": "2018-11-05T12:55:50.000+0000"
+                                      },
+                                      "updatedAt": {
+                                        "type": "string",
+                                        "example": "2018-11-05T12:58:15.000+0000"
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/cd/microservice/{notificationProviderName}": {
+      "summary": "Ocean CD",
+      "get": {
+        "summary": "Get Ocean CD Notification Provider",
+        "description": "Get an existing Ocean CD notification provider.\n",
+        "operationId": "oceanCDNotificationProviderGet",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "notificationProviderName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "ci-webhook",
+            "description": "The name identifier of the Ocean CD notification provider\n"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/paths/~1ocean~1cd~1notificationProvider/get/responses/200"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update Ocean CD Notification Provider",
+        "description": "Full Update of Ocean CD notification provider configuration. *All non included fields will be nullified*\n",
+        "operationId": "OceanCDNotificationProviderUpdate",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "notificationProviderName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "ci-webhook",
+            "description": "The name identifier of the Ocean CD notification provider\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "title": "Ocean CD Notification Provider Request",
+                    "description": "Ocean CD notification provider request.\n",
+                    "properties": {
+                      "notificationProvider": {
+                        "type": "object",
+                        "title": "Ocean CD Notification Provider",
+                        "description": "Represents notification provider.\n",
+                        "properties": {
+                          "description": {
+                            "type": "string"
+                          },
+                          "webhook": {
+                            "type": "object",
+                            "$ref": "#/paths/~1ocean~1cd~1notificationProvider/post/requestBody/content/application~1json/schema/allOf/0/properties/notificationProvider/properties/webhook"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Patch Ocean CD Notification Provider",
+        "description": "Partial update Ocean CD notification provider configuration.\n",
+        "operationId": "OceanCDNotificationProviderPatch",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "notificationProviderName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "ci-webhook",
+            "description": "The name identifier of the Ocean CD notification provider\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "title": "Ocean CD Notification Provider Request",
+                    "description": "Ocean CD notification provider request.\n",
+                    "properties": {
+                      "notificationProvider": {
+                        "type": "object",
+                        "title": "Ocean CD Notification Provider",
+                        "description": "Represents notification provider.\n",
+                        "properties": {
+                          "description": {
+                            "type": "string"
+                          },
+                          "webhook": {
+                            "type": "object",
+                            "$ref": "#/paths/~1ocean~1cd~1notificationProvider/post/requestBody/content/application~1json/schema/allOf/0/properties/notificationProvider/properties/webhook"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Ocean CD Notification Provider",
+        "description": "Delete an existing Ocean CD notification provider.\n",
+        "operationId": "OceanCDNotificationProviderDelete",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "notificationProviderName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "ci-webhook",
+            "description": "The name identifier of the Ocean CD notification provider\n"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/cd/rolloutSpec": {
+      "summary": "Ocean CD",
+      "post": {
+        "summary": "Create OceanCD Rollout Spec",
+        "description": "Create Ocean CD rollout spec.\n",
+        "operationId": "OceanCDRolloutSpecCreate",
+        "tags": [
+          "Ocean CD"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "title": "Ocean CD Rollout Spec Request",
+                    "description": "Ocean CD rollout spec request entity.\n",
+                    "properties": {
+                      "rolloutSpec": {
+                        "type": "object",
+                        "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/0"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/get/responses/200"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "get": {
+        "summary": "List OceanCD Rollout Specs",
+        "description": "List all Ocean CD rollout specs.\n",
+        "operationId": "OceanCDRolloutSpecList",
+        "tags": [
+          "Ocean CD"
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean CD Rollout Spec Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "response": {
+                          "type": "object",
+                          "description": "response body\n",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "allOf": [
+                                  {
+                                    "type": "object",
+                                    "title": "Ocean CD Rollout Spec",
+                                    "description": "Ocean CD rollout spec entity.\n",
+                                    "properties": {
+                                      "name": {
+                                        "type": "string",
+                                        "description": "The name identifier of the Ocean CD Rollout Spec"
+                                      },
+                                      "microservice": {
+                                        "type": "string",
+                                        "description": "Name of existing Ocean CD Microservice"
+                                      },
+                                      "environment": {
+                                        "type": "string",
+                                        "description": "Name of existing Ocean CD Environment"
+                                      },
+                                      "strategy": {
+                                        "type": "object",
+                                        "title": "Ocean CD Rollout Spec Strategy",
+                                        "description": "Determines the rollout spec strategy.\n",
+                                        "properties": {
+                                          "rolling": {
+                                            "type": "object",
+                                            "title": "Ocean CD Rollout Rolling Strategy",
+                                            "description": "Determines Rolling Update strategy for rollout\n",
+                                            "properties": {
+                                              "verification": {
+                                                "type": "object",
+                                                "title": "Ocean CD Rollout Verification",
+                                                "description": "Determines rollout verification configuration.\n",
+                                                "properties": {
+                                                  "phases": {
+                                                    "type": "array",
+                                                    "items": {
+                                                      "type": "object",
+                                                      "title": "Ocean CD Rollout Verification Phase",
+                                                      "description": "Represents rollout verification phase entity.\n",
+                                                      "properties": {
+                                                        "initialDelay": {
+                                                          "type": "string",
+                                                          "description": "Duration of time to wait before starting verification phase. format: [number][unit -s/m/h]. example: 30s/2m/5m"
+                                                        },
+                                                        "name": {
+                                                          "type": "string",
+                                                          "description": "Name for the verificaton phase"
+                                                        },
+                                                        "externalVerification": {
+                                                          "type": "object",
+                                                          "title": "OceanCD Rollout External Verification",
+                                                          "description": "Determines External verification configuration. A status API call should be received in the given timeout.\n",
+                                                          "properties": {
+                                                            "fallback": {
+                                                              "type": "string",
+                                                              "enum": [
+                                                                "fail",
+                                                                "continue"
+                                                              ],
+                                                              "description": "Fallback action in case timeout is reached and external verification status was not received"
+                                                            },
+                                                            "timeout": {
+                                                              "type": "string",
+                                                              "description": "Duration of time to wait for external verification status API call. format: [number][unit -s/m/h]. example: 30s/2m/5m"
+                                                            }
+                                                          },
+                                                          "required": [
+                                                            "timeout",
+                                                            "fallback"
+                                                          ]
+                                                        }
+                                                      },
+                                                      "required": [
+                                                        "name"
+                                                      ]
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "notification": {
+                                        "type": "object",
+                                        "title": "OceanCD Rollout Notification",
+                                        "description": "Determines notification configuration for the rollout events\n",
+                                        "properties": {
+                                          "providers": {
+                                            "description": "List of Notification Provider names",
+                                            "type": "array",
+                                            "items": {
+                                              "type": "string"
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "failurePolicy": {
+                                        "type": "object",
+                                        "title": "OceanCD Rollout Rollback",
+                                        "description": "Determines the rollout behavior in case of failure\n",
+                                        "properties": {
+                                          "rollback": {
+                                            "type": "object",
+                                            "title": "OceanCD Rollout Rollback",
+                                            "description": "Determines automatic rollback in case of failure.\n",
+                                            "properties": {
+                                              "mode": {
+                                                "type": "string",
+                                                "enum": [
+                                                  "immediate",
+                                                  "newRollout"
+                                                ]
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "required": [
+                                      "name",
+                                      "microservice",
+                                      "environment",
+                                      "strategy"
+                                    ]
+                                  },
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "createdAt": {
+                                        "type": "string",
+                                        "example": "2018-11-05T12:55:50.000+0000"
+                                      },
+                                      "updatedAt": {
+                                        "type": "string",
+                                        "example": "2018-11-05T12:58:15.000+0000"
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/cd/rolloutSpec/{rolloutSpecName}": {
+      "summary": "Ocean CD",
+      "get": {
+        "summary": "Get OceanCD Rollout Spec",
+        "description": "Get the configuration of an existing Ocean CD rollout spec.\n",
+        "operationId": "oceanCDRolloutSpecGet",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rolloutSpecName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "my-service-dev-rolling",
+            "description": "The name identifier of the OceanCD Rollout Spec\n"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/get/responses/200"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update OceanCD Rollout Spec",
+        "description": "Full Update Ocean CD rollout spec configuration.\n*All non included fields will be nullified*\n",
+        "operationId": "OceanCDRolloutSpecUpdate",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rolloutSpecName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "my-service-dev-rolling",
+            "description": "The name identifier of the OceanCD rollout spec\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "title": "Ocean CD Rollout Spec Request",
+                    "description": "Ocean CD rollout spec request entity.\n",
+                    "properties": {
+                      "rolloutSpec": {
+                        "type": "object",
+                        "title": "Ocean CD Rollout Spec",
+                        "description": "Ocean CD rollout spec entity.\n",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "microservice": {
+                            "type": "string",
+                            "description": "Name of existing Ocean CD Microservice"
+                          },
+                          "environment": {
+                            "type": "string",
+                            "description": "Name of existing Ocean CD Environment"
+                          },
+                          "strategy": {
+                            "type": "object",
+                            "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/rolloutSpec/properties/strategy"
+                          },
+                          "notification": {
+                            "type": "object",
+                            "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/rolloutSpec/properties/notification"
+                          },
+                          "failurePolicy": {
+                            "type": "object",
+                            "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/rolloutSpec/properties/failurePolicy"
+                          }
+                        },
+                        "required": [
+                          "microservice",
+                          "environment",
+                          "strategy"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Patch OceanCD Rollout Spec",
+        "description": "Partial update Ocean CD rollout spec configuration.\n",
+        "operationId": "OceanCDRolloutSpecPatch",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rolloutSpecName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "my-service-dev-rolling",
+            "description": "The name identifier of the OceanCD rollout spec\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "title": "Ocean CD Rollout Spec Request",
+                    "description": "Ocean CD rollout spec request entity.\n",
+                    "properties": {
+                      "rolloutSpec": {
+                        "type": "object",
+                        "title": "Ocean CD Rollout Spec",
+                        "description": "Ocean CD rollout spec entity.\n",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "The name identifier of the Ocean CD Rollout Spec"
+                          },
+                          "microservice": {
+                            "type": "string",
+                            "description": "Name of existing Ocean CD Microservice"
+                          },
+                          "environment": {
+                            "type": "string",
+                            "description": "Name of existing Ocean CD Environment"
+                          },
+                          "strategy": {
+                            "type": "object",
+                            "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/rolloutSpec/properties/strategy"
+                          },
+                          "notification": {
+                            "type": "object",
+                            "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/rolloutSpec/properties/notification"
+                          },
+                          "failurePolicy": {
+                            "type": "object",
+                            "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/rolloutSpec/properties/failurePolicy"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete OceanCD Rollout Spec",
+        "description": "Delete an existing Ocean CD rollout spec.\n",
+        "operationId": "OceanCDRolloutSpecDelete",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rolloutSpecName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "my-service-dev-rolling",
+            "description": "The name identifier of the OceanCD rollout spec\n"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/cd/rollout": {
+      "summary": "Ocean CD",
+      "get": {
+        "summary": "List Ocean CD Rollouts",
+        "description": "List Ocean CD rollouts.\n",
+        "operationId": "OceanCDRolloutList",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "fromDate",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "2021-10-14",
+            "description": "date to fetch the rollouts from\n"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean CD Rollout Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "response": {
+                          "type": "object",
+                          "description": "response body\n",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "allOf": [
+                                  {
+                                    "type": "object",
+                                    "title": "Ocean CD Rollout",
+                                    "description": "Represents rollout entity.\n",
+                                    "properties": {
+                                      "id": {
+                                        "type": "string"
+                                      },
+                                      "rolloutSpec": {
+                                        "type": "string"
+                                      },
+                                      "microservice": {
+                                        "type": "string"
+                                      },
+                                      "environment": {
+                                        "type": "string"
+                                      },
+                                      "strategy": {
+                                        "type": "string"
+                                      },
+                                      "initiator": {
+                                        "type": "string"
+                                      },
+                                      "status": {
+                                        "type": "string"
+                                      },
+                                      "namespace": {
+                                        "type": "string"
+                                      },
+                                      "deploymentName": {
+                                        "type": "string"
+                                      },
+                                      "clusterId": {
+                                        "type": "string"
+                                      },
+                                      "cloudProvider": {
+                                        "type": "string"
+                                      },
+                                      "oldVersion": {
+                                        "type": "string"
+                                      },
+                                      "newVersion": {
+                                        "type": "string"
+                                      },
+                                      "startTime": {
+                                        "type": "string",
+                                        "example": "2018-11-05T12:55:50.000+0000"
+                                      },
+                                      "endTime": {
+                                        "type": "string",
+                                        "example": "2018-11-05T13:55:50.000+0000"
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "type": "object"
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/cd/rollout/{rolloutId}": {
+      "summary": "Ocean CD",
+      "put": {
+        "summary": "Ocean CD Rollout Actions",
+        "description": "Execute action on an existing Ocean CD rollout.\n",
+        "operationId": "OceanCDRolloutActions",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rolloutId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "rol-123456",
+            "description": "The identifier of the Ocean CD rollout\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "title": "Ocean CD Cluster Rollout Update Request",
+                    "description": "Ocean CD cluster rollout update request entity.\n",
+                    "properties": {
+                      "action": {
+                        "type": "string",
+                        "enum": [
+                          "rollback"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "action"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/cd/rollout/{rolloutId}/externalVerification": {
+      "summary": "Ocean CD",
+      "put": {
+        "summary": "Update Ocean CD Rollout External Verification",
+        "description": "Update Ocean CD on-going rollout external verification status.\n",
+        "operationId": "OceanCDExternalVerificationUpdate",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rolloutId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "rol-12345",
+            "description": "The identifier of the Ocean CD rollout\n"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "title": "Ocean CD Rollout External Verification Request",
+                    "description": "Ocean CD rollout external verification status update request entity.\n",
+                    "properties": {
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "failed",
+                          "passed"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "status"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok"
           },
           "400": {
             "description": "Bad Request"
