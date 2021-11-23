@@ -1,0 +1,79 @@
+summary: Ocean Spark
+
+get:
+  summary: "List Applications in Cluster"
+  description: >
+    List the Spark applications in a specific cluster.
+    This endpoint is paginated (cursor pagination).
+  operationId: "OceanSparkClusterApplicationList"
+  tags:
+    - "Ocean Spark"
+  parameters:
+    - $ref: "../../../../commons/parameters/nonRequiredAccountId.yaml"
+    - $ref: "../parameters/path/oceanSparkClusterId.yaml"
+    - $ref: "../parameters/query/oceanSparkJobId.yaml"
+    - $ref: "../parameters/query/oceanSparkApplicationSubmissionSource.yaml"
+    - $ref: "../parameters/query/oceanSparkApplicationState.yaml"
+    - $ref: "../parameters/query/userId.yaml"
+    - $ref: "../parameters/query/searchTerm.yaml"
+    - $ref: "../parameters/query/minCreatedAt.yaml"
+    - $ref: "../parameters/query/maxCreatedAt.yaml"
+    - $ref: "../parameters/query/minUpdatedAt.yaml"
+    - $ref: "../parameters/query/maxUpdatedAt.yaml"
+    - $ref: "../parameters/query/pageSize.yaml"
+    - $ref: "../parameters/query/after.yaml"
+    - $ref: "../parameters/query/before.yaml"
+    - $ref: "../parameters/query/order.yaml"
+    - $ref: "../parameters/query/orderBy.yaml"
+  responses:
+    200:
+      $ref: "../responses/paginatedApplications.yaml"
+    400:
+      description: "Bad Request"
+
+post:
+  summary: "Submit an Application"
+  description: >
+    Submit a Spark application in an Ocean Spark cluster
+  operationId: "OceanSparkClusterApplicationSubmit"
+  tags:
+    - "Ocean Spark"
+  parameters:
+    - $ref: "../../../../commons/parameters/nonRequiredAccountId.yaml"
+    - $ref: "../parameters/path/oceanSparkClusterId.yaml"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+          - jobId
+          properties:
+            appId:
+              $ref: "../schemas/oceanSparkApplicationId.yaml"
+            jobId:
+              # This is not how you're supposed to merge two objects (here: custom description + $ref).
+              # But I tried the more classic construct and it didn't work:
+              # allOf:
+              # - $ref: "../schemas/oceanSparkApplicationSpec.yaml"
+              # - description: ...
+              description: >
+                The ID of the job to which the Spark application belongs.
+                If a job with this ID does not exist yet, it will be created.
+              allOf:
+              - $ref: "../schemas/oceanSparkJobId.yaml"
+            configOverrides:
+              description: >
+                Configurations for the Spark application supplied in the request.
+                Prefer using a config template for configurations that are stable across runs.
+                Configurations in `configOverrides` have precedence over those in the config template.
+              allOf:
+              - $ref: "../schemas/oceanSparkApplicationSpec.yaml"
+            configTemplateId:
+              $ref: "../schemas/oceanSparkConfigTemplateId.yaml"
+  responses:
+    200:
+      $ref: "../responses/applications.yaml"
+    400:
+      description: "Bad Request"
