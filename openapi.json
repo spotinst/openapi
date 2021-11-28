@@ -27577,6 +27577,17 @@
                                 "example": "This is why I rolled my cluster."
                               }
                             }
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "batchMinHealthyPercentage": {
+                                "type": "integer",
+                                "description": "Indicates the threshold of minimum healthy instances in single batch. If the amount of healthy instances in single batch is under the threshold, the cluster roll will fail. If exists, the parameter value will be in range of 1-100. In case of null as value, the default value in the backend will be 50%. Value of param should represent the number in percentage (%) of the batch.\n",
+                                "example": 100,
+                                "default": 50
+                              }
+                            }
                           }
                         ]
                       }
@@ -27593,6 +27604,9 @@
                           },
                           {
                             "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/properties/roll/allOf/1"
+                          },
+                          {
+                            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/properties/roll/allOf/2"
                           },
                           {
                             "type": "object",
@@ -27622,6 +27636,9 @@
                           },
                           {
                             "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/properties/roll/allOf/1"
+                          },
+                          {
+                            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/properties/roll/allOf/2"
                           },
                           {
                             "type": "object",
@@ -27800,7 +27817,10 @@
                                         "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/properties/roll/allOf/1"
                                       },
                                       {
-                                        "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/1/properties/roll/allOf/2"
+                                        "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/properties/roll/allOf/2"
+                                      },
+                                      {
+                                        "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/1/properties/roll/allOf/3"
                                       }
                                     ]
                                   },
@@ -27816,7 +27836,10 @@
                                         "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/properties/roll/allOf/1"
                                       },
                                       {
-                                        "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/2/properties/roll/allOf/2"
+                                        "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/properties/roll/allOf/2"
+                                      },
+                                      {
+                                        "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/2/properties/roll/allOf/3"
                                       }
                                     ]
                                   }
@@ -29328,6 +29351,12 @@
                             "type": "string",
                             "example": "This is why I deployed my cluster.",
                             "description": "Add a comment description for the roll. comment should be limit to 256 chars.\n"
+                          },
+                          "batchMinHealthyPercentage": {
+                            "type": "integer",
+                            "default": 50,
+                            "example": 100,
+                            "description": "Indicates the threshold of minimum healthy instances in single batch. If the amount of healthy instances in single batch is under the threshold, the cluster roll will fail. If exists, the parameter value will be in range of 1-100. In case of null as value, the default value in the backend will be 50%. Value of param should represent the number in percentage (%) of the batch.\n"
                           }
                         }
                       }
@@ -29501,6 +29530,10 @@
                                   "comment": {
                                     "type": "string",
                                     "example": "This is why I deployed my cluster."
+                                  },
+                                  "batchMinHealthyPercentage": {
+                                    "type": "integer",
+                                    "example": 100
                                   },
                                   "progress": {
                                     "type": "object",
@@ -32487,58 +32520,146 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "roll": {
+                "oneOf": [
+                  {
                     "type": "object",
-                    "description": "Object that specifies the parameters required to initiate a roll (also called a deployment).\n",
+                    "title": "Roll",
                     "properties": {
-                      "batchSizePercentage": {
-                        "type": "integer",
-                        "description": "Value as a percent to set the size of a batch in a roll. Valid values are 0-100.\n",
-                        "example": 20
-                      },
-                      "comment": {
-                        "description": "Add a comment description for the roll. The comment is limited to 256 chars.\n",
-                        "type": "string",
-                        "example": "This is why I deployed my cluster."
-                      },
-                      "launchSpecIds": {
-                        "type": "array",
-                        "description": "List of virtual node group identifiers to be rolled. Each identifier is a string. LaunchSpecIds can be null, and cannot be used together with instanceIds.",
-                        "items": {
-                          "type": "string",
-                          "example": [
-                            "ols-76694a7d",
-                            "ols-56694a76"
-                          ]
-                        }
-                      },
-                      "disableLaunchSpecAutoScaling": {
-                        "type": "boolean",
-                        "example": true,
-                        "description": "When set to True and virtual node group identifiers are defined to roll, the specified launch spec(s) will be blocked from scaling up. (Replacements will scale up in other launch specs that match the displaced pods instead.) This is meant for different use cases of 'migrating' nodes from one launch spec to another.\n"
-                      },
-                      "instanceIds": {
-                        "type": "array",
-                        "description": "List of instance identifiers to be rolled. Each identifier is a string. InstanceIds can be null, and cannot be used together with launchSpecIds.\n",
-                        "items": {
-                          "type": "string",
-                          "example": [
-                            "i-0003a99ffb566f039",
-                            "i-0567a99ffb566f765"
-                          ]
-                        }
-                      },
-                      "respectPdb": {
-                        "type": "boolean",
-                        "example": true,
-                        "default": false,
-                        "description": "During the roll, if the parameter is set to True we honor PDB during the instance replacement.\n"
+                      "roll": {
+                        "allOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "batchSizePercentage": {
+                                "type": "integer",
+                                "description": "Value as a percent to set the size of a batch in a roll. Valid values are 0-100.\n",
+                                "example": 20
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "comment": {
+                                "type": "string",
+                                "description": "Add a comment description for the roll. The comment is limited to 256 chars.\n",
+                                "example": "This is why I deployed my cluster."
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "respectPdb": {
+                                "type": "boolean",
+                                "description": "During the roll, if the parameter is set to True we honor PDB during the instance replacement.\n",
+                                "example": true,
+                                "default": false
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "batchMinHealthyPercentage": {
+                                "type": "integer",
+                                "description": "Indicates the threshold of minimum healthy instances in single batch. If the amount of healthy instances in single batch is under the threshold, the cluster roll will fail. If exists, the parameter value will be in range of 1-100. In case of null as value, the default value in the backend will be 50%. Value of param should represent the number in percentage (%) of the batch.\n",
+                                "example": 100,
+                                "default": 50
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "title": "Roll with instance ids",
+                    "properties": {
+                      "roll": {
+                        "allOf": [
+                          {
+                            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/properties/roll/allOf/0"
+                          },
+                          {
+                            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/properties/roll/allOf/1"
+                          },
+                          {
+                            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/properties/roll/allOf/2"
+                          },
+                          {
+                            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/properties/roll/allOf/3"
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "instanceIds": {
+                                "type": "array",
+                                "description": "List of instance identifiers to be rolled. Each identifier is a string. InstanceIds can be null, and cannot be used together with launchSpecIds.\n",
+                                "items": {
+                                  "type": "string",
+                                  "example": [
+                                    "i-0003a99ffb566f039",
+                                    "i-0567a99ffb566f765"
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "title": "Roll with launch specification ids",
+                    "properties": {
+                      "roll": {
+                        "allOf": [
+                          {
+                            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/properties/roll/allOf/0"
+                          },
+                          {
+                            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/properties/roll/allOf/1"
+                          },
+                          {
+                            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/properties/roll/allOf/2"
+                          },
+                          {
+                            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/properties/roll/allOf/3"
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "launchSpecIds": {
+                                "type": "array",
+                                "description": "List of virtual node group identifiers to be rolled. Each identifier is a string. LaunchSpecIds can be null, and cannot be used together with instanceIds.\n",
+                                "items": {
+                                  "type": "string",
+                                  "example": [
+                                    "ols-76694a7d",
+                                    "ols-56694a76"
+                                  ]
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "disableLaunchSpecAutoScaling": {
+                                "type": "boolean",
+                                "description": "When set to True and virtual node group identifiers are defined to roll, the specified launch spec(s) will be blocked from scaling up. (Replacements will scale up in other launch specs that match the displaced pods instead.) This is meant for different use cases of 'migrating' nodes from one launch spec to another.\n",
+                                "example": true
+                              }
+                            }
+                          }
+                        ]
                       }
                     }
                   }
-                }
+                ]
               }
             }
           }
@@ -32654,6 +32775,10 @@
                     "respectPdb": {
                       "type": "boolean",
                       "example": true
+                    },
+                    "batchMinHealthyPercentage": {
+                      "type": "integer",
+                      "example": 100
                     },
                     "createdAt": {
                       "type": "string",
@@ -32829,6 +32954,10 @@
                             "type": "boolean",
                             "example": true
                           },
+                          "batchMinHealthyPercentage": {
+                            "type": "integer",
+                            "example": 100
+                          },
                           "createdAt": {
                             "type": "string",
                             "example": "2019-03-24T15:46:09.000Z"
@@ -32995,6 +33124,10 @@
                     "respectPdb": {
                       "type": "boolean",
                       "example": true
+                    },
+                    "batchMinHealthyPercentage": {
+                      "type": "integer",
+                      "example": 100
                     },
                     "createdAt": {
                       "type": "string",
@@ -44169,6 +44302,12 @@
                         "default": false,
                         "description": "During the roll, if the parameter is set to True we honor PDB during the instance replacement.\n"
                       },
+                      "batchMinHealthyPercentage": {
+                        "type": "integer",
+                        "description": "Indicates the threshold of minimum healthy instances in single batch. If the amount of healthy instances in single batch is under the threshold, the cluster roll will fail. If exists, the parameter value will be in range of 1-100. In case of null as value, the default value in the backend will be 50%. Value of param should represent the number in percentage (%) of the batch.\n",
+                        "example": 100,
+                        "default": 50
+                      },
                       "launchSpecIds": {
                         "type": "array",
                         "description": "List of virtual node group identifiers to be rolled. Each identifier is a string. Can be null. Cannot be used together with instanceName.\n",
@@ -44310,6 +44449,10 @@
                         "ols-56694a76"
                       ]
                     },
+                    "batchMinHealthyPercentage": {
+                      "type": "integer",
+                      "example": 100
+                    },
                     "createdAt": {
                       "type": "string",
                       "example": "2019-03-24T15:46:09.000Z"
@@ -44450,6 +44593,10 @@
                                     }
                                   }
                                 }
+                              },
+                              "batchMinHealthyPercentage": {
+                                "type": "integer",
+                                "example": 100
                               },
                               "oceanId": {
                                 "type": "string",
@@ -44606,6 +44753,10 @@
                           }
                         }
                       }
+                    },
+                    "batchMinHealthyPercentage": {
+                      "type": "integer",
+                      "example": 100
                     },
                     "oceanId": {
                       "type": "string",
