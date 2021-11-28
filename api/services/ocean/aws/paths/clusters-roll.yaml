@@ -16,51 +16,37 @@ post:
     content:
       application/json:
         schema:
-          type: object
-          properties:
-            roll:
-              type: object
-              description: >
-                Object that specifies the parameters required to initiate a roll (also called a deployment).
+          oneOf:
+            - type: object
+              title: 'Roll'
               properties:
-               batchSizePercentage:
-                 type: integer
-                 description: >
-                   Value as a percent to set the size of a batch in a roll. Valid values are 0-100.
-                 example: 20
-               comment:
-                 description: >
-                   Add a comment description for the roll. The comment is limited to 256 chars.
-                 type: string
-                 example: "This is why I deployed my cluster."
-               launchSpecIds:
-                 type: array
-                 description: List of virtual node group identifiers to be rolled. Each identifier is a string. LaunchSpecIds can be null, and cannot be used together with instanceIds.
-                 items:
-                   type: string
-                   example:
-                     - ols-76694a7d
-                     - ols-56694a76
-               disableLaunchSpecAutoScaling:
-                 type: boolean
-                 example: true
-                 description: >
-                   When set to True and virtual node group identifiers are defined to roll, the specified launch spec(s) will be blocked from scaling up. (Replacements will scale up in other launch specs that match the displaced pods instead.) This is meant for different use cases of 'migrating' nodes from one launch spec to another.
-               instanceIds:
-                 type: array
-                 description: >
-                   List of instance identifiers to be rolled. Each identifier is a string. InstanceIds can be null, and cannot be used together with launchSpecIds.
-                 items:
-                   type: string
-                   example:
-                     - i-0003a99ffb566f039
-                     - i-0567a99ffb566f765
-               respectPdb:
-                 type: boolean
-                 example: true
-                 default: false
-                 description: >
-                   During the roll, if the parameter is set to True we honor PDB during the instance replacement.
+                roll:
+                  allOf:
+                  - $ref: "../schemas/roll/roll-batchSizePercentage.yaml"
+                  - $ref: "../schemas/roll/roll-comment.yaml"
+                  - $ref: "../schemas/roll/roll-respectPdb.yaml"
+                  - $ref: "../schemas/roll/roll-batchMinHealthyPercentage.yaml"
+            - type: object
+              title: 'Roll with instance ids'
+              properties:
+                roll:
+                  allOf:
+                    - $ref: "../schemas/roll/roll-batchSizePercentage.yaml"
+                    - $ref: "../schemas/roll/roll-comment.yaml"
+                    - $ref: "../schemas/roll/roll-respectPdb.yaml"
+                    - $ref: "../schemas/roll/roll-batchMinHealthyPercentage.yaml"
+                    - $ref: "../schemas/roll/roll-instanceIds.yaml"
+            - type: object
+              title: 'Roll with launch specification ids'
+              properties:
+                roll:
+                  allOf:
+                    - $ref: "../schemas/roll/roll-batchSizePercentage.yaml"
+                    - $ref: "../schemas/roll/roll-comment.yaml"
+                    - $ref: "../schemas/roll/roll-respectPdb.yaml"
+                    - $ref: "../schemas/roll/roll-batchMinHealthyPercentage.yaml"
+                    - $ref: "../schemas/roll/roll-launchSpecIds.yaml"
+                    - $ref: "../schemas/roll/roll-disableLaunchSpecAutoScaling.yaml"
   responses:
     200:
       $ref: "../responses/initiate-clusterRoll.yaml"
