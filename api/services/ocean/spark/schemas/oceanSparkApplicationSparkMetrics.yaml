@@ -1,0 +1,40 @@
+type: object
+description: Computed statistics about the performance of the Spark application
+required:
+- inputDataBytes
+- outputDataBytes
+- sparkCoresDurationSeconds
+- efficiencyPercent
+- createdAt
+- updatedAt
+properties:
+  createdAt:
+    # I had to write createdAt and updatedAt manually and not use a $ref.
+    # Otherwise the object is marked as "recursive". This looks like a redoc bug.
+    $ref: "createdAt.yaml"
+  updatedAt:
+    $ref: "updatedAt.yaml"
+  sparkCoresDurationSeconds:
+    format: time-delta
+    type: number
+    description: >
+      The total core resources used by the application.
+      This metric is calculated as the sum over each container (driver or executor)
+      of its uptime duration multiplied by the number of cores allocated to it.
+  inputDataBytes:
+    type: integer
+    description: >
+      The number of bytes read by Spark, typically from an object store.
+  outputDataBytes:
+    type: integer
+    description: >
+      The number of bytes written by Spark, typically to an object store.
+  durationSeconds:
+    description: >
+      The duration of the Spark application
+    format: time-delta
+    type: number
+  efficiencyPercent:
+    type: number
+    description: >
+      The fraction of the time that Spark executor cores are running Spark tasks.
