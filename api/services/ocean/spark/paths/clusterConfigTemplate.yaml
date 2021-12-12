@@ -1,0 +1,107 @@
+summary: Ocean Spark
+
+get:
+  summary: "Get Config Template"
+  description: >
+    Describe a config template tied to an Ocean Spark cluster.
+  operationId: "OceanSparkClusterConfigTemplateGet"
+  tags:
+    - "Ocean Spark"
+  parameters:
+    - $ref: "../../../../commons/parameters/nonRequiredAccountId.yaml"
+    - $ref: "../parameters/path/oceanSparkClusterId.yaml"
+    - $ref: "../parameters/path/oceanSparkConfigTemplateId.yaml"
+  responses:
+    200:
+      $ref: "../responses/configTemplates.yaml"
+    400:
+      description: "Bad Request"
+
+patch:
+  summary: "Patch Config Template"
+  description: >
+    Update a config template by merging the existing configuration with the one provided in the request body.
+  operationId: "OceanSparkClusterConfigTemplatePatch"
+  tags:
+    - "Ocean Spark"
+  parameters:
+    - $ref: "../../../../commons/parameters/nonRequiredAccountId.yaml"
+    - $ref: "../parameters/path/oceanSparkClusterId.yaml"
+    - $ref: "../parameters/path/oceanSparkConfigTemplateId.yaml"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            displayName:
+              $ref: "../schemas/oceanSparkConfigTemplateDisplayName.yaml"
+            config:
+              # This is not how you're supposed to merge two objects (here: custom description + $ref).
+              # But I tried the more classic construct and it didn't work:
+              # allOf:
+              # - $ref: "../schemas/oceanSparkApplicationSpec.yaml"
+              # - description: ...
+              description: >
+                The piece of configuration to merge on top of the existing configuration
+              allOf:
+              - $ref: "../schemas/oceanSparkApplicationSpec.yaml"
+  responses:
+    200:
+      $ref: "../responses/configTemplates.yaml"
+    400:
+      description: "Bad Request"
+
+put:
+  summary: "Put Config Template"
+  description: >
+    Update a config template by replacing the existing configuration with the one provided in the request body.
+  operationId: "OceanSparkClusterConfigTemplatePut"
+  tags:
+    - "Ocean Spark"
+  parameters:
+    - $ref: "../../../../commons/parameters/nonRequiredAccountId.yaml"
+    - $ref: "../parameters/path/oceanSparkClusterId.yaml"
+    - $ref: "../parameters/path/oceanSparkConfigTemplateId.yaml"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            displayName:
+              $ref: "../schemas/oceanSparkConfigTemplateDisplayName.yaml"
+            config:
+              # This is not how you're supposed to merge two objects (here: custom description + $ref).
+              # But I tried the more classic construct and it didn't work:
+              # allOf:
+              # - $ref: "../schemas/oceanSparkApplicationSpec.yaml"
+              # - description: ...
+              description: >
+                The piece of configuration that will replace the existing configuration
+              allOf:
+              - $ref: "../schemas/oceanSparkApplicationSpec.yaml"
+  responses:
+    200:
+      $ref: "../responses/configTemplates.yaml"
+    400:
+      description: "Bad Request"
+
+delete:
+  summary: "Delete Config Template"
+  description: >
+    Delete a config template.
+  operationId: "OceanSparkClusterConfigTemplateDelete"
+  tags:
+    - "Ocean Spark"
+  parameters:
+    - $ref: "../../../../commons/parameters/nonRequiredAccountId.yaml"
+    - $ref: "../parameters/path/oceanSparkClusterId.yaml"
+    - $ref: "../parameters/path/oceanSparkConfigTemplateId.yaml"
+  responses:
+    204:
+      description: "Config Template Deleted"
+    400:
+      description: "Bad Request"
