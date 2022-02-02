@@ -27349,22 +27349,10 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "in": "query",
-            "name": "fromDate",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "description": "Beginning date value using either the date format \"yyyy-mm-dd; 2016-11-20\" or ms \"1494751821472\".\n"
+            "$ref": "#/paths/~1mcs~1ecs~1cluster~1%7BclusterName%7D~1costs/get/parameters/2"
           },
           {
-            "in": "query",
-            "name": "toDate",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "description": "End date value using either the date format \"yyyy-mm-dd; 2016-11-20\" or ms \"1494751821472\".\n"
+            "$ref": "#/paths/~1mcs~1ecs~1cluster~1%7BclusterName%7D~1costs/get/parameters/1"
           },
           {
             "in": "query",
@@ -31290,10 +31278,10 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1log/get/parameters/2"
+            "$ref": "#/paths/~1mcs~1ecs~1cluster~1%7BclusterName%7D~1costs/get/parameters/2"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1log/get/parameters/3"
+            "$ref": "#/paths/~1mcs~1ecs~1cluster~1%7BclusterName%7D~1costs/get/parameters/1"
           },
           {
             "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1log/get/parameters/4"
@@ -31864,10 +31852,10 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1log/get/parameters/3"
+            "$ref": "#/paths/~1mcs~1ecs~1cluster~1%7BclusterName%7D~1costs/get/parameters/1"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1log/get/parameters/2"
+            "$ref": "#/paths/~1mcs~1ecs~1cluster~1%7BclusterName%7D~1costs/get/parameters/2"
           },
           {
             "in": "query",
@@ -32303,6 +32291,149 @@
                                     "type": "number",
                                     "format": "float",
                                     "example": 216.10321
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/mcs/ecs/cluster/{clusterName}/costs": {
+      "get": {
+        "summary": "Get Cluster Costs",
+        "description": "Describes ECS cluster costs in a time range.\\\nThe response will provide the distribution of the costs per cluster.\n",
+        "operationId": "oceanEcsClusterCosts",
+        "tags": [
+          "Ocean ECS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "in": "query",
+            "name": "toDate",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "End date value using either the date format \"yyyy-mm-dd; 2016-11-20\" or ms \"1494751821472\".\n"
+          },
+          {
+            "in": "query",
+            "name": "fromDate",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Beginning date value using either the date format \"yyyy-mm-dd; 2016-11-20\" or ms \"1494751821472\".\n"
+          },
+          {
+            "in": "query",
+            "name": "region",
+            "example": "us-east-1",
+            "description": "Region name.\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "clusterName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "ocean.ecs",
+            "description": "The name of the ECS cluster, as set in the Ocean cluster configuration under the \"clusterName\" field.\n"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean ECS Cluster Costs Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/mcs/ecs/cluster/my-cluster-identifier/costs"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "totalCost": {
+                                    "type": "number",
+                                    "format": "float",
+                                    "example": 279.9907
+                                  },
+                                  "headroomCost": {
+                                    "type": "number",
+                                    "format": "float",
+                                    "example": 279.9907
+                                  },
+                                  "standAloneTasksCost": {
+                                    "type": "number",
+                                    "format": "float",
+                                    "example": 0
+                                  },
+                                  "ecsGroups": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "name": {
+                                          "type": "string",
+                                          "example": "default"
+                                        },
+                                        "cost": {
+                                          "type": "number",
+                                          "format": "float",
+                                          "example": 18.00862
+                                        },
+                                        "type": {
+                                          "type": "string",
+                                          "example": "SERVICE",
+                                          "enum": [
+                                            "SERVICE",
+                                            "HEADROOM",
+                                            "STAND_ALONE",
+                                            "IDLE"
+                                          ]
+                                        }
+                                      }
+                                    }
                                   }
                                 }
                               }
@@ -43607,10 +43738,10 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1log/get/parameters/2"
+            "$ref": "#/paths/~1mcs~1ecs~1cluster~1%7BclusterName%7D~1costs/get/parameters/2"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1log/get/parameters/3"
+            "$ref": "#/paths/~1mcs~1ecs~1cluster~1%7BclusterName%7D~1costs/get/parameters/1"
           },
           {
             "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1log/get/parameters/4"
