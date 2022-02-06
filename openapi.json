@@ -30812,6 +30812,17 @@
                                 "type": "boolean",
                                 "description": "When set to true, both automatic and per-VNG manual headroom to be saved concurrently and independently in the cluster. prerequisite: isAutoConfig must be true\n",
                                 "example": true
+                              },
+                              "extendedResourceDefinitions": {
+                                "type": "array",
+                                "description": "List of Ocean extended resource definitions to use in this cluster.\n",
+                                "items": {
+                                  "type": "string"
+                                },
+                                "example": [
+                                  "erd-123",
+                                  "erd-456"
+                                ]
                               }
                             }
                           },
@@ -49081,6 +49092,402 @@
                             },
                             "kind": {
                               "example": "spotinst:ocean:aws:ecs:launchSpec:launchContainerInstances"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/k8s/extendedResourceDefinition": {
+      "summary": "Ocean extended resource definition",
+      "post": {
+        "summary": "Create Extended Resource Definition",
+        "description": "Creates an Ocean extended resource definition entity.\n",
+        "operationId": "oceanK8sExtendedResourceDefinitionCreate",
+        "tags": [
+          "Ocean AWS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "extendedResourceDefinition"
+                    ],
+                    "properties": {
+                      "extendedResourceDefinition": {
+                        "type": "object",
+                        "description": "The Ocean extended resource definition.\n",
+                        "title": "Ocean Extended Resource Definition",
+                        "required": [
+                          "name",
+                          "mapping"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "readOnly": true,
+                            "example": "erd-123abc",
+                            "description": "Ocean extended resource definition identifier.\n"
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "example.com/name",
+                            "description": "The extended resource name as should be requested by your pods and registered to the nodes. Cannot be updated.</br>\nThe name should be a valid [Kubernetes extended resource name](https://kubernetes.io/docs/tasks/configure-pod-container/extended-resource/#assign-an-extended-resource-to-a-pod).\n"
+                          },
+                          "mapping": {
+                            "type": "object",
+                            "title": "AWS mapping",
+                            "description": "A mapping between AWS instanceType or `*` as default and its value for the given extended resource.\n",
+                            "example": {
+                              "c3.large": "2Ki",
+                              "c3.xlarge": "4Ki",
+                              "c3.2xlarge": "8Mi"
+                            }
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "readOnly": true,
+                            "format": "date-time",
+                            "example": "2021-03-17T08:13:08.000Z",
+                            "description": "A timestamp of the extended resource definition creation.\n"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "readOnly": true,
+                            "format": "date-time",
+                            "example": "2021-03-17T15:06:13.000Z",
+                            "description": "A timestamp of the latest extended resource definition update.\n"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ocean Create Extended Resource Definition Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/k8s/extendedResourceDefinition"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1k8s~1extendedResourceDefinition/post/requestBody/content/application~1json/schema/allOf/0/properties/extendedResourceDefinition"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:k8s:extendedResourceDefinition"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "get": {
+        "summary": "List Extended Resource Definitions",
+        "description": "List the configurations for all Ocean extended resource definitions in the specified account.\n",
+        "operationId": "oceanK8sExtendedResourceDefinitionList",
+        "tags": [
+          "Ocean AWS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean Extended Resource Definition Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/k8s/extendedResourceDefinition"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1k8s~1extendedResourceDefinition/post/requestBody/content/application~1json/schema/allOf/0/properties/extendedResourceDefinition"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:k8s:extendedResourceDefinition"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/k8s/extendedResourceDefinition/{oceanExtendedResourceDefinitionId}": {
+      "get": {
+        "summary": "Get Extended Resource Definition",
+        "description": "Get the configurations for a specified Ocean extended resource definition.\n",
+        "operationId": "oceanK8sExtendedResourceDefinitionGet",
+        "tags": [
+          "Ocean AWS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "in": "path",
+            "name": "oceanExtendedResourceDefinitionId",
+            "example": "erd-12345abc",
+            "description": "Identifier of the Ocean extended resource definition.\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean Extended Resource Definition Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/k8s/extendedResourceDefinition/erd-12345abc"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1k8s~1extendedResourceDefinition/post/requestBody/content/application~1json/schema/allOf/0/properties/extendedResourceDefinition"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:k8s:extendedResourceDefinition"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update Extended Resource Definition",
+        "description": "Only the mapping parameter is updatable for extended resource definition.\n",
+        "operationId": "oceanK8sExtendedResourceDefinitionUpdate",
+        "tags": [
+          "Ocean AWS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1ocean~1k8s~1extendedResourceDefinition~1%7BoceanExtendedResourceDefinitionId%7D/get/parameters/1"
+          },
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/paths/~1ocean~1k8s~1extendedResourceDefinition/post/requestBody/content/application~1json/schema/allOf/0"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ocean Update Extended Resource Definition Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/k8s/extendedResourceDefinition/erd-12345abc"
+                            },
+                            "method": {
+                              "example": "PUT"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1k8s~1extendedResourceDefinition/post/requestBody/content/application~1json/schema/allOf/0/properties/extendedResourceDefinition"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:k8s:extendedResourceDefinition"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Extended Resource Definition",
+        "description": "Delete a specified Ocean extended resource definition.\n",
+        "operationId": "oceanK8sExtendedResourceDefinitionDelete",
+        "tags": [
+          "Ocean AWS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean Delete Extended Resource Definition Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/k8s/extendedResourceDefinition/erd-12345abc"
+                            },
+                            "method": {
+                              "example": "DELETE"
                             }
                           }
                         }
