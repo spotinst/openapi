@@ -1,0 +1,64 @@
+type: object
+properties:
+  userId:
+    type: string
+    description: user id
+  userName:
+    type: string
+    description: user name
+  type:
+    type: string
+    enum: [personal, programmatic]
+    description: user type
+  email:
+    type: string
+    description: user's email
+  mfa:
+    type: boolean
+    description: is validated by mfa
+  groups:
+    type: array
+    description: the groups that the given user is registered to
+    items:
+      type: object
+      properties:
+        id:
+          type: string
+          description: user group id
+        name:
+          type: string
+          description: user group name
+        policyNames:
+          type: array
+          description: The names of the policies registered under the given group
+          items:
+            type: string
+  policies:
+    type: array
+    description: The policies registered under the given group
+    items:
+      type: object
+      properties:
+        policyId:
+          type: string
+          description: the ID of the given policy
+        policyName:
+          type: string
+          description: the name of the given policy
+        policyType:
+          type: string
+          description: the type of the given policy
+        accountNames:
+          type: array
+          description: the names of the accounts registered under the given policy
+          items:
+            type: string
+
+example:
+  userId: "u-a1b2c3d4"
+  userName: "John Doe"
+  type: "personal"
+  email: "john.doe@company.com"
+  mfa: "false"
+  groups: [{id: "ugr-12345678", name: "DevOps", policyNames: ["DevOps-PROD", "DevOps-DEV", "IT"]},{id: "ugr-87654321", name: "IT", policyNames: ["IT"]}]
+  policies: [ { policyId: "pol-12345678", policyName: "TriggerDeployment",policyType: "ACCOUNT", accountNames: [ "Smallville", "Metropolis" ] },{ policyId: "pol-87654321", policyName: "UpdateScheduling",policyType: "ORGANIZATION", accountNames: [ ] } ]
