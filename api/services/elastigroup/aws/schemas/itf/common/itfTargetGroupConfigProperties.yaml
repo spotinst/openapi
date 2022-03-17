@@ -1,0 +1,106 @@
+type: object
+#description: |
+#  Object with target group configuration
+properties:
+  vpcId:
+    type: string
+    description: |
+      The id of the Amazon Virtual Private Cloud for the creation of the target groups. any string which is not empty or null.
+    example: "vpc-0410a20ec1702a537"
+  healthCheckPath:
+    type: string
+    description: |
+      The id of the Amazon Virtual Private Cloud for the creation of the target groups. Use the default path of “/“ to ping the root, or specify a custom path if preferred. Up to 1024 characters.
+    example: "/index.html"
+  healthCheckProtocol:
+    type: string
+    description: |
+      The protocol to use to connect with the target. HTTP or HTTPS.
+    enum: [ HTTP, HTTPS ]
+    default: "HTTP"
+    example: "HTTP"
+  healthCheckPort:
+    type: string
+    description: |
+      The port to use to connect with the target. 1-65535 or traffic-port.
+    default: "80"
+    example: "traffic-port"
+  healthCheckIntervalSeconds:
+    type: integer
+    description: |
+      The approximate amount of time, in seconds, between health checks of an individual target. integer between 5-300.
+    default: 30
+    example: 40
+  healthCheckTimeoutSeconds:
+    type: integer
+    description: |
+      The amount of time, in seconds, during which no response means a failed health check. integer between 2-120.
+    default: 5
+    example: 20
+  healthyThresholdCount:
+    type: integer
+    description: |
+      The number of consecutive health checks successes required before considering an unhealthy target healthy. integer between 2-10.
+    default: 5
+    example: 3
+  unhealthyThresholdCount:
+    type: integer
+    description: |
+      The number of consecutive health check failures required before considering the target unhealthy. integer between 2-10.
+    default: 2
+    example: 4
+  port:
+    type: Integer
+    description: |
+      The port on which the targets are listening. Not used if the target is a Lambda function. 1-65535.
+    example: 80
+  protocol:
+    type: String
+    description: |
+      The protocol to use for routing traffic to the targets. The possible values are HTTP or HTTPS.
+    enum: [ HTTP, HTTPS ]
+    example: "HTTP"
+  protocolVersion:
+    type: String
+    description: |
+      The protocol version. The possible values are GRPC, HTTP1, and HTTP2.
+    default: "HTTP1"
+    enum: [ GRPC, HTTP1, HTTP2 ]
+    example: "HTTP1"
+  tags:
+    type: array
+    description: |
+      The tags to assign to the target group
+    default: []
+    example: [ "creator" : "John Doe" ]
+    items:
+      type: object
+      properties:
+        tagKey:
+          type: string
+          description: |
+            The tag's key
+          example: "Creator"
+        tagValue:
+          type: string
+          description: |
+            The tag's value
+          example: "John Doe"
+  matcher:
+    type: object
+    description: |
+      Matcher to use when checking for a successful response from a target group. one of the httpCoder or grpcCod are required.
+    default: { "httpCode": "200" }
+    properties:
+      httpCode:
+        type: String
+        description: |
+          Codes to use when checking for a successful response from a target group. Can be set only when http/https protocol version is set. number between 200 and 499, or multiple values ("200,202") or a range of values ("200-299").
+        default: "200"
+        example: "200"
+      grpcCode:
+        type: String
+        description: |
+          Codes to use when checking for a successful response from a target group. Can be set only when GRCP protocol version is set. number between 0 and 99, or multiple values ("0,1") or a range ("0-5").
+        default: "12"
+        example: "4"

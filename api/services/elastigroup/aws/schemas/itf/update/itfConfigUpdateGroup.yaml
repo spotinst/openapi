@@ -1,0 +1,32 @@
+title: Intelligent Traffic Flow configurations
+type: object
+description: |
+  Intelligent Traffic Flow configurations
+properties:
+  fixedTargetGroups:
+    type: boolean
+    description: |
+      Boolean to control whether to keep the set of target groups fixed. When set to true, all target groups will be created in advance upon create/update group, and will not be deleted even when not being used anymore
+    default: false
+    example: false
+  weightStrategy:
+    type: string
+    description: |
+      Distribution strategy (either vCPU or custom weights). Custom strategy can be set only when group has custom weights
+    enum: [ custom, vcpu ]
+    default: vcpu
+    example: custom
+  migrationHealthinessThreshold:
+    type: integer
+    description: |
+      Threshold for the minimum healthiness level of the target groups that is needed before activating the ITF rules (integer representing the percentage of healthy instances within the target groups. integer between 0-100.
+    default: 50
+    example: 80
+  loadBalancers:
+    type: array
+    description: |
+      Array of LoadBalancer Object. List with a single element.
+    items:
+      $ref: "../common/itfLoadBalancerConfig.yaml"
+  targetGroupConfig:
+    $ref: "../update/itfTargetGroupConfigUpdateGroup.yaml"
