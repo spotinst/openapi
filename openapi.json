@@ -703,6 +703,257 @@
                                       }
                                     }
                                   },
+                                  "itf": {
+                                    "title": "Intelligent Traffic Flow (ITF) Configuration",
+                                    "type": "object",
+                                    "description": "Contains the configuration details of Intelligent Traffic Flow (ITF).\n",
+                                    "properties": {
+                                      "fixedTargetGroups": {
+                                        "type": "boolean",
+                                        "description": "Boolean to control whether to keep the set of target groups fixed. When set to true, all target groups will be created in advance upon create/update group, and will not be deleted even when not being used anymore.\n",
+                                        "default": false,
+                                        "example": false
+                                      },
+                                      "weightStrategy": {
+                                        "type": "string",
+                                        "description": "Distribution strategy (either 'vcpu' or 'custom'). 'Custom' strategy can be set only when the group is configured with custom weights.\n",
+                                        "enum": [
+                                          "vcpu",
+                                          "custom"
+                                        ],
+                                        "default": "vcpu",
+                                        "example": "custom"
+                                      },
+                                      "migrationHealthinessThreshold": {
+                                        "type": "integer",
+                                        "description": "Threshold for the minimum healthiness level of the target groups that is needed before activating the ITF rules. Integer representing the percentage of healthy instances within the target groups. Valid values: integer between 0-100.\n",
+                                        "default": 50,
+                                        "example": 80
+                                      },
+                                      "loadBalancers": {
+                                        "type": "array",
+                                        "description": "The load balancer associated with the ITF. Array with a single element.\n",
+                                        "items": {
+                                          "title": "ITF Load Balancer Configuration",
+                                          "type": "object",
+                                          "description": "Contains the configuration details of an ITF load balancer.\n",
+                                          "required": [
+                                            "loadBalancerArn",
+                                            "listenerRules"
+                                          ],
+                                          "properties": {
+                                            "loadBalancerArn": {
+                                              "type": "string",
+                                              "description": "Identifier of the load balancer in AWS.\n",
+                                              "example": "arn:aws:elasticloadbalancing:us-west-2:123456789012:loadbalancer/app/my-load-balancer/50dc6c495c0c9188"
+                                            },
+                                            "listenerRules": {
+                                              "type": "array",
+                                              "description": "The listener rules that should be maintained by ITF. Array with a minimum of 1 element.\n",
+                                              "items": {
+                                                "title": "ITF Listener Rule Configuration",
+                                                "type": "object",
+                                                "description": "Contains the configuration details of an ITF listener rule.\n",
+                                                "required": [
+                                                  "ruleArn"
+                                                ],
+                                                "properties": {
+                                                  "ruleArn": {
+                                                    "type": "string",
+                                                    "description": "Identifier of the listener rule in AWS.\n",
+                                                    "example": "arn:aws:elasticloadbalancing:us-west-2:123456789012:listener-rule/app/0123456789012345/1234567890123456/234567890123456"
+                                                  },
+                                                  "staticTargetGroups": {
+                                                    "type": "array",
+                                                    "description": "Listener rule target group whose percentage should remain static (unchanged). Array with a single element.",
+                                                    "items": {
+                                                      "$ref": "#/paths/~1aws~1ec2~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/compute/properties/launchSpecification/properties/itf/properties/loadBalancers/items/properties/defaultStaticTargetGroups/items"
+                                                    },
+                                                    "example": [
+                                                      {
+                                                        "arn": "arn:aws:elasticloadbalancing:us-west-2:123456789012:targetgroup/blue-targets/73e2d6bc24d8a068",
+                                                        "percentage": 0.5
+                                                      }
+                                                    ]
+                                                  }
+                                                }
+                                              }
+                                            },
+                                            "defaultStaticTargetGroups": {
+                                              "type": "array",
+                                              "description": "A default static target group on the rule. Array with a single element.",
+                                              "items": {
+                                                "title": "ITF Static Target Group Configuration",
+                                                "type": "object",
+                                                "description": "Contains the configuration details of an ITF static target group.\n",
+                                                "required": [
+                                                  "arn",
+                                                  "percentage"
+                                                ],
+                                                "properties": {
+                                                  "arn": {
+                                                    "type": "string",
+                                                    "description": "Identifier of the target group in AWS.\n",
+                                                    "example": "arn:aws:elasticloadbalancing:us-west-2:123456789012:targetgroup/blue-targets/73e2d6bc24d8a067"
+                                                  },
+                                                  "percentage": {
+                                                    "type": "number",
+                                                    "description": "A float number in the range of 0.1-10.\n",
+                                                    "example": 0.4
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "targetGroupConfig": {
+                                        "title": "ITF Target Group Configuration",
+                                        "type": "object",
+                                        "description": "Contains the configuration details of an ITF target group.\n",
+                                        "allOf": [
+                                          {
+                                            "type": "object",
+                                            "properties": {
+                                              "vpcId": {
+                                                "type": "string",
+                                                "description": "The ID of the AWS VPC for the targets. Valid values: any string which is not empty or null.\n",
+                                                "example": "vpc-0410a20ec1702a537"
+                                              },
+                                              "healthCheckPath": {
+                                                "type": "string",
+                                                "description": "The destination for health checks on the targets.\n",
+                                                "example": "/index.html"
+                                              },
+                                              "healthCheckProtocol": {
+                                                "type": "string",
+                                                "description": "HTTP, HTTPS are already listed under the enum below, no need to repeat.\n",
+                                                "enum": [
+                                                  "HTTP",
+                                                  "HTTPS"
+                                                ],
+                                                "default": "HTTP",
+                                                "example": "HTTP"
+                                              },
+                                              "healthCheckPort": {
+                                                "type": "string",
+                                                "description": "The port to use to connect with the target. Valid values: 1-65535 or \"traffic-port\".\n",
+                                                "default": "80",
+                                                "example": "traffic-port"
+                                              },
+                                              "healthCheckIntervalSeconds": {
+                                                "type": "integer",
+                                                "description": "The approximate amount of time, in seconds, between health checks of an individual target. Valid values: integer between 5-300.\n",
+                                                "default": 30,
+                                                "example": 40
+                                              },
+                                              "healthCheckTimeoutSeconds": {
+                                                "type": "integer",
+                                                "description": "The amount of time, in seconds, during which no response means a failed health check. Valid values: integer between 2-120.\n",
+                                                "default": 5,
+                                                "example": 20
+                                              },
+                                              "healthyThresholdCount": {
+                                                "type": "integer",
+                                                "description": "The number of consecutive health checks successes required before considering an unhealthy target healthy. Valid values: integer between 2-10.\n",
+                                                "default": 5,
+                                                "example": 3
+                                              },
+                                              "unhealthyThresholdCount": {
+                                                "type": "integer",
+                                                "description": "The number of consecutive health check failures required before considering the target unhealthy. Valid values: integer between 2-10.\n",
+                                                "default": 2,
+                                                "example": 4
+                                              },
+                                              "port": {
+                                                "type": "integer",
+                                                "description": "The port on which the targets are listening. Not used if the target is a Lambda function. Valid values: integer between 1-65535.\n",
+                                                "example": 80
+                                              },
+                                              "protocol": {
+                                                "type": "string",
+                                                "description": "The protocol to use for routing traffic to the targets.\n",
+                                                "enum": [
+                                                  "HTTP",
+                                                  "HTTPS"
+                                                ],
+                                                "example": "HTTP"
+                                              },
+                                              "protocolVersion": {
+                                                "type": "string",
+                                                "description": "The protocol version.\n",
+                                                "default": "HTTP1",
+                                                "enum": [
+                                                  "GRPC",
+                                                  "HTTP1",
+                                                  "HTTP2"
+                                                ],
+                                                "example": "HTTP1"
+                                              },
+                                              "tags": {
+                                                "type": "array",
+                                                "description": "The tags to assigned with the created target groups\n",
+                                                "default": [],
+                                                "example": [
+                                                  {
+                                                    "creator": "John Doe"
+                                                  }
+                                                ],
+                                                "items": {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "tagKey": {
+                                                      "type": "string",
+                                                      "description": "The tag's key\n",
+                                                      "example": "Creator"
+                                                    },
+                                                    "tagValue": {
+                                                      "type": "string",
+                                                      "description": "The tag's value\n",
+                                                      "example": "John Doe"
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                              "matcher": {
+                                                "type": "object",
+                                                "description": "Matcher to use when checking for a successful response from a target group. One of 'httpCode' or 'grpcCode' is required.\n",
+                                                "default": {
+                                                  "httpCode": "200"
+                                                },
+                                                "properties": {
+                                                  "httpCode": {
+                                                    "type": "string",
+                                                    "description": "You can specify values between 200 and 499, and the default value is 200. You can specify multiple values (for example, “200,202”) or a range of values (for example, “200-299”).\n",
+                                                    "default": "200",
+                                                    "example": "200"
+                                                  },
+                                                  "grpcCode": {
+                                                    "type": "string",
+                                                    "description": "You can specify values between 0 and 99. You can specify multiple values (for example, “0,1”) or a range of values (for example, “0-5”). The default value is 12.\n",
+                                                    "default": "12",
+                                                    "example": "4"
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          },
+                                          {
+                                            "required": [
+                                              "vpcId",
+                                              "healthCheckPath",
+                                              "port",
+                                              "protocol"
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "required": [
+                                      "loadBalancers",
+                                      "targetGroupConfig"
+                                    ]
+                                  },
                                   "healthCheckType": {
                                     "type": "string",
                                     "description": "The service to use for the health check.\n",
@@ -3646,6 +3897,52 @@
                                   }
                                 }
                               },
+                              "itf": {
+                                "title": "Intelligent Traffic Flow (ITF) Configuration",
+                                "type": "object",
+                                "description": "Contains the configuration details of Intelligent Traffic Flow (ITF).\n",
+                                "properties": {
+                                  "fixedTargetGroups": {
+                                    "type": "boolean",
+                                    "description": "Boolean to control whether to keep the set of target groups fixed. When set to true, all target groups will be created in advance upon create/update group, and will not be deleted even when not being used anymore.\n",
+                                    "default": false,
+                                    "example": false
+                                  },
+                                  "weightStrategy": {
+                                    "type": "string",
+                                    "description": "Distribution strategy (either 'vcpu' or 'custom'). 'Custom' strategy can be set only when the group is configured with custom weights.\n",
+                                    "enum": [
+                                      "vcpu",
+                                      "custom"
+                                    ],
+                                    "default": "vcpu",
+                                    "example": "custom"
+                                  },
+                                  "migrationHealthinessThreshold": {
+                                    "type": "integer",
+                                    "description": "Threshold for the minimum healthiness level of the target groups that is needed before activating the ITF rules. Integer representing the percentage of healthy instances within the target groups. Valid values: integer between 0-100.\n",
+                                    "default": 50,
+                                    "example": 80
+                                  },
+                                  "loadBalancers": {
+                                    "type": "array",
+                                    "description": "The load balancer associated with the ITF. Array with a single element.\n",
+                                    "items": {
+                                      "$ref": "#/paths/~1aws~1ec2~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/compute/properties/launchSpecification/properties/itf/properties/loadBalancers/items"
+                                    }
+                                  },
+                                  "targetGroupConfig": {
+                                    "title": "ITF Target Group Configuration",
+                                    "type": "object",
+                                    "description": "Contains the configuration details of an ITF target group.\n",
+                                    "allOf": [
+                                      {
+                                        "$ref": "#/paths/~1aws~1ec2~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/compute/properties/launchSpecification/properties/itf/properties/targetGroupConfig/allOf/0"
+                                      }
+                                    ]
+                                  }
+                                }
+                              },
                               "healthCheckType": {
                                 "type": "string",
                                 "description": "The service to use for the health check.\n",
@@ -5344,7 +5641,7 @@
               "type": "string"
             },
             "required": true,
-            "exmaple": "ssi-227a0005",
+            "example": "ssi-227a0005",
             "description": "Stateful instance ID\n"
           }
         ],
@@ -5470,7 +5767,7 @@
               "type": "string"
             },
             "required": true,
-            "exmaple": "vol-0faa4b2957a3d59c8",
+            "example": "vol-0faa4b2957a3d59c8",
             "description": "Volume ID\n"
           }
         ],
@@ -30671,6 +30968,211 @@
         }
       }
     },
+    "/aws/ec2/group/{groupId}/itf/migration": {
+      "get": {
+        "summary": "List Elastigroup ITF Listener Rule Migrations",
+        "description": "Get all ITF listener rule migrations of a specific Elastigroup.\n",
+        "operationId": "elastigroupAwsItfListenerRuleMigrationsGet",
+        "tags": [
+          "Elastigroup AWS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/put/parameters/0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Elastigroup Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/aws/ec2/group/sig-12345/itf/migration?spotinstAccountId=act-123456"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "title": "ITF Listener Rule Migration",
+                                "type": "object",
+                                "description": "Contains the details of an ITF listener rule migration process.\n",
+                                "properties": {
+                                  "createdAt": {
+                                    "type": "string",
+                                    "example": "2020-04-10T21:41:31.000Z"
+                                  },
+                                  "updatedAt": {
+                                    "type": "string",
+                                    "example": "2020-05-12T22:37:18.000Z"
+                                  },
+                                  "id": {
+                                    "type": "string",
+                                    "example": "ilrm-12345678"
+                                  },
+                                  "groupId": {
+                                    "type": "string",
+                                    "title": "Group Id",
+                                    "example": "sig-12345"
+                                  },
+                                  "ruleArn": {
+                                    "type": "string",
+                                    "example": "arn:aws:elasticloadbalancing:us-west-2:123456789012:listener-rule/app/0123456789012345/1234567890123456/234567890123456"
+                                  },
+                                  "status": {
+                                    "type": "string",
+                                    "enum": [
+                                      "Starting",
+                                      "In progress",
+                                      "Finished",
+                                      "Failed"
+                                    ],
+                                    "example": "Starting"
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:aws:ec2:group:itf:migration"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/aws/ec2/group/{groupId}/itf/migration/{migrationId}": {
+      "put": {
+        "summary": "Update ITF Listener Rule Migration",
+        "description": "Update an ITF listener rule migration object of a specific Elastigroup.\n",
+        "operationId": "elastigroupAwsItfListenerRuleMigrationUpdate",
+        "tags": [
+          "Elastigroup AWS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D/put/parameters/0"
+          },
+          {
+            "in": "path",
+            "name": "migrationId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The ID of the ITF listener rule migration to be updated.\n",
+            "example": "ilrm-12345678"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "title": "ITF Listener Rule Migration Update Request",
+                    "type": "object",
+                    "description": "A request to update the status of an ITF listener rule migration process. Only 'USER_RETRY' is supported, allowing to retry a previously failed migration process (having a \"Failed\" status).\n",
+                    "properties": {
+                      "status": {
+                        "type": "string",
+                        "description": "The status to be updated. Valid value is \"USER_RETRY\".",
+                        "enum": [
+                          "USER_RETRY"
+                        ],
+                        "example": "USER_RETRY"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Elastigroup Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/aws/ec2/group/sig-12345/itf/migration/ilrm-12345678?spotinstAccountId=act-123456"
+                            },
+                            "method": {
+                              "example": "UPDATE"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1aws~1ec2~1group~1%7BgroupId%7D~1itf~1migration/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:aws:ec2:group:itf:migration"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/ocean/aws/k8s/cluster": {
       "summary": "Ocean for AWS",
       "post": {
@@ -36747,7 +37249,7 @@
               "type": "string"
             },
             "required": true,
-            "exmaple": "smi-123456",
+            "example": "smi-123456",
             "description": "Managed Instance ID\n"
           },
           {
@@ -36757,7 +37259,7 @@
               "type": "string"
             },
             "required": true,
-            "exmaple": "vol-0faa4b2957a3d59c8",
+            "example": "vol-0faa4b2957a3d59c8",
             "description": "Volume ID\n"
           }
         ],
