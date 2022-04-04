@@ -1,34 +1,43 @@
 type: object
 title: Ocean Cluster Strategy
-description: >
+description: |
   An object defining the cluster strategy with regard to waiting periods and utilization of on-demand and reserved instances.
 properties:
   utilizeReservedInstances:
     type: boolean
     default: false
     example: true
-    description: >
+    description: |
       If reserved instances exist, Ocean will utilize them before launching spot instances.
   fallbackToOd:
     type: boolean
     default: false
     example: true
-    description: >
+    description: |
       If no spot instance markets are available, enable Ocean to launch on-demand instances instead.
+  spotPercentage:
+    type: integer
+    default: 100
+    minimum: 0
+    maximum: 100
+    description: |
+      The desired percentage of Spot instances out of all running instances.\
+      Only available when the field is **not** set in any VNG directly (launchSpec.strategy.spotPercentage).
+    example: 100
   gracePeriod:
     type: integer
     default: 600
     example: 600
-    description: >
+    description: |
       The amount of time, in seconds, from the time the instance has launched to the time its first health check starts.
   drainingTimeout:
     type: integer
     example: 60
-    description: >
+    description: |
       The configurable amount of time that Ocean will wait for the draining process to complete before terminating an instance. If you have not defined a draining timeout, the default of 300 seconds will be used.
   utilizeCommitments:
     type: boolean
-    description: >
+    description: |
       If savings plans commitment has available capacity, Ocean will utilize them alongside RIs (if exist) to maximize cost efficiency.
     example: false
     default: false
