@@ -1,0 +1,44 @@
+get:
+  summary: "Get Elastilog"
+  description:
+    You can fetch a Stateful Node's Elastilog via the Spot API, in order to be able to consume elastilog from various tools used for log storing and analyzing.
+    Logs have retention of 3 months back from today, so minimal fromDate should be up to 3 months back at runtime.
+  operationId: "azureStatefulNodeLogs"
+  tags:
+    - Elastigroup Azure Stateful
+  parameters:
+    - $ref: "../../../../../commons/parameters/accountId.yaml"
+    - $ref: "../../parameters/nodeId.yaml"
+    - $ref: "../../../../../commons/parameters/fromDateUnixEnabled.yaml"
+    - $ref: "../../../../../commons/parameters/toDateUnixEnabled.yaml"
+    - in: query
+      name: severity
+      example: "WARN"
+      description: >
+        Severity of log entries to extract.
+      schema:
+        type: string
+        enum: ["DEBUG", "WARN", "INFO", "ALL", "ERROR"]
+    - in: query
+      name: resourceId
+      example: ssn-12345678
+      description: >
+        Filter log extracted entires related to a specific resource id
+      default: Null
+      schema:
+        type: string
+    - in: query
+      name: limit
+      example: 100
+      default: 500
+      description: >
+        Maximum number of lines to extract in a response.
+      schema:
+        type: integer
+        maximum: 1000
+        minimum: 0
+  responses:
+    200:
+      $ref: "../responses/getLogs.yaml"
+    400:
+      description: "Bad Request"

@@ -22,7 +22,7 @@ externalDocs:
 servers:
   - url: https://api.spotinst.io
 security:
-  - auth: []
+  - auth: [ ]
 
 components:
   securitySchemes:
@@ -50,6 +50,12 @@ tags:
 
   - name: Elastigroup GCP
     description: Elastigroup for Google Cloud
+    externalDocs:
+      description: Elastigroup Concepts and Tutorials
+      url: https://docs.spot.io/elastigroup/
+
+  - name: Elastigroup Azure Stateful
+    description: Elastigroup for Microsoft Azure Stateful Node
     externalDocs:
       description: Elastigroup Concepts and Tutorials
       url: https://docs.spot.io/elastigroup/
@@ -169,7 +175,7 @@ tags:
       url: https://docs.spot.io/elastigroup/tools-integrations/custom-health-check-service
 
   - name: Notifications Service
-    description:  |
+    description: |
       A Spot Notifications service enables you a fast, flexible, fully managed push notification service that lets you know about major events that happened in your Spot account.ֿ Spot Notifications makes it simple and cost-effective to get push notifications to your email address, HTTP, HTTPS or AWS SNS (Simple Notifications Service).
 
   - name: Insights Service
@@ -196,6 +202,7 @@ x-tagGroups:
       - Elastigroup GCP
       - Elastigroup Azure Spot VMs
       - Elastigroup Azure Scale Set VMs
+      - Elastigroup Azure Stateful
   - name: Managed Instance
     tags:
       - Managed Instance AWS
@@ -367,6 +374,36 @@ paths:
     $ref: services/elastigroup/azure/spotVms/paths/vmProtection.yaml
   /azure/compute/group/{groupId}/logs:
     $ref: services/elastigroup/azure/spotVms/paths/vmLogs.yaml
+  /azure/compute/statefulNode:
+    $ref: services/elastigroup/azure/stateful/node/paths/createGetAll.yaml
+  /azure/compute/statefulNode/{nodeId}:
+    $ref: services/elastigroup/azure/stateful/node/paths/deleteUpdateGet.yaml
+  /azure/compute/statefulNode/{nodeId}/status:
+    $ref: services/elastigroup/azure/stateful/node/paths/getStatus.yaml
+  /azure/compute/statefulNode/status:
+    $ref: services/elastigroup/azure/stateful/node/paths/getAllStatus.yaml
+  /azure/compute/statefulNode/{nodeId}/resources:
+    $ref: services/elastigroup/azure/stateful/node/paths/getResources.yaml
+  /azure/compute/statefulNode/cost:
+    $ref: services/elastigroup/azure/stateful/node/paths/getAggregatedCosts.yaml
+  /azure/compute/statefulNode/cost/daily:
+    $ref: services/elastigroup/azure/stateful/node/paths/getDailyAggregatedCosts.yaml
+  /azure/compute/statefulNode/sizeUsage/daily:
+    $ref: services/elastigroup/azure/stateful/node/paths/getDailyVmSizeUsage.yaml
+  /azure/compute/statefulNode/{nodeId}/state:
+    $ref: services/elastigroup/azure/stateful/node/paths/changeState.yaml
+  /azure/compute/statefulNode/import:
+    $ref: services/elastigroup/azure/stateful/node/paths/importVm.yaml
+  /azure/compute/statefulNode/resourceGroup/{resourceGroupName}/virtualMachine/{virtualMachineName}/importConfiguration:
+    $ref: services/elastigroup/azure/stateful/node/paths/getImportConfiguration.yaml
+  /azure/compute/statefulNode/import/{importId}/status:
+    $ref: services/elastigroup/azure/stateful/node/paths/getImportStatus.yaml
+  /azure/compute/statefulNode/{nodeId}/dataDisk/attach:
+    $ref: services/elastigroup/azure/stateful/node/paths/attachDataDisk.yaml
+  /azure/compute/statefulNode/{nodeId}/dataDisk/detach:
+    $ref: services/elastigroup/azure/stateful/node/paths/detachDataDisk.yaml
+  /azure/compute/statefulNode/{nodeId}/log:
+    $ref: services/elastigroup/azure/stateful/node/paths/getLogs.yaml
   /gcp/gce/group:
     $ref: services/elastigroup/gcp/paths/groups.yaml
   /gcp/gce/group/{groupId}:
@@ -575,7 +612,7 @@ paths:
     $ref: services/ocean/gke/paths/clusterFetchElastilog.yaml
   /ocean/gcp/k8s/cluster/{oceanClusterId}/rightSizing/suggestion:
     $ref: services/ocean/gke/paths/rightSizing.yaml
-#    $ref: services/ocean/gke/paths/rightSizingLegacy.yaml - deprecated
+  #    $ref: services/ocean/gke/paths/rightSizingLegacy.yaml - deprecated
   /ocean/gcp/k8s/launchSpec:
     $ref: services/ocean/gke/paths/clusters-launchSpec.yaml
   /ocean/gcp/k8s/launchSpec/{oceanLaunchSpecId}:
