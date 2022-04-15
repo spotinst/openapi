@@ -484,6 +484,16 @@ components:
         javaOptions:
           title: Javaoptions
           type: string
+        sidecars:
+          title: Sidecars
+          type: array
+          items:
+            "$ref": "#/components/schemas/Container"
+        initContainers:
+          title: Initcontainers
+          type: array
+          items:
+            "$ref": "#/components/schemas/Container"
         labels:
           additionalProperties:
             type: string
@@ -588,6 +598,16 @@ components:
           type: string
         instanceSelector:
           $ref: '#/components/schemas/InstanceSelector'
+        sidecars:
+          title: Sidecars
+          type: array
+          items:
+            "$ref": "#/components/schemas/Container"
+        initContainers:
+          title: Initcontainers
+          type: array
+          items:
+            "$ref": "#/components/schemas/Container"
         instances:
           title: Instances
           type: integer
@@ -2136,3 +2156,579 @@ components:
           type: string
       title: WindowsSecurityContextOptions
       type: object
+    Container:
+      title: Container
+      required:
+      - name
+      type: object
+      properties:
+        args:
+          title: Args
+          type: array
+          items:
+            type: string
+          description: 'Arguments to the entrypoint. The docker image''s CMD is used
+            if this is not provided. Variable references $(VAR_NAME) are expanded
+            using the container''s environment. If a variable cannot be resolved,
+            the reference in the input string will be unchanged. The $(VAR_NAME) syntax
+            can be escaped with a double $$, ie: $$(VAR_NAME). Escaped references
+            will never be expanded, regardless of whether the variable exists or not.
+            Cannot be updated. More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell'
+        command:
+          title: Command
+          type: array
+          items:
+            type: string
+          description: 'Entrypoint array. Not executed within a shell. The docker
+            image''s ENTRYPOINT is used if this is not provided. Variable references
+            $(VAR_NAME) are expanded using the container''s environment. If a variable
+            cannot be resolved, the reference in the input string will be unchanged.
+            The $(VAR_NAME) syntax can be escaped with a double $$, ie: $$(VAR_NAME).
+            Escaped references will never be expanded, regardless of whether the variable
+            exists or not. Cannot be updated. More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell'
+        env:
+          title: Env
+          type: array
+          items:
+            "$ref": "#/components/schemas/EnvVar"
+          description: List of environment variables to set in the container. Cannot
+            be updated.
+        envFrom:
+          title: Envfrom
+          type: array
+          items:
+            "$ref": "#/components/schemas/EnvFromSource"
+          description: List of sources to populate environment variables in the container.
+            The keys defined within a source must be a C_IDENTIFIER. All invalid keys
+            will be reported as an event when the container is starting. When a key
+            exists in multiple sources, the value associated with the last source
+            will take precedence. Values defined by an Env with a duplicate key will
+            take precedence. Cannot be updated.
+        image:
+          title: Image
+          type: string
+          description: 'Docker image name. More info: https://kubernetes.io/docs/concepts/containers/images
+            This field is optional to allow higher level config management to default
+            or override container images in workload controllers like Deployments
+            and StatefulSets.'
+        imagePullPolicy:
+          title: Imagepullpolicy
+          type: string
+          description: 'Image pull policy. One of Always, Never, IfNotPresent. Defaults
+            to Always if :latest tag is specified, or IfNotPresent otherwise. Cannot
+            be updated. More info: https://kubernetes.io/docs/concepts/containers/images#updating-images'
+        lifecycle:
+          title: Lifecycle
+          allOf:
+          - "$ref": "#/components/schemas/Lifecycle"
+          description: Actions that the management system should take in response
+            to container lifecycle events. Cannot be updated.
+        livenessProbe:
+          title: Livenessprobe
+          allOf:
+          - "$ref": "#/components/schemas/Probe"
+          description: 'Periodic probe of container liveness. Container will be restarted
+            if the probe fails. Cannot be updated. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
+        name:
+          title: Name
+          type: string
+          description: Name of the container specified as a DNS_LABEL. Each container
+            in a pod must have a unique name (DNS_LABEL). Cannot be updated.
+        ports:
+          title: Ports
+          type: array
+          items:
+            "$ref": "#/components/schemas/ContainerPort"
+          description: List of ports to expose from the container. Exposing a port
+            here gives the system additional information about the network connections
+            a container uses, but is primarily informational. Not specifying a port
+            here DOES NOT prevent that port from being exposed. Any port which is
+            listening on the default "0.0.0.0" address inside a container will be
+            accessible from the network. Cannot be updated.
+        readinessProbe:
+          title: Readinessprobe
+          allOf:
+          - "$ref": "#/components/schemas/Probe"
+          description: 'Periodic probe of container service readiness. Container will
+            be removed from service endpoints if the probe fails. Cannot be updated.
+            More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
+        resources:
+          title: Resources
+          allOf:
+          - "$ref": "#/components/schemas/ResourceRequirements"
+          description: 'Compute Resources required by this container. Cannot be updated.
+            More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+        securityContext:
+          title: Securitycontext
+          allOf:
+          - "$ref": "#/components/schemas/SecurityContext"
+          description: 'Security options the pod should run with. More info: https://kubernetes.io/docs/concepts/policy/security-context/
+            More info: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/'
+        stdin:
+          title: Stdin
+          type: boolean
+          description: Whether this container should allocate a buffer for stdin in
+            the container runtime. If this is not set, reads from stdin in the container
+            will always result in EOF. Default is false.
+        stdinOnce:
+          title: Stdinonce
+          type: boolean
+          description: Whether the container runtime should close the stdin channel
+            after it has been opened by a single attach. When stdin is true the stdin
+            stream will remain open across multiple attach sessions. If stdinOnce
+            is set to true, stdin is opened on container start, is empty until the
+            first client attaches to stdin, and then remains open and accepts data
+            until the client disconnects, at which time stdin is closed and remains
+            closed until the container is restarted. If this flag is false, a container
+            processes that reads from stdin will never receive an EOF. Default is
+            false
+        terminationMessagePath:
+          title: Terminationmessagepath
+          type: string
+          description: 'Optional: Path at which the file to which the container''s
+            termination message will be written is mounted into the container''s filesystem.
+            Message written is intended to be brief final status, such as an assertion
+            failure message. Will be truncated by the node if greater than 4096 bytes.
+            The total message length across all containers will be limited to 12kb.
+            Defaults to /dev/termination-log. Cannot be updated.'
+        terminationMessagePolicy:
+          title: Terminationmessagepolicy
+          type: string
+          description: Indicate how the termination message should be populated. File
+            will use the contents of terminationMessagePath to populate the container
+            status message on both success and failure. FallbackToLogsOnError will
+            use the last chunk of container log output if the termination message
+            file is empty and the container exited with an error. The log output is
+            limited to 2048 bytes or 80 lines, whichever is smaller. Defaults to File.
+            Cannot be updated.
+        tty:
+          title: Tty
+          type: boolean
+          description: Whether this container should allocate a TTY for itself, also
+            requires 'stdin' to be true. Default is false.
+        volumeDevices:
+          title: Volumedevices
+          type: array
+          items:
+            "$ref": "#/components/schemas/VolumeDevice"
+          description: volumeDevices is the list of block devices to be used by the
+            container. This is a beta feature.
+        volumeMounts:
+          title: Volumemounts
+          type: array
+          items:
+            "$ref": "#/components/schemas/VolumeMount"
+          description: Pod volumes to mount into the container's filesystem. Cannot
+            be updated.
+        workingDir:
+          title: Workingdir
+          type: string
+          description: Container's working directory. If not specified, the container
+            runtime's default will be used, which might be configured in the container
+            image. Cannot be updated.
+    EnvVar:
+      title: EnvVar
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          title: Name
+          type: string
+          description: Name of the environment variable. Must be a C_IDENTIFIER.
+        value:
+          title: Value
+          type: string
+          description: 'Variable references $(VAR_NAME) are expanded using the previous
+            defined environment variables in the container and any service environment
+            variables. If a variable cannot be resolved, the reference in the input
+            string will be unchanged. The $(VAR_NAME) syntax can be escaped with a
+            double $$, ie: $$(VAR_NAME). Escaped references will never be expanded,
+            regardless of whether the variable exists or not. Defaults to "".'
+        valueFrom:
+          title: Valuefrom
+          allOf:
+          - "$ref": "#/components/schemas/EnvVarSource"
+          description: Source for the environment variable's value. Cannot be used
+            if value is not empty.
+    EnvVarSource:
+      title: EnvVarSource
+      type: object
+      properties:
+        configMapKeyRef:
+          title: Configmapkeyref
+          allOf:
+          - "$ref": "#/components/schemas/ConfigMapKeySelector"
+          description: Selects a key of a ConfigMap.
+        fieldRef:
+          title: Fieldref
+          allOf:
+          - "$ref": "#/components/schemas/ObjectFieldSelector"
+          description: 'Selects a field of the pod: supports metadata.name, metadata.namespace,
+            metadata.labels, metadata.annotations, spec.nodeName, spec.serviceAccountName,
+            status.hostIP, status.podIP.'
+        resourceFieldRef:
+          title: Resourcefieldref
+          allOf:
+          - "$ref": "#/components/schemas/ResourceFieldSelector"
+          description: 'Selects a resource of the container: only resources limits
+            and requests (limits.cpu, limits.memory, limits.ephemeral-storage, requests.cpu,
+            requests.memory and requests.ephemeral-storage) are currently supported.'
+        secretKeyRef:
+          title: Secretkeyref
+          allOf:
+          - "$ref": "#/components/schemas/SecretKeySelector"
+          description: Selects a key of a secret in the pod's namespace
+    Lifecycle:
+      title: Lifecycle
+      type: object
+      properties:
+        postStart:
+          title: Poststart
+          allOf:
+          - "$ref": "#/components/schemas/Handler"
+          description: 'PostStart is called immediately after a container is created.
+            If the handler fails, the container is terminated and restarted according
+            to its restart policy. Other management of the container blocks until
+            the hook completes. More info: https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#container-hooks'
+        preStop:
+          title: Prestop
+          allOf:
+          - "$ref": "#/components/schemas/Handler"
+          description: 'PreStop is called immediately before a container is terminated
+            due to an API request or management event such as liveness probe failure,
+            preemption, resource contention, etc. The handler is not called if the
+            container crashes or exits. The reason for termination is passed to the
+            handler. The Pod''s termination grace period countdown begins before the
+            PreStop hooked is executed. Regardless of the outcome of the handler,
+            the container will eventually terminate within the Pod''s termination
+            grace period. Other management of the container blocks until the hook
+            completes or until the termination grace period is reached. More info:
+            https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#container-hooks'
+    Handler:
+      title: Handler
+      type: object
+      properties:
+        exec:
+          title: Exec
+          allOf:
+          - "$ref": "#/components/schemas/ExecAction"
+          description: One and only one of the following should be specified. Exec
+            specifies the action to take.
+        httpGet:
+          title: Httpget
+          allOf:
+          - "$ref": "#/components/schemas/HTTPGetAction"
+          description: HTTPGet specifies the http request to perform.
+        tcpSocket:
+          title: Tcpsocket
+          allOf:
+          - "$ref": "#/components/schemas/TCPSocketAction"
+          description: TCPSocket specifies an action involving a TCP port. TCP hooks
+            not yet supported
+    ExecAction:
+      title: ExecAction
+      type: object
+      properties:
+        command:
+          title: Command
+          type: array
+          items:
+            type: string
+          description: Command is the command line to execute inside the container,
+            the working directory for the command  is root ('/') in the container's
+            filesystem. The command is simply exec'd, it is not run inside a shell,
+            so traditional shell instructions ('|', etc) won't work. To use a shell,
+            you need to explicitly call out to that shell. Exit status of 0 is treated
+            as live/healthy and non-zero is unhealthy.
+    HTTPGetAction:
+      title: HTTPGetAction
+      required:
+      - port
+      type: object
+      properties:
+        host:
+          title: Host
+          type: string
+          description: Host name to connect to, defaults to the pod IP. You probably
+            want to set "Host" in httpHeaders instead.
+        httpHeaders:
+          title: Httpheaders
+          type: array
+          items:
+            "$ref": "#/components/schemas/HTTPHeader"
+          description: Custom headers to set in the request. HTTP allows repeated
+            headers.
+        path:
+          title: Path
+          type: string
+          description: Path to access on the HTTP server.
+        port:
+          title: Port
+          allOf:
+          - "$ref": "#/components/schemas/IntOrString"
+          description: Name or number of the port to access on the container. Number
+            must be in the range 1 to 65535. Name must be an IANA_SVC_NAME.
+        scheme:
+          title: Scheme
+          type: string
+          description: Scheme to use for connecting to the host. Defaults to HTTP.
+    HTTPHeader:
+      title: HTTPHeader
+      required:
+      - name
+      - value
+      type: object
+      properties:
+        name:
+          title: Name
+          type: string
+          description: The header field name
+        value:
+          title: Value
+          type: string
+          description: The header field value
+    HTTPValidationError:
+      title: HTTPValidationError
+      type: object
+      properties:
+        detail:
+          title: Detail
+          type: array
+          items:
+            "$ref": "#/components/schemas/ValidationError"
+    Probe:
+      title: Probe
+      type: object
+      properties:
+        exec:
+          title: Exec
+          allOf:
+          - "$ref": "#/components/schemas/ExecAction"
+          description: One and only one of the following should be specified. Exec
+            specifies the action to take.
+        failureThreshold:
+          title: Failurethreshold
+          type: integer
+          description: Minimum consecutive failures for the probe to be considered
+            failed after having succeeded. Defaults to 3. Minimum value is 1.
+        httpGet:
+          title: Httpget
+          allOf:
+          - "$ref": "#/components/schemas/HTTPGetAction"
+          description: HTTPGet specifies the http request to perform.
+        initialDelaySeconds:
+          title: Initialdelayseconds
+          type: integer
+          description: 'Number of seconds after the container has started before liveness
+            probes are initiated. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
+        periodSeconds:
+          title: Periodseconds
+          type: integer
+          description: How often (in seconds) to perform the probe. Default to 10
+            seconds. Minimum value is 1.
+        successThreshold:
+          title: Successthreshold
+          type: integer
+          description: Minimum consecutive successes for the probe to be considered
+            successful after having failed. Defaults to 1. Must be 1 for liveness.
+            Minimum value is 1.
+        tcpSocket:
+          title: Tcpsocket
+          allOf:
+          - "$ref": "#/components/schemas/TCPSocketAction"
+          description: TCPSocket specifies an action involving a TCP port. TCP hooks
+            not yet supported
+        timeoutSeconds:
+          title: Timeoutseconds
+          type: integer
+          description: 'Number of seconds after which the probe times out. Defaults
+            to 1 second. Minimum value is 1. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
+    ResourceRequirements:
+      title: ResourceRequirements
+      type: object
+      properties:
+        limits:
+          title: Limits
+          type: object
+          additionalProperties:
+            "$ref": "#/components/schemas/Quantity"
+          description: 'Limits describes the maximum amount of compute resources allowed.
+            More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+        requests:
+          title: Requests
+          type: object
+          additionalProperties:
+            "$ref": "#/components/schemas/Quantity"
+          description: 'Requests describes the minimum amount of compute resources
+            required. If Requests is omitted for a container, it defaults to Limits
+            if that is explicitly specified, otherwise to an implementation-defined
+            value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+    ConfigMapKeySelector:
+      title: ConfigMapKeySelector
+      required:
+      - key
+      type: object
+      properties:
+        key:
+          title: Key
+          type: string
+          description: The key to select.
+        name:
+          title: Name
+          type: string
+          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+        optional:
+          title: Optional
+          type: boolean
+          description: Specify whether the ConfigMap or its key must be defined
+    SecretKeySelector:
+      title: SecretKeySelector
+      required:
+      - key
+      type: object
+      properties:
+        key:
+          title: Key
+          type: string
+          description: The key of the secret to select from.  Must be a valid secret
+            key.
+        name:
+          title: Name
+          type: string
+          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+        optional:
+          title: Optional
+          type: boolean
+          description: Specify whether the Secret or its key must be defined
+    EnvFromSource:
+      title: EnvFromSource
+      type: object
+      properties:
+        configMapRef:
+          title: Configmapref
+          allOf:
+          - "$ref": "#/components/schemas/ConfigMapEnvSource"
+          description: The ConfigMap to select from
+        prefix:
+          title: Prefix
+          type: string
+          description: An optional identifier to prepend to each key in the ConfigMap.
+            Must be a C_IDENTIFIER.
+        secretRef:
+          title: Secretref
+          allOf:
+          - "$ref": "#/components/schemas/SecretEnvSource"
+          description: The Secret to select from
+    ConfigMapEnvSource:
+      title: ConfigMapEnvSource
+      type: object
+      properties:
+        name:
+          title: Name
+          type: string
+          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+        optional:
+          title: Optional
+          type: boolean
+          description: Specify whether the ConfigMap must be defined
+    SecretEnvSource:
+      title: SecretEnvSource
+      type: object
+      properties:
+        name:
+          title: Name
+          type: string
+          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+        optional:
+          title: Optional
+          type: boolean
+          description: Specify whether the Secret must be defined
+    IntOrString:
+      title: IntOrString
+      anyOf:
+      - type: string
+      - type: integer
+    TCPSocketAction:
+      title: TCPSocketAction
+      required:
+      - port
+      type: object
+      properties:
+        host:
+          title: Host
+          type: string
+          description: 'Optional: Host name to connect to, defaults to the pod IP.'
+        port:
+          title: Port
+          allOf:
+          - "$ref": "#/components/schemas/IntOrString"
+          description: Number or name of the port to access on the container. Number
+            must be in the range 1 to 65535. Name must be an IANA_SVC_NAME.
+    ContainerPort:
+      title: ContainerPort
+      required:
+      - containerPort
+      type: object
+      properties:
+        containerPort:
+          title: Containerport
+          type: integer
+          description: Number of port to expose on the pod's IP address. This must
+            be a valid port number, 0 < x < 65536.
+        hostIP:
+          title: Hostip
+          type: string
+          description: What host IP to bind the external port to.
+        hostPort:
+          title: Hostport
+          type: integer
+          description: Number of port to expose on the host. If specified, this must
+            be a valid port number, 0 < x < 65536. If HostNetwork is specified, this
+            must match ContainerPort. Most containers do not need this.
+        name:
+          title: Name
+          type: string
+          description: If specified, this must be an IANA_SVC_NAME and unique within
+            the pod. Each named port in a pod must have a unique name. Name for the
+            port that can be referred to by services.
+        protocol:
+          title: Protocol
+          type: string
+          description: Protocol for port. Must be UDP, TCP, or SCTP. Defaults to "TCP".
+    VolumeDevice:
+      title: VolumeDevice
+      required:
+      - devicePath
+      - name
+      type: object
+      properties:
+        devicePath:
+          title: Devicepath
+          type: string
+          description: devicePath is the path inside of the container that the device
+            will be mapped to.
+        name:
+          title: Name
+          type: string
+          description: name must match the name of a persistentVolumeClaim in the
+            pod
+    ValidationError:
+      title: ValidationError
+      required:
+      - loc
+      - msg
+      - type
+      type: object
+      properties:
+        loc:
+          title: Location
+          type: array
+          items:
+            type: string
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
