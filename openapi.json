@@ -45156,22 +45156,431 @@
                             }
                           },
                           "autoScaler": {
-                            "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster/post/responses/200/content/application~1json/schema/allOf/0/properties/autoScaler"
+                            "type": "object",
+                            "title": "auto-scaler",
+                            "description": "The Ocean Kubernetes Autoscaler object.",
+                            "properties": {
+                              "isEnabled": {
+                                "type": "boolean",
+                                "description": "Enable the Ocean Kubernetes Autoscaler.",
+                                "default": true,
+                                "example": true
+                              },
+                              "cooldown": {
+                                "type": "integer",
+                                "description": "Cooldown period between scaling actions.",
+                                "default": null,
+                                "example": 30
+                              },
+                              "resourceLimits": {
+                                "type": "object",
+                                "description": "Optionally set upper and lower bounds on the resource usage of the cluster.",
+                                "properties": {
+                                  "maxMemoryGib": {
+                                    "type": "integer",
+                                    "description": "The maximum memory in GiB units that can be allocated to the cluster.",
+                                    "example": 1500
+                                  },
+                                  "maxVcpu": {
+                                    "type": "integer",
+                                    "description": "The maximum CPU in vCPU units that can be allocated to the cluster.",
+                                    "example": 750
+                                  }
+                                }
+                              },
+                              "down": {
+                                "type": "object",
+                                "description": "Autoscaling scale down operations.",
+                                "properties": {
+                                  "maxScaleDownPercentage": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 100,
+                                    "description": "The maximum percentage allowed to scale down in a single scaling action.",
+                                    "example": 30
+                                  }
+                                }
+                              },
+                              "headRoom": {
+                                "type": "object",
+                                "description": "Spare resource capacity management enabling fast assignment of pods without waiting for new resources to launch.\n",
+                                "properties": {
+                                  "cpuPerUnit": {
+                                    "type": "integer",
+                                    "description": "Optionally configure the number of CPUs to allocate the headroom. CPUs are denoted in millicores where 1000 millicores = 1 vCPU.\n",
+                                    "example": 0
+                                  },
+                                  "memoryPerUnit": {
+                                    "type": "integer",
+                                    "description": "Optionally configure the amount of memory (MiB) to allocate the headroom.",
+                                    "example": 0
+                                  },
+                                  "gpuPerUnit": {
+                                    "type": "integer",
+                                    "description": "How much GPU to allocate to a headroom unit.",
+                                    "example": 0
+                                  },
+                                  "numOfUnit": {
+                                    "type": "integer",
+                                    "description": "The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.\n",
+                                    "example": 0
+                                  }
+                                }
+                              },
+                              "isAutoConfig": {
+                                "type": "boolean",
+                                "description": "Use automatic headroom. When set to true, the values under cluster.autoScaler.headroom are not effective, as Ocean configures and optimizes headroom automatically.\n",
+                                "default": true,
+                                "example": false
+                              },
+                              "autoHeadroomPercentage": {
+                                "type": "integer",
+                                "description": "Optionally set the auto headroom percentage. Set a number between 0-200 to control the headroom percent of the cluster. Relevant when isAutoConfig=true.\n",
+                                "example": null
+                              },
+                              "enableAutomaticAndManualHeadroom": {
+                                "type": "boolean",
+                                "description": "When set to true, both automatic and per-VNG manual headroom to be saved concurrently and independently in the cluster. prerequisite: isAutoConfig must be true\n",
+                                "example": true
+                              }
+                            }
                           },
                           "capacity": {
-                            "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster/post/responses/200/content/application~1json/schema/allOf/0/properties/capacity"
+                            "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster~1import/post/responses/200/content/application~1json/schema/properties/response/properties/items/properties/capacity"
                           },
                           "strategy": {
-                            "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster/post/responses/200/content/application~1json/schema/allOf/0/properties/strategy"
+                            "type": "object",
+                            "title": "Ocean Strategy",
+                            "properties": {
+                              "drainingTimeout": {
+                                "type": "integer",
+                                "description": "The draining timeout (in seconds) before terminating the instance.\nIf no draining timeout is defined, the default draining timeout will be used.\n",
+                                "example": 60
+                              },
+                              "provisioningModel": {
+                                "type": "string",
+                                "description": "Define the provisioning model of the launched instances\n",
+                                "enum": [
+                                  "SPOT",
+                                  "PREEMPTIBLE"
+                                ]
+                              },
+                              "preemptiblePercentage": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 100,
+                                "default": 100,
+                                "description": "The desired percentage of Spot/Preemptible instances out of all running instances.\\\nOnly available when the field is **not** set in any VNG directly (launchSpec.strategy.preemptiblePercentage).\n",
+                                "example": 100
+                              }
+                            }
                           },
                           "scheduling": {
-                            "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster/post/responses/200/content/application~1json/schema/allOf/0/properties/scheduling"
+                            "type": "object",
+                            "title": "Ocean GKE Scheduling",
+                            "description": "Schedule an action such as a planned shutdown or a cluster roll.",
+                            "properties": {
+                              "shutdownHours": {
+                                "type": "object",
+                                "description": "Define time(s) for a scheduled shutdown.\n",
+                                "required": [
+                                  "timeWindows"
+                                ],
+                                "properties": {
+                                  "isEnabled": {
+                                    "type": "boolean",
+                                    "description": "Flag to enable or disable the shutdown hours mechanism. When false, the mechanism is deactivated and the cluster remains in its current state.\n",
+                                    "example": true
+                                  },
+                                  "timeWindows": {
+                                    "type": "array",
+                                    "description": "Set time windows for shutdown hours. Specify a list of timeWindows that includes at least one time window. Each string is in the format of - ddd:hh:mm-ddd:hh:mm ddd = day of week = Sun | Mon | Tue | Wed | Thu | Fri | Sat hh = hour 24 = 0 -23 mm = minute = 0 - 59. Time windows should not overlap. Required when cluster.scheduling.isEnabled = True.\n",
+                                    "items": {
+                                      "type": "string",
+                                      "example": [
+                                        "Fri:15:30-Wed:14:30",
+                                        "Wed:15:30-Thu:18:30"
+                                      ]
+                                    }
+                                  }
+                                }
+                              },
+                              "tasks": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "title": "Task Definition",
+                                  "required": [
+                                    "isEnabled",
+                                    "cronExpression",
+                                    "taskType"
+                                  ],
+                                  "properties": {
+                                    "isEnabled": {
+                                      "type": "boolean",
+                                      "example": true,
+                                      "description": "Describes whether the task is enabled. When true, the task runs. When false, it does not run. Required for the cluster.scheduling.tasks object.\n"
+                                    },
+                                    "cronExpression": {
+                                      "type": "string",
+                                      "example": "0 1 * * *",
+                                      "description": "A valid cron expression. For example : \" * * * * * \". The cron is running in UTC time zone and is in Unix cron format [Cron Expression Validator Script](http://www.unix.com/man-page/linux/5/crontab/). Frequency and cronExpression cannot be used at a time.\n"
+                                    },
+                                    "taskType": {
+                                      "type": "string",
+                                      "example": "clusterRoll",
+                                      "description": "Valid values: \"clusterRoll\". Required for the cluster.scheduling.tasks object.\n"
+                                    },
+                                    "batchSizePercentage": {
+                                      "type": "integer",
+                                      "description": "Value in percent to set the size of a batch in a roll. Valid values are 0-100\n",
+                                      "example": 20
+                                    }
+                                  }
+                                }
+                              }
+                            }
                           },
                           "security": {
-                            "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster/post/responses/200/content/application~1json/schema/allOf/0/properties/security"
+                            "type": "object",
+                            "title": "Security",
+                            "properties": {
+                              "containerImage": {
+                                "type": "object",
+                                "properties": {
+                                  "approvedImages": {
+                                    "type": "array",
+                                    "description": "Set list of permitted repositories for container images.",
+                                    "items": {
+                                      "type": "string",
+                                      "example": [
+                                        "gce.io/*",
+                                        "docker.*"
+                                      ]
+                                    }
+                                  }
+                                }
+                              }
+                            }
                           },
                           "compute": {
-                            "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster~1%7BoceanClusterId%7D/put/responses/200/content/application~1json/schema/allOf/0/properties/compute"
+                            "type": "object",
+                            "title": "Ocean Compute",
+                            "required": [
+                              "subnetname",
+                              "launchSpecification",
+                              "networkInterfaces",
+                              "availabilityZones"
+                            ],
+                            "properties": {
+                              "networkInterfaces": {
+                                "type": "object",
+                                "description": "Settings for network interfaces\n",
+                                "required": [
+                                  "accessConfigs",
+                                  "network"
+                                ],
+                                "properties": {
+                                  "network": {
+                                    "type": "string",
+                                    "example": "default"
+                                  },
+                                  "projectId": {
+                                    "type": "string",
+                                    "description": "Use a network resource from a different project. Set the project identifier to use its network resource. This parameter is relevant only if the network resource is in a different project.\n",
+                                    "example": "test-project"
+                                  },
+                                  "accessConfigs": {
+                                    "type": "object",
+                                    "required": [
+                                      "name",
+                                      "type"
+                                    ],
+                                    "properties": {
+                                      "name": {
+                                        "type": "string",
+                                        "example": "external-nat"
+                                      },
+                                      "type": {
+                                        "type": "string",
+                                        "description": "Possible values: ONE_TO_ONE_NAT\n",
+                                        "example": "ONE_TO_ONE_NAT"
+                                      }
+                                    }
+                                  },
+                                  "aliasIpRanges": {
+                                    "type": "object",
+                                    "required": [
+                                      "ipCidrRange",
+                                      "subnetworkRangeName"
+                                    ],
+                                    "properties": {
+                                      "ipCidrRange": {
+                                        "type": "string",
+                                        "description": "Required for the cluster.compute.networkInterfaces.aliasIpRanges object.\n",
+                                        "example": "/24"
+                                      },
+                                      "subnetworkRangeName": {
+                                        "type": "string",
+                                        "description": "Required for the cluster.compute.networkInterfaces.aliasIpRanges object.\n",
+                                        "example": "gke-test-native-vpc-pods-5cb557f7"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "backendServices": {
+                                "type": "object",
+                                "description": "Settings for backend services.",
+                                "required": [
+                                  "backendServiceName"
+                                ],
+                                "properties": {
+                                  "backendServiceName": {
+                                    "type": "string",
+                                    "description": "Required for the cluster.compute.backendServices object.",
+                                    "example": "test-global-tcp"
+                                  },
+                                  "locationType": {
+                                    "type": "string",
+                                    "example": "global"
+                                  }
+                                }
+                              },
+                              "subnetName": {
+                                "type": "string",
+                                "description": "Subnet identifier for the Ocean cluster",
+                                "example": "default"
+                              },
+                              "availabilityZones": {
+                                "type": "array",
+                                "description": "Availability zone(s) used by the Ocean cluster.",
+                                "items": {
+                                  "type": "string",
+                                  "example": "us-west1-a"
+                                }
+                              },
+                              "instanceTypes": {
+                                "type": "object",
+                                "description": "The type of instances that may or may not be a part of the Ocean cluster.",
+                                "properties": {
+                                  "whitelist": {
+                                    "type": "array",
+                                    "description": "Instance types allowed in the Ocean cluster.\n",
+                                    "items": {
+                                      "type": "string",
+                                      "example": [
+                                        "n1-standard-2"
+                                      ]
+                                    }
+                                  }
+                                }
+                              },
+                              "launchSpecification": {
+                                "type": "object",
+                                "required": [
+                                  "sourceImage",
+                                  "tags",
+                                  "metadata",
+                                  "serviceAccount"
+                                ],
+                                "properties": {
+                                  "sourceImage": {
+                                    "type": "string",
+                                    "description": "URL of the image used to launch the instances.",
+                                    "example": "https://www.googleapis.com/compute/v1/projects/gke-node-images/global/images/gke-1117-gke12-cos-69-10895-138-0-v190225-pre"
+                                  },
+                                  "metadata": {
+                                    "type": "object",
+                                    "description": "Set array of cluster metadata.\n",
+                                    "properties": {
+                                      "key": {
+                                        "type": "string",
+                                        "description": "Key of metadata key pair.\n",
+                                        "example": "example_key1"
+                                      },
+                                      "value": {
+                                        "type": "string",
+                                        "description": "Value of metadata key pair.\n",
+                                        "example": "exmample_value1"
+                                      }
+                                    }
+                                  },
+                                  "tags": {
+                                    "type": "array",
+                                    "description": "Array of tags to instances launched in Ocean cluster.",
+                                    "items": {
+                                      "type": "string",
+                                      "example": [
+                                        "gke-test-native-vpc-5cb557f7-node"
+                                      ]
+                                    }
+                                  },
+                                  "ipForwarding": {
+                                    "type": "boolean",
+                                    "example": true
+                                  },
+                                  "minCpuPlatform": {
+                                    "type": "string",
+                                    "description": "Set instance CPU platform.\n",
+                                    "example": "Intel Sandy Bridge"
+                                  },
+                                  "serviceAccount": {
+                                    "type": "string",
+                                    "example": "265168459660-compute@developer.gserviceaccount.com",
+                                    "description": "The service account used by applications running on the VM to call GCP APIs.\n"
+                                  },
+                                  "labels": {
+                                    "type": "array",
+                                    "description": "Set labels on cluster. Can set up to 60 labels\n",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "key": {
+                                          "type": "string",
+                                          "example": "spotinst-gke-original-node-pool"
+                                        },
+                                        "value": {
+                                          "type": "string",
+                                          "example": "test-native-vpc__default-pool"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "rootVolumeSizeInGb": {
+                                    "type": "integer",
+                                    "description": "Optionally set root size (GB). Value should be greater than or equal to 100.",
+                                    "example": 100
+                                  },
+                                  "rootVolumeType": {
+                                    "type": "string",
+                                    "description": "Set the root volume disk type.",
+                                    "example": "pd-standard",
+                                    "enum": [
+                                      "pd-standard",
+                                      "pd-ssd"
+                                    ]
+                                  },
+                                  "shieldedInstanceConfig": {
+                                    "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec~1%7BoceanLaunchSpecId%7D/put/requestBody/content/application~1json/schema/properties/launchSpec/properties/shieldedInstanceConfig"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "readOnly": true,
+                            "format": "date-time",
+                            "example": "2021-03-17T08:13:08.000Z",
+                            "description": "A timestamp of the Ocean creation.\n"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "readOnly": true,
+                            "format": "date-time",
+                            "example": "2021-03-17T15:06:13.000Z",
+                            "description": "A timestamp of the latest Ocean update.\n"
                           }
                         }
                       }
@@ -45201,234 +45610,33 @@
                 "schema": {
                   "allOf": [
                     {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
                       "type": "object",
-                      "title": "cluster",
                       "properties": {
-                        "autoScaler": {
+                        "request": {
                           "type": "object",
-                          "title": "auto-scaler",
-                          "description": "The Ocean Kubernetes Autoscaler object.",
                           "properties": {
-                            "isEnabled": {
-                              "type": "boolean",
-                              "description": "Enable the Ocean Kubernetes Autoscaler.",
-                              "default": true,
-                              "example": true
+                            "url": {
+                              "example": "/ocean/gcp/k8s/cluster"
                             },
-                            "cooldown": {
-                              "type": "integer",
-                              "description": "Cooldown period between scaling actions.",
-                              "default": null,
-                              "example": 30
-                            },
-                            "resourceLimits": {
-                              "type": "object",
-                              "description": "Optionally set upper and lower bounds on the resource usage of the cluster.",
-                              "properties": {
-                                "maxMemoryGib": {
-                                  "type": "integer",
-                                  "description": "The maximum memory in GiB units that can be allocated to the cluster.",
-                                  "example": 1500
-                                },
-                                "maxVcpu": {
-                                  "type": "integer",
-                                  "description": "The maximum CPU in vCPU units that can be allocated to the cluster.",
-                                  "example": 750
-                                }
-                              }
-                            },
-                            "down": {
-                              "type": "object",
-                              "description": "Autoscaling scale down operations.",
-                              "properties": {
-                                "maxScaleDownPercentage": {
-                                  "type": "integer",
-                                  "minimum": 1,
-                                  "maximum": 100,
-                                  "description": "The maximum percentage allowed to scale down in a single scaling action.",
-                                  "example": 30
-                                }
-                              }
-                            },
-                            "headRoom": {
-                              "type": "object",
-                              "description": "Spare resource capacity management enabling fast assignment of pods without waiting for new resources to launch.\n",
-                              "properties": {
-                                "cpuPerUnit": {
-                                  "type": "integer",
-                                  "description": "Optionally configure the number of CPUs to allocate the headroom. CPUs are denoted in millicores where 1000 millicores = 1 vCPU.\n",
-                                  "example": 0
-                                },
-                                "memoryPerUnit": {
-                                  "type": "integer",
-                                  "description": "Optionally configure the amount of memory (MiB) to allocate the headroom.",
-                                  "example": 0
-                                },
-                                "gpuPerUnit": {
-                                  "type": "integer",
-                                  "description": "How much GPU to allocate to a headroom unit.",
-                                  "example": 0
-                                },
-                                "numOfUnit": {
-                                  "type": "integer",
-                                  "description": "The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.\n",
-                                  "example": 0
-                                }
-                              }
-                            },
-                            "isAutoConfig": {
-                              "type": "boolean",
-                              "description": "Use automatic headroom. When set to true, the values under cluster.autoScaler.headroom are not effective, as Ocean configures and optimizes headroom automatically.\n",
-                              "default": true,
-                              "example": false
-                            },
-                            "autoHeadroomPercentage": {
-                              "type": "integer",
-                              "description": "Optionally set the auto headroom percentage. Set a number between 0-200 to control the headroom percent of the cluster. Relevant when isAutoConfig=true.\n",
-                              "example": null
-                            },
-                            "enableAutomaticAndManualHeadroom": {
-                              "type": "boolean",
-                              "description": "When set to true, both automatic and per-VNG manual headroom to be saved concurrently and independently in the cluster. prerequisite: isAutoConfig must be true\n",
-                              "example": true
+                            "method": {
+                              "example": "POST"
                             }
                           }
                         },
-                        "capacity": {
+                        "response": {
                           "type": "object",
-                          "title": "Capacity Units",
-                          "description": "Capacity specifications for the Ocean cluster.",
                           "properties": {
-                            "minimum": {
-                              "type": "integer",
-                              "example": 0,
-                              "description": "The bottom limit of instances that the cluster can scale down to.\n"
-                            },
-                            "maximum": {
-                              "type": "integer",
-                              "default": 1000,
-                              "example": 3,
-                              "description": "The upper limit of instances that the cluster can scale up to.\n"
-                            },
-                            "target": {
-                              "type": "integer",
-                              "example": 3,
-                              "description": "Number of instances to launch and maintain in the cluster.\n"
-                            }
-                          }
-                        },
-                        "strategy": {
-                          "type": "object",
-                          "title": "Ocean Strategy",
-                          "properties": {
-                            "drainingTimeout": {
-                              "type": "integer",
-                              "description": "The draining timeout (in seconds) before terminating the instance.\nIf no draining timeout is defined, the default draining timeout will be used.\n",
-                              "example": 60
-                            },
-                            "provisioningModel": {
-                              "type": "string",
-                              "description": "Define the provisioning model of the launched instances\n",
-                              "enum": [
-                                "SPOT",
-                                "PREEMPTIBLE"
-                              ]
-                            },
-                            "preemptiblePercentage": {
-                              "type": "integer",
-                              "minimum": 0,
-                              "maximum": 100,
-                              "default": 100,
-                              "description": "The desired percentage of Spot/Preemptible instances out of all running instances.\\\nOnly available when the field is **not** set in any VNG directly (launchSpec.strategy.preemptiblePercentage).\n",
-                              "example": 100
-                            }
-                          }
-                        },
-                        "scheduling": {
-                          "type": "object",
-                          "title": "Ocean GKE Scheduling",
-                          "description": "Schedule an action such as a planned shutdown or a cluster roll.",
-                          "properties": {
-                            "shutdownHours": {
-                              "type": "object",
-                              "description": "Define time(s) for a scheduled shutdown.\n",
-                              "required": [
-                                "timeWindows"
-                              ],
-                              "properties": {
-                                "isEnabled": {
-                                  "type": "boolean",
-                                  "description": "Flag to enable or disable the shutdown hours mechanism. When false, the mechanism is deactivated and the cluster remains in its current state.\n",
-                                  "example": true
-                                },
-                                "timeWindows": {
-                                  "type": "array",
-                                  "description": "Set time windows for shutdown hours. Specify a list of timeWindows that includes at least one time window. Each string is in the format of - ddd:hh:mm-ddd:hh:mm ddd = day of week = Sun | Mon | Tue | Wed | Thu | Fri | Sat hh = hour 24 = 0 -23 mm = minute = 0 - 59. Time windows should not overlap. Required when cluster.scheduling.isEnabled = True.\n",
-                                  "items": {
-                                    "type": "string",
-                                    "example": [
-                                      "Fri:15:30-Wed:14:30",
-                                      "Wed:15:30-Thu:18:30"
-                                    ]
-                                  }
-                                }
-                              }
-                            },
-                            "tasks": {
+                            "items": {
                               "type": "array",
                               "items": {
-                                "type": "object",
-                                "title": "Task Definition",
-                                "required": [
-                                  "isEnabled",
-                                  "cronExpression",
-                                  "taskType"
-                                ],
-                                "properties": {
-                                  "isEnabled": {
-                                    "type": "boolean",
-                                    "example": true,
-                                    "description": "Describes whether the task is enabled. When true, the task runs. When false, it does not run. Required for the cluster.scheduling.tasks object.\n"
-                                  },
-                                  "cronExpression": {
-                                    "type": "string",
-                                    "example": "0 1 * * *",
-                                    "description": "A valid cron expression. For example : \" * * * * * \". The cron is running in UTC time zone and is in Unix cron format [Cron Expression Validator Script](http://www.unix.com/man-page/linux/5/crontab/). Frequency and cronExpression cannot be used at a time.\n"
-                                  },
-                                  "taskType": {
-                                    "type": "string",
-                                    "example": "clusterRoll",
-                                    "description": "Valid values: \"clusterRoll\". Required for the cluster.scheduling.tasks object.\n"
-                                  },
-                                  "batchSizePercentage": {
-                                    "type": "integer",
-                                    "description": "Value in percent to set the size of a batch in a roll. Valid values are 0-100\n",
-                                    "example": 20
-                                  }
-                                }
+                                "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster"
                               }
-                            }
-                          }
-                        },
-                        "security": {
-                          "type": "object",
-                          "title": "Security",
-                          "properties": {
-                            "containerImage": {
-                              "type": "object",
-                              "properties": {
-                                "approvedImages": {
-                                  "type": "array",
-                                  "description": "Set list of permitted repositories for container images.",
-                                  "items": {
-                                    "type": "string",
-                                    "example": [
-                                      "gce.io/*",
-                                      "docker.*"
-                                    ]
-                                  }
-                                }
-                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:gcp:k8s"
                             }
                           }
                         }
@@ -45458,7 +45666,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Ocean GKE Get All Response",
+            "description": "Ocean GKE List Response",
             "content": {
               "application/json": {
                 "schema": {
@@ -45469,46 +45677,28 @@
                     {
                       "type": "object",
                       "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/gcp/k8s/cluster"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
                         "response": {
                           "type": "object",
-                          "description": "Response body.\n",
                           "properties": {
                             "items": {
                               "type": "array",
                               "items": {
-                                "allOf": [
-                                  {
-                                    "type": "object",
-                                    "properties": {
-                                      "autoScaler": {
-                                        "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster/post/responses/200/content/application~1json/schema/allOf/0/properties/autoScaler"
-                                      },
-                                      "capacity": {
-                                        "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster/post/responses/200/content/application~1json/schema/allOf/0/properties/capacity"
-                                      },
-                                      "compute": {
-                                        "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster~1%7BoceanClusterId%7D/put/responses/200/content/application~1json/schema/allOf/0/properties/compute"
-                                      },
-                                      "strategy": {
-                                        "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster/post/responses/200/content/application~1json/schema/allOf/0/properties/strategy"
-                                      }
-                                    }
-                                  },
-                                  {
-                                    "type": "object",
-                                    "properties": {
-                                      "createdAt": {
-                                        "type": "string",
-                                        "example": "2018-11-05T12:55:50.000+0000"
-                                      },
-                                      "updatedAt": {
-                                        "type": "string",
-                                        "example": "2018-11-05T12:58:15.000+0000"
-                                      }
-                                    }
-                                  }
-                                ]
+                                "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster"
                               }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:gcp:k8s"
                             }
                           }
                         }
@@ -45543,7 +45733,34 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
+            "description": "Ocean GKE Delete Cluster Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/gcp/k8s/cluster/o-abcd1234"
+                            },
+                            "method": {
+                              "example": "DELETE"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -45567,7 +45784,48 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster/get/responses/200"
+            "description": "Ocean GKE Get Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/gcp/k8s/cluster/o-abcd1234"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:gcp:k8s"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -45611,216 +45869,33 @@
                 "schema": {
                   "allOf": [
                     {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
                       "type": "object",
                       "properties": {
-                        "autoScaler": {
-                          "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster/post/responses/200/content/application~1json/schema/allOf/0/properties/autoScaler"
-                        },
-                        "capacity": {
-                          "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster/post/responses/200/content/application~1json/schema/allOf/0/properties/capacity"
-                        },
-                        "strategy": {
-                          "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster/post/responses/200/content/application~1json/schema/allOf/0/properties/strategy"
-                        },
-                        "scheduling": {
-                          "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster/post/responses/200/content/application~1json/schema/allOf/0/properties/scheduling"
-                        },
-                        "security": {
-                          "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster/post/responses/200/content/application~1json/schema/allOf/0/properties/security"
-                        },
-                        "compute": {
+                        "request": {
                           "type": "object",
-                          "title": "Ocean Compute",
-                          "required": [
-                            "subnetname",
-                            "launchSpecification",
-                            "networkInterfaces",
-                            "availabilityZones"
-                          ],
                           "properties": {
-                            "networkInterfaces": {
-                              "type": "object",
-                              "description": "Settings for network interfaces\n",
-                              "required": [
-                                "accessConfigs",
-                                "network"
-                              ],
-                              "properties": {
-                                "network": {
-                                  "type": "string",
-                                  "example": "default"
-                                },
-                                "projectId": {
-                                  "type": "string",
-                                  "description": "Use a network resource from a different project. Set the project identifier to use its network resource. This parameter is relevant only if the network resource is in a different project.\n",
-                                  "example": "test-project"
-                                },
-                                "accessConfigs": {
-                                  "type": "object",
-                                  "required": [
-                                    "name",
-                                    "type"
-                                  ],
-                                  "properties": {
-                                    "name": {
-                                      "type": "string",
-                                      "example": "external-nat"
-                                    },
-                                    "type": {
-                                      "type": "string",
-                                      "description": "Possible values: ONE_TO_ONE_NAT\n",
-                                      "example": "ONE_TO_ONE_NAT"
-                                    }
-                                  }
-                                },
-                                "aliasIpRanges": {
-                                  "type": "object",
-                                  "required": [
-                                    "ipCidrRange",
-                                    "subnetworkRangeName"
-                                  ],
-                                  "properties": {
-                                    "ipCidrRange": {
-                                      "type": "string",
-                                      "description": "Required for the cluster.compute.networkInterfaces.aliasIpRanges object.\n",
-                                      "example": "/24"
-                                    },
-                                    "subnetworkRangeName": {
-                                      "type": "string",
-                                      "description": "Required for the cluster.compute.networkInterfaces.aliasIpRanges object.\n",
-                                      "example": "gke-test-native-vpc-pods-5cb557f7"
-                                    }
-                                  }
-                                }
-                              }
+                            "url": {
+                              "example": "/ocean/gcp/k8s/cluster/o-abcd1234"
                             },
-                            "backendServices": {
-                              "type": "object",
-                              "description": "Settings for backend services.",
-                              "required": [
-                                "backendServiceName"
-                              ],
-                              "properties": {
-                                "backendServiceName": {
-                                  "type": "string",
-                                  "description": "Required for the cluster.compute.backendServices object.",
-                                  "example": "test-global-tcp"
-                                },
-                                "locationType": {
-                                  "type": "string",
-                                  "example": "global"
-                                }
-                              }
-                            },
-                            "subnetName": {
-                              "type": "string",
-                              "description": "Subnet identifier for the Ocean cluster",
-                              "example": "default"
-                            },
-                            "availabilityZones": {
+                            "method": {
+                              "example": "PUT"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
                               "type": "array",
-                              "description": "Availability zone(s) used by the Ocean cluster.",
                               "items": {
-                                "type": "string",
-                                "example": "us-west1-a"
+                                "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster"
                               }
                             },
-                            "instanceTypes": {
-                              "type": "object",
-                              "description": "The type of instances that may or may not be a part of the Ocean cluster.",
-                              "properties": {
-                                "whitelist": {
-                                  "type": "array",
-                                  "description": "Instance types allowed in the Ocean cluster.\n",
-                                  "items": {
-                                    "type": "string",
-                                    "example": [
-                                      "n1-standard-2"
-                                    ]
-                                  }
-                                }
-                              }
-                            },
-                            "launchSpecification": {
-                              "type": "object",
-                              "required": [
-                                "sourceImage",
-                                "tags",
-                                "metadata",
-                                "serviceAccount"
-                              ],
-                              "properties": {
-                                "sourceImage": {
-                                  "type": "string",
-                                  "description": "URL of the image used to launch the instances.",
-                                  "example": "https://www.googleapis.com/compute/v1/projects/gke-node-images/global/images/gke-1117-gke12-cos-69-10895-138-0-v190225-pre"
-                                },
-                                "metadata": {
-                                  "type": "object",
-                                  "description": "Set array of cluster metadata.\n",
-                                  "properties": {
-                                    "key": {
-                                      "type": "string",
-                                      "description": "Key of metadata key pair.\n",
-                                      "example": "example_key1"
-                                    },
-                                    "value": {
-                                      "type": "string",
-                                      "description": "Value of metadata key pair.\n",
-                                      "example": "exmample_value1"
-                                    }
-                                  }
-                                },
-                                "tags": {
-                                  "type": "array",
-                                  "description": "Array of tags to instances launched in Ocean cluster.",
-                                  "items": {
-                                    "type": "string",
-                                    "example": [
-                                      "gke-test-native-vpc-5cb557f7-node"
-                                    ]
-                                  }
-                                },
-                                "ipForwarding": {
-                                  "type": "boolean",
-                                  "example": true
-                                },
-                                "minCpuPlatform": {
-                                  "type": "string",
-                                  "description": "Set instance CPU platform.\n",
-                                  "example": "Intel Sandy Bridge"
-                                },
-                                "serviceAccount": {
-                                  "type": "string",
-                                  "example": "265168459660-compute@developer.gserviceaccount.com",
-                                  "description": "The service account used by applications running on the VM to call GCP APIs.\n"
-                                },
-                                "labels": {
-                                  "type": "array",
-                                  "description": "Set labels on cluster. Can set up to 60 labels\n",
-                                  "items": {
-                                    "type": "object",
-                                    "properties": {
-                                      "key": {
-                                        "type": "string",
-                                        "example": "spotinst-gke-original-node-pool"
-                                      },
-                                      "value": {
-                                        "type": "string",
-                                        "example": "test-native-vpc__default-pool"
-                                      }
-                                    }
-                                  }
-                                },
-                                "rootVolumeSizeInGb": {
-                                  "type": "integer",
-                                  "description": "Optionally set root size (GB). Value should be greater than or equal to 100.",
-                                  "example": 100
-                                },
-                                "shieldedInstanceConfig": {
-                                  "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec~1%7BoceanLaunchSpecId%7D/put/requestBody/content/application~1json/schema/properties/launchSpec/properties/shieldedInstanceConfig"
-                                }
-                              }
+                            "kind": {
+                              "example": "spotinst:ocean:gcp:k8s"
                             }
                           }
                         }
@@ -46585,6 +46660,216 @@
                               "type": "array",
                               "items": {
                                 "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/launchSpec"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:gcp:k8s:launchSpec"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/gcp/k8s/launchSpec/import": {
+      "summary": "Ocean for GKE",
+      "post": {
+        "summary": "Import GKE Node Pool To VNG",
+        "description": "Returns an Ocean Virtual Node Group (VNG) configuration based on a given GCP GKE Cluster Node Pool.\\\nThe returned value (\"Imported VNG\") can then be used as input to the Create VNG API in order to create an actual VNG in your Ocean cluster.\n",
+        "operationId": "oceanGkeImportNodePoolToLaunchSpec",
+        "tags": [
+          "Ocean GKE"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec/get/parameters/1"
+          },
+          {
+            "in": "query",
+            "name": "nodePoolName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "test",
+            "description": "Name of the Node Pool.\n"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean Launch Spec Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/gcp/k8s/launchSpec/import"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "description": "Ocean Cluster Virtual Node Group (VNG).\n",
+                                "required": [
+                                  "oceanId",
+                                  "sourceImage"
+                                ],
+                                "properties": {
+                                  "oceanId": {
+                                    "type": "string",
+                                    "example": "o-1fff54ed",
+                                    "description": "The Ocean cluster identifier. Required to create the virtual node group.\n"
+                                  },
+                                  "sourceImage": {
+                                    "type": "string",
+                                    "example": "https://www.googleapis.com/compute/v1/projects/gke-node-images/global/images/container-v1-3-v20160517",
+                                    "description": "Set the image URL. Can be null.\n"
+                                  },
+                                  "serviceAccount": {
+                                    "type": "string",
+                                    "example": "265168459660-compute@developer.gserviceaccount.com",
+                                    "description": "The account used by applications running on the VM to call GCP APIs.\n"
+                                  },
+                                  "rootVolumeType": {
+                                    "type": "string",
+                                    "description": "Set the root volume disk type.",
+                                    "example": "pd-standard",
+                                    "enum": [
+                                      "pd-standard",
+                                      "pd-ssd"
+                                    ]
+                                  },
+                                  "metadata": {
+                                    "type": "array",
+                                    "required": [
+                                      "key",
+                                      "value"
+                                    ],
+                                    "description": "Add metadata to the cluster.\n",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "key": {
+                                          "type": "string",
+                                          "description": "Set the metadata key. Required for launchSpec.metadata.",
+                                          "example": "key1"
+                                        },
+                                        "value": {
+                                          "type": "string",
+                                          "description": "Set the metadata name. Required for launchSpec.metadata.",
+                                          "example": "value1"
+                                        }
+                                      }
+                                    },
+                                    "example": [
+                                      {
+                                        "key": "key1",
+                                        "value": "value1"
+                                      },
+                                      {
+                                        "key": "key2",
+                                        "value": "value2"
+                                      }
+                                    ]
+                                  },
+                                  "availabilityZones": {
+                                    "type": "array",
+                                    "description": "An array holding availability zones, this configures the availability zones the Ocean may launch instances in per VNG. Can be null.\n",
+                                    "items": {
+                                      "type": "string"
+                                    },
+                                    "example": [
+                                      "us-central1-a",
+                                      "us-central1-b"
+                                    ]
+                                  },
+                                  "taints": {
+                                    "type": "array",
+                                    "description": "Add taints to the virtual node group.",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "key": {
+                                          "type": "string",
+                                          "description": "Set taint key."
+                                        },
+                                        "value": {
+                                          "type": "string",
+                                          "description": "Set taint value."
+                                        },
+                                        "effect": {
+                                          "type": "string",
+                                          "description": "Set taint effect."
+                                        }
+                                      }
+                                    },
+                                    "example": [
+                                      {
+                                        "key": "taintKey",
+                                        "value": "taintValue",
+                                        "effect": "NoSchedule"
+                                      }
+                                    ]
+                                  },
+                                  "labels": {
+                                    "type": "array",
+                                    "description": "An array of labels to add to the virtual node group. Only custom user labels are allowed, and not Kubernetes built-in labels or Spot internal labels.",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "key": {
+                                          "type": "string",
+                                          "description": "Set label key.\\\nThe following are not allowed:\n* \"kubernetes.io/hostname\"\n* \"failure-domain.beta.kubernetes.io/zone\"\n* \"topology.kubernetes.io/zone\"\n* \"failure-domain.beta.kubernetes.io/region\"\n* \"topology.kubernetes.io/region\"\n* \"beta.kubernetes.io/instance-type\"\n* \"node.kubernetes.io/instance-type\"\n* \"beta.kubernetes.io/os\"\n* \"kubernetes.io/os\"\n* \"beta.kubernetes.io/arch\"\n* \"kubernetes.io/arch\"\n* \"spotinst.io/node-lifecycle\"\n* \"spotinst.io/gpu-type\"\n"
+                                        },
+                                        "value": {
+                                          "type": "string",
+                                          "description": "Set label value."
+                                        }
+                                      }
+                                    },
+                                    "example": [
+                                      {
+                                        "key": "env",
+                                        "value": "test"
+                                      }
+                                    ]
+                                  },
+                                  "shieldedInstanceConfig": {
+                                    "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec~1%7BoceanLaunchSpecId%7D/put/requestBody/content/application~1json/schema/properties/launchSpec/properties/shieldedInstanceConfig"
+                                  },
+                                  "storage": {
+                                    "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec~1%7BoceanLaunchSpecId%7D/put/requestBody/content/application~1json/schema/properties/launchSpec/properties/storage"
+                                  }
+                                }
                               }
                             },
                             "kind": {
@@ -47969,7 +48254,27 @@
                               }
                             },
                             "capacity": {
-                              "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster/post/responses/200/content/application~1json/schema/allOf/0/properties/capacity"
+                              "type": "object",
+                              "title": "Capacity Units",
+                              "description": "Capacity specifications for the Ocean cluster.",
+                              "properties": {
+                                "minimum": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "description": "The bottom limit of instances that the cluster can scale down to.\n"
+                                },
+                                "maximum": {
+                                  "type": "integer",
+                                  "default": 1000,
+                                  "example": 3,
+                                  "description": "The upper limit of instances that the cluster can scale up to.\n"
+                                },
+                                "target": {
+                                  "type": "integer",
+                                  "example": 3,
+                                  "description": "Number of instances to launch and maintain in the cluster.\n"
+                                }
+                              }
                             },
                             "compute": {
                               "type": "object",
