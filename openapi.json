@@ -49241,6 +49241,12 @@
                           "compute"
                         ],
                         "properties": {
+                          "id": {
+                            "type": "string",
+                            "readOnly": true,
+                            "example": "o-abcd1234",
+                            "description": "Ocean cluster identifier.\n"
+                          },
                           "name": {
                             "type": "string",
                             "example": "test",
@@ -49272,97 +49278,10 @@
                             }
                           },
                           "autoScaler": {
-                            "type": "object",
-                            "title": "auto-scaler",
-                            "description": "The Ocean Kubernetes Autoscaler object.",
-                            "properties": {
-                              "isEnabled": {
-                                "type": "boolean",
-                                "description": "Enable the Ocean Kubernetes Autoscaler.",
-                                "default": true,
-                                "example": true
-                              },
-                              "cooldown": {
-                                "type": "integer",
-                                "description": "Cooldown period between scaling actions.",
-                                "default": null,
-                                "example": 30
-                              },
-                              "resourceLimits": {
-                                "type": "object",
-                                "description": "Optionally set upper and lower bounds on the resource usage of the cluster.",
-                                "properties": {
-                                  "maxMemoryGib": {
-                                    "type": "integer",
-                                    "description": "The maximum memory in GiB units that can be allocated to the cluster.",
-                                    "example": 1500
-                                  },
-                                  "maxVcpu": {
-                                    "type": "integer",
-                                    "description": "The maximum CPU in vCPU units that can be allocated to the cluster.",
-                                    "example": 750
-                                  }
-                                }
-                              },
-                              "down": {
-                                "type": "object",
-                                "description": "Autoscaling scale down operations.",
-                                "properties": {
-                                  "maxScaleDownPercentage": {
-                                    "type": "integer",
-                                    "minimum": 1,
-                                    "maximum": 100,
-                                    "description": "The maximum percentage allowed to scale down in a single scaling action.",
-                                    "example": 30
-                                  }
-                                }
-                              },
-                              "headRoom": {
-                                "type": "object",
-                                "description": "Spare resource capacity management enabling fast assignment of pods without waiting for new resources to launch.\n",
-                                "properties": {
-                                  "cpuPerUnit": {
-                                    "type": "integer",
-                                    "description": "Optionally configure the number of CPUs to allocate the headroom. CPUs are denoted in millicores where 1000 millicores = 1 vCPU.\n",
-                                    "example": 0
-                                  },
-                                  "memoryPerUnit": {
-                                    "type": "integer",
-                                    "description": "Optionally configure the amount of memory (MiB) to allocate the headroom.",
-                                    "example": 0
-                                  },
-                                  "gpuPerUnit": {
-                                    "type": "integer",
-                                    "description": "How much GPU to allocate to a headroom unit.",
-                                    "example": 0
-                                  },
-                                  "numOfUnit": {
-                                    "type": "integer",
-                                    "description": "The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.\n",
-                                    "example": 0
-                                  }
-                                }
-                              },
-                              "isAutoConfig": {
-                                "type": "boolean",
-                                "description": "Use automatic headroom. When set to true, the values under cluster.autoScaler.headroom are not effective, as Ocean configures and optimizes headroom automatically.\n",
-                                "default": true,
-                                "example": false
-                              },
-                              "autoHeadroomPercentage": {
-                                "type": "integer",
-                                "description": "Optionally set the auto headroom percentage. Set a number between 0-200 to control the headroom percent of the cluster. Relevant when isAutoConfig=true.\n",
-                                "example": null
-                              },
-                              "enableAutomaticAndManualHeadroom": {
-                                "type": "boolean",
-                                "description": "When set to true, both automatic and per-VNG manual headroom to be saved concurrently and independently in the cluster. prerequisite: isAutoConfig must be true\n",
-                                "example": true
-                              }
-                            }
+                            "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster~1gke~1import/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/properties/autoScaler"
                           },
                           "capacity": {
-                            "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster~1import/post/responses/200/content/application~1json/schema/properties/response/properties/items/properties/capacity"
+                            "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster~1gke~1import/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/properties/capacity"
                           },
                           "strategy": {
                             "type": "object",
@@ -49584,11 +49503,11 @@
                                     "type": "array",
                                     "description": "Instance types allowed in the Ocean cluster.\n",
                                     "items": {
-                                      "type": "string",
-                                      "example": [
-                                        "n1-standard-2"
-                                      ]
-                                    }
+                                      "type": "string"
+                                    },
+                                    "example": [
+                                      "n1-standard-2"
+                                    ]
                                   }
                                 }
                               },
@@ -52370,27 +52289,7 @@
                               }
                             },
                             "capacity": {
-                              "type": "object",
-                              "title": "Capacity Units",
-                              "description": "Capacity specifications for the Ocean cluster.",
-                              "properties": {
-                                "minimum": {
-                                  "type": "integer",
-                                  "example": 0,
-                                  "description": "The bottom limit of instances that the cluster can scale down to.\n"
-                                },
-                                "maximum": {
-                                  "type": "integer",
-                                  "default": 1000,
-                                  "example": 3,
-                                  "description": "The upper limit of instances that the cluster can scale up to.\n"
-                                },
-                                "target": {
-                                  "type": "integer",
-                                  "example": 3,
-                                  "description": "Number of instances to launch and maintain in the cluster.\n"
-                                }
-                              }
+                              "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster~1gke~1import/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/properties/capacity"
                             },
                             "compute": {
                               "type": "object",
@@ -52547,6 +52446,404 @@
                       }
                     }
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/gcp/k8s/cluster/gke/import": {
+      "summary": "Ocean for GKE",
+      "post": {
+        "summary": "Import GKE Cluster To Ocean",
+        "description": "Returns an Ocean Cluster configuration, and optionally Virtual Node Group (VNG) configurations based on a given GKE Cluster and its Node Pools.\\\nThe returned values (\"Imported Cluster/VNGs\") can then be used as inputs to the Create Cluster/VNG APIs in order to create the respectful resources.\n",
+        "operationId": "oceanGkeImportGkeToOcean",
+        "tags": [
+          "Ocean GKE"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "in": "query",
+            "name": "location",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "us-central1-a",
+            "description": "Location GKE Cluster Master.\n"
+          },
+          {
+            "in": "query",
+            "name": "clusterName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "test-gke",
+            "description": "Name of the GKE Cluster.\n"
+          },
+          {
+            "in": "query",
+            "name": "nodePoolName",
+            "schema": {
+              "type": "string"
+            },
+            "example": "test",
+            "description": "Name of the Node Pool.\n"
+          },
+          {
+            "in": "query",
+            "name": "includeLaunchSpecs",
+            "example": true,
+            "description": "When set to \"true\", GKE cluster node pools will be imported to Ocean custom VNG (\"customLaunchSpec\") configurations.\n",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "cluster"
+                    ],
+                    "properties": {
+                      "cluster": {
+                        "type": "object",
+                        "description": "The specification of the Ocean cluster.",
+                        "required": [
+                          "name",
+                          "compute"
+                        ],
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "example": "test",
+                            "description": "Add a name for the Ocean cluster.\n"
+                          },
+                          "controllerClusterId": {
+                            "type": "string",
+                            "example": "test-123124",
+                            "description": "Enter the Ocean cluster identifier.\n"
+                          },
+                          "capacity": {
+                            "type": "object",
+                            "title": "Capacity Units",
+                            "description": "Capacity specifications for the Ocean cluster.",
+                            "properties": {
+                              "minimum": {
+                                "type": "integer",
+                                "example": 0,
+                                "description": "The bottom limit of instances that the cluster can scale down to.\n"
+                              },
+                              "maximum": {
+                                "type": "integer",
+                                "default": 1000,
+                                "example": 3,
+                                "description": "The upper limit of instances that the cluster can scale up to.\n"
+                              },
+                              "target": {
+                                "type": "integer",
+                                "example": 3,
+                                "description": "Number of instances to launch and maintain in the cluster.\n"
+                              }
+                            }
+                          },
+                          "instanceTypes": {
+                            "type": "object",
+                            "description": "The type of instances that may or may not be a part of the Ocean cluster.",
+                            "properties": {
+                              "whitelist": {
+                                "type": "array",
+                                "description": "Instance types allowed in the Ocean cluster.\n",
+                                "items": {
+                                  "type": "string"
+                                },
+                                "example": [
+                                  "n1-standard-2"
+                                ]
+                              }
+                            }
+                          },
+                          "autoScaler": {
+                            "type": "object",
+                            "title": "auto-scaler",
+                            "description": "The Ocean Kubernetes Autoscaler object.",
+                            "properties": {
+                              "isEnabled": {
+                                "type": "boolean",
+                                "description": "Enable the Ocean Kubernetes Autoscaler.",
+                                "default": true,
+                                "example": true
+                              },
+                              "cooldown": {
+                                "type": "integer",
+                                "description": "Cooldown period between scaling actions.",
+                                "default": null,
+                                "minimum": 180,
+                                "example": 180
+                              },
+                              "resourceLimits": {
+                                "type": "object",
+                                "description": "Optionally set upper and lower bounds on the resource usage of the cluster.",
+                                "properties": {
+                                  "maxMemoryGib": {
+                                    "type": "integer",
+                                    "description": "The maximum memory in GiB units that can be allocated to the cluster.",
+                                    "example": 1500
+                                  },
+                                  "maxVcpu": {
+                                    "type": "integer",
+                                    "description": "The maximum CPU in vCPU units that can be allocated to the cluster.",
+                                    "example": 750
+                                  }
+                                }
+                              },
+                              "down": {
+                                "type": "object",
+                                "description": "Autoscaling scale down operations.",
+                                "properties": {
+                                  "evaluationPeriods": {
+                                    "type": "integer",
+                                    "minimum": 3,
+                                    "description": "Number of minutes a node should be eligible for scale down before it is scaled down.",
+                                    "example": 3
+                                  },
+                                  "maxScaleDownPercentage": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 100,
+                                    "description": "The maximum percentage allowed to scale down in a single scaling action.",
+                                    "example": 30
+                                  }
+                                }
+                              },
+                              "headRoom": {
+                                "type": "object",
+                                "description": "Spare resource capacity management enabling fast assignment of pods without waiting for new resources to launch.\n",
+                                "properties": {
+                                  "cpuPerUnit": {
+                                    "type": "integer",
+                                    "description": "Optionally configure the number of CPUs to allocate the headroom. CPUs are denoted in millicores where 1000 millicores = 1 vCPU.\n",
+                                    "example": 0
+                                  },
+                                  "memoryPerUnit": {
+                                    "type": "integer",
+                                    "description": "Optionally configure the amount of memory (MiB) to allocate the headroom.",
+                                    "example": 0
+                                  },
+                                  "gpuPerUnit": {
+                                    "type": "integer",
+                                    "description": "How much GPU to allocate to a headroom unit.",
+                                    "example": 0
+                                  },
+                                  "numOfUnit": {
+                                    "type": "integer",
+                                    "description": "The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.\n",
+                                    "example": 0
+                                  }
+                                }
+                              },
+                              "isAutoConfig": {
+                                "type": "boolean",
+                                "description": "Use automatic headroom. When set to true, the values under cluster.autoScaler.headroom are not effective, as Ocean configures and optimizes headroom automatically.\n",
+                                "default": true,
+                                "example": false
+                              },
+                              "autoHeadroomPercentage": {
+                                "type": "integer",
+                                "description": "Optionally set the auto headroom percentage. Set a number between 0-200 to control the headroom percent of the cluster. Relevant when isAutoConfig=true.\n",
+                                "example": null
+                              },
+                              "enableAutomaticAndManualHeadroom": {
+                                "type": "boolean",
+                                "description": "When set to true, both automatic and per-VNG manual headroom to be saved concurrently and independently in the cluster. prerequisite: isAutoConfig must be true\n",
+                                "example": true
+                              }
+                            }
+                          },
+                          "availabilityZones": {
+                            "type": "array",
+                            "description": "An array holding availability zones, this configures the availability zones the Ocean may launch instances in per VNG. Can be null.\n",
+                            "items": {
+                              "type": "string"
+                            },
+                            "example": [
+                              "us-central1-a",
+                              "us-central1-b"
+                            ]
+                          },
+                          "backendServices": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "required": [
+                                "backendServiceName"
+                              ],
+                              "properties": {
+                                "backendServiceName": {
+                                  "type": "string",
+                                  "example": "bserv-2"
+                                },
+                                "locationType": {
+                                  "type": "string",
+                                  "enum": [
+                                    "regional",
+                                    "global"
+                                  ],
+                                  "example": "regional"
+                                },
+                                "scheme": {
+                                  "type": "string",
+                                  "description": "Required if locationType is set to \"regional\".\n",
+                                  "enum": [
+                                    "EXTERNAL",
+                                    "INTERNAL"
+                                  ],
+                                  "example": "EXTERNAL"
+                                },
+                                "namedPorts": {
+                                  "type": "object",
+                                  "required": [
+                                    "name",
+                                    "ports"
+                                  ],
+                                  "properties": {
+                                    "name": {
+                                      "type": "string",
+                                      "example": "https"
+                                    },
+                                    "ports": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "integer"
+                                      },
+                                      "example": [
+                                        443,
+                                        8443
+                                      ]
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ocean CKE Cluster Import Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/gcp/k8s/cluster/gke/import"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "cluster": {
+                                    "type": "object",
+                                    "description": "The specification of the Ocean cluster.",
+                                    "properties": {
+                                      "name": {
+                                        "type": "string",
+                                        "example": "test",
+                                        "description": "Add a name for the Ocean cluster.\n"
+                                      },
+                                      "controllerClusterId": {
+                                        "type": "string",
+                                        "example": "test-123124",
+                                        "description": "Enter the Ocean cluster identifier.\n"
+                                      },
+                                      "gke": {
+                                        "type": "object",
+                                        "required": [
+                                          "clusterName",
+                                          "masterLocation"
+                                        ],
+                                        "description": "Use existing GKE cluster.\n",
+                                        "properties": {
+                                          "clusterName": {
+                                            "type": "string",
+                                            "description": "Required for the cluster.gke object.\n",
+                                            "example": "test-cluster"
+                                          },
+                                          "masterLocation": {
+                                            "type": "string",
+                                            "description": "Required for the cluster.gke object.\n",
+                                            "example": "us-central1-a"
+                                          }
+                                        }
+                                      },
+                                      "autoScaler": {
+                                        "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster~1gke~1import/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/properties/autoScaler"
+                                      },
+                                      "capacity": {
+                                        "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster~1gke~1import/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/properties/capacity"
+                                      },
+                                      "compute": {
+                                        "$ref": "#/paths/~1ocean~1gcp~1k8s~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/properties/compute"
+                                      }
+                                    }
+                                  },
+                                  "customLaunchSpecs": {
+                                    "type": "array",
+                                    "items": {
+                                      "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec~1import/post/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items"
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:gcp:k8s"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
                 }
               }
             }
