@@ -1,0 +1,72 @@
+type: object
+#description: |
+#  The object specifying the configuration of the Ocean cluster detailed cost.
+required:
+  - endTime
+  - startTime
+properties:
+  clusterIdentifier:
+    type: string
+    description: |
+      The reporting identifier of the Ocean Controller as set in the cluster configuration under the "controllerClusterId" field.
+    example: o-6e3819ae
+  endTime:
+    type: string
+    description: >
+      End date value using either the date format "yyyy-mm-dd; 2021-11-20" or ms "1494751821472".
+  startTime:
+    type: string
+    description: >
+      Beginning date value using either the date format "yyyy-mm-dd; 2021-11-20" or ms "1494751821472".
+  groupBy:
+    type: string
+    description: TODO
+    example: "namespace.label.env"
+    enum: [ "namespace", "namespace.label.${labelKey}", "resource.label.${labelKey}", "resource.annotation.${annotationKey}", "namespace.annotation.${annotationKey}" ]
+  filter:
+    type: object
+    description: TODO
+    required:
+      - scope
+      - conditions
+    properties:
+      scope:
+        type: string
+        enum: [ namespace, resource ]
+      conditions:
+        type: object
+        description: Conatins array of conditions that OR operator applied between them
+        required:
+          - anyMatch
+        properties:
+          anyMatch:
+            type: array
+            description: Constains array of conditions that AND operator applied between them.
+            items:
+              type: object
+              required:
+                - allMatch
+              properties:
+                allMatch:
+                  type: array
+                  description: ADD?
+                  items:
+                    type: object
+                    required:
+                      - type
+                      - key
+                      - operator
+                      - value
+                    properties:
+                      type:
+                        type: string
+                        enum: [ label, annotation ]
+                      key:
+                        type: string
+                        example: env
+                      operator:
+                        type: string
+                        enum: [ equals, notEquals, exists, notExists ]
+                      value:
+                        type: string
+                        example: prod
