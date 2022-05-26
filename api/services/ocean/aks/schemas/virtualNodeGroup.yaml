@@ -1,206 +1,177 @@
 type: object
+title: Ocean AKS Virtual Node Group
+required:
+  - name
 properties:
-  virtualNodeGroup:
+  name:
+    type: string
+    example: testVng
+    description: |
+      Enter a name for the virtual node group.
+  resourceLimits:
     type: object
-    title: Ocean AKS Virtual Node Group
-    required:
-      - name
-      - oceanId
     properties:
-      id:
-        type: string
-        readOnly: true
-        example: vng-12345abc
+      maxInstanceCount:
         description: |
-          Virtual node group identifier.
-      name:
-        type: string
-        example: testVng
-        description: |
-          Enter a name for the virtual node group.
-      oceanId:
-        type: string
-        example: o-13245abc
-        description: |
-          The Ocean cluster identifier.
-      resourceLimits:
-        type: object
-        properties:
-          maxInstanceCount:
-            description: |
-              Option to set a maximum number of instances per virtual node group.\
-              If set, the value must be greater than or equal to 0.
-            type: integer
-            example: 5
-      labels:
+          Option to set a maximum number of instances per virtual node group.\
+          If set, the value must be greater than or equal to 0.
+        type: integer
+        example: 5
+  labels:
+    type: array
+    description: |
+      An array of labels to add to the virtual node group.\
+      Only custom user labels are allowed, and not Kubernetes built-in labels or Spot internal labels.
+    items:
+      type: object
+      required:
+        - key
+      properties:
+        key:
+          type: string
+          description: |
+            Set label key.\
+            The following are not allowed:
+            * "kubernetes.io/hostname"
+            * "failure-domain.beta.kubernetes.io/zone"
+            * "topology.kubernetes.io/zone"
+            * "failure-domain.beta.kubernetes.io/region"
+            * "topology.kubernetes.io/region"
+            * "beta.kubernetes.io/instance-type"
+            * "node.kubernetes.io/instance-type"
+            * "beta.kubernetes.io/os"
+            * "kubernetes.io/os"
+            * "beta.kubernetes.io/arch"
+            * "kubernetes.io/arch"
+            * "spotinst.io/node-lifecycle"
+            * "spotinst.io/gpu-type"
+        value:
+          type: string
+          description: |
+            Set label value.
+    example:
+      - key: env
+        value: test
+  taints:
+    type: array
+    description: |
+      Add taints to a virtual node group.
+    items:
+      type: object
+      properties:
+        key:
+          type: string
+          description: |
+            Set taint key.
+        value:
+          type: string
+          description: |
+            Set taint value.
+        effect:
+          type: string
+          description: |
+            Set taint effect.
+          enum: [NoSchedule, PreferNoSchedule, NoExecute, PreferNoExecute]
+    example:
+      - key: taintKey
+        value: taintValue
+        effect: NoSchedule
+  vmSizes:
+    type: array
+    description: |
+      An Array holding VM sizes, this configures the allowed VM sizes the Ocean may launch per VNG.
+    items:
+      type: string
+    example: ["standard_ds2_v2", "standard_d2s_v4"]
+  zones:
+    type: array
+    description: |
+      An Array holding Availability Zones, this configures the availability zones the Ocean may launch instances in per VNG.
+    items:
+      type: string
+    example: ["1", "2", "3"]
+  autoScale:
+    type: object
+    properties:
+      headrooms:
         type: array
         description: |
-          An array of labels to add to the virtual node group.\
-          Only custom user labels are allowed, and not Kubernetes built-in labels or Spot internal labels.
+          A List of headroom objects. Define custom headroom per virtual node group.\
+          A maximum of 30 objects is allowed.\
+          At least one of cpuPerUnit, memoryPerUnit or gpuPerUnit must be set.
         items:
           type: object
           required:
-            - key
+            - numOfUnits
           properties:
-            key:
-              type: string
+            cpuPerUnit:
+              type: integer
               description: |
-                Set label key.\
-                The following are not allowed:
-                * "kubernetes.io/hostname"
-                * "failure-domain.beta.kubernetes.io/zone"
-                * "topology.kubernetes.io/zone"
-                * "failure-domain.beta.kubernetes.io/region"
-                * "topology.kubernetes.io/region"
-                * "beta.kubernetes.io/instance-type"
-                * "node.kubernetes.io/instance-type"
-                * "beta.kubernetes.io/os"
-                * "kubernetes.io/os"
-                * "beta.kubernetes.io/arch"
-                * "kubernetes.io/arch"
-                * "spotinst.io/node-lifecycle"
-                * "spotinst.io/gpu-type"
-            value:
-              type: string
+                Configure the number of CPUs to allocate for the headroom.
+                CPUs are denoted in millicores, where 1000 millicores = 1 vCPU.
+              example: 1000
+            memoryPerUnit:
+              type: integer
               description: |
-                Set label value.
-        example:
-          - key: env
-            value: test
-      taints:
+                Configure the amount of memory (MiB) to allocate the headroom.
+              example: 2048
+            gpuPerUnit:
+              type: integer
+              description: |
+                How many GPU cores should be allocated per headroom unit.
+              example: 0
+            numOfUnits:
+              type: integer
+              description: |
+                The number of headroom units to maintain, where each unit has the defined CPU, memory, and GPU.
+              example: 3
+      autoHeadroomPercentage:
+        type: integer
+        description: >
+          Number between 0-200 to control the headroom % of the specific Virtual Node Group. Effective when cluster.autoScaler.headroom.automatic.isEnabled=true is set on the Ocean cluster.
+        example: 20
+  launchSpecification:
+    type: object
+    properties:
+      osDisk:
+        type: object
+        required:
+          - sizeGB
+        description: |
+          Specify OS disk specification other than default.
+        properties:
+          type:
+            type: string
+            description: |
+              The type of the OS disk.
+            enum: [ Standard_LRS, Premium_LRS, StandardSSD_LRS ]
+            example: Standard_LRS
+          sizeGB:
+            type: integer
+            description: |
+              The size of the OS disk in GB. Required if dataDisks is specified.
+            minimum: 1
+            maximum: 1023
+            example: 30
+          utilizeEphemeralStorage:
+            type: boolean
+            description: |
+              Flag to enable/disable the Ephemeral OS Disk utilization.
+            example: true
+      tags:
         type: array
         description: |
-          Add taints to a virtual node group.
+          A maximum of 10 unique key-value pairs for VM tags in the virtual node group.
         items:
           type: object
           properties:
-            key:
+            tagKey:
               type: string
               description: |
-                Set taint key.
-            value:
+                Tag key for VMs in the cluster.
+              example: env
+            tagValue:
               type: string
               description: |
-                Set taint value.
-            effect:
-              type: string
-              description: |
-                Set taint effect.
-              enum: [NoSchedule, PreferNoSchedule, NoExecute, PreferNoExecute]
-        example:
-          - key: taintKey
-            value: taintValue
-            effect: NoSchedule
-      vmSizes:
-        type: array
-        description: |
-          An Array holding VM sizes, this configures the allowed VM sizes the Ocean may launch per VNG.
-        items:
-          type: string
-        example: ["standard_ds2_v2", "standard_d2s_v4"]
-      zones:
-        type: array
-        description: |
-          An Array holding Availability Zones, this configures the availability zones the Ocean may launch instances in per VNG.
-        items:
-          type: string
-        example: ["1", "2", "3"]
-      autoScale:
-        type: object
-        properties:
-          headrooms:
-            type: array
-            description: |
-              A List of headroom objects. Define custom headroom per virtual node group.\
-              A maximum of 30 objects is allowed.\
-              At least one of cpuPerUnit, memoryPerUnit or gpuPerUnit must be set.
-            items:
-              type: object
-              required:
-                - numOfUnits
-              properties:
-                cpuPerUnit:
-                  type: integer
-                  description: |
-                    Configure the number of CPUs to allocate for the headroom.
-                    CPUs are denoted in millicores, where 1000 millicores = 1 vCPU.
-                  example: 1000
-                memoryPerUnit:
-                  type: integer
-                  description: |
-                    Configure the amount of memory (MiB) to allocate the headroom.
-                  example: 2048
-                gpuPerUnit:
-                  type: integer
-                  description: |
-                    How many GPU cores should be allocated per headroom unit.
-                  example: 0
-                numOfUnits:
-                  type: integer
-                  description: |
-                    The number of headroom units to maintain, where each unit has the defined CPU, memory, and GPU.
-                  example: 3
-          autoHeadroomPercentage:
-            type: integer
-            description: >
-              Number between 0-200 to control the headroom % of the specific Virtual Node Group. Effective when cluster.autoScaler.headroom.automatic.isEnabled=true is set on the Ocean cluster.
-            example: 20
-      launchSpecification:
-        type: object
-        properties:
-          osDisk:
-            type: object
-            required:
-              - sizeGB
-            description: |
-              Specify OS disk specification other than default.
-            properties:
-              type:
-                type: string
-                description: |
-                  The type of the OS disk.
-                enum: [ Standard_LRS, Premium_LRS, StandardSSD_LRS ]
-                example: Standard_LRS
-              sizeGB:
-                type: integer
-                description: |
-                  The size of the OS disk in GB. Required if dataDisks is specified.
-                minimum: 1
-                maximum: 1023
-                example: 30
-              utilizeEphemeralStorage:
-                type: boolean
-                description: |
-                  Flag to enable/disable the Ephemeral OS Disk utilization.
-                example: true
-          tags:
-            type: array
-            description: |
-              A maximum of 10 unique key-value pairs for VM tags in the virtual node group.
-            items:
-              type: object
-              properties:
-                tagKey:
-                  type: string
-                  description: |
-                    Tag key for VMs in the cluster.
-                  example: env
-                tagValue:
-                  type: string
-                  description: |
-                    Tag value for VMs in the cluster.
-                  example: staging
-      createdAt:
-        type: string
-        readOnly: true
-        format: date-time
-        example: "2021-03-17T08:13:08.000Z"
-        description: |
-          A timestamp of the virtual node group creation.
-      updatedAt:
-        type: string
-        readOnly: true
-        format: date-time
-        example: "2021-03-17T15:06:13.000Z"
-        description: |
-          A timestamp of the latest virtual node group update.
+                Tag value for VMs in the cluster.
+              example: staging
