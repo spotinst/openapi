@@ -42201,6 +42201,118 @@
         }
       }
     },
+    "/aws/ec2/managedInstance/state": {
+      "put": {
+        "summary": "Update Managed Instance States",
+        "description": "Update the state of multiple managed instances.\n",
+        "operationId": "AWSManagedInstanceUpdateStates",
+        "tags": [
+          "Managed Instance AWS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "title": "Update Managed Instance states",
+                    "type": "object",
+                    "description": "Contains the details of a request to update managed instance states.\n",
+                    "required": [
+                      "managedInstanceStates"
+                    ],
+                    "properties": {
+                      "managedInstanceStates": {
+                        "type": "array",
+                        "description": "An array of Managed Instance State objects (must contain at least 1 object).\n",
+                        "items": {
+                          "title": "Managed Instance State",
+                          "type": "object",
+                          "description": "Contains the details of a managed instance state.\n",
+                          "required": [
+                            "id",
+                            "state"
+                          ],
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "description": "Identifier of the managed instance.\n",
+                              "example": "smi-12345678"
+                            },
+                            "state": {
+                              "type": "string",
+                              "description": "The new state of the managed instance.\n",
+                              "enum": [
+                                "PAUSE",
+                                "RESUME"
+                              ],
+                              "example": "PAUSE"
+                            }
+                          }
+                        },
+                        "example": {
+                          "managedInstanceStates": [
+                            {
+                              "id": "smi-12345678",
+                              "state": "PAUSE"
+                            },
+                            {
+                              "id": "smi-12345679",
+                              "state": "RESUME"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Update Managed Instance States Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/aws/ec2/managedInstance/state?spotinstAccountId=act-123456"
+                            },
+                            "method": {
+                              "example": "PUT"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/audit/events": {
       "get": {
         "summary": "List Audit Log Events",
