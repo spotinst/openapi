@@ -9,6 +9,9 @@ properties:
     required:
       - name
       - capacity
+      - region
+      - strategy
+      - compute
     properties:
       name:
         type: string
@@ -196,6 +199,7 @@ properties:
         required:
           - product
           - availabilityZones
+          - launchSpecification
         properties:
           product:
             type: string
@@ -312,7 +316,6 @@ properties:
             required:
               - securityGroupIds
               - monitoring
-              - imageId
               - keyPair
             properties:
               creditSpecification:
@@ -418,6 +421,15 @@ properties:
                   * The following instance types are supported by PV image: M1, M2, M3, C1, C3.
                   * In case of conflict between Instance type to image type, an error message will be returned
                 example: "ami-01e24be29428c15b2"
+              images:
+                type: array
+                description: |
+                  Elastigroup can be configure with imageId or images, but not with both of them.
+                  * Valid values: null, Array with a minimum of 1 element. <br>
+                  * Multiple AMIs aren't allowed with stateful groups / MI
+                  Or with the following third-party integrations: Ocean / Ecs / Nomad / Docker swarm / Kubernetes
+                items:
+                  $ref: "./elastic-compute-launchspec-image.yaml"
               keyPair:
                 type: string
                 description: |
