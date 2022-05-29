@@ -1,7 +1,7 @@
 type: object
 title: "Stateful Node Compute"
 description: |
-  Defines the Computational parameters to use when launch the VM for the Stateful Node.
+  Defines the computational parameters to use when launch the VM for the Stateful Node.
 required:
   - os
   - vmSizes
@@ -11,12 +11,12 @@ properties:
     type: string
     enum: [ Linux, Windows ]
     description: |
-      Defines the correct operating system for which to launch the VM.
+      Defines the type of the operating system.
     example: "Linux"
   vmSizes:
     type: object
     description: |
-      Defines the Vm Sizes to use when launching VMs.
+      Defines the VM sizes to use when launching VMs.
     required:
       - odSizes
       - spotSizes
@@ -24,14 +24,14 @@ properties:
       odSizes:
         type: array
         description: |
-          Defines the On-Demand sizes to use when launching VMs.
+          Defines the on-demand sizes to use when launching VMs.
         items:
           type: string
           example: "standard_a1_v1"
       spotSizes:
         type: array
         description: |
-          Defines the Spot sizes to use when launching VMs.
+          Defines the spot-VM sizes to use when launching VMs.
         items:
           type: string
           example: "standard_a2_v2"
@@ -72,8 +72,10 @@ properties:
       image:
         type: object
         description: |
-          Defines the image to launch the VM.
+          Defines the image with which the VM will be launched.
           * <a style=color:red>Must be only one initialized from the following (marketplace, custom, gallery).</a>
+          * <a style=color:red>For import or update operations, image object cannot be defined when the compute.persistence.shouldPersistOsDisk = true.</a>
+          * <a style=color:red>For import or update operations, image that contains data disk definitions cannot be defined when the compute.persistence.shouldPersistDataDisks = true.</a>
         properties:
           marketplace:
             type: object
@@ -167,6 +169,8 @@ properties:
         format: byte
         description: |
           Defines the custom data (YAML encoded at Base64) that will be executed upon VM launch.
+          * <a style=color:red>The customData object cannot be defined when the compute.launchSpecification.image is defined as specialized.</a>
+          * <a style=color:red>For import or update operations, customData object cannot be defined when the compute.persistence.shouldPersistOsDisk = true.</a>
         example: ""
       shutdownScript:
         type: string
@@ -175,9 +179,12 @@ properties:
         example: "IyEvdXNyL2Jpbi9lbnYgYmFzaAoiR29vZGJ5ZSBvbGQgaW5zdGFuY2Ui"
         description: |
           Defines the shutdown script (encoded at Base64) to execute once the VM is detached.
+          * <a style=color:red>For import or update operations, shutdownScript object cannot be defined when the compute.persistence.shouldPersistOsDisk = true.</a>
       network:
         title: Network
-        description: Defines the network profile to launch the VM.
+        description: |
+          Defines the network profile with which the VM will be launched.
+          * <a style=color:red>For import or update operations, network object cannot be defined when the compute.persistence.shouldPersistNetwork = true.</a>
         type: object
         required:
           - resourceGroupName
@@ -186,17 +193,17 @@ properties:
         properties:
           resourceGroupName:
             title: Resource Group Name
-            description: Defines the resource group name of the virtual network to launch the VM.
+            description: Defines the resource group name of the virtual network with which the VM will be launched.
             type: string
             example: subnetResourceGroup
           virtualNetworkName:
             title: Virtual Network Name
-            description: Defines the name of the virtual network to launch the VM.
+            description: Defines the name of the virtual network with which the VM will be launched.
             type: string
             example: vname
           networkInterfaces:
             title: Network Interfaces
-            description: Defines the network interfaces to launch with the VM.
+            description: Defines the network interfaces with which the VM will be launched.
             type: array
             items:
               type: object
@@ -207,18 +214,18 @@ properties:
                 isPrimary:
                   title: Is Primary Criteria
                   description: |
-                    Defines the network interface to be the primary network interface.
+                    Defines whether the network interface is primary or not.
                     * <a style=color:red>Must be true for only one of the items.</a>
                   type: boolean
                   example: true
                 subnetName:
                   title: Subnet Name
-                  description: Defines the subnet to create the specific network interface.
+                  description: Defines the subnet to which the network interface will be connected.
                   type: string
                   example: "testSubnet"
                 assignPublicIp:
                   title: Assign Public IP
-                  description: Determines if a Public IP should be assigned in this network interface.
+                  description: Defines if a Public IP should be assigned in this network interface.
                   type: boolean
                   example: true
                 publicIpSku:
@@ -231,7 +238,7 @@ properties:
                   example: "Standard"
                 networkSecurityGroup:
                   title: Network Security Group
-                  description: Defines the network security group to use with the VM.
+                  description: Defines the network security group to which the network interface will be assigned.
                   type: object
                   required:
                     - name
@@ -239,25 +246,25 @@ properties:
                   properties:
                     name:
                       title: Name
-                      description: Defines the name of the network security group to use.
+                      description: Specify the name of the network security group to use in this network interface.
                       type: string
                       example: "test"
                     resourceGroupName:
                       title: Resource Group Name
-                      description: Defines the resource group of the network security group.
+                      description: Specify the resource group of the network security group.
                       type: string
                       example: "test"
                 enableIPForwarding:
                   title: Enable IP Forwarding
-                  description: Enables the IP forwarding feature on the network interface.
+                  description: Enables IP forwarding on the network interface.
                   type: boolean
                   example: true
                 privateIpAddresses:
                   type: array
                   description: |
-                    Defines a pool of private IPs to launch the VM.
-                    * A list of unique items of ip addresses.
-                    * If none exist then a dynamic IP is used.
+                    Specify the private IP pool in which the VMs will be launched.
+                    * A list of unique IP addresses.
+                    * If none of the IP addresses available then a dynamic IP is used.
                   items:
                     type: string
                     example:
@@ -275,19 +282,22 @@ properties:
                       name:
                         title: Name
                         description: |
-                          Defines the name of the additional Ip Configuration.
+                          Specify the name of the additional Ip Configuration.
                           * <a style=color:red>Must be unique across additionalIpConfigurations.</a>
                         type: string
                         example: "test"
                       privateIpAddressVersion:
                         title: Private IP Address Version
-                        description: Defines the type of IP to allocate to the additional IP configuration.
+                        description: Defines the version of the private IP address.
                         type: string
                         enum: [IPv4, IPv6]
                         default: IPv4
                         example: "IPv4"
                 publicIps:
-                  description: Defined a pool of Public Ips (from Azure) the VM would be launched with, that will be associated to the network interface.
+                  description: |
+                    Specify the public IP pool in which the VMs will be launched.
+                    * A list of unique IP addresses.
+                    * If none of the IP addresses available then a dynamic IP is used.
                   type: array
                   items:
                     type: object
@@ -296,15 +306,15 @@ properties:
                       - name
                     properties:
                       resourceGroupName:
-                        description: Defines the resource group name of the public ip to use in the public ip pool.
+                        description: Specify the resource group of the public IP.
                         type: string
                         example: "resourceGroup"
                       name:
-                        description: Defines the name of the public ip to use in the public ip pool.
+                        description: Specify the name of the public IP to which the VMs will be assigned.
                         type: string
                         example: "name"
                 applicationSecurityGroups:
-                  description: Defines the Application Security Groups that will be associated to the primary ip configration of the network interface.
+                  description: Defines the Application Security Groups that will be associated to the primary IP configration of the network interface.
                   type: array
                   items:
                     type: object
@@ -313,42 +323,41 @@ properties:
                       - name
                     properties:
                       resourceGroupName:
-                        description: Defines the resource group name of the Application Security Group.
+                        description: Specify the resource group of the Application Security Group.
                         type: string
                         example: "AsgResourceGroup"
                       name:
-                        description: Defines the name of the Application Security Group.
+                        description: Specify the name of the Application Security Group.
                         type: string
                         example: "AsgName"
       login:
         type: object
         description: |
-          Defines the login information for admin access to sign into the VM.
-          * <a style=color:red>Password/SSH is required for Linux.</a>
+          Specify the authentication details to be used for launching VMs.
+          * <a style=color:red>For Linux: password/sshPublicKey is required.</a>
+          * <a style=color:red>For Windows: password is required.</a>
+          * <a style=color:red>The login object cannot be defined when the compute.launchSpecification.image is defined as specialized.</a>
+          * <a style=color:red>For import or update operations, login object cannot be defined when the compute.persistence.shouldPersistOsDisk = true.</a>
         required:
           - userName
         properties:
           userName:
             type: string
             description: |
-              Defines user name for admin access to VMs.\
-              Login can be set:
-              * for windows: compute.launchSpecification.login.password
-              * for linux: compute.launchSpecification.login.sshPublicKey
-              Just user name, without pwd or SSH key
+              Defines the admin user name for launching VMs.
             example: "spotinst"
           sshPublicKey:
             type: string
             description: |
-              SSH for admin access to Linux VMs.\
-              Optional for Linux.
+              Defines the SSH public key for admin access to Linux VMs.\
+              * Optional only for Linux.
             example: "ssh-rsa"
           password:
             type: string
             writeOnly: true
             description: |
-              Password for admin access to Windows VMs.\
-              Required for Windows.
+              Defines the password for admin access to Windows VMs.\
+              * <a style=color:red>Required for Windows.</a>
       loadBalancersConfig:
         type: object
         description: |
@@ -409,20 +418,20 @@ properties:
       tags:
         type: array
         description: |
-          Defines the tags (unique Key-Value pairs) to tag your Stateful Node resources.
+          Defines the tags (unique key-value pairs) to tag your resources.
         items:
           type: object
           properties:
             tagKey:
               type: string
               description: |
-                Tag Key for Stateful Node resources.
+                Tag key for all resources.
                 * Maximum length of 512 characters.
               example: "env"
             tagValue:
               type: string
               description: |
-                Tag Value for Stateful Node resources.
+                Tag value for all resources.
                 * Maximum length of 512 characters.
               example: "staging"
         max: 44
@@ -430,7 +439,7 @@ properties:
         type: array
         writeOnly: true
         description: |
-          Defines a user-assigned managed identity to the Stateful Node's VM.
+          Defines a user-assigned managed identity to the launched VMs.
         items:
           type: object
           required:
