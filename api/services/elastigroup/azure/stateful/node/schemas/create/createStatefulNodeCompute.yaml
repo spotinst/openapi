@@ -1,7 +1,7 @@
 type: object
 title: "Stateful Node Compute"
 description: |
-  Compute settings for stateful node.
+  Defines the computational parameters to use when launch the VM for the Stateful Node.
 required:
   - os
   - vmSizes
@@ -11,12 +11,12 @@ properties:
     type: string
     enum: [ Linux, Windows ]
     description: |
-      Type of operating system.
+      Defines the type of the operating system.
     example: "Linux"
   vmSizes:
     type: object
     description: |
-      Amount of time to be unhealthy before a replacement is triggered
+      Defines the VM sizes to use when launching VMs.
     required:
       - odSizes
       - spotSizes
@@ -24,28 +24,30 @@ properties:
       odSizes:
         type: array
         description: |
-          Available On-Demand sizes.
+          Defines the on-demand sizes to use when launching VMs.
         items:
           type: string
           example: "standard_a1_v1"
       spotSizes:
         type: array
         description: |
-          Available Spot-VM sizes.
+          Defines the spot-VM sizes to use when launching VMs.
         items:
           type: string
           example: "standard_a2_v2"
       preferredSpotSizes:
         type: array
         description: |
-          Prioritize Spot VM sizes when launching Spot VMs for the group.
-          <a style=color:red>If set, must be a sublist of compute.vmSizes.spotSizes. </a>
+          Prioritize Spot VM sizes when launching Spot VMs.
+          * <a style=color:red>If set, must be a sublist of compute.vmSizes.spotSizes. </a>
         items:
           type: string
           example: "standard_a2_v2"
   zones:
     type: array
-    description: List of Azure Availability Zones in the defined region; If not defined, Virtual machines will be launched regionally.
+    description: |
+      List of Azure Availability Zones in the defined region.
+      * If not defined, VMs will be launched regionally.
     items:
       enum: [ 1, 2, 3 ]
       type: string
@@ -53,15 +55,16 @@ properties:
   preferredZones:
     type: array
     description: |
-      The AZs to prioritize when launching VMs./
-      If no markets are available in the Preferred AZs, VMs are launched in the non-preferred AZs.
-      <a style=color:red>Must be a sublist of compute.zones.</a>
+      The AZs to prioritize when launching VMs.
+      * If no markets are available in the Preferred AZs, VMs are launched in the non-preferred AZs.
+      * <a style=color:red>Must be a sublist of compute.zones.</a>
     items:
       enum: [ 1, 2, 3 ]
       type: string
       example: 1
   launchSpecification:
     type: object
+    description: Defines the launch specification of the VM.
     required:
       - image
       - network
@@ -69,13 +72,16 @@ properties:
       image:
         type: object
         description: |
-          The image definitions. An image is a template for creating new VMs.
+          Defines the image with which the VM will be launched.
+          * <a style=color:red>Must be only one initialized from the following (marketplace, custom, gallery).</a>
+          * <a style=color:red>For import or update operations, image object cannot be defined when the compute.persistence.shouldPersistOsDisk = true.</a>
+          * <a style=color:red>For import or update operations, image that contains data disk definitions cannot be defined when the compute.persistence.shouldPersistDataDisks = true.</a>
         properties:
           marketplace:
             type: object
             description: |
-              Select an image from Azure's Marketplace image catalogue\
-              Required if the custom image or gallery image are not specified.
+              Select an image from Azure's Marketplace image catalogue.
+              * <a style=color:red>Required if the custom image or gallery image are not specified.</a>
             required:
               - publisher
               - offer
@@ -106,7 +112,8 @@ properties:
           custom:
             type: object
             description: |
-              Custom image definitions. Required if marketplace image or gallery image are not specified.
+              Custom image definitions.
+              * <a style=color:red>Required if marketplace image or gallery image are not specified.</a>
             required:
               - resourceGroupName
               - name
@@ -125,7 +132,8 @@ properties:
             title: Gallery
             type: object
             description: |
-              Gallery image definitions. Required if custom image or marketplace image are not specified.
+              Gallery image definitions.
+              * <a style=color:red>Required if custom image or marketplace image are not specified.</a>
             required:
               - resourceGroupName
               - galleryName
@@ -160,7 +168,9 @@ properties:
         type: string
         format: byte
         description: |
-          This value will hold the YAML in base64 and will be executed upon VM launch.
+          Defines the custom data (YAML encoded at Base64) that will be executed upon VM launch.
+          * <a style=color:red>The customData object cannot be defined when the compute.launchSpecification.image is defined as specialized.</a>
+          * <a style=color:red>For import or update operations, customData object cannot be defined when the compute.persistence.shouldPersistOsDisk = true.</a>
         example: ""
       shutdownScript:
         type: string
@@ -168,10 +178,13 @@ properties:
         writeOnly: true
         example: "IyEvdXNyL2Jpbi9lbnYgYmFzaAoiR29vZGJ5ZSBvbGQgaW5zdGFuY2Ui"
         description: |
-          Shutdown script for the stateful node. Value should be passed as a string encoded at Base64 only
+          Defines the shutdown script (encoded at Base64) to execute once the VM is detached.
+          * <a style=color:red>For import or update operations, shutdownScript object cannot be defined when the compute.persistence.shouldPersistOsDisk = true.</a>
       network:
         title: Network
-        description: Define the Virtual Network and Subnet for your Stateful Node.
+        description: |
+          Defines the network profile with which the VM will be launched.
+          * <a style=color:red>For import or update operations, network object cannot be defined when the compute.persistence.shouldPersistNetwork = true.</a>
         type: object
         required:
           - resourceGroupName
@@ -180,17 +193,17 @@ properties:
         properties:
           resourceGroupName:
             title: Resource Group Name
-            description: Vnet Resource Group Name
+            description: Defines the resource group name of the virtual network with which the VM will be launched.
             type: string
             example: subnetResourceGroup
           virtualNetworkName:
             title: Virtual Network Name
-            description: Virtual Network
+            description: Defines the name of the virtual network with which the VM will be launched.
             type: string
             example: vname
           networkInterfaces:
             title: Network Interfaces
-            description: Network Interfaces
+            description: Defines the network interfaces with which the VM will be launched.
             type: array
             items:
               type: object
@@ -200,54 +213,65 @@ properties:
               properties:
                 isPrimary:
                   title: Is Primary Criteria
-                  description: Defines whether the network interface is primary or not.
+                  description: |
+                    Defines whether the network interface is primary or not.
+                    * <a style=color:red>Must be true for only one of the items.</a>
                   type: boolean
                   example: true
                 subnetName:
                   title: Subnet Name
-                  description: Subnet name
+                  description: Defines the subnet to which the network interface will be connected.
                   type: string
                   example: "testSubnet"
                 assignPublicIp:
                   title: Assign Public IP
-                  description: Assign public IP
+                  description: Defines if a Public IP should be assigned in this network interface.
                   type: boolean
                   example: true
                 publicIpSku:
                   title: Public Ip Sku
-                  description: Required if assignPublicIp=true values=[STANDARD/BASIC]
+                  description: |
+                    Defines the type of public IP to assign the VM.
+                    * <a style=color:red>Required if assignPublicIp=true.</a>
                   type: string
-                  example: "STANDARD"
+                  enum: [Standard, Basic]
+                  example: "Standard"
                 networkSecurityGroup:
                   title: Network Security Group
-                  description: Network Security Group
+                  description: Defines the network security group to which the network interface will be assigned.
                   type: object
+                  required:
+                    - name
+                    - resourceGroupName
                   properties:
                     name:
                       title: Name
-                      description: Requires valid security group name. Required if security group is specified.
+                      description: Specify the name of the network security group to use in this network interface.
                       type: string
                       example: "test"
                     resourceGroupName:
                       title: Resource Group Name
-                      description: Requires valid resource group name. Required if security group is specified.
+                      description: Specify the resource group of the network security group.
                       type: string
                       example: "test"
                 enableIPForwarding:
                   title: Enable IP Forwarding
-                  description: Enable IP Forwarding
+                  description: Enables IP forwarding on the network interface.
                   type: boolean
                   example: true
                 privateIpAddresses:
                   type: array
-                  description: A list with unique items that every item is a valid IP
+                  description: |
+                    Specify the private IP pool in which the VMs will be launched.
+                    * A list of unique IP addresses.
+                    * If none of the IP addresses available then a dynamic IP is used.
                   items:
                     type: string
                     example:
                       - "172.23.4.20"
                 additionalIpConfigurations:
                   title: Additional IP Configurations
-                  description: Additional configuration of network interface
+                  description: Defines a list of extra IPs to be dynamically allocated.
                   type: array
                   items:
                     type: object
@@ -257,19 +281,23 @@ properties:
                     properties:
                       name:
                         title: Name
-                        description: Required if additionalConfiguration has been specified.
+                        description: |
+                          Specify the name of the additional Ip Configuration.
+                          * <a style=color:red>Must be unique across additionalIpConfigurations.</a>
                         type: string
                         example: "test"
                       privateIpAddressVersion:
                         title: Private IP Address Version
-                        description: "Version of the private IP address"
+                        description: Defines the version of the private IP address.
                         type: string
                         enum: [IPv4, IPv6]
                         default: IPv4
                         example: "IPv4"
                 publicIps:
-                  description: Defined a pool of Public Ips (from Azure), that will be associated to the network interface.
-                    We will associate one public ip per instance until the pool is exhausted, in which case, we will create a new one.
+                  description: |
+                    Specify the public IP pool in which the VMs will be launched.
+                    * A list of unique IP addresses.
+                    * If none of the IP addresses available then a dynamic IP is used.
                   type: array
                   items:
                     type: object
@@ -278,15 +306,15 @@ properties:
                       - name
                     properties:
                       resourceGroupName:
-                        description: The resource group of the public ip.
+                        description: Specify the resource group of the public IP.
                         type: string
                         example: "resourceGroup"
                       name:
-                        description: The name of the public ip.
+                        description: Specify the name of the public IP to which the VMs will be assigned.
                         type: string
                         example: "name"
                 applicationSecurityGroups:
-                  description: List of Application Security Groups that will be associated to the primary ip configration of the network interface.
+                  description: Defines the Application Security Groups that will be associated to the primary IP configration of the network interface.
                   type: array
                   items:
                     type: object
@@ -295,42 +323,41 @@ properties:
                       - name
                     properties:
                       resourceGroupName:
-                        description: The resource group of the Application Security Group.
+                        description: Specify the resource group of the Application Security Group.
                         type: string
                         example: "AsgResourceGroup"
                       name:
-                        description: The name of the Application Security group
+                        description: Specify the name of the Application Security Group.
                         type: string
                         example: "AsgName"
       login:
         type: object
         description: |
-          Set admin access for accessing your VMs. Password/SSH is required for Linux.
+          Specify the authentication details to be used for launching VMs.
+          * <a style=color:red>For Linux: password/sshPublicKey is required.</a>
+          * <a style=color:red>For Windows: password is required.</a>
+          * <a style=color:red>The login object cannot be defined when the compute.launchSpecification.image is defined as specialized.</a>
+          * <a style=color:red>For import or update operations, login object cannot be defined when the compute.persistence.shouldPersistOsDisk = true.</a>
         required:
           - userName
         properties:
           userName:
             type: string
             description: |
-              user name for admin access to VMs.\
-              Login can be set:
-              * for windows: compute.launchSpecification.login.password
-              * for linux: compute.launchSpecification.login.sshPublicKey
-
-              Just user name, without pwd or SSH key
+              Defines the admin user name for launching VMs.
             example: "spotinst"
           sshPublicKey:
             type: string
             description: |
-              SSH for admin access to Linux VMs.\
-              Optional for Linux.
+              Defines the SSH public key for admin access to Linux VMs.
+              * Optional only for Linux.
             example: "ssh-rsa"
           password:
             type: string
             writeOnly: true
             description: |
-              Password for admin access to Windows VMs.\
-              Required for Windows.
+              Defines the password for admin access to Windows VMs.
+              * <a style=color:red>Required for Windows.</a>
       loadBalancersConfig:
         type: object
         description: |
@@ -391,26 +418,28 @@ properties:
       tags:
         type: array
         description: |
-          Unique Key-Value pairs for all Stateful Node Resources.
+          Defines the tags (unique key-value pairs) to tag your resources.
         items:
           type: object
           properties:
             tagKey:
               type: string
               description: |
-                Tag Key for Stateful Node Resources.
+                Tag key for all resources.
+                * Maximum length of 512 characters.
               example: "env"
             tagValue:
               type: string
               description: |
-                Tag Value for Stateful Node Resources.
+                Tag value for all resources.
+                * Maximum length of 512 characters.
               example: "staging"
         max: 44
       managedServiceIdentities:
         type: array
         writeOnly: true
         description: |
-          Add a user-assigned managed identity to the Stateful Node's VM.
+          Defines a user-assigned managed identity to the launched VMs.
         items:
           type: object
           required:
@@ -420,17 +449,17 @@ properties:
             name:
               type: string
               description: |
-                name of the managed identity
+                Defines the name of the managed service identities.
               example: "mySI2"
             resourceGroupName:
               type: string
               description: |
-                The Resource Group that the user-assigned managed identity resides in.
+                Defines the resource group of the managed service identities.
               example: "myResourceGroup"
       extensions:
         type: array
         description: |
-          A list of objects for azure extensions.
+          A list of objects for Azure extensions.
         items:
           type: object
           required:
@@ -518,7 +547,7 @@ properties:
           type:
             type: string
             description: |
-              The type of the OS disk,
+              The type of the OS disk.
             enum: [ Standard_LRS, Premium_LRS, StandardSSD_LRS ]
             example: "Standard_LRS"
           sizeGB:
@@ -597,7 +626,10 @@ properties:
           storageUri:
             type: string
             description: |
-              The storage URI that is used if a type is unmanaged. The storage URI must follow the blob storage URI format (\"https://<blobstoragename>.blob.core.windows.net/\"). StorageUri is required if the type is unmanaged. StorageUri must be ‘null’ in case the boot diagnostics type is managed.
+              The storage URI that is used if a type is unmanaged.
+              * The storage URI must follow the blob storage URI format (\"https://<blobstoragename>.blob.core.windows.net/\").
+              * StorageUri is required if the type is unmanaged.
+              * StorageUri must be ‘null’ in case the boot diagnostics type is managed.
             example: "https://example.blob.core.windows.net/"
 
 
