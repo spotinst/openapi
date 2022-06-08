@@ -278,7 +278,10 @@
                         "description": "Elastigroup Configuration",
                         "required": [
                           "name",
-                          "capacity"
+                          "capacity",
+                          "region",
+                          "strategy",
+                          "compute"
                         ],
                         "properties": {
                           "name": {
@@ -492,7 +495,8 @@
                             "title": "Elastigroup Compute",
                             "required": [
                               "product",
-                              "availabilityZones"
+                              "availabilityZones",
+                              "launchSpecification"
                             ],
                             "properties": {
                               "product": {
@@ -639,7 +643,6 @@
                                 "required": [
                                   "securityGroupIds",
                                   "monitoring",
-                                  "imageId",
                                   "keyPair"
                                 ],
                                 "properties": {
@@ -1015,6 +1018,22 @@
                                     "type": "string",
                                     "description": "The ID of the image used to launch the instance.\n* The following instance types are supported by HVM image: M3, M4, C3, C4, D2, G2, R3, CC2, CC1, CG1, CR1.\n* The following instance types are supported by PV image: M1, M2, M3, C1, C3.\n* In case of conflict between Instance type to image type, an error message will be returned\n",
                                     "example": "ami-01e24be29428c15b2"
+                                  },
+                                  "images": {
+                                    "type": "array",
+                                    "description": "An array of image objects. <br>\nElastigroup can be configured with either imageId or images, but not both. <br>\n* Valid values: null, or an array with at least 1 element.\n* Multiple AMIs aren't allowed with stateful groups / Managed Instance / Ocean\n  or with the following third-party integrations: ECS / Nomad / Docker Swarm / Kubernetes\n",
+                                    "items": {
+                                      "type": "object",
+                                      "title": "Image object, containing the id of the image used to launch the instance.",
+                                      "required": "-id",
+                                      "properties": {
+                                        "id": {
+                                          "type": "string",
+                                          "description": "Identifier of the image in AWS. Valid values: any string which is not empty or null.\n",
+                                          "example": "ami-123456789"
+                                        }
+                                      }
+                                    }
                                   },
                                   "keyPair": {
                                     "type": "string",
@@ -4004,6 +4023,13 @@
                                 "type": "string",
                                 "description": "The ID of the image used to launch the instance.\n* The following instance types are supported by HVM image: M3, M4, C3, C4, D2, G2, R3, CC2, CC1, CG1, CR1.\n* The following instance types are supported by PV image: M1, M2, M3, C1, C3.\n* In case of conflict between Instance type to image type, an error message will be returned\n",
                                 "example": "ami-01e24be29428c15b2"
+                              },
+                              "images": {
+                                "type": "array",
+                                "description": "An array of image objects. <br>\nElastigroup can be configured with either imageId or images, but not both. <br>\n* Valid values: null, or an array with at least 1 element.\n* Multiple AMIs aren't allowed with stateful groups / Managed Instance / Ocean\n  or with the following third-party integrations: ECS / Nomad / Docker Swarm / Kubernetes\n",
+                                "items": {
+                                  "$ref": "#/paths/~1aws~1ec2~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/compute/properties/launchSpecification/properties/images/items"
+                                }
                               },
                               "keyPair": {
                                 "type": "string",
