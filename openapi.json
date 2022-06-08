@@ -31357,7 +31357,7 @@
                           "scheduling": {
                             "type": "object",
                             "title": "Ocean Scheduling",
-                            "description": "",
+                            "description": "An object used to define times for a task such as a shutdown to be activated.\n",
                             "required": [
                               "tasks"
                             ],
@@ -31365,13 +31365,13 @@
                               "tasks": {
                                 "type": "array",
                                 "description": "The actions in the cluster to be scheduled.\n",
-                                "required": [
-                                  "isEnabled",
-                                  "cronExpression",
-                                  "taskType"
-                                ],
                                 "items": {
                                   "type": "object",
+                                  "required": [
+                                    "isEnabled",
+                                    "cronExpression",
+                                    "taskType"
+                                  ],
                                   "properties": {
                                     "isEnabled": {
                                       "type": "boolean",
@@ -31384,8 +31384,41 @@
                                     },
                                     "taskType": {
                                       "type": "string",
-                                      "example": "clusterRoll",
-                                      "description": "Valid values: \"clusterRoll\". Required for cluster.scheduling.tasks.\n"
+                                      "description": "Valid values: \"clusterRoll\". Required for cluster.scheduling.tasks.\n",
+                                      "enum": [
+                                        "clusterRoll"
+                                      ],
+                                      "example": "clusterRoll"
+                                    },
+                                    "parameters": {
+                                      "type": "object",
+                                      "properties": {
+                                        "clusterRoll": {
+                                          "type": "object",
+                                          "properties": {
+                                            "batchSizePercentage": {
+                                              "type": "integer",
+                                              "minimum": 0,
+                                              "maximum": 100,
+                                              "example": 20,
+                                              "description": "Value as a percent to set the size of a batch in a roll. Valid values are 0-100.\n"
+                                            },
+                                            "comment": {
+                                              "type": "string",
+                                              "example": "This is why I deployed my cluster.",
+                                              "description": "Add a comment description for the roll. The comment is limited to 256 chars\n"
+                                            },
+                                            "batchMinHealthyPercentage": {
+                                              "type": "integer",
+                                              "minimum": 1,
+                                              "maximum": 100,
+                                              "default": 50,
+                                              "example": 100,
+                                              "description": "Indicates the threshold of minimum healthy instances in single batch. If the amount of healthy instances in single batch is under the threshold, the cluster roll will fail. If exists, the parameter value will be in range of 1-100. In case of null as value, the default value in the backend will be 50%. Value of param should represent the number in percentage (%) of the batch.\n"
+                                            }
+                                          }
+                                        }
+                                      }
                                     }
                                   }
                                 }
@@ -35599,6 +35632,9 @@
                                     "taskType": {
                                       "type": "string",
                                       "example": "clusterRoll",
+                                      "enum": [
+                                        "clusterRoll"
+                                      ],
                                       "description": "The activity that you are scheduling. Valid values: \"clusterRoll\". Required for cluster.scheduling.tasks.\n"
                                     },
                                     "parameters": {
@@ -35609,6 +35645,8 @@
                                           "properties": {
                                             "batchSizePercentage": {
                                               "type": "integer",
+                                              "minimum": 0,
+                                              "maximum": 100,
                                               "example": 20,
                                               "description": "Value as a percent to set the size of a batch in a roll. Valid values are 0-100.\n"
                                             },
@@ -35619,6 +35657,8 @@
                                             },
                                             "batchMinHealthyPercentage": {
                                               "type": "integer",
+                                              "minimum": 1,
+                                              "maximum": 100,
                                               "default": 50,
                                               "example": 100,
                                               "description": "Indicates the threshold of minimum healthy instances in single batch. If the amount of healthy instances in single batch is under the threshold, the cluster roll will fail. If exists, the parameter value will be in range of 1-100. In case of null as value, the default value in the backend will be 50%. Value of param should represent the number in percentage (%) of the batch.\n"
@@ -50294,13 +50334,41 @@
                                     },
                                     "taskType": {
                                       "type": "string",
+                                      "enum": [
+                                        "clusterRoll"
+                                      ],
                                       "example": "clusterRoll",
                                       "description": "Valid values: \"clusterRoll\". Required for the cluster.scheduling.tasks object.\n"
                                     },
-                                    "batchSizePercentage": {
-                                      "type": "integer",
-                                      "description": "Value in percent to set the size of a batch in a roll. Valid values are 0-100\n",
-                                      "example": 20
+                                    "parameters": {
+                                      "type": "object",
+                                      "properties": {
+                                        "clusterRoll": {
+                                          "type": "object",
+                                          "properties": {
+                                            "batchSizePercentage": {
+                                              "type": "integer",
+                                              "minimum": 0,
+                                              "maximum": 100,
+                                              "example": 20,
+                                              "description": "Value as a percent to set the size of a batch in a roll. Valid values are 0-100.\n"
+                                            },
+                                            "comment": {
+                                              "type": "string",
+                                              "example": "This is why I deployed my cluster.",
+                                              "description": "Add a comment description for the roll. The comment is limited to 256 chars\n"
+                                            },
+                                            "batchMinHealthyPercentage": {
+                                              "type": "integer",
+                                              "minimum": 1,
+                                              "maximum": 100,
+                                              "default": 50,
+                                              "example": 100,
+                                              "description": "Indicates the threshold of minimum healthy instances in single batch. If the amount of healthy instances in single batch is under the threshold, the cluster roll will fail. If exists, the parameter value will be in range of 1-100. In case of null as value, the default value in the backend will be 50%. Value of param should represent the number in percentage (%) of the batch.\n"
+                                            }
+                                          }
+                                        }
+                                      }
                                     }
                                   }
                                 }
