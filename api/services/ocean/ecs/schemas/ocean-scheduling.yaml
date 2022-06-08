@@ -1,7 +1,7 @@
 type: object
 title: Ocean Scheduling
 description: >
-
+  An object used to define times for a task such as a shutdown to be activated.
 required:
   - tasks
 properties:
@@ -9,12 +9,12 @@ properties:
     type: array
     description: >
       The actions in the cluster to be scheduled.
-    required:
-      - isEnabled
-      - cronExpression
-      - taskType
     items:
       type: object
+      required:
+        - isEnabled
+        - cronExpression
+        - taskType
       properties:
         isEnabled:
           type: boolean
@@ -27,9 +27,10 @@ properties:
             A valid cron expression, for example " * * * * * ". The cron runs in the UTC time zone and is in Unix cron format [Cron Expression Validator Script](https://www.unix.com/man-page/linux/5/crontab/). Only one of ‘frequency' or ‘cronExpression' should be used at a time. Required for cluster.scheduling.tasks.
         taskType:
           type: string
-          example: clusterRoll
           description: >
             Valid values: "clusterRoll". Required for cluster.scheduling.tasks.
+          enum: ["clusterRoll"]
+          example: clusterRoll
         parameters:
           type: object
           properties:
@@ -38,6 +39,8 @@ properties:
               properties:
                 batchSizePercentage:
                   type: integer
+                  minimum: 0
+                  maximum: 100
                   example: 20
                   description: >
                     Value as a percent to set the size of a batch in a roll. Valid values are 0-100.
@@ -48,6 +51,8 @@ properties:
                     Add a comment description for the roll. The comment is limited to 256 chars
                 batchMinHealthyPercentage:
                   type: integer
+                  minimum: 1
+                  maximum: 100
                   default: 50
                   example: 100
                   description: >
