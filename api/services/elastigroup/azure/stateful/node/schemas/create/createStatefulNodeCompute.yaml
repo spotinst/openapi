@@ -49,19 +49,17 @@ properties:
       List of Azure Availability Zones in the defined region.
       * If not defined, VMs will be launched regionally.
     items:
-      enum: [ 1, 2, 3 ]
+      enum: [ "1", "2", "3" ]
       type: string
-      example: 1
-  preferredZones:
-    type: array
+      example: "1"
+  preferredZone:
+    type: String
     description: |
-      The AZs to prioritize when launching VMs.
-      * If no markets are available in the Preferred AZs, VMs are launched in the non-preferred AZs.
-      * <a style=color:red>Must be a sublist of compute.zones.</a>
-    items:
-      enum: [ 1, 2, 3 ]
-      type: string
-      example: 1
+      The AZ to prioritize when launching VMs.
+      * If no markets are available in the Preferred AZ, VMs will be launched in the non-preferred AZs.
+      * <a style=color:red>Must be one of the zones in compute.zones.</a>
+    enum: [ "1", "2", "3" ]
+    example: "1"
   launchSpecification:
     type: object
     description: Defines the launch specification of the VM.
@@ -234,7 +232,7 @@ properties:
                     Defines the type of public IP to assign the VM.
                     * <a style=color:red>Required if assignPublicIp=true.</a>
                   type: string
-                  enum: [Standard, Basic]
+                  enum: [ Standard, Basic ]
                   example: "Standard"
                 networkSecurityGroup:
                   title: Network Security Group
@@ -290,7 +288,7 @@ properties:
                         title: Private IP Address Version
                         description: Defines the version of the private IP address.
                         type: string
-                        enum: [IPv4, IPv6]
+                        enum: [ IPv4, IPv6 ]
                         default: IPv4
                         example: "IPv4"
                 publicIps:
@@ -607,6 +605,9 @@ properties:
                       * This field is required only when using windows OS type
                       * This field must be ‘null’ when the OS type is Linux
       bootDiagnostics:
+        required:
+          - isEnabled
+          - type
         type: object
         description:
           "Will enable boot diagnostics in Azure when a new VM is launched"
