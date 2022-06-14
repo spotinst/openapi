@@ -1,5 +1,5 @@
 type: object
-title: Elastigroup/Managed instance event
+title: Ocean event
 required:
   - subscription
 properties:
@@ -10,7 +10,7 @@ properties:
     properties:
       resourceId:
         type: string
-        example: sig-1234abcd
+        example: o-1234abcd
         description: |
           Spot Resource ID (Elastigroup ID, Ocean ID or Managed Instance ID)
         required: true
@@ -36,9 +36,10 @@ properties:
         enum: [ "AWS_EC2_INSTANCE_TERMINATE", "AWS_EC2_INSTANCE_TERMINATED", "AWS_EC2_INSTANCE_LAUNCH", "AWS_EC2_INSTANCE_READY_SIGNAL_TIMEOUT", "SIGNAL_TIMEOUT_SHUTDOWN_SCRIPT",
                 "AWS_EC2_CANT_SPIN_OD", "AWS_EC2_INSTANCE_UNHEALTHY_IN_ELB", "GROUP_ROLL_FAILED", "GROUP_ROLL_FINISHED", "CANT_SCALE_UP_GROUP_MAX_CAPACITY", "GROUP_UPDATED",
                 "AWS_EMR_PROVISION_TIMEOUT", "GROUP_BEANSTALK_INIT_READY", "AZURE_VM_TERMINATED", "AZURE_VM_TERMINATE", "AWS_EC2_MANAGED_INSTANCE_PAUSING", "AWS_EC2_MANAGED_INSTANCE_RESUMING",
-                "AWS_EC2_MANAGED_INSTANCE_RECYCLING", "AWS_EC2_MANAGED_INSTANCE_DELETING" ]
+                "AWS_EC2_MANAGED_INSTANCE_RECYCLING", "AWS_EC2_MANAGED_INSTANCE_DELETING", "CLUSTER_ROLL_FINISHED", "CLUSTER_ROLL_FAILED", "OCEAN_CANT_SCALE_UP_MAX_RESOURCES",
+                "OCEAN_LAUNCH_SPEC_CANT_SCALE_UP_MAX_INSTANCES", "OCEAN_K8S_NODE_REMOVED" ]
         type: string
-        example: AWS_EC2_INSTANCE_TERMINATE
+        example: OCEAN_K8S_NODE_REMOVED
         description: |
           The event to send the notification when triggered.
         required: true
@@ -68,6 +69,26 @@ properties:
             enum: ["%instance-id%"]
             description:  Allow to get the instance ID which related to the event
             example: "%instance-id%"
+          launchSpecId:
+            type: string
+            enum: ["%launchSpec-id%"]
+            description: Allow to get the launch specification ID which related to the event
+            example: "%launchSpec-id%"
+          launchSpecName:
+            type: string
+            enum: ["%launchSpec-name%"]
+            description: Allow to get the launch specification name which related to the event (relevant only for OCEAN_K8S_NODE_REMOVED)
+            example: "%launchSpec-name%"
+          nodeName:
+            type: string
+            enum: ["%node-name%"]
+            description: Allow to get the node name which related to the event (relevant only for OCEAN_K8S_NODE_REMOVED)
+            example: "%node-name%"
+          runningPodsOnNode:
+            type: string
+            enum: ["%running-pods-on-node%"]
+            description: Allow to get the running pods on the node which related to the event (relevant only for OCEAN_K8S_NODE_REMOVED)
+            example: "%running-pods-on-node%"
           myCustomKey:
             type: string
             description: Allow to use custom text in messages
