@@ -43262,82 +43262,250 @@
           "content": {
             "application/json": {
               "schema": {
-                "allOf": [
+                "oneOf": [
                   {
                     "type": "object",
+                    "title": "Elastigroup/Managed instance event",
                     "required": [
                       "subscription"
                     ],
                     "properties": {
                       "subscription": {
                         "type": "object",
-                        "description": "Group",
+                        "description": "Object defining the subscription parameters\n",
                         "properties": {
                           "resourceId": {
                             "type": "string",
-                            "example": "YOUR_ELASTIGROUP_ID || YOUR_OCEAN_ID || YOUR_MANAGED_INSTANCE_ID",
-                            "description": "Spot Resource ID (Elastigroup, Ocean or Managed Instance ID)\nExample: sig-12345\n",
+                            "example": "sig-1234abcd",
+                            "description": "Spot Resource ID (Elastigroup ID, Ocean ID or Managed Instance ID)\n",
                             "required": true
                           },
                           "protocol": {
                             "type": "string",
-                            "example": "aws-sns || email || email-json || web ",
-                            "description": "The protocol to send the notification. Valid values: email email-json aws-sns web\nThe following values are deprecated: http https You can use the generic web protocol instead. aws-sns is only supported with AWS provider\n",
+                            "enum": [
+                              "aws-sns",
+                              "email",
+                              "email-json",
+                              "web"
+                            ],
+                            "example": "email",
+                            "description": "The protocol to send the notification.\n\nThe following values are deprecated: http https\nYou can use the generic web protocol instead.\naws-sns is only supported with AWS provider\n",
                             "required": true
                           },
                           "endpoint": {
                             "type": "string",
-                            "example": "YOUR@EMAIL.COM || https://YOUR_ENDPOINT.COM || SNS_TOPIC_ARN",
-                            "description": "The endpoint the notification will be sent to. url in case of http/https/web, email address in case of email/email-json and sns-topic-arn in case of aws-sns\n",
+                            "example": "YOUR@EMAIL.COM",
+                            "description": "The endpoint the notification will be sent to. url in case of http/https/web, email address in case of email/email-json and sns-topic-arn in case of aws-sns.\nFor example: YOUR@EMAIL.COM or https://YOUR_ENDPOINT.COM or SNS_TOPIC_ARN\n",
                             "required": true
                           },
                           "eventType": {
+                            "enum": [
+                              "AWS_EC2_INSTANCE_TERMINATE",
+                              "AWS_EC2_INSTANCE_TERMINATED",
+                              "AWS_EC2_INSTANCE_LAUNCH",
+                              "AWS_EC2_INSTANCE_READY_SIGNAL_TIMEOUT",
+                              "SIGNAL_TIMEOUT_SHUTDOWN_SCRIPT",
+                              "AWS_EC2_CANT_SPIN_OD",
+                              "AWS_EC2_INSTANCE_UNHEALTHY_IN_ELB",
+                              "GROUP_ROLL_FAILED",
+                              "GROUP_ROLL_FINISHED",
+                              "CANT_SCALE_UP_GROUP_MAX_CAPACITY",
+                              "GROUP_UPDATED",
+                              "AWS_EMR_PROVISION_TIMEOUT",
+                              "GROUP_BEANSTALK_INIT_READY",
+                              "AZURE_VM_TERMINATED",
+                              "AZURE_VM_TERMINATE",
+                              "AWS_EC2_MANAGED_INSTANCE_PAUSING",
+                              "AWS_EC2_MANAGED_INSTANCE_RESUMING",
+                              "AWS_EC2_MANAGED_INSTANCE_RECYCLING",
+                              "AWS_EC2_MANAGED_INSTANCE_DELETING"
+                            ],
                             "type": "string",
-                            "example": "AWS_EC2_INSTANCE_TERMINATE || AZURE_VM_TERMINATE",
-                            "description": "The event to send the notification when triggered. Valid values: AWS_EC2_INSTANCE_TERMINATE, AWS_EC2_INSTANCE_TERMINATED, AWS_EC2_INSTANCE_LAUNCH, AWS_EC2_INSTANCE_READY_SIGNAL_TIMEOUT, SIGNAL_TIMEOUT_SHUTDOWN_SCRIPT, AWS_EC2_CANT_SPIN_OD, AWS_EC2_INSTANCE_UNHEALTHY_IN_ELB, GROUP_ROLL_FAILED, GROUP_ROLL_FINISHED, CANT_SCALE_UP_GROUP_MAX_CAPACITY, GROUP_UPDATED, AWS_EMR_PROVISION_TIMEOUT, GROUP_BEANSTALK_INIT_READY, AZURE_VM_TERMINATED, AZURE_VM_TERMINATE, AWS_EC2_MANAGED_INSTANCE_PAUSING, AWS_EC2_MANAGED_INSTANCE_RESUMING, AWS_EC2_MANAGED_INSTANCE_RECYCLING, AWS_EC2_MANAGED_INSTANCE_DELETING Ocean Events: CLUSTER_ROLL_FINISHED, CLUSTER_ROLL_FAILED, OCEAN_CANT_SCALE_UP_MAX_RESOURCES, OCEAN_LAUNCH_SPEC_CANT_SCALE_UP_MAX_INSTANCES, OCEAN_K8S_NODE_REMOVED\n",
+                            "example": "AWS_EC2_INSTANCE_TERMINATE",
+                            "description": "The event to send the notification when triggered.\n",
                             "required": true
                           },
                           "eventFormat": {
                             "type": "object",
-                            "description": "The format of the notification content (JSON Format: Key + Value).\n",
-                            "enum": [
-                              "%instance-id%",
-                              "%event%",
-                              "%resource-id%",
-                              "%resource-name%",
-                              "%subnet-id%",
-                              "%availability-zone%",
-                              "%reason%",
-                              "%private-ip%",
-                              "%launchspec-id%"
-                            ],
-                            "example": {
-                              "event": "%event%",
-                              "resourceId": "%resource-id%",
-                              "resourceName": "%resource-name%",
-                              "myCustomKey": "My content is set here"
-                            },
-                            "default": {
-                              "event": "%event%",
-                              "instanceId": "%instance-id%",
-                              "resourceId": "%resource-id%",
-                              "resourceName": "%resource-name%"
-                            },
+                            "description": "The format of the notification content (JSON Format: Key + Value).\nThe keys can be renamed.\n",
                             "properties": {
                               "event": {
                                 "type": "string",
+                                "enum": [
+                                  "%event%"
+                                ],
                                 "description": "Allow to get name of event that happened",
                                 "example": "%event%"
                               },
                               "resourceId": {
                                 "type": "string",
+                                "enum": [
+                                  "%resource-id%"
+                                ],
                                 "description": "Allow to get ID of resource where event happened",
                                 "example": "%resource-id%"
                               },
                               "resourceName": {
                                 "type": "string",
+                                "enum": [
+                                  "%resource-name%"
+                                ],
                                 "description": "Allow to get the name of resource (related to ID)",
                                 "example": "%resource-name%"
+                              },
+                              "instanceId": {
+                                "type": "string",
+                                "enum": [
+                                  "%instance-id%"
+                                ],
+                                "description": "Allow to get the instance ID which related to the event",
+                                "example": "%instance-id%"
+                              },
+                              "myCustomKey": {
+                                "type": "string",
+                                "description": "Allow to use custom text in messages",
+                                "example": "My content is set here"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "title": "Ocean event",
+                    "required": [
+                      "subscription"
+                    ],
+                    "properties": {
+                      "subscription": {
+                        "type": "object",
+                        "description": "Object defining the subscription parameters\n",
+                        "properties": {
+                          "resourceId": {
+                            "type": "string",
+                            "example": "o-1234abcd",
+                            "description": "Spot Resource ID (Elastigroup ID, Ocean ID or Managed Instance ID)\n",
+                            "required": true
+                          },
+                          "protocol": {
+                            "type": "string",
+                            "enum": [
+                              "aws-sns",
+                              "email",
+                              "email-json",
+                              "web"
+                            ],
+                            "example": "email",
+                            "description": "The protocol to send the notification.\n\nThe following values are deprecated: http https\nYou can use the generic web protocol instead.\naws-sns is only supported with AWS provider\n",
+                            "required": true
+                          },
+                          "endpoint": {
+                            "type": "string",
+                            "example": "YOUR@EMAIL.COM",
+                            "description": "The endpoint the notification will be sent to. url in case of http/https/web, email address in case of email/email-json and sns-topic-arn in case of aws-sns.\nFor example: YOUR@EMAIL.COM or https://YOUR_ENDPOINT.COM or SNS_TOPIC_ARN\n",
+                            "required": true
+                          },
+                          "eventType": {
+                            "enum": [
+                              "AWS_EC2_INSTANCE_TERMINATE",
+                              "AWS_EC2_INSTANCE_TERMINATED",
+                              "AWS_EC2_INSTANCE_LAUNCH",
+                              "AWS_EC2_INSTANCE_READY_SIGNAL_TIMEOUT",
+                              "SIGNAL_TIMEOUT_SHUTDOWN_SCRIPT",
+                              "AWS_EC2_CANT_SPIN_OD",
+                              "AWS_EC2_INSTANCE_UNHEALTHY_IN_ELB",
+                              "GROUP_ROLL_FAILED",
+                              "GROUP_ROLL_FINISHED",
+                              "CANT_SCALE_UP_GROUP_MAX_CAPACITY",
+                              "GROUP_UPDATED",
+                              "AWS_EMR_PROVISION_TIMEOUT",
+                              "GROUP_BEANSTALK_INIT_READY",
+                              "AZURE_VM_TERMINATED",
+                              "AZURE_VM_TERMINATE",
+                              "AWS_EC2_MANAGED_INSTANCE_PAUSING",
+                              "AWS_EC2_MANAGED_INSTANCE_RESUMING",
+                              "AWS_EC2_MANAGED_INSTANCE_RECYCLING",
+                              "AWS_EC2_MANAGED_INSTANCE_DELETING",
+                              "CLUSTER_ROLL_FINISHED",
+                              "CLUSTER_ROLL_FAILED",
+                              "OCEAN_CANT_SCALE_UP_MAX_RESOURCES",
+                              "OCEAN_LAUNCH_SPEC_CANT_SCALE_UP_MAX_INSTANCES",
+                              "OCEAN_K8S_NODE_REMOVED"
+                            ],
+                            "type": "string",
+                            "example": "OCEAN_K8S_NODE_REMOVED",
+                            "description": "The event to send the notification when triggered. \\\nThe following event types are relevant for Ocean events only: \\\nCLUSTER_ROLL_FINISHED, \\\nCLUSTER_ROLL_FAILED, \\\nOCEAN_CANT_SCALE_UP_MAX_RESOURCES, \\\nOCEAN_LAUNCH_SPEC_CANT_SCALE_UP_MAX_INSTANCES, \\\nOCEAN_K8S_NODE_REMOVED\n",
+                            "required": true
+                          },
+                          "eventFormat": {
+                            "type": "object",
+                            "description": "The format of the notification content (JSON Format: Key + Value).\nThe keys can be renamed.\n",
+                            "properties": {
+                              "event": {
+                                "type": "string",
+                                "enum": [
+                                  "%event%"
+                                ],
+                                "description": "Allow to get name of event that happened",
+                                "example": "%event%"
+                              },
+                              "resourceId": {
+                                "type": "string",
+                                "enum": [
+                                  "%resource-id%"
+                                ],
+                                "description": "Allow to get ID of resource where event happened",
+                                "example": "%resource-id%"
+                              },
+                              "resourceName": {
+                                "type": "string",
+                                "enum": [
+                                  "%resource-name%"
+                                ],
+                                "description": "Allow to get the name of resource (related to ID)",
+                                "example": "%resource-name%"
+                              },
+                              "instanceId": {
+                                "type": "string",
+                                "enum": [
+                                  "%instance-id%"
+                                ],
+                                "description": "Allow to get the instance ID which related to the event",
+                                "example": "%instance-id%"
+                              },
+                              "launchSpecId": {
+                                "type": "string",
+                                "enum": [
+                                  "%launchSpec-id%"
+                                ],
+                                "description": "Allow to get the launch specification ID which related to the event",
+                                "example": "%launchSpec-id%"
+                              },
+                              "launchSpecName": {
+                                "type": "string",
+                                "enum": [
+                                  "%launchSpec-name%"
+                                ],
+                                "description": "Allow to get the launch specification name which related to the event (relevant only for OCEAN_K8S_NODE_REMOVED)",
+                                "example": "%launchSpec-name%"
+                              },
+                              "nodeName": {
+                                "type": "string",
+                                "enum": [
+                                  "%node-name%"
+                                ],
+                                "description": "Allow to get the node name which related to the event (relevant only for OCEAN_K8S_NODE_REMOVED)",
+                                "example": "%node-name%"
+                              },
+                              "runningPodsOnNode": {
+                                "type": "string",
+                                "enum": [
+                                  "%running-pods-on-node%"
+                                ],
+                                "description": "Allow to get the running pods on the node which related to the event (relevant only for OCEAN_K8S_NODE_REMOVED)",
+                                "example": "%running-pods-on-node%"
                               },
                               "myCustomKey": {
                                 "type": "string",
@@ -43382,7 +43550,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Response",
+            "description": "Subscription Response",
             "content": {
               "application/json": {
                 "schema": {
@@ -43393,6 +43561,17 @@
                     {
                       "type": "object",
                       "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/events/subscription"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
+                        },
                         "response": {
                           "type": "object",
                           "properties": {
@@ -43403,23 +43582,70 @@
                                 "properties": {
                                   "id": {
                                     "type": "string",
-                                    "example": "sis-123456"
+                                    "example": "sis-1234abcd"
                                   },
                                   "resourceId": {
                                     "type": "string",
-                                    "example": "sig-5cf38a24"
+                                    "example": "sig-1234abcd"
+                                  },
+                                  "resourceName": {
+                                    "type": "string",
+                                    "example": "myGroup"
                                   },
                                   "protocol": {
                                     "type": "string",
-                                    "example": "http"
+                                    "example": "email"
                                   },
                                   "endpoint": {
                                     "type": "string",
-                                    "example": "http://localhost:5000"
+                                    "example": "YOUR@EMAIL.COM"
                                   },
                                   "eventType": {
                                     "type": "string",
-                                    "example": "AWS_EC2_INSTANCE_TERMINIATED"
+                                    "example": "AWS_EC2_INSTANCE_TERMINATE"
+                                  },
+                                  "eventFormat": {
+                                    "type": "object",
+                                    "description": "The format of the notification content (JSON Format: Key + Value).\nThe keys can be renamed.\n",
+                                    "properties": {
+                                      "event": {
+                                        "type": "string",
+                                        "enum": [
+                                          "%event%"
+                                        ],
+                                        "description": "Allow to get name of event that happened",
+                                        "example": "%event%"
+                                      },
+                                      "resourceId": {
+                                        "type": "string",
+                                        "enum": [
+                                          "%resource-id%"
+                                        ],
+                                        "description": "Allow to get ID of resource where event happened",
+                                        "example": "%resource-id%"
+                                      },
+                                      "resourceName": {
+                                        "type": "string",
+                                        "enum": [
+                                          "%resource-name%"
+                                        ],
+                                        "description": "Allow to get the name of resource (related to ID)",
+                                        "example": "%resource-name%"
+                                      },
+                                      "instanceId": {
+                                        "type": "string",
+                                        "enum": [
+                                          "%instance-id%"
+                                        ],
+                                        "description": "Allow to get the instance ID which related to the event",
+                                        "example": "%instance-id%"
+                                      },
+                                      "myCustomKey": {
+                                        "type": "string",
+                                        "description": "Allow to use custom text in messages",
+                                        "example": "My content is set here"
+                                      }
+                                    }
                                   },
                                   "updatedAt": {
                                     "type": "string",
@@ -43469,7 +43695,7 @@
           {
             "in": "path",
             "name": "SUBSCRIPTION_ID",
-            "example": "hcs-123",
+            "example": "sis-1234abcd",
             "description": "The subscription you want to update\n",
             "required": true
           }
@@ -43501,7 +43727,7 @@
           {
             "in": "path",
             "name": "SUBSCRIPTION_ID",
-            "example": "hcs-123",
+            "example": "sis-1234abcd",
             "description": "The subscription you want to update\n",
             "required": true
           }
@@ -43533,7 +43759,7 @@
           {
             "in": "path",
             "name": "SUBSCRIPTION_ID",
-            "example": "hcs-123",
+            "example": "sis-1234abcd",
             "description": "The subscription you want to update\n",
             "required": true
           }
