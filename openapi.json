@@ -31226,6 +31226,18 @@
                                   "iamInstanceProfile"
                                 ],
                                 "properties": {
+                                  "associatePublicIpAddress": {
+                                    "type": "boolean",
+                                    "description": "Configure public IP address allocation.",
+                                    "default": false,
+                                    "example": false
+                                  },
+                                  "associateIpv6Address": {
+                                    "type": "boolean",
+                                    "description": "Configure IPv6 address allocation.",
+                                    "default": false,
+                                    "example": false
+                                  },
                                   "imageId": {
                                     "type": "string",
                                     "example": "ami-123456789abcdefgh"
@@ -35776,7 +35788,48 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster/get/responses/200"
+            "description": "Ocean Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/aws/k8s/cluster"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:aws:k8s"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -35803,41 +35856,33 @@
                 "schema": {
                   "allOf": [
                     {
-                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
                     },
                     {
                       "type": "object",
                       "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/aws/k8s/cluster"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
                         "response": {
                           "type": "object",
-                          "description": "response body\n",
                           "properties": {
                             "items": {
                               "type": "array",
                               "items": {
-                                "allOf": [
-                                  {
-                                    "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster"
-                                  },
-                                  {
-                                    "type": "object",
-                                    "properties": {
-                                      "id": {
-                                        "type": "string",
-                                        "example": "o-482d9d26"
-                                      },
-                                      "createdAt": {
-                                        "type": "string",
-                                        "example": "2018-11-05T12:55:50.000+0000"
-                                      },
-                                      "updatedAt": {
-                                        "type": "string",
-                                        "example": "2018-11-05T12:58:15.000+0000"
-                                      }
-                                    }
-                                  }
-                                ]
+                                "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster"
                               }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:aws:k8s"
                             }
                           }
                         }
@@ -35872,7 +35917,34 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
+            "description": "Ocean AWS Delete Cluster Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/aws/k8s/cluster/o-abcd1234"
+                            },
+                            "method": {
+                              "example": "DELETE"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -35903,7 +35975,48 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster/get/responses/200"
+            "description": "Ocean Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/aws/k8s/cluster/o-abcd1234"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:aws:k8s"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -35919,14 +36032,7 @@
         ],
         "parameters": [
           {
-            "in": "path",
-            "name": "oceanClusterId",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "example": "o-1abcd124",
-            "description": "The identifier of the Ocean cluster\n"
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
           },
           {
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
@@ -35958,7 +36064,48 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster/get/responses/200"
+            "description": "Ocean Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/aws/k8s/cluster/o-abcd1234"
+                            },
+                            "method": {
+                              "example": "PUT"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:aws:k8s"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -37678,6 +37825,12 @@
                                 "associatePublicIpAddress": {
                                   "type": "boolean",
                                   "description": "Configure public IP address allocation.",
+                                  "default": false,
+                                  "example": false
+                                },
+                                "associateIpv6Address": {
+                                  "type": "boolean",
+                                  "description": "Configure IPv6 address allocation.",
                                   "default": false,
                                   "example": false
                                 },
