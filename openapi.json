@@ -60491,6 +60491,20 @@
                             "title": "Sparkversion",
                             "type": "string"
                           },
+                          "timeout": {
+                            "title": "Timeout",
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "enum": [
+                                  "DISABLED"
+                                ]
+                              },
+                              {
+                                "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0/components/schemas/TimeoutSpec"
+                              }
+                            ]
+                          },
                           "timeToLiveSeconds": {
                             "title": "Timetoliveseconds",
                             "type": "integer"
@@ -63621,6 +63635,32 @@
                                   "type": "string"
                                 }
                               }
+                            },
+                            "TimeoutSpec": {
+                              "title": "TimeoutSpec",
+                              "required": [
+                                "minutes",
+                                "policy"
+                              ],
+                              "type": "object",
+                              "properties": {
+                                "minutes": {
+                                  "title": "Minutes",
+                                  "exclusiveMinimum": true,
+                                  "type": "integer"
+                                },
+                                "policy": {
+                                  "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0/components/schemas/TimeoutPolicy"
+                                }
+                              }
+                            },
+                            "TimeoutPolicy": {
+                              "title": "TimeoutPolicy",
+                              "type": "string",
+                              "description": "A TimeoutPolicy is an action that needs to be run when a timeout reaches its end.\nFor now, only KILL is supported, but to make the API extensible we require the\npolicy to be set. Future policies may include behaviours like \"NOTIFY\" instead of\njust killing the application.",
+                              "enum": [
+                                "KILL"
+                              ]
                             }
                           }
                         }
@@ -63838,7 +63878,7 @@
         }
       }
     },
-    "/ocean/spark/cluster/{clusterId}/app/{applicationId}/logs/live": {
+    "/ocean/spark/cluster/{clusterId}/app/{applicationId}/log/live": {
       "summary": "Ocean Spark",
       "get": {
         "summary": "Stream Driver log",
@@ -63876,7 +63916,45 @@
         }
       }
     },
-    "/ocean/spark/cluster/{clusterId}/app/{applicationId}/kubeEvents/live": {
+    "/ocean/spark/cluster/{clusterId}/app/{applicationId}/log/archive": {
+      "summary": "Ocean Spark",
+      "get": {
+        "summary": "Download Driver log",
+        "description": "Download an archive of the driver logs for a finished spark application.\n",
+        "operationId": "OceanSparkClusterApplicationLogsArchive",
+        "tags": [
+          "Ocean Spark"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D/get/parameters/1"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app~1%7BapplicationId%7D/get/parameters/2"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A file download of the driver's log archive",
+            "content": {
+              "application/gzip": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/spark/cluster/{clusterId}/app/{applicationId}/kubeEvent/live": {
       "summary": "Ocean Spark",
       "get": {
         "summary": "Stream Kubernetes events",
