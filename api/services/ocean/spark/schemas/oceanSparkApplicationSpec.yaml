@@ -61,6 +61,13 @@ properties:
   sparkVersion:
     title: Sparkversion
     type: string
+  timeout:
+          title: Timeout
+          anyOf:
+          - type: string
+            enum:
+            - DISABLED
+          - $ref: '#/components/schemas/TimeoutSpec'
   timeToLiveSeconds:
     title: Timetoliveseconds
     type: integer
@@ -2736,3 +2743,26 @@ components:
         type:
           title: Error Type
           type: string
+    TimeoutSpec:
+      title: TimeoutSpec
+      required:
+      - minutes
+      - policy
+      type: object
+      properties:
+        minutes:
+          title: Minutes
+          exclusiveMinimum: true
+          type: integer
+        policy:
+          $ref: '#/components/schemas/TimeoutPolicy'
+    TimeoutPolicy:
+      title: TimeoutPolicy
+      type: string
+      description: |-
+        A TimeoutPolicy is an action that needs to be run when a timeout reaches its end.
+        For now, only KILL is supported, but to make the API extensible we require the
+        policy to be set. Future policies may include behaviours like "NOTIFY" instead of
+        just killing the application.
+      enum:
+      - KILL
