@@ -14,7 +14,99 @@ properties:
         description: |
           ECS cluster name
       autoScale:
-        $ref: "../../../ocean/ecs/schemas/ocean-autoscaler.yaml"
+        type: object
+        title: ECS Autoscaler
+        description: >
+          The ECS Autoscaler properties.
+        required:
+          - isEnabled
+        properties:
+          isEnabled:
+            type: boolean
+            description: >
+              Enable the ECS Autoscaler.
+            example: true
+          cooldown:
+            type: integer
+            description: >
+              Cooldown period between scaling actions. Value should be cooldown period in seconds, greater than 180.
+            example: 300
+          attributes:
+            type: object
+            properties:
+              key:
+                type: string
+                example: the_key
+              value:
+                type: string
+                example: the_value
+          resourceLimits:
+            type: object
+            description: >
+              Optionally set upper and lower bounds on the resource usage of the cluster.
+            properties:
+              maxMemoryGib:
+                type: integer
+                description: >
+                  The maximum memory in GiB units that can be allocated to the cluster. Minimum value: 1.
+                example: 1
+              maxVcpu:
+                type: integer
+                description: >
+                  The maximum CPU in vCPU units that can be allocated to the cluster. Minimum value: 1.
+                example: 1
+          down:
+            type: object
+            description: >
+              Autoscaling scale down operations.
+            properties:
+              evaluationPeriods:
+                type: integer
+                example: 4
+              maxScaleDownPercentage:
+                type: integer
+                description: |
+                  The maximum portion (as a %) of nodes that will be scaled down at once out of the total number of potential nodes to scale down.
+                  Example: If there are 10 nodes to scale down and the parameter is 50%, then only 5 nodes will be scaled down at once.
+                  The other 5 nodes will be scaled down in the next autoscaling iteration.
+                example: 20
+          headroom:
+            type: object
+            description: >
+              Spare resource capacity management enabling fast assignment of pods without waiting for new resources to launch.
+            properties:
+              cpuPerUnit:
+                type: integer
+                description: >
+                  Optionally configure the number of CPUs to allocate per headroom unit. CPUs are denoted in CPU units, where 1024 units = 1 vCPU.
+                example: 2048
+              memoryPerUnit:
+                type: integer
+                description: >
+                  Optionally configure the amount of memory (MiB) to allocate per headroom unit.
+                example: 3
+              numOfUnits:
+                type: integer
+                description: >
+                  The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.
+                example: 2
+          isAutoConfig:
+            type: boolean
+            description: >
+              Use automatic headroom. When set to true, the values under cluster.autoScaler.headroom are not effective, as Ocean configures and optimizes headroom automatically.
+            example: false
+          shouldScaleDownNonServiceTasks:
+            type: boolean
+            description: >
+              Option to scale down non-service tasks. If not set, Ocean does not scale down standalone tasks.
+            default: false
+            example: true
+          enableAutomaticAndManualHeadroom:
+            type: boolean
+            description: >
+              When set to true, both automatic and per custom launch specification manual headroom to be saved concurrently and independently in the cluster.
+              prerequisite: isAutoConfig must be true
+            example: false
       batch:
         type: object
         properties:
