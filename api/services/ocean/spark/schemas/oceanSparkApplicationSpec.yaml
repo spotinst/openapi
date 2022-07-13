@@ -472,16 +472,12 @@ components:
         cores:
           title: Cores
           type: integer
+        env:
+          $ref: '#/components/schemas/Env'
         envSecretKeyRefs:
-          additionalProperties:
-            $ref: '#/components/schemas/NameKey'
-          title: Envsecretkeyrefs
-          type: object
+          $ref: '#/components/schemas/EnvSecretKeyRefs'
         envVars:
-          additionalProperties:
-            type: string
-          title: Envvars
-          type: object
+          $ref: '#/components/schemas/EnvVars'
         hostAliases:
           items:
             $ref: '#/components/schemas/HostAlias'
@@ -566,6 +562,24 @@ components:
           title: Sizelimit
       title: EmptyDirVolumeSource
       type: object
+    Env:
+      title: Env
+      type: array
+      items:
+        "$ref": "#/components/schemas/EnvVar"  # TODO: deprecate, driver/exec, description
+      description: List of environment variables to set in the container.
+    EnvSecretKeyRefs:
+      additionalProperties:
+        $ref: '#/components/schemas/NameKey'
+      title: EnvSecretKeyRefs
+      type: object
+      description: DEPRECATED use `env` instead
+    EnvVars:
+      additionalProperties:
+        type: string
+      title: EnvVars
+      type: object
+      description: DEPRECATED use `env` instead
     ExecutorSpec:
       additionalProperties: false
       description: A configuration for a Spark executor (no required field)
@@ -591,16 +605,12 @@ components:
         cores:
           title: Cores
           type: integer
+        env:
+          $ref: '#/components/schemas/Env'
         envSecretKeyRefs:
-          additionalProperties:
-            $ref: '#/components/schemas/NameKey'
-          title: Envsecretkeyrefs
-          type: object
+          $ref: '#/components/schemas/EnvSecretKeyRefs'
         envVars:
-          additionalProperties:
-            type: string
-          title: Envvars
-          type: object
+          $ref: '#/components/schemas/EnvVars'
         hostAliases:
           items:
             $ref: '#/components/schemas/HostAlias'
@@ -2205,12 +2215,7 @@ components:
             Escaped references will never be expanded, regardless of whether the variable
             exists or not. Cannot be updated. More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell'
         env:
-          title: Env
-          type: array
-          items:
-            "$ref": "#/components/schemas/EnvVar"
-          description: List of environment variables to set in the container. Cannot
-            be updated.
+          $ref: "#/components/schemas/Env"
         envFrom:
           title: Envfrom
           type: array
