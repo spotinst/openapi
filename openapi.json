@@ -10410,46 +10410,64 @@
           "content": {
             "application/json": {
               "schema": {
-                "allOf": [
+                "oneOf": [
                   {
                     "type": "object",
+                    "title": "Processes",
                     "properties": {
-                      "groupId": {
+                      "processes": {
                         "type": "array",
-                        "description": "groupId",
+                        "description": "The names of the processes that will be suspended. Valid values are: AUTO_SCALE, AUTO_HEALING, OUT_OF_STRATEGY, PREVENTIVE_REPLACEMENT, REVERT_PREFERRED, SCHEDULING\n",
                         "items": {
                           "type": "string",
-                          "example": "sig-12345"
-                        }
-                      },
-                      "suspensions": {
-                        "type": "array",
-                        "description": "Suspensions",
-                        "items": {
-                          "type": "object",
                           "example": [
-                            {
-                              "name": "AUTO_SCALE",
-                              "expiresAt": null
-                            },
-                            {
-                              "name": "OUT_OF_STRATEGY",
-                              "expiresAt": "2018-10-03T07:23:24.000+0000"
-                            },
-                            {
-                              "name": "PREVENTIVE_REPLACEMENT",
-                              "expiresAt": "2018-10-03T09:03:24.000+0000"
-                            },
-                            {
-                              "name": "REVERT_PREFERRED",
-                              "expiresAt": null
-                            },
-                            {
-                              "name": "SCHEDULING",
-                              "expiresAt": null
-                            }
+                            "AUTO_SCALE",
+                            "OUT_OF_STRATEGY",
+                            "PREVENTIVE_REPLACEMENT"
                           ]
                         }
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "title": "Suspensions",
+                    "properties": {
+                      "suspensions": {
+                        "type": "array",
+                        "description": "A list of processes to suspend",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "description": "The name of the process that will be suspended. Valid values are: AUTO_SCALE, AUTO_HEALING, OUT_OF_STRATEGY, PREVENTIVE_REPLACEMENT, REVERT_PREFERRED, SCHEDULING\n"
+                            },
+                            "ttlInMinutes": {
+                              "type": "integer",
+                              "description": "This is the TTL, time to live, of the suspension in minutes. The default value is null, which denotes that the suspension is indefinite until specifically deleted\n"
+                            }
+                          }
+                        },
+                        "example": [
+                          {
+                            "name": "AUTO_SCALE"
+                          },
+                          {
+                            "name": "OUT_OF_STRATEGY",
+                            "ttlInMinutes": 30
+                          },
+                          {
+                            "name": "PREVENTIVE_REPLACEMENT",
+                            "ttlInMinutes\"": 120
+                          },
+                          {
+                            "name": "REVERT_PREFERRED"
+                          },
+                          {
+                            "name": "SCHEDULING"
+                          }
+                        ]
                       }
                     }
                   }
