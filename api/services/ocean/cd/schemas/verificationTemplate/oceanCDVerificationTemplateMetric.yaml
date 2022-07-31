@@ -1,0 +1,40 @@
+type: object
+required:
+  - name
+  - provider
+title: Ocean CD Verification Metric
+properties:
+  name:
+    type: string
+  interval:
+    type: string
+    example: 5m
+    description: defines an interval string (30s, 5m, 1h) between each verification measurements. If omitted, will perform a single measurement
+  initialDelay:
+    type: string
+    description: how long the should wait before starting this metric measurements
+    example: 1m
+  count:
+    type: integer
+    description: the number of times to run the measurement. If both interval and count are omitted, the effective count is 1. If only interval is specified, metric runs indefinitely. If count > 1, interval must be specified.
+    example: 10
+  successCondition:
+    type: string
+    description: expression which determines if a measurement is considered successful. The keyword `result` is a variable reference to the value of measurement. Results can be both structured data or primitive.
+    example: "result[0] <= 0.95"
+  failureCondition:
+    type: string
+    description: an expression which determines if a measurement is considered failed. If both success and failure conditions are specified, and the measurement does not fall into either condition, the measurement is considered Inconclusive
+    example: "result[0] >= 1.2"
+  failureLimit:
+    type: integer
+    description: the maximum number of times the measurement is allowed to fail, before the entire metric is considered Failed default is 0
+  inconclusiveLimit:
+    type: integer
+    description: the maximum number of times the measurement is allowed to measure Inconclusive, before the entire metric is considered Inconclusive default is 0
+  consecutiveErrorLimit:
+    type: integer
+    description: the maximum number of times the measurement is allowed to error in succession, before the metric is considered error default is 4
+  provider:
+    type: object
+    $ref: "oceanCDVerificationTemplateMetricProvider.yaml"
