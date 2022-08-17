@@ -1,0 +1,75 @@
+type: object
+required:
+- id
+- displayName
+- accountId
+- organizationId
+- userId
+- clusterId
+- controllerClusterId
+- appState
+- submissionSource
+- createdAt
+- updatedAt
+allOf:
+- $ref: "../../../../commons/schemas/createdAtUpdatedAt.yaml"
+- type: object
+  description: >
+    The description of a Spark application
+  properties:
+    id:
+      $ref: "oceanSparkApplicationId.yaml"
+    displayName:
+      $ref: "oceanSparkApplicationDisplayName.yaml"
+    userId:
+      $ref: "userId.yaml"
+    clusterId:
+      $ref: "oceanSparkClusterId.yaml"
+    controllerClusterId:
+      $ref: "controllerClusterId.yaml"
+    appState:
+      $ref: "oceanSparkApplicationState.yaml"
+    submissionSource:
+      $ref: "oceanSparkApplicationSubmissionSource.yaml"
+    job:
+      type: object
+      description: >
+        The job to which the application belongs.
+        A job is collection of Spark applications, typically a workload run on a schedule.
+      required:
+        - id
+        - displayName
+      properties:
+        id:
+          $ref: oceanSparkJobId.yaml
+        displayName:
+          $ref: oceanSparkJobDisplayName.yaml
+    startedAt:
+      type: string
+      format: date-time
+      description: >
+        The time when the Spark application started running (the app state becomes RUNNING).
+        This is not the time when the application launch was requested (this is `createdAt`).
+      example: "2021-11-18T17:09:37+00:00"
+    endedAt:
+      type: string
+      format: date-time
+      description: >
+        The time when the Spark application terminated.
+      example: "2021-11-18T17:09:37+00:00"
+    liveLog:
+      type: object
+      description: API pointers to endpoints serving logs and events related to the Spark application
+      properties:
+        logsStreamUrl:
+          type: string
+          format: uri
+          description: URL of the endpoint serving the live driver logs
+          example: /ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/logs/live
+        kubeEventsStreamUrl:
+          type: string
+          format: uri
+          description: URL of the endpoint serving a stream of Kubernetes events
+          example: /ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/kubeEvents/live
+    metrics:
+      $ref: "./oceanSparkApplicationMetrics.yaml"
