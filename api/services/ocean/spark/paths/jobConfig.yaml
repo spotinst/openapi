@@ -1,0 +1,33 @@
+put:
+  summary: "Put Job Config Template"
+  description: >
+    Attach or update an attached config template by replacing the existing configuration with the one provided in the request body.
+  operationId: "OceanSparkJobConfig"
+  tags:
+    - "Ocean Spark"
+  parameters:
+    - $ref: "../../../../commons/parameters/nonRequiredAccountId.yaml"
+    - $ref: "../parameters/path/oceanSparkClusterId.yaml"
+    - $ref: "../parameters/path/oceanSparkJobId.yaml"
+  requestBody:
+    required: false # if empty then the config is deleted 
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            config:
+              # This is not how you're supposed to merge two objects (here: custom description + $ref).
+              # But I tried the more classic construct and it didn't work:
+              # allOf:
+              # - $ref: "../schemas/oceanSparkApplicationSpec.yaml"
+              # - description: ...
+              description: >
+                The piece of configuration that will replace the existing configuration, if empty then the job configuration will be removed
+              allOf:
+              - $ref: "../schemas/oceanSparkApplicationSpec.yaml"
+  responses:
+    200:
+      $ref: "../responses/job.yaml"
+    400:
+      description: "Bad Request"
