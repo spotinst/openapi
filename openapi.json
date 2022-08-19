@@ -61996,7 +61996,101 @@
                                       "page": {
                                         "type": "array",
                                         "items": {
-                                          "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items"
+                                          "type": "object",
+                                          "required": [
+                                            "id",
+                                            "displayName",
+                                            "accountId",
+                                            "organizationId",
+                                            "userId",
+                                            "clusterId",
+                                            "controllerClusterId",
+                                            "appState",
+                                            "submissionSource",
+                                            "createdAt",
+                                            "updatedAt"
+                                          ],
+                                          "allOf": [
+                                            {
+                                              "$ref": "#/paths/~1aws~1emr~1mrScaler/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/1"
+                                            },
+                                            {
+                                              "type": "object",
+                                              "description": "The description of a Spark application\n",
+                                              "properties": {
+                                                "id": {
+                                                  "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/appId"
+                                                },
+                                                "displayName": {
+                                                  "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/1/properties/displayName"
+                                                },
+                                                "userId": {
+                                                  "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/5/schema"
+                                                },
+                                                "clusterId": {
+                                                  "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/1/schema"
+                                                },
+                                                "controllerClusterId": {
+                                                  "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
+                                                },
+                                                "appState": {
+                                                  "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/4/schema"
+                                                },
+                                                "submissionSource": {
+                                                  "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/3/schema"
+                                                },
+                                                "job": {
+                                                  "type": "object",
+                                                  "description": "The job to which the application belongs. A job is collection of Spark applications, typically a workload run on a schedule.\n",
+                                                  "required": [
+                                                    "id",
+                                                    "displayName"
+                                                  ],
+                                                  "properties": {
+                                                    "id": {
+                                                      "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/jobId/allOf/0"
+                                                    },
+                                                    "displayName": {
+                                                      "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/displayName"
+                                                    }
+                                                  }
+                                                },
+                                                "startedAt": {
+                                                  "type": "string",
+                                                  "format": "date-time",
+                                                  "description": "The time when the Spark application started running (the app state becomes RUNNING). This is not the time when the application launch was requested (this is `createdAt`).\n",
+                                                  "example": "2021-11-18T17:09:37+00:00"
+                                                },
+                                                "endedAt": {
+                                                  "type": "string",
+                                                  "format": "date-time",
+                                                  "description": "The time when the Spark application terminated.\n",
+                                                  "example": "2021-11-18T17:09:37+00:00"
+                                                },
+                                                "liveLog": {
+                                                  "type": "object",
+                                                  "description": "API pointers to endpoints serving logs and events related to the Spark application",
+                                                  "properties": {
+                                                    "logsStreamUrl": {
+                                                      "type": "string",
+                                                      "format": "uri",
+                                                      "description": "URL of the endpoint serving the live driver logs",
+                                                      "example": "/ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/logs/live"
+                                                    },
+                                                    "kubeEventsStreamUrl": {
+                                                      "type": "string",
+                                                      "format": "uri",
+                                                      "description": "URL of the endpoint serving a stream of Kubernetes events",
+                                                      "example": "/ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/kubeEvents/live"
+                                                    }
+                                                  }
+                                                },
+                                                "metrics": {
+                                                  "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1statistics/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/metrics"
+                                                }
+                                              }
+                                            }
+                                          ]
                                         }
                                       }
                                     }
@@ -65444,7 +65538,7 @@
         },
         "responses": {
           "200": {
-            "description": "A list of Spark applications (can be a single app)",
+            "description": "A Spark application just submitted",
             "content": {
               "application/json": {
                 "schema": {
@@ -65464,7 +65558,6 @@
                               "items": {
                                 "type": "object",
                                 "required": [
-                                  "internalId",
                                   "id",
                                   "displayName",
                                   "accountId",
@@ -65485,9 +65578,6 @@
                                     "type": "object",
                                     "description": "The description of a Spark application\n",
                                     "properties": {
-                                      "internalId": {
-                                        "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/internalId"
-                                      },
                                       "id": {
                                         "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/appId"
                                       },
@@ -65542,7 +65632,7 @@
                                         "description": "The time when the Spark application terminated.\n",
                                         "example": "2021-11-18T17:09:37+00:00"
                                       },
-                                      "log": {
+                                      "liveLog": {
                                         "type": "object",
                                         "description": "API pointers to endpoints serving logs and events related to the Spark application",
                                         "properties": {
@@ -65559,9 +65649,6 @@
                                             "example": "/ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/kubeEvents/live"
                                           }
                                         }
-                                      },
-                                      "metrics": {
-                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1statistics/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/metrics"
                                       }
                                     }
                                   }
@@ -65610,7 +65697,132 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/responses/200"
+            "description": "A Spark application",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "response": {
+                          "type": "object",
+                          "description": "response body\n",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "required": [
+                                  "id",
+                                  "displayName",
+                                  "accountId",
+                                  "organizationId",
+                                  "userId",
+                                  "clusterId",
+                                  "controllerClusterId",
+                                  "appState",
+                                  "submissionSource",
+                                  "createdAt",
+                                  "updatedAt"
+                                ],
+                                "allOf": [
+                                  {
+                                    "$ref": "#/paths/~1aws~1emr~1mrScaler/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/1"
+                                  },
+                                  {
+                                    "type": "object",
+                                    "description": "The description of a Spark application\n",
+                                    "properties": {
+                                      "id": {
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/appId"
+                                      },
+                                      "displayName": {
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/1/properties/displayName"
+                                      },
+                                      "userId": {
+                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/5/schema"
+                                      },
+                                      "clusterId": {
+                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/1/schema"
+                                      },
+                                      "controllerClusterId": {
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
+                                      },
+                                      "appState": {
+                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/4/schema"
+                                      },
+                                      "submissionSource": {
+                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/3/schema"
+                                      },
+                                      "job": {
+                                        "type": "object",
+                                        "description": "The job to which the application belongs. A job is collection of Spark applications, typically a workload run on a schedule.\n",
+                                        "required": [
+                                          "id",
+                                          "displayName"
+                                        ],
+                                        "properties": {
+                                          "id": {
+                                            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/jobId/allOf/0"
+                                          },
+                                          "displayName": {
+                                            "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/displayName"
+                                          }
+                                        }
+                                      },
+                                      "config": {
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0"
+                                      },
+                                      "startedAt": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "description": "The time when the Spark application started running (the app state becomes RUNNING). This is not the time when the application launch was requested (this is `createdAt`).\n",
+                                        "example": "2021-11-18T17:09:37+00:00"
+                                      },
+                                      "endedAt": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "description": "The time when the Spark application terminated.\n",
+                                        "example": "2021-11-18T17:09:37+00:00"
+                                      },
+                                      "liveLog": {
+                                        "type": "object",
+                                        "description": "API pointers to endpoints serving logs and events related to the Spark application",
+                                        "properties": {
+                                          "logsStreamUrl": {
+                                            "type": "string",
+                                            "format": "uri",
+                                            "description": "URL of the endpoint serving the live driver logs",
+                                            "example": "/ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/logs/live"
+                                          },
+                                          "kubeEventsStreamUrl": {
+                                            "type": "string",
+                                            "format": "uri",
+                                            "description": "URL of the endpoint serving a stream of Kubernetes events",
+                                            "example": "/ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/kubeEvents/live"
+                                          }
+                                        }
+                                      },
+                                      "metrics": {
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1statistics/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/metrics"
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -65636,8 +65848,111 @@
           }
         ],
         "responses": {
-          "204": {
-            "description": "Application deleted"
+          "200": {
+            "description": "A killed Spark application",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "response": {
+                          "type": "object",
+                          "description": "response body\n",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "required": [
+                                  "id",
+                                  "displayName",
+                                  "accountId",
+                                  "organizationId",
+                                  "userId",
+                                  "clusterId",
+                                  "controllerClusterId",
+                                  "appState",
+                                  "submissionSource",
+                                  "createdAt",
+                                  "updatedAt"
+                                ],
+                                "allOf": [
+                                  {
+                                    "$ref": "#/paths/~1aws~1emr~1mrScaler/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/1"
+                                  },
+                                  {
+                                    "type": "object",
+                                    "description": "The description of a Spark application\n",
+                                    "properties": {
+                                      "id": {
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/appId"
+                                      },
+                                      "displayName": {
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/1/properties/displayName"
+                                      },
+                                      "userId": {
+                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/5/schema"
+                                      },
+                                      "clusterId": {
+                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/1/schema"
+                                      },
+                                      "controllerClusterId": {
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
+                                      },
+                                      "appState": {
+                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/4/schema"
+                                      },
+                                      "submissionSource": {
+                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/3/schema"
+                                      },
+                                      "startedAt": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "description": "The time when the Spark application started running (the app state becomes RUNNING). This is not the time when the application launch was requested (this is `createdAt`).\n",
+                                        "example": "2021-11-18T17:09:37+00:00"
+                                      },
+                                      "endedAt": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "description": "The time when the Spark application terminated.\n",
+                                        "example": "2021-11-18T17:09:37+00:00"
+                                      },
+                                      "liveLog": {
+                                        "type": "object",
+                                        "description": "API pointers to endpoints serving logs and events related to the Spark application",
+                                        "properties": {
+                                          "logsStreamUrl": {
+                                            "type": "string",
+                                            "format": "uri",
+                                            "description": "URL of the endpoint serving the live driver logs",
+                                            "example": "/ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/logs/live"
+                                          },
+                                          "kubeEventsStreamUrl": {
+                                            "type": "string",
+                                            "format": "uri",
+                                            "description": "URL of the endpoint serving a stream of Kubernetes events",
+                                            "example": "/ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/kubeEvents/live"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -66221,13 +66536,114 @@
                                     "description": "The time when the entity was last updated"
                                   },
                                   "lastApp": {
-                                    "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items"
+                                    "type": "object",
+                                    "required": [
+                                      "internalId",
+                                      "id",
+                                      "displayName",
+                                      "accountId",
+                                      "organizationId",
+                                      "userId",
+                                      "clusterId",
+                                      "controllerClusterId",
+                                      "appState",
+                                      "submissionSource",
+                                      "createdAt",
+                                      "updatedAt"
+                                    ],
+                                    "allOf": [
+                                      {
+                                        "$ref": "#/paths/~1aws~1emr~1mrScaler/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/1"
+                                      },
+                                      {
+                                        "type": "object",
+                                        "description": "The description of a Spark application\n",
+                                        "properties": {
+                                          "internalId": {
+                                            "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/internalId"
+                                          },
+                                          "id": {
+                                            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/appId"
+                                          },
+                                          "displayName": {
+                                            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/1/properties/displayName"
+                                          },
+                                          "userId": {
+                                            "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/5/schema"
+                                          },
+                                          "clusterId": {
+                                            "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/1/schema"
+                                          },
+                                          "controllerClusterId": {
+                                            "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
+                                          },
+                                          "appState": {
+                                            "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/4/schema"
+                                          },
+                                          "submissionSource": {
+                                            "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/3/schema"
+                                          },
+                                          "job": {
+                                            "type": "object",
+                                            "description": "The job to which the application belongs. A job is collection of Spark applications, typically a workload run on a schedule.\n",
+                                            "required": [
+                                              "id",
+                                              "displayName"
+                                            ],
+                                            "properties": {
+                                              "id": {
+                                                "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/jobId/allOf/0"
+                                              },
+                                              "displayName": {
+                                                "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/displayName"
+                                              }
+                                            }
+                                          },
+                                          "config": {
+                                            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0"
+                                          },
+                                          "startedAt": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "description": "The time when the Spark application started running (the app state becomes RUNNING). This is not the time when the application launch was requested (this is `createdAt`).\n",
+                                            "example": "2021-11-18T17:09:37+00:00"
+                                          },
+                                          "endedAt": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "description": "The time when the Spark application terminated.\n",
+                                            "example": "2021-11-18T17:09:37+00:00"
+                                          },
+                                          "log": {
+                                            "type": "object",
+                                            "description": "API pointers to endpoints serving logs and events related to the Spark application",
+                                            "properties": {
+                                              "logsStreamUrl": {
+                                                "type": "string",
+                                                "format": "uri",
+                                                "description": "URL of the endpoint serving the live driver logs",
+                                                "example": "/ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/logs/live"
+                                              },
+                                              "kubeEventsStreamUrl": {
+                                                "type": "string",
+                                                "format": "uri",
+                                                "description": "URL of the endpoint serving a stream of Kubernetes events",
+                                                "example": "/ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/kubeEvents/live"
+                                              }
+                                            }
+                                          },
+                                          "metrics": {
+                                            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1statistics/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/metrics"
+                                          }
+                                        }
+                                      }
+                                    ]
                                   },
                                   "history": {
                                     "description": "The most recent Spark applications in this job.",
                                     "type": "array",
                                     "items": {
-                                      "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items"
+                                      "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/lastApp"
                                     }
                                   },
                                   "trends": {
