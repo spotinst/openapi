@@ -66792,7 +66792,121 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200"
+            "description": "An Ocean Spark job",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "response": {
+                          "type": "object",
+                          "description": "response body\n",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "required": [
+                                  "id",
+                                  "displayName",
+                                  "accountId",
+                                  "organizationId",
+                                  "clusterId",
+                                  "controllerClusterId",
+                                  "createdAt",
+                                  "updatedAt"
+                                ],
+                                "description": "The description of an Ocean Spark job with config\n",
+                                "properties": {
+                                  "internalId": {
+                                    "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/internalId"
+                                  },
+                                  "id": {
+                                    "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/jobId/allOf/0"
+                                  },
+                                  "displayName": {
+                                    "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/displayName"
+                                  },
+                                  "controllerClusterId": {
+                                    "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
+                                  },
+                                  "clusterId": {
+                                    "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/1/schema"
+                                  },
+                                  "createdAt": {
+                                    "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/createdAt"
+                                  },
+                                  "updatedAt": {
+                                    "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/updatedAt"
+                                  },
+                                  "config": {
+                                    "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/spark/cluster/{clusterId}/job/{jobId}/config": {
+      "put": {
+        "summary": "Put Job Config Template",
+        "description": "Attach or update an attached config template by replacing the existing configuration with the one provided in the request body.\n",
+        "operationId": "OceanSparkJobConfig",
+        "tags": [
+          "Ocean Spark"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D/get/parameters/1"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/parameters/2"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "config": {
+                    "description": "The piece of configuration that will replace the existing configuration, if empty then the job configuration will be removed\n",
+                    "allOf": [
+                      {
+                        "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200"
           },
           "400": {
             "description": "Bad Request"
