@@ -61954,6 +61954,191 @@
     },
     "/ocean/spark/cluster": {
       "summary": "Ocean Spark",
+      "post": {
+        "summary": "Create Cluster",
+        "description": "Create Ocean Spark Cluster\n",
+        "operationId": "OceanSparkClusterCreate",
+        "tags": [
+          "Ocean Spark"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "cluster"
+                    ],
+                    "properties": {
+                      "cluster": {
+                        "type": "object",
+                        "description": "The object specifying the configuration of the Ocean Spark cluster.\n",
+                        "title": "Ocean Spark Cluster",
+                        "required": [
+                          "oceanClusterId"
+                        ],
+                        "allOf": [
+                          {
+                            "type": "object",
+                            "description": "The description of an Ocean Spark cluster\n",
+                            "properties": {
+                              "oceanClusterId": {
+                                "type": "string",
+                                "example": "o-d3a2908e",
+                                "description": "A unique identifier for the Ocean cluster"
+                              },
+                              "config": {
+                                "type": "object",
+                                "description": "The object specifying the configuration of the Ocean Spark cluster.\n",
+                                "properties": {
+                                  "ingress": {
+                                    "type": "object",
+                                    "description": "The object specifying the Ocean Spark Ingress configuration.\n",
+                                    "properties": {
+                                      "serviceAnnotations": {
+                                        "type": "object",
+                                        "additionalProperties": {
+                                          "type": "string"
+                                        },
+                                        "description": "Extra annotations to the ingress load balancer service. This is useful to configure properties of the load balancer \ndeployed by the ingress controller, like the nature of the load balancer (e.g. ELB, NLB, ALB on AWS), \nthe security groups, or various timeouts.\n",
+                                        "example": {
+                                          "service.beta.kubernetes.io/aws-load-balancer-security-groups": "sg-03ba056e31f183482"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "webhook": {
+                                    "type": "object",
+                                    "description": "The object specifying the Ocean Spark Webhook configuration.\n",
+                                    "properties": {
+                                      "useHostNetwork": {
+                                        "type": "boolean",
+                                        "default": false,
+                                        "example": true,
+                                        "description": "Enable/Disable host networking on the Spark Operator. Host networking can be useful when using custom CNI plugins \nlike Calico.\n"
+                                      },
+                                      "hostNetworkPorts": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "integer",
+                                          "example": 1234
+                                        },
+                                        "description": "List of ports allowed to use on the host network - if empty default is **25554**\n"
+                                      }
+                                    }
+                                  },
+                                  "compute": {
+                                    "type": "object",
+                                    "description": "The object specifying the Ocean Spark Compute configuration.\n",
+                                    "properties": {
+                                      "useTaints": {
+                                        "type": "boolean",
+                                        "default": true,
+                                        "example": false,
+                                        "description": "Enable/Disable **ocean-spark** taints on the Ocean Spark VNGs. By default, Spark uses taints to prevent \nnon-Spark pods to run on Ocean Spark VNGs.\n"
+                                      },
+                                      "createVngs": {
+                                        "type": "boolean",
+                                        "default": true,
+                                        "example": false,
+                                        "description": "Enable/Disable creating **ocean-spark** VNGs\n"
+                                      }
+                                    }
+                                  },
+                                  "logCollection": {
+                                    "type": "object",
+                                    "description": "The object specifying the Ocean Spark Log Collection configuration.\n",
+                                    "properties": {
+                                      "collectDriverLogs": {
+                                        "type": "boolean",
+                                        "default": true,
+                                        "example": false,
+                                        "description": "Enable/Disable collecting driver logs. When enabled, driver logs are stored by NetApp and can be downloaded from \nthe Spot console web interface. The driver logs are deleted after 30 days.\n"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "cluster": {
+                        "type": "object",
+                        "required": [
+                          "name"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ocean Spark Cluster Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/spark/cluster"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1spark~1cluster/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:spark:cluster"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
       "get": {
         "summary": "List Clusters",
         "description": "List the Ocean Spark clusters in the specified account.\n",
@@ -62077,24 +62262,13 @@
                               "type": "array",
                               "items": {
                                 "type": "object",
+                                "description": "The object specifying the Ocean Spark cluster.\n",
+                                "title": "Ocean Spark Cluster",
                                 "required": [
-                                  "id",
                                   "controllerClusterId",
-                                  "oceanClusterId",
-                                  "state",
-                                  "region",
-                                  "k8sVersion",
-                                  "nodeCount",
-                                  "runningAppCount",
-                                  "oceanControllerLastHeartbeat",
-                                  "operatorLastHeartbeat",
-                                  "createdAt",
-                                  "updatedAt"
+                                  "oceanClusterId"
                                 ],
                                 "allOf": [
-                                  {
-                                    "$ref": "#/paths/~1aws~1emr~1mrScaler/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/1"
-                                  },
                                   {
                                     "type": "object",
                                     "description": "The description of an Ocean Spark cluster\n",
@@ -62106,12 +62280,13 @@
                                         "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
                                       },
                                       "oceanClusterId": {
-                                        "type": "string",
-                                        "example": "o-d3a2908e",
-                                        "description": "A unique identifier for the Ocean cluster"
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/allOf/0/properties/oceanClusterId"
                                       },
                                       "state": {
                                         "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/3/schema"
+                                      },
+                                      "config": {
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/allOf/0/properties/config"
                                       },
                                       "region": {
                                         "type": "string",
@@ -62123,22 +62298,6 @@
                                         "description": "The Kubernetes API of the Ocean Spark cluster\n",
                                         "example": "v1.21.2-eks-0389ca3"
                                       },
-                                      "nodeCount": {
-                                        "type": "integer",
-                                        "description": "The number of nodes currently provisioned in the Ocean Spark cluster",
-                                        "example": 1
-                                      },
-                                      "runningAppCount": {
-                                        "type": "integer",
-                                        "description": "The number of Spark applications currently running in the Ocean Spark cluster",
-                                        "example": 3
-                                      },
-                                      "oceanControllerLastHeartbeat": {
-                                        "type": "string",
-                                        "format": "date-time",
-                                        "description": "The last heartbeat received from the Ocean controller running in the Ocean cluster",
-                                        "example": "2021-11-20T13:29:53.000Z"
-                                      },
                                       "operatorLastHeartbeat": {
                                         "type": "string",
                                         "format": "date-time",
@@ -62146,6 +62305,9 @@
                                         "example": "2021-11-20T13:29:30.000Z"
                                       }
                                     }
+                                  },
+                                  {
+                                    "$ref": "#/paths/~1aws~1emr~1mrScaler/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/1"
                                   }
                                 ]
                               }
@@ -62213,7 +62375,69 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1ocean~1spark~1cluster/get/responses/200"
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update Cluster",
+        "description": "All Ocean Spark configuration parameters are updatable. This API supports partial updates, so specific fields can be updated separately.\n",
+        "operationId": "OceanSparkClusterUpdate",
+        "tags": [
+          "Ocean Spark"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D/get/parameters/1"
+          },
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "cluster"
+                    ],
+                    "properties": {
+                      "cluster": {
+                        "type": "object",
+                        "description": "The object specifying the configuration of the Ocean Spark cluster.\n",
+                        "title": "Ocean Spark Cluster",
+                        "allOf": [
+                          {
+                            "type": "object",
+                            "description": "The description of an Ocean Spark cluster\n",
+                            "required": [
+                              "config"
+                            ],
+                            "properties": {
+                              "config": {
+                                "$ref": "#/paths/~1ocean~1spark~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/allOf/0/properties/config"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok"
           },
           "400": {
             "description": "Bad Request"
@@ -67716,6 +67940,164 @@
         "responses": {
           "200": {
             "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/spark/cluster/{clusterId}/virtualNodeGroup": {
+      "summary": "Ocean Spark",
+      "post": {
+        "summary": "Attach Dedicated Virtual Node Group",
+        "description": "Attach an Ocean Virtual Group to the Ocean Spark cluster.\n",
+        "operationId": "AttachOceanSparkVirtualNodeGroup",
+        "tags": [
+          "Ocean Spark"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D/get/parameters/1"
+          },
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "virtualNodeGroup"
+                    ],
+                    "properties": {
+                      "virtualNodeGroup": {
+                        "type": "object",
+                        "description": "The object specifying the Ocean Spark Dedicated Virtual Node Group.\n",
+                        "title": "Ocean Spark VNG",
+                        "required": [
+                          "id"
+                        ],
+                        "allOf": [
+                          {
+                            "type": "object",
+                            "description": "The description of an Ocean Spark VNG\n",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "example": "ols-e3ea5883",
+                                "description": "The Ocean Virtual Node Group Id\n"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "A list of Ocean Spark Dedicated VNGs (can be a single VNG)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/spark/osc-20fac3f1/virtualNodeGroup"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "description": "The object specifying the Ocean Spark Dedicated Virtual Node Group.\n",
+                                "title": "Ocean Spark VNG",
+                                "required": [
+                                  "oceanClusterId",
+                                  "oceanSparkClusterId",
+                                  "vngId"
+                                ],
+                                "allOf": [
+                                  {
+                                    "type": "object",
+                                    "description": "The description of an Ocean Spark VNG\n",
+                                    "properties": {
+                                      "oceanClusterId": {
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/allOf/0/properties/oceanClusterId"
+                                      },
+                                      "oceanSparkClusterId": {
+                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/1/schema"
+                                      },
+                                      "vngId": {
+                                        "type": "string",
+                                        "example": "ols-e3ea5883",
+                                        "description": "A unique identifier for the Ocean Virtual Node Group\n"
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:spark:vng"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Detach Dedicated Virtual Node Group",
+        "description": "Detach an Ocean Virtual Group to the Ocean Spark cluster.\n",
+        "operationId": "DetachOceanSparkVirtualNodeGroup",
+        "tags": [
+          "Ocean Spark"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D/get/parameters/1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
           },
           "400": {
             "description": "Bad Request"
