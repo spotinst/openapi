@@ -183,12 +183,12 @@ properties:
                   type: string
                   example: testSubnet
                 assignPublicIp:
-                  title: Assign Publick IP
+                  title: Assign Public IP
                   description: Assign public IP
                   type: boolean
                   example: true
                 publicIpSku:
-                  title:
+                  title: Public IP Sku
                   description: Required if assignPublicIp=true values=[STANDARD/BASIC]
                   type: string
                   example: STANDARD
@@ -404,16 +404,19 @@ properties:
           List of objects for azure extensions
         items:
           type: object
+          required:
+            - name
+            - type
+            - publisher
+            - minorVersionAutoUpgrade
           properties:
             name:
               type: string
               description: |
                 Required on compute.launchSpecification.extensions object
-              required: true
               example: "extensionName"
             type:
               type: string
-              required: true
               description: |
                 Required on compute.launchSpecification.extensions object
               example: "customScript"
@@ -421,7 +424,6 @@ properties:
               type: string
               description: |
                 Required on compute.launchSpecification.extensions object
-              required: true
               example: "MMicrosoft.Azure.Extensions"
             apiVersion:
               type: string
@@ -430,7 +432,6 @@ properties:
               example: "2.0"
             minorVersionAutoUpgrade:
               type: boolean
-              required: true
               description: |
                 Required on compute.launchSpecification.extensions object
               example: true
@@ -489,15 +490,16 @@ properties:
         type: object
         description:
           "Will enable boot diagnostics in Azure when a new VM is launched"
+        required:
+          - isEnabled
+          - type
         properties:
           isEnabled:
             type: boolean
-            required: true
             description:
               "Allows you to enable and disable the configuration of boot diagnostics at launch"
           type:
             type: string
-            required: true
             description: "Defines the type of storage on VM launch  in Azure."
             enum: [ managed, unmanaged ]
           storageUri:
@@ -520,33 +522,35 @@ properties:
               type: object
               description: |
                 The key vault reference, contains the required certificates
+              required:
+                - resourceGroupName
+                - name
+                - vaultCertificates
               properties:
                 resourceGroupName:
                   type: string
-                  required: true
                   description: |
                     The resource group name of the key vault
                 name:
                   type: string
-                  required: true
                   description: |
                     The name of the key vault
             vaultCertificates:
               type: array
-              required: true
               description: |
                 The required certificate references
               items:
                 type: object
+                required:
+                  - certificateUrl
+                  - certificateStore
                 properties:
                   certificateUrl:
                     type: string
-                    required: true
                     description: |
                       The URL of the certificate under the key vault
                   certificateStore:
                     type: string
-                    required: true
                     description: |
                       The certificate store directory the VM. The directory is created in the LocalMachine account.
                       * This field is required only when using windows OS type

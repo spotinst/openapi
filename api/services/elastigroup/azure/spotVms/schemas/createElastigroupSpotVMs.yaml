@@ -418,24 +418,27 @@ properties:
                       + percentageAdjustment"
                     type: string
                     example: "2"
-                policyName:
-                  type: object
-                  example: "cpuScaleDown"
-                  threshold:
-                    example: 0.25
-                  operator:
-                    example: "lte"
-                  action:
+                  policyName:
                     type: object
+                    example: "cpuScaleDown"
                     properties:
-                      type:
+                      threshold:
+                        type: number
+                        example: 0.25
+                      operator:
                         type: string
-                        example: adjustment
-                        enum:
-                          - adjustment
-                          - setMaxTarget
-                          - updateCapacity
-                          - percentageAdjustment
+                        example: "lte"
+                      action:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            example: adjustment
+                            enum:
+                              - adjustment
+                              - setMaxTarget
+                              - updateCapacity
+                              - percentageAdjustment
       strategy:
         type: object
         title: Scaling Strategy
@@ -604,7 +607,7 @@ properties:
                         example: "OpenLogic"
                       offer:
                         title: Offer
-                        desription: "Name of image to use.  <a style=color:red;>Required if marketplace image is specified.</a>"
+                        description: "Name of image to use.  <a style=color:red;>Required if marketplace image is specified.</a>"
                         type: string
                         example: "CentOS"
                       sku:
@@ -806,7 +809,7 @@ properties:
                           type: boolean
                           example: true
                         publicIpSku:
-                          title:
+                          title: Public IP Sku
                           description: Required if assignPublicIp=true values=[STANDARD/BASIC]
                           type: string
                           example: STANDARD
@@ -915,7 +918,6 @@ properties:
                       description: Required on compute.launchSpecification.extensions object
                       type: boolean
                       example: true
-                      required: true
                     name:
                       title: name
                       description: Required on compute.launchSpecification.extensions object
@@ -1046,15 +1048,16 @@ properties:
                 type: object
                 description:
                   "Will enable boot diagnostics in Azure when a new VM is launched"
+                required:
+                  - isEnabled
+                  - type
                 properties:
                   isEnabled:
                     type: boolean
-                    required: true
                     description:
                       "Allows you to enable and disable the configuration of boot diagnostics at launch"
                   type:
                     type: string
-                    required: true
                     description: "Defines the type of storage on VM launch  in Azure."
                     enum: [ managed, unmanaged ]
                   storageUri:
@@ -1072,38 +1075,41 @@ properties:
                   Set of certificates that should be installed the VM
                 items:
                   type: object
+                  required:
+                    - vaultCertificates
                   properties:
                     sourceVault:
                       type: object
                       description: |
                         The key vault reference, contains the required certificates
+                      required:
+                        - resourceGroupName
+                        - name
                       properties:
                         resourceGroupName:
                           type: string
-                          required: true
                           description: |
                             The resource group name of the key vault
                         name:
                           type: string
-                          required: true
                           description: |
                             The name of the key vault
                     vaultCertificates:
                       type: array
-                      required: true
                       description: |
                         The required certificate references
                       items:
                         type: object
+                        required:
+                          - certificateUrl
+                          - certificateStore
                         properties:
                           certificateUrl:
                             type: string
-                            required: true
                             description: |
                               The URL of the certificate under the key vault
                           certificateStore:
                             type: string
-                            required: true
                             description: |
                               The certificate store directory the VM. The directory is created in the LocalMachine account.
                               * This field is required only when using windows OS type
