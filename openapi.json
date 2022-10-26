@@ -15807,7 +15807,34 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1compute~1azure~1task/get/responses/200"
+            "description": "Elastigroup Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D/put/requestBody/content/application~1json/schema/allOf/0"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -16853,7 +16880,7 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/paths/~1compute~1azure~1task/get/responses/200"
+            "$ref": "#/paths/~1compute~1azure~1group/get/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -16903,7 +16930,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/paths/~1compute~1azure~1task/get/responses/200"
+            "$ref": "#/paths/~1compute~1azure~1group/get/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -16932,7 +16959,592 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/paths/~1compute~1azure~1task/post/requestBody/content/application~1json/schema/allOf/0"
+                    "type": "object",
+                    "title": "Elastigroup Wrapper",
+                    "required": [
+                      "group"
+                    ],
+                    "properties": {
+                      "group": {
+                        "type": "object",
+                        "title": "Azure Elastigroup",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "sig-123456789",
+                            "readOnly": true,
+                            "description": "Azure Elastigroup ID\n"
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "spotinst-group",
+                            "description": "Azure Elastigroup Name\n"
+                          },
+                          "region": {
+                            "type": "string",
+                            "example": "eastus",
+                            "description": "Valid Azure region the Elastigroup is managed in\n"
+                          },
+                          "resourceGroupName": {
+                            "type": "string",
+                            "example": "spotinst-azure",
+                            "description": "The Azure resource group to associate the Elastigroup with\n"
+                          },
+                          "capacity": {
+                            "type": "object",
+                            "properties": {
+                              "target": {
+                                "type": "integer",
+                                "example": 8,
+                                "description": "Current scale the Elastigroup will conform to"
+                              },
+                              "minimum": {
+                                "type": "integer",
+                                "example": 2,
+                                "description": "The Elastigroup will not set a target below this value\n"
+                              },
+                              "maximum": {
+                                "type": "integer",
+                                "example": 10,
+                                "description": "The Elastigroup will not set a target greater than this value\n"
+                              }
+                            }
+                          },
+                          "scaling": {
+                            "type": "object",
+                            "title": "Azure Scaling",
+                            "properties": {
+                              "up": {
+                                "type": "array",
+                                "items": {
+                                  "allOf": [
+                                    {
+                                      "type": "object",
+                                      "properties": {
+                                        "policyName": {
+                                          "type": "string",
+                                          "example": "cpuScale"
+                                        },
+                                        "metricName": {
+                                          "type": "string",
+                                          "example": "Percentage CPU"
+                                        },
+                                        "statistic": {
+                                          "type": "string",
+                                          "example": "average",
+                                          "enum": [
+                                            "average",
+                                            "sampleCount",
+                                            "sum",
+                                            "minimum",
+                                            "maximum"
+                                          ]
+                                        },
+                                        "threshold": {
+                                          "type": "number",
+                                          "format": "float",
+                                          "example": 0.75
+                                        },
+                                        "period": {
+                                          "type": "integer",
+                                          "example": 60
+                                        },
+                                        "evaluationPeriods": {
+                                          "type": "integer",
+                                          "example": 3
+                                        },
+                                        "cooldown": {
+                                          "type": "integer",
+                                          "example": 300
+                                        },
+                                        "namespace": {
+                                          "type": "string",
+                                          "example": "Microsoft.Network/applicationGateways"
+                                        },
+                                        "operator": {
+                                          "type": "string",
+                                          "example": "gte",
+                                          "enum": [
+                                            "gt",
+                                            "gte",
+                                            "lt",
+                                            "lte"
+                                          ]
+                                        },
+                                        "dimenstions": {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "name": {
+                                                "type": "string",
+                                                "example": "resourceName"
+                                              },
+                                              "value": {
+                                                "type": "string",
+                                                "example": "TestAppGateway"
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "action": {
+                                          "type": "object",
+                                          "properties": {
+                                            "type": {
+                                              "type": "string",
+                                              "example": "adjustment"
+                                            },
+                                            "adjustment": {
+                                              "type": "string",
+                                              "example": "2"
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "type": "object",
+                                      "properties": {
+                                        "policyName": {
+                                          "example": "cpuScaleUp"
+                                        },
+                                        "threshold": {
+                                          "example": 0.75
+                                        },
+                                        "operator": {
+                                          "example": "gte"
+                                        },
+                                        "action": {
+                                          "type": "object",
+                                          "properties": {
+                                            "type": {
+                                              "type": "string",
+                                              "example": "adjustment",
+                                              "enum": [
+                                                "adjustment",
+                                                "setMinTarget",
+                                                "updateCapacity",
+                                                "percentageAdjustment"
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              "down": {
+                                "type": "array",
+                                "items": {
+                                  "allOf": [
+                                    {
+                                      "$ref": "#/paths/~1compute~1azure~1group/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/group/properties/scaling/properties/up/items/allOf/0"
+                                    },
+                                    {
+                                      "type": "object",
+                                      "properties": {
+                                        "policyName": {
+                                          "example": "cpuScaleDown"
+                                        },
+                                        "threshold": {
+                                          "example": 0.25
+                                        },
+                                        "operator": {
+                                          "example": "lte"
+                                        },
+                                        "action": {
+                                          "type": "object",
+                                          "properties": {
+                                            "type": {
+                                              "type": "string",
+                                              "example": "adjustment",
+                                              "enum": [
+                                                "adjustment",
+                                                "setMaxTarget",
+                                                "updateCapacity",
+                                                "percentageAdjustment"
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          },
+                          "strategy": {
+                            "type": "object",
+                            "title": "Scaling Strategy",
+                            "properties": {
+                              "lowPriorityPercentage": {
+                                "type": "integer"
+                              },
+                              "odCount": {
+                                "type": "integer"
+                              },
+                              "drainingTimeout": {
+                                "type": "integer"
+                              }
+                            }
+                          },
+                          "compute": {
+                            "type": "object",
+                            "properties": {
+                              "vmSizes": {
+                                "type": "object",
+                                "properties": {
+                                  "odSizes": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string",
+                                      "example": "standard_a1_v1"
+                                    }
+                                  },
+                                  "lowPrioritySizes": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string",
+                                      "example": "standard_a2_v2"
+                                    }
+                                  }
+                                }
+                              },
+                              "product": {
+                                "type": "string",
+                                "example": "Linux",
+                                "enum": [
+                                  "Linux",
+                                  "Windows"
+                                ]
+                              },
+                              "health": {
+                                "type": "object",
+                                "properties": {
+                                  "autoHealing": {
+                                    "type": "boolean",
+                                    "example": true
+                                  },
+                                  "healthCheckType": {
+                                    "type": "string",
+                                    "example": "INSTANCE_STATE",
+                                    "enum": [
+                                      "INSTANCE_STATE"
+                                    ]
+                                  },
+                                  "gracePeriod": {
+                                    "type": "integer",
+                                    "example": 120
+                                  }
+                                }
+                              },
+                              "launchSpecification": {
+                                "type": "object",
+                                "properties": {
+                                  "image": {
+                                    "type": "object",
+                                    "properties": {
+                                      "marketplace": {
+                                        "type": "object",
+                                        "description": "Azure Marketplace VM Image. Cannot be used with `custom`",
+                                        "properties": {
+                                          "publisher": {
+                                            "type": "string",
+                                            "example": "OpenLogic"
+                                          },
+                                          "offer": {
+                                            "type": "string",
+                                            "example": "CentOS"
+                                          },
+                                          "sku": {
+                                            "type": "string",
+                                            "example": "7.3"
+                                          },
+                                          "version": {
+                                            "type": "string",
+                                            "example": "7.3-1611"
+                                          }
+                                        }
+                                      },
+                                      "shutdownScript": {
+                                        "type": "string",
+                                        "example": "IyEvdXNyL2Jpbi9lbnYgYmFzaAoiR29vZGJ5ZSBvbGQgaW5zdGFuY2Ui"
+                                      },
+                                      "custom": {
+                                        "type": "object",
+                                        "description": "Custom VM image.  Cannot be used with `marketplace`\n",
+                                        "properties": {
+                                          "resourceGroupName": {
+                                            "type": "string",
+                                            "example": "spotinst-azure"
+                                          },
+                                          "imageName": {
+                                            "type": "string",
+                                            "example": "custom-image-name"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "loadBalancersConfig": {
+                                    "type": "object",
+                                    "properties": {
+                                      "loadBalancers": {
+                                        "type": "array",
+                                        "items": {
+                                          "anyOf": [
+                                            {
+                                              "type": "object",
+                                              "title": "MULTAI_TARGET_SET",
+                                              "properties": {
+                                                "type": {
+                                                  "type": "string",
+                                                  "example": "MULTAI_TARGET_SET",
+                                                  "enum": [
+                                                    "MULTAI_TARGET_SET"
+                                                  ]
+                                                },
+                                                "balancerId": {
+                                                  "type": "string",
+                                                  "example": "lb-1ee2e3q"
+                                                },
+                                                "targetSetId": {
+                                                  "type": "string",
+                                                  "example": "ts-3eq"
+                                                },
+                                                "autoWeight": {
+                                                  "type": "boolean",
+                                                  "example": true
+                                                }
+                                              }
+                                            },
+                                            {
+                                              "type": "object",
+                                              "title": "APPLICATION_GATEWAY",
+                                              "properties": {
+                                                "type": {
+                                                  "type": "string",
+                                                  "example": "APPLICATION_GATEWAY",
+                                                  "enum": [
+                                                    "APPLICATION_GATEWAY"
+                                                  ]
+                                                },
+                                                "resourceGroupName": {
+                                                  "type": "string",
+                                                  "example": "azureResourceGroup"
+                                                },
+                                                "applicationGatewayName": {
+                                                  "type": "string",
+                                                  "example": "appGateway"
+                                                },
+                                                "backendPoolName": {
+                                                  "type": "string",
+                                                  "example": "backendpool490822"
+                                                }
+                                              }
+                                            }
+                                          ]
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "userData": {
+                                    "type": "string"
+                                  },
+                                  "managedServiceIdentities": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "name": "string",
+                                        "example": "mySI2"
+                                      },
+                                      "resourceGroupName": {
+                                        "resourceGroupName": "string",
+                                        "example": "myResourceGroup"
+                                      }
+                                    }
+                                  },
+                                  "tags": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "tagKey": {
+                                          "type": "string",
+                                          "example": "env"
+                                        },
+                                        "tagValue": {
+                                          "type": "string",
+                                          "example": "staging"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "network": {
+                                    "type": "object",
+                                    "properties": {
+                                      "virtualNetworkName": {
+                                        "type": "string",
+                                        "example": "vname"
+                                      },
+                                      "subnetName": {
+                                        "type": "string",
+                                        "example": "my-subnet-name"
+                                      },
+                                      "resourceGroupName": {
+                                        "type": "string",
+                                        "example": "subnetResourceGroup"
+                                      },
+                                      "assignPublicIp": true,
+                                      "additionalIpConfigurations": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "object",
+                                          "properties": {
+                                            "name": {
+                                              "type": "string",
+                                              "example": "config1"
+                                            },
+                                            "privateIpAddressVersion": {
+                                              "type": "string",
+                                              "example": "IPv4"
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "extensions": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "autoUpgradeMinorVersion": {
+                                          "type": "boolean",
+                                          "example": true
+                                        },
+                                        "name": {
+                                          "type": "string",
+                                          "example": "k8s-agentpool1-38611891-vmss-computeAksLinuxBilling"
+                                        },
+                                        "protectedSettings": {
+                                          "type": "string",
+                                          "example": null
+                                        },
+                                        "publisher": {
+                                          "type": "string",
+                                          "example": "Microsoft.AKS"
+                                        },
+                                        "type": {
+                                          "type": "string",
+                                          "example": "Compute.AKS-Engine.Linux.Billing"
+                                        },
+                                        "typeHandlerVersion": {
+                                          "type": "string",
+                                          "example": "1.0"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "customData": {
+                                    "type": "string"
+                                  },
+                                  "login": {
+                                    "type": "object",
+                                    "properties": {
+                                      "userName": {
+                                        "type": "string",
+                                        "example": "spotinst"
+                                      },
+                                      "sshPublicKey": {
+                                        "type": "string"
+                                      },
+                                      "password": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "thirdPartiesIntegration": {
+                            "type": "object",
+                            "properties": {
+                              "kubernetes": {
+                                "type": "object",
+                                "properties": {
+                                  "clusterIdentifier": {
+                                    "type": "string",
+                                    "example": "aks-engine-cluser",
+                                    "description": "Must mastch the clusterIdentifier that was sent when\n the [Spot Controller](https://api.spot.io/container-management/kubernetes/kubernetes-tutorials/installing-kubernetes-controller/)\n was installed.\n"
+                                  }
+                                }
+                              },
+                              "hpcGridEngine": {
+                                "type": "object",
+                                "required": [
+                                  "clusterId"
+                                ],
+                                "properties": {
+                                  "clusterId": {
+                                    "type": "string",
+                                    "example": "spotinst-uge-cluster",
+                                    "description": "Must match the clusterId used by the [controller](https://api.spot.io/elastigroup-for-azure/hpc/introduction/)\n"
+                                  },
+                                  "queues": {
+                                    "type": "array",
+                                    "description": "If defined the autoscaler will only match this Elastigroup to jobs associated with the queues listed here. If empty or null, then all queues will be monitored.\n",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "name": {
+                                          "type": "string",
+                                          "example": "burst.q",
+                                          "description": "The name of the queue to monitor\n"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "distribution": {
+                                    "type": "string",
+                                    "enum": [
+                                      "sge",
+                                      "uge"
+                                    ],
+                                    "description": "The specific distribution of grid engine. Defaults to `sge`\n",
+                                    "properties": {
+                                      "name": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "tortuga": {
+                                    "type": "object",
+                                    "description": "Optional configuration for `uge` distribution managed with Tortuga\n",
+                                    "properties": {
+                                      "softwareProfile": {
+                                        "type": "string",
+                                        "example": "execd",
+                                        "description": "An existing Tortuga software profile\n"
+                                      },
+                                      "hardwareProfile": {
+                                        "type": "string",
+                                        "example": "execd-elastigroup",
+                                        "description": "An existing Torguga hardware profile that is configured for remote nodes and dynamic hostnames\n"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
                   },
                   {
                     "type": "object",
@@ -16949,7 +17561,7 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/paths/~1compute~1azure~1task/get/responses/200"
+            "$ref": "#/paths/~1compute~1azure~1group/get/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -17535,7 +18147,7 @@
             "in": "path",
             "name": "groupId",
             "example": "sig-12345",
-            "description": "The Elasticgroup id you want to roll\n",
+            "description": "The Elastigroup id you want to roll\n",
             "schema": {
               "type": "string"
             },
@@ -17555,7 +18167,7 @@
             "in": "query",
             "name": "accountId",
             "example": "act-123abc",
-            "description": "Your Spotinst accountid associated with your token\n",
+            "description": "Your Spotinst accountId associated with your token\n",
             "schema": {
               "type": "string"
             },
@@ -17695,9 +18307,9 @@
         }
       },
       "put": {
-        "summary": "Update Task",
+        "summary": "Update Roll",
         "description": "Update an Elastigroup Azure\n",
-        "operationId": "tasksScaleSetsAzureUpdateRoll",
+        "operationId": "scaleSetsAzureUpdateRoll",
         "tags": [
           "Elastigroup Azure Scale Set VMs"
         ],
@@ -17709,7 +18321,7 @@
             "in": "path",
             "name": "groupId",
             "example": "sig-12345",
-            "description": "The Elasticgroup id you want to roll\n",
+            "description": "The Elastigroup id you want to roll\n",
             "schema": {
               "type": "string"
             },
@@ -17733,7 +18345,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/paths/~1compute~1azure~1task/post/requestBody/content/application~1json/schema/allOf/0"
+                    "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D/put/requestBody/content/application~1json/schema/allOf/0"
                   },
                   {
                     "type": "object",
@@ -17753,7 +18365,7 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/paths/~1compute~1azure~1task/get/responses/200"
+            "$ref": "#/paths/~1compute~1azure~1group/get/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -17784,7 +18396,7 @@
             },
             "example": "sbgd-9876",
             "required": true,
-            "description": "Azure Elastigroup ID\n"
+            "description": "Deployment ID\n"
           }
         ],
         "responses": {
@@ -17843,769 +18455,6 @@
         "responses": {
           "200": {
             "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
-      }
-    },
-    "/compute/azure/task": {
-      "get": {
-        "summary": "List Tasks",
-        "description": "List all Azure Tasks for a Spot Account\n",
-        "operationId": "tasksScaleSetsAzureListAll",
-        "tags": [
-          "Elastigroup Azure Scale Set VMs"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Elastigroup Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/paths/~1compute~1azure~1group~1%7BgroupId%7D~1status/components/responses/groupStatus/content/application~1json/schema/allOf/0"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "response": {
-                          "type": "object",
-                          "properties": {
-                            "items": {
-                              "type": "array",
-                              "items": {
-                                "$ref": "#/paths/~1compute~1azure~1task/post/requestBody/content/application~1json/schema/allOf/0"
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
-      },
-      "post": {
-        "summary": "Create Task",
-        "description": "Create a new Azure Task",
-        "operationId": "tasksScaleSetsAzureCreate",
-        "tags": [
-          "Elastigroup Azure Scale Set VMs"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "type": "object",
-                    "title": "Elastigroup Wrapper",
-                    "required": [
-                      "group"
-                    ],
-                    "properties": {
-                      "group": {
-                        "type": "object",
-                        "title": "Azure Elastigroup",
-                        "properties": {
-                          "id": {
-                            "type": "string",
-                            "example": "sig-123456789",
-                            "readOnly": true,
-                            "description": "Azure Elastigroup ID\n"
-                          },
-                          "name": {
-                            "type": "string",
-                            "example": "spotinst-group",
-                            "description": "Azure Elastigroup Name\n"
-                          },
-                          "region": {
-                            "type": "string",
-                            "example": "eastus",
-                            "description": "Valid Azure region the Elastigroup is managed in\n"
-                          },
-                          "resourceGroupName": {
-                            "type": "string",
-                            "example": "spotinst-azure",
-                            "description": "The Azure resource group to associate the Elastigroup with\n"
-                          },
-                          "capacity": {
-                            "type": "object",
-                            "properties": {
-                              "target": {
-                                "type": "integer",
-                                "example": 8,
-                                "description": "Current scale the Elastigroup will conform to"
-                              },
-                              "minimum": {
-                                "type": "integer",
-                                "example": 2,
-                                "description": "The Elastigroup will not set a target below this value\n"
-                              },
-                              "maximum": {
-                                "type": "integer",
-                                "example": 10,
-                                "description": "The Elastigroup will not set a target greater than this value\n"
-                              }
-                            }
-                          },
-                          "scaling": {
-                            "type": "object",
-                            "title": "Azure Scaling",
-                            "properties": {
-                              "up": {
-                                "type": "array",
-                                "items": {
-                                  "allOf": [
-                                    {
-                                      "type": "object",
-                                      "properties": {
-                                        "policyName": {
-                                          "type": "string",
-                                          "example": "cpuScale"
-                                        },
-                                        "metricName": {
-                                          "type": "string",
-                                          "example": "Percentage CPU"
-                                        },
-                                        "statistic": {
-                                          "type": "string",
-                                          "example": "average",
-                                          "enum": [
-                                            "average",
-                                            "sampleCount",
-                                            "sum",
-                                            "minimum",
-                                            "maximum"
-                                          ]
-                                        },
-                                        "threshold": {
-                                          "type": "number",
-                                          "format": "float",
-                                          "example": 0.75
-                                        },
-                                        "period": {
-                                          "type": "integer",
-                                          "example": 60
-                                        },
-                                        "evaluationPeriods": {
-                                          "type": "integer",
-                                          "example": 3
-                                        },
-                                        "cooldown": {
-                                          "type": "integer",
-                                          "example": 300
-                                        },
-                                        "namespace": {
-                                          "type": "string",
-                                          "example": "Microsoft.Network/applicationGateways"
-                                        },
-                                        "operator": {
-                                          "type": "string",
-                                          "example": "gte",
-                                          "enum": [
-                                            "gt",
-                                            "gte",
-                                            "lt",
-                                            "lte"
-                                          ]
-                                        },
-                                        "dimenstions": {
-                                          "type": "array",
-                                          "items": {
-                                            "type": "object",
-                                            "properties": {
-                                              "name": {
-                                                "type": "string",
-                                                "example": "resourceName"
-                                              },
-                                              "value": {
-                                                "type": "string",
-                                                "example": "TestAppGateway"
-                                              }
-                                            }
-                                          }
-                                        },
-                                        "action": {
-                                          "type": "object",
-                                          "properties": {
-                                            "type": {
-                                              "type": "string",
-                                              "example": "adjustment"
-                                            },
-                                            "adjustment": {
-                                              "type": "string",
-                                              "example": "2"
-                                            }
-                                          }
-                                        }
-                                      }
-                                    },
-                                    {
-                                      "type": "object",
-                                      "properties": {
-                                        "policyName": {
-                                          "example": "cpuScaleUp"
-                                        },
-                                        "threshold": {
-                                          "example": 0.75
-                                        },
-                                        "operator": {
-                                          "example": "gte"
-                                        },
-                                        "action": {
-                                          "type": "object",
-                                          "properties": {
-                                            "type": {
-                                              "type": "string",
-                                              "example": "adjustment",
-                                              "enum": [
-                                                "adjustment",
-                                                "setMinTarget",
-                                                "updateCapacity",
-                                                "percentageAdjustment"
-                                              ]
-                                            }
-                                          }
-                                        }
-                                      }
-                                    }
-                                  ]
-                                }
-                              },
-                              "down": {
-                                "type": "array",
-                                "items": {
-                                  "allOf": [
-                                    {
-                                      "$ref": "#/paths/~1compute~1azure~1task/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/group/properties/scaling/properties/up/items/allOf/0"
-                                    },
-                                    {
-                                      "type": "object",
-                                      "properties": {
-                                        "policyName": {
-                                          "example": "cpuScaleDown"
-                                        },
-                                        "threshold": {
-                                          "example": 0.25
-                                        },
-                                        "operator": {
-                                          "example": "lte"
-                                        },
-                                        "action": {
-                                          "type": "object",
-                                          "properties": {
-                                            "type": {
-                                              "type": "string",
-                                              "example": "adjustment",
-                                              "enum": [
-                                                "adjustment",
-                                                "setMaxTarget",
-                                                "updateCapacity",
-                                                "percentageAdjustment"
-                                              ]
-                                            }
-                                          }
-                                        }
-                                      }
-                                    }
-                                  ]
-                                }
-                              }
-                            }
-                          },
-                          "strategy": {
-                            "type": "object",
-                            "title": "Scaling Strategy",
-                            "properties": {
-                              "lowPriorityPercentage": {
-                                "type": "integer"
-                              },
-                              "odCount": {
-                                "type": "integer"
-                              },
-                              "drainingTimeout": {
-                                "type": "integer"
-                              }
-                            }
-                          },
-                          "compute": {
-                            "type": "object",
-                            "properties": {
-                              "vmSizes": {
-                                "type": "object",
-                                "properties": {
-                                  "odSizes": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "string",
-                                      "example": "standard_a1_v1"
-                                    }
-                                  },
-                                  "lowPrioritySizes": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "string",
-                                      "example": "standard_a2_v2"
-                                    }
-                                  }
-                                }
-                              },
-                              "product": {
-                                "type": "string",
-                                "example": "Linux",
-                                "enum": [
-                                  "Linux",
-                                  "Windows"
-                                ]
-                              },
-                              "health": {
-                                "type": "object",
-                                "properties": {
-                                  "autoHealing": {
-                                    "type": "boolean",
-                                    "example": true
-                                  },
-                                  "healthCheckType": {
-                                    "type": "string",
-                                    "example": "INSTANCE_STATE",
-                                    "enum": [
-                                      "INSTANCE_STATE"
-                                    ]
-                                  },
-                                  "gracePeriod": {
-                                    "type": "integer",
-                                    "example": 120
-                                  }
-                                }
-                              },
-                              "launchSpecification": {
-                                "type": "object",
-                                "properties": {
-                                  "image": {
-                                    "type": "object",
-                                    "properties": {
-                                      "marketplace": {
-                                        "type": "object",
-                                        "description": "Azure Marketplace VM Image. Cannot be used with `custom`",
-                                        "properties": {
-                                          "publisher": {
-                                            "type": "string",
-                                            "example": "OpenLogic"
-                                          },
-                                          "offer": {
-                                            "type": "string",
-                                            "example": "CentOS"
-                                          },
-                                          "sku": {
-                                            "type": "string",
-                                            "example": "7.3"
-                                          },
-                                          "version": {
-                                            "type": "string",
-                                            "example": "7.3-1611"
-                                          }
-                                        }
-                                      },
-                                      "shutdownScript": {
-                                        "type": "string",
-                                        "example": "IyEvdXNyL2Jpbi9lbnYgYmFzaAoiR29vZGJ5ZSBvbGQgaW5zdGFuY2Ui"
-                                      },
-                                      "custom": {
-                                        "type": "object",
-                                        "description": "Custom VM image.  Cannot be used with `marketplace`\n",
-                                        "properties": {
-                                          "resourceGroupName": {
-                                            "type": "string",
-                                            "example": "spotinst-azure"
-                                          },
-                                          "imageName": {
-                                            "type": "string",
-                                            "example": "custom-image-name"
-                                          }
-                                        }
-                                      }
-                                    }
-                                  },
-                                  "loadBalancersConfig": {
-                                    "type": "object",
-                                    "properties": {
-                                      "loadBalancers": {
-                                        "type": "array",
-                                        "items": {
-                                          "anyOf": [
-                                            {
-                                              "type": "object",
-                                              "title": "MULTAI_TARGET_SET",
-                                              "properties": {
-                                                "type": {
-                                                  "type": "string",
-                                                  "example": "MULTAI_TARGET_SET",
-                                                  "enum": [
-                                                    "MULTAI_TARGET_SET"
-                                                  ]
-                                                },
-                                                "balancerId": {
-                                                  "type": "string",
-                                                  "example": "lb-1ee2e3q"
-                                                },
-                                                "targetSetId": {
-                                                  "type": "string",
-                                                  "example": "ts-3eq"
-                                                },
-                                                "autoWeight": {
-                                                  "type": "boolean",
-                                                  "example": true
-                                                }
-                                              }
-                                            },
-                                            {
-                                              "type": "object",
-                                              "title": "APPLICATION_GATEWAY",
-                                              "properties": {
-                                                "type": {
-                                                  "type": "string",
-                                                  "example": "APPLICATION_GATEWAY",
-                                                  "enum": [
-                                                    "APPLICATION_GATEWAY"
-                                                  ]
-                                                },
-                                                "resourceGroupName": {
-                                                  "type": "string",
-                                                  "example": "azureResourceGroup"
-                                                },
-                                                "applicationGatewayName": {
-                                                  "type": "string",
-                                                  "example": "appGateway"
-                                                },
-                                                "backendPoolName": {
-                                                  "type": "string",
-                                                  "example": "backendpool490822"
-                                                }
-                                              }
-                                            }
-                                          ]
-                                        }
-                                      }
-                                    }
-                                  },
-                                  "userData": {
-                                    "type": "string"
-                                  },
-                                  "managedServiceIdentities": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "object",
-                                      "properties": {
-                                        "name": "string",
-                                        "example": "mySI2"
-                                      },
-                                      "resourceGroupName": {
-                                        "resourceGroupName": "string",
-                                        "example": "myResourceGroup"
-                                      }
-                                    }
-                                  },
-                                  "tags": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "object",
-                                      "properties": {
-                                        "tagKey": {
-                                          "type": "string",
-                                          "example": "env"
-                                        },
-                                        "tagValue": {
-                                          "type": "string",
-                                          "example": "staging"
-                                        }
-                                      }
-                                    }
-                                  },
-                                  "network": {
-                                    "type": "object",
-                                    "properties": {
-                                      "virtualNetworkName": {
-                                        "type": "string",
-                                        "example": "vname"
-                                      },
-                                      "subnetName": {
-                                        "type": "string",
-                                        "example": "my-subnet-name"
-                                      },
-                                      "resourceGroupName": {
-                                        "type": "string",
-                                        "example": "subnetResourceGroup"
-                                      },
-                                      "assignPublicIp": true,
-                                      "additionalIpConfigurations": {
-                                        "type": "array",
-                                        "items": {
-                                          "type": "object",
-                                          "properties": {
-                                            "name": {
-                                              "type": "string",
-                                              "example": "config1"
-                                            },
-                                            "privateIpAddressVersion": {
-                                              "type": "string",
-                                              "example": "IPv4"
-                                            }
-                                          }
-                                        }
-                                      }
-                                    }
-                                  },
-                                  "extensions": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "object",
-                                      "properties": {
-                                        "autoUpgradeMinorVersion": {
-                                          "type": "boolean",
-                                          "example": true
-                                        },
-                                        "name": {
-                                          "type": "string",
-                                          "example": "k8s-agentpool1-38611891-vmss-computeAksLinuxBilling"
-                                        },
-                                        "protectedSettings": {
-                                          "type": "string",
-                                          "example": null
-                                        },
-                                        "publisher": {
-                                          "type": "string",
-                                          "example": "Microsoft.AKS"
-                                        },
-                                        "type": {
-                                          "type": "string",
-                                          "example": "Compute.AKS-Engine.Linux.Billing"
-                                        },
-                                        "typeHandlerVersion": {
-                                          "type": "string",
-                                          "example": "1.0"
-                                        }
-                                      }
-                                    }
-                                  },
-                                  "customData": {
-                                    "type": "string"
-                                  },
-                                  "login": {
-                                    "type": "object",
-                                    "properties": {
-                                      "userName": {
-                                        "type": "string",
-                                        "example": "spotinst"
-                                      },
-                                      "sshPublicKey": {
-                                        "type": "string"
-                                      },
-                                      "password": {
-                                        "type": "string"
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          },
-                          "thirdPartiesIntegration": {
-                            "type": "object",
-                            "properties": {
-                              "kubernetes": {
-                                "type": "object",
-                                "properties": {
-                                  "clusterIdentifier": {
-                                    "type": "string",
-                                    "example": "aks-engine-cluser",
-                                    "description": "Must mastch the clusterIdentifier that was sent when\n the [Spot Controller](https://api.spot.io/container-management/kubernetes/kubernetes-tutorials/installing-kubernetes-controller/)\n was installed.\n"
-                                  }
-                                }
-                              },
-                              "hpcGridEngine": {
-                                "type": "object",
-                                "required": [
-                                  "clusterId"
-                                ],
-                                "properties": {
-                                  "clusterId": {
-                                    "type": "string",
-                                    "example": "spotinst-uge-cluster",
-                                    "description": "Must match the clusterId used by the [controller](https://api.spot.io/elastigroup-for-azure/hpc/introduction/)\n"
-                                  },
-                                  "queues": {
-                                    "type": "array",
-                                    "description": "If defined the autoscaler will only match this Elastigroup to jobs associated with the queues listed here. If empty or null, then all queues will be monitored.\n",
-                                    "items": {
-                                      "type": "object",
-                                      "properties": {
-                                        "name": {
-                                          "type": "string",
-                                          "example": "burst.q",
-                                          "description": "The name of the queue to monitor\n"
-                                        }
-                                      }
-                                    }
-                                  },
-                                  "distribution": {
-                                    "type": "string",
-                                    "enum": [
-                                      "sge",
-                                      "uge"
-                                    ],
-                                    "description": "The specific distribution of grid engine. Defaults to `sge`\n",
-                                    "properties": {
-                                      "name": {
-                                        "type": "string"
-                                      }
-                                    }
-                                  },
-                                  "tortuga": {
-                                    "type": "object",
-                                    "description": "Optional configuration for `uge` distribution managed with Tortuga\n",
-                                    "properties": {
-                                      "softwareProfile": {
-                                        "type": "string",
-                                        "example": "execd",
-                                        "description": "An existing Tortuga software profile\n"
-                                      },
-                                      "hardwareProfile": {
-                                        "type": "string",
-                                        "example": "execd-elastigroup",
-                                        "description": "An existing Torguga hardware profile that is configured for remote nodes and dynamic hostnames\n"
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "group": {
-                        "type": "object",
-                        "required": [
-                          "name"
-                        ]
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "$ref": "#/paths/~1compute~1azure~1task/get/responses/200"
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
-      }
-    },
-    "/compute/azure/task/{taskId}": {
-      "delete": {
-        "summary": "Delete Task",
-        "description": "Delete an Elastigroup Azure\n",
-        "operationId": "tasksScaleSetsAzureDelete",
-        "tags": [
-          "Elastigroup Azure Scale Set VMs"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
-          },
-          {
-            "$ref": "#/paths/~1compute~1azure~1task~1%7BtaskId%7D/put/parameters/1"
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/delete/responses/200"
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
-      },
-      "put": {
-        "summary": "Update Task",
-        "description": "Update an Elastigroup Azure\n",
-        "operationId": "tasksScaleSetsAzureUpdate",
-        "tags": [
-          "Elastigroup Azure Scale Set VMs"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
-          },
-          {
-            "in": "path",
-            "name": "taskId",
-            "example": "sig-12345",
-            "description": "The Azure Task ID\n",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/paths/~1compute~1azure~1task/post/requestBody/content/application~1json/schema/allOf/0"
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "group": {
-                        "type": "object",
-                        "required": [
-                          "name"
-                        ]
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "$ref": "#/paths/~1compute~1azure~1task/get/responses/200"
           },
           "400": {
             "description": "Bad Request"
@@ -19119,30 +18968,38 @@
                                     },
                                     {
                                       "type": "object",
-                                      "properties": {
-                                        "policyName": {
-                                          "example": "cpuScaleUp"
+                                      "allOf": [
+                                        {
+                                          "$ref": "#/paths/~1azure~1compute~1group~1%7BgroupId%7D/put/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/scaling/properties/up/items/allOf/0"
                                         },
-                                        "threshold": {
-                                          "example": 0.75
-                                        },
-                                        "operator": {
-                                          "example": "gte"
-                                        },
-                                        "action": {
+                                        {
                                           "type": "object",
                                           "properties": {
-                                            "type": {
-                                              "type": "string",
-                                              "example": "adjustment",
-                                              "enum": [
-                                                "adjustment",
-                                                "updateCapacity"
-                                              ]
+                                            "policyName": {
+                                              "example": "cpuScaleUp"
+                                            },
+                                            "threshold": {
+                                              "example": 0.75
+                                            },
+                                            "operator": {
+                                              "example": "gte"
+                                            },
+                                            "action": {
+                                              "type": "object",
+                                              "properties": {
+                                                "type": {
+                                                  "type": "string",
+                                                  "example": "adjustment",
+                                                  "enum": [
+                                                    "adjustment",
+                                                    "updateCapacity"
+                                                  ]
+                                                }
+                                              }
                                             }
                                           }
                                         }
-                                      }
+                                      ]
                                     }
                                   ]
                                 }
@@ -19153,34 +19010,42 @@
                                 "items": {
                                   "allOf": [
                                     {
-                                      "$ref": "#/paths/~1azure~1compute~1group/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/scaling/properties/up/items/allOf/0"
+                                      "$ref": "#/paths/~1azure~1compute~1group~1%7BgroupId%7D/put/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/scaling/properties/up/items/allOf/0"
                                     },
                                     {
                                       "type": "object",
-                                      "properties": {
-                                        "policyName": {
-                                          "example": "cpuScaleDown"
+                                      "allOf": [
+                                        {
+                                          "$ref": "#/paths/~1azure~1compute~1group~1%7BgroupId%7D/put/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/scaling/properties/up/items/allOf/0"
                                         },
-                                        "threshold": {
-                                          "example": 0.25
-                                        },
-                                        "operator": {
-                                          "example": "lte"
-                                        },
-                                        "action": {
+                                        {
                                           "type": "object",
                                           "properties": {
-                                            "type": {
-                                              "type": "string",
-                                              "example": "adjustment",
-                                              "enum": [
-                                                "adjustment",
-                                                "updateCapacity"
-                                              ]
+                                            "policyName": {
+                                              "example": "cpuScaleDown"
+                                            },
+                                            "threshold": {
+                                              "example": 0.25
+                                            },
+                                            "operator": {
+                                              "example": "lte"
+                                            },
+                                            "action": {
+                                              "type": "object",
+                                              "properties": {
+                                                "type": {
+                                                  "type": "string",
+                                                  "example": "adjustment",
+                                                  "enum": [
+                                                    "adjustment",
+                                                    "updateCapacity"
+                                                  ]
+                                                }
+                                              }
                                             }
                                           }
                                         }
-                                      }
+                                      ]
                                     }
                                   ]
                                 }
@@ -31101,37 +30966,6 @@
             "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D/get/parameters/1"
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "type": "object",
-                    "title": "Group Deploy Object",
-                    "required": [
-                      "batchSizePercentage",
-                      "gracePeriod"
-                    ],
-                    "properties": {
-                      "batchSizePercentage": {
-                        "type": "integer",
-                        "example": 20,
-                        "description": "(in percentage) the batch size of the deployment, i.e.: how many instances to replace in each batch\n"
-                      },
-                      "gracePeriod": {
-                        "type": "integer",
-                        "example": 300,
-                        "description": "(in seconds) the time until an instance becomes healthy in the load balancer\n"
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Elastigroup Response",
@@ -31232,7 +31066,24 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/paths/~1gcp~1gce~1group~1%7BgroupId%7D~1roll/get/requestBody/content/application~1json/schema/allOf/0"
+                    "type": "object",
+                    "title": "Group Deploy Object",
+                    "required": [
+                      "batchSizePercentage",
+                      "gracePeriod"
+                    ],
+                    "properties": {
+                      "batchSizePercentage": {
+                        "type": "integer",
+                        "example": 20,
+                        "description": "(in percentage) the batch size of the deployment, i.e.: how many instances to replace in each batch\n"
+                      },
+                      "gracePeriod": {
+                        "type": "integer",
+                        "example": 300,
+                        "description": "(in seconds) the time until an instance becomes healthy in the load balancer\n"
+                      }
+                    }
                   }
                 ]
               }
