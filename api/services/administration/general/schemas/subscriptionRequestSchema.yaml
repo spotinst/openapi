@@ -7,13 +7,17 @@ properties:
     type: object
     description: |
       Object defining the subscription parameters
+    required:
+      - resourceId
+      - protocol
+      - endpoint
+      - eventType
     properties:
       resourceId:
         type: string
         example: sig-1234abcd
         description: |
           Spot Resource ID (Elastigroup ID, Ocean ID or Managed Instance ID)
-        required: true
       protocol:
         type: string
         enum: ["aws-sns", "email", "email-json", "web"]
@@ -24,14 +28,12 @@ properties:
           The following values are deprecated: http https
           You can use the generic web protocol instead.
           aws-sns is only supported with AWS provider
-        required: true
       endpoint:
         type: string
         example: YOUR@EMAIL.COM
         description: |
           The endpoint the notification will be sent to. url in case of http/https/web, email address in case of email/email-json and sns-topic-arn in case of aws-sns.
           For example: YOUR@EMAIL.COM or https://YOUR_ENDPOINT.COM or SNS_TOPIC_ARN
-        required: true
       eventType:
         enum: [ "AWS_EC2_INSTANCE_TERMINATE", "AWS_EC2_INSTANCE_TERMINATED", "AWS_EC2_INSTANCE_LAUNCH", "AWS_EC2_INSTANCE_READY_SIGNAL_TIMEOUT", "SIGNAL_TIMEOUT_SHUTDOWN_SCRIPT",
                 "AWS_EC2_CANT_SPIN_OD", "AWS_EC2_INSTANCE_UNHEALTHY_IN_ELB", "GROUP_ROLL_FAILED", "GROUP_ROLL_FINISHED", "CANT_SCALE_UP_GROUP_MAX_CAPACITY", "GROUP_UPDATED",
@@ -41,7 +43,6 @@ properties:
         example: AWS_EC2_INSTANCE_TERMINATE
         description: |
           The event to send the notification when triggered.
-        required: true
       eventFormat:
         type: object
         description: |
