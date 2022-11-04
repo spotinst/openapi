@@ -1,50 +1,61 @@
 type: object
 description: >
   List of filters. The Instance types that match with all filters compose the Ocean's whitelist parameter. 
-  Cannot be configured if a whitelist or a blacklist is configured.
-#  todo guy barman consider alter last sentence configured x2
+  Cannot be configured together with whitelist/blacklist.
+#  todo guy barman consider alter last sentence configured x2 - done
 title: InstanceTypesFilters
 properties:
   minVcpu:
     type: integer
     description: |
-      Minimum number of vCPU.
+      Minimum number of vcpus available.
     example: 2
   maxVcpu:
     type: integer
     description: |
-      Maximum number of vCPU.
+      Maximum number of vcpus available.
     example: 16
   minMemoryGiB:
     type: double
     description: |
-      Minimum size of Memory (GiB).
+      Minimum amount of Memory (GiB).
     example: 10
   maxMemoryGiB:
     type: double
     description: |
-      Maximum size of Memory (GiB).
+      Maximum amount of Memory (GiB).
     example: 16
+  minGpu:
+    type: integer
+    description: |
+      Minimum total number of GPUs.
+    example: 0
+  maxGpu:
+    type: integer
+    description: |
+      Maximum total number of GPUs.
+    example: 4
   includeFamilies:
     type: array
     description: >
-      All the families that an instance type must belong to one of (asterisk wildcard is also supported).
-    #  todo guy barman families add what kind
+      The filtered instance types will belong to one of the instances families in this list (asterisk wildcard is also supported).
+    #  todo guy barman families add what kind - done
     items:
       type: string
     example: [ "c5*", "g5"]
   excludeFamilies:
     type: array
     description: >
-      All the families that an instance type must not belong to (asterisk wildcard is also supported).
+      The filtered instance types must not belong to one of the instances families in this list (asterisk wildcard is also supported).
     items:
       type: string
     example: [ "t2", "R4*"]
   excludeMetal:
     type: boolean
-    #  todo guy barman add default
+    default: false
+    #  todo guy barman add default - done
     description: |
-      Determine whether Metal instance types are allowed or disallowed (false by default).
+      Determines whether Metal instance types are allowed or disallowed.
     example: true
   isEnaSupported:
     type: boolean
@@ -55,7 +66,7 @@ properties:
     type: array
     description: |
       The filtered instance types will support at least one of the architectures from this list.
-    # todo guy barman
+    # todo guy barman - done
       # The filtered instance types will support at least one of the architectures from this list.
       # A list of architectures. The filtered instance type will support at least one of the chosen/given architectures.
       # A list of architectures. A filtered instance type must support the chosen architectures.
@@ -67,15 +78,15 @@ properties:
   virtualizationTypes:
     type: array
     description: |
-      All the virtualization types that an instance type must support one of.
+      The filtered instance types will support at least one of the virtualization types from this list.
     items:
       type: string
-      enum: [ hvm, paravirtual4 ]
+      enum: [ hvm, paravirtual ]
     example: [ "hvm" ]
   categories:
     type: array
     description: |
-      All the categories types that an instance must belong to one of.
+      The filtered instance types will belong to one of the categories types from this list.
     items:
       type: string
       enum: [ Accelerated_computing, Compute_optimized, General_purpose, Memory_optimized, Storage_optimized]
@@ -88,7 +99,7 @@ properties:
   diskTypes:
     type: array
     description: |
-      All the disk types that an instance must have.
+      The filtered instance types will have one of the disk type from this list.
     # todo guy barman ?
     items:
       type: string
@@ -97,10 +108,10 @@ properties:
   minNetworkPerformance:
     type: integer
     description: |
-      Minimum Bandwidth in Gib/s of network performance
+      Minimum Bandwidth in Gib/s of network performance.
     example: 2
   maxNetworkPerformance:
     type: integer
     description: |
-      Maximum Bandwidth in Gib/s of network performance
+      Maximum Bandwidth in Gib/s of network performance.
     example: 20
