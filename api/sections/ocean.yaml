@@ -1,0 +1,314 @@
+openapi: "3.0.0"
+info:
+  version: "1.0"
+  description: |
+    Welcome to the Spot by NetApp OpenAPI Specification.
+    Here you will find REST definitions for all Spot products and platform administration tasks.
+
+    The API is hosted at `https://api.spotinst.io` and requires Bearer Token
+    Authentication.
+
+    For more information on how to use the Spot platform, including user guides,
+    developer guides, concepts, and tutorials, see the external [Spot Documentation](https://docs.spot.io/).
+  title: Spot by NetApp API
+  x-logo:
+    url: https://docs.spot.io/_media/images/spot.png
+    altText: SpotByNetAppLogo
+    href: https://docs.spot.io/api
+  contact:
+    email: support@spot.io
+externalDocs:
+  url: https://docs.spot.io/
+servers:
+  - url: https://api.spotinst.io
+security:
+  - auth: [ ]
+
+components:
+  securitySchemes:
+    auth:
+      $ref: ../commons/security.yaml#/components/securitySchemes/BearerAuth
+
+tags:
+  - name: Ocean AWS
+    description: Ocean - Serverless containers for Amazon Web Services (AWS)
+    externalDocs:
+      description: Ocean Concepts and Tutorials
+      url: https://docs.spot.io/ocean/
+
+  - name: Ocean ECS
+    description: Ocean - Serverless containers for Amazon Elastic Container Service (ECS)
+    externalDocs:
+      description: Ocean Concepts and Tutorials
+      url: https://docs.spot.io/ocean/
+
+  - name: Ocean GKE
+    description: Ocean - Serverless containers for Google Kubernetes Engine
+    externalDocs:
+      description: Ocean Concepts and Tutorials
+      url: https://docs.spot.io/ocean/
+
+  - name: Ocean AKS
+    description: Ocean - Serverless containers for Azure Kubernetes Service
+    externalDocs:
+      description: Ocean Concepts and Tutorials
+      url: https://docs.spot.io/ocean/
+
+  - name: Ocean On-Premise
+    description: Ocean On-Premise API - Understand cost drivers within your on-premise clusters and compare the costs to the Ocean Cloud.
+    externalDocs:
+      description: Ocean Concepts and Tutorials
+      url: https://docs.spot.io/ocean/
+
+  - name: Ocean Insights
+    description: |
+      Insights allows Spot users on AWS to connect a Kubernetes cluster and within minutes get the cluster analyzed with insights
+      about the current state of infrastructure in the cluster, and the potential effect of migrating the specific cluster into Ocean.
+      Through its powerful features, Ocean presents significant opportunities for infrastructure optimization and automation, which are on display in the Insights console.
+      Connected to Kubernetes clusters and running a continuous analysis, Ocean Insights delivers a holistic picture of your cluster and workloads behavior, from expected cloud costs and resource utilization.
+      Through a simple UI, users will see a breakdown of potential savings when they first connect to Ocean Insights.
+    externalDocs:
+      description: Ocean Insights
+      url: https://docs.spot.io/ocean-insights/
+  - name: Ocean CD
+    description: |
+      Ocean CD is a fully managed continuous delivery ('CD') solution for Kubernetes applications. Designed for end-to-end automation and verification of frequent application-deployment processes at scale.
+      Ocean CD architecture and API enable a simple and secured installation that seamlessly fits into any Kubernetes environment. Users get key features like granular visibility, SaaS logic that manage the rollout process, verifications of the applied workloads and automatic rollbacks.
+      To enable Ocean CD, install the controller with one simple command in the Kubernetes cluster and create the following entities using the API:
+      * Strategy
+      * Rollout Spec
+
+    externalDocs:
+      description: Ocean CD
+      url: https://docs.spot.io/ocean-cd/
+
+  - name: Ocean Spark
+    description: |
+      Ocean for Apache Spark is a managed cloud-native Spark platform that can be deployed in your cloud account.
+
+      Running on top of Ocean, Spot’s serverless infrastructure engine for containers, Ocean Spark makes it easy for your data teams to be successful with Apache Spark on Kubernetes, without dealing with the complexity of managing servers.
+
+    externalDocs:
+      description: Ocean Spark
+      url: https://docs.spot.io/ocean-spark/
+
+x-tagGroups:
+  - name: Ocean
+    tags:
+      - Ocean AWS
+      - Ocean ECS
+      - Ocean GKE
+      - Ocean AKS
+      - Ocean On-Premise
+      - Ocean Insights
+      - Ocean CD
+      - Ocean Spark
+
+paths:
+  /ocean/aws/ecs/cluster:
+    $ref: ../services/ocean/ecs/paths/clusters.yaml
+  /ocean/aws/ecs/cluster/{oceanClusterId}:
+    $ref: ../services/ocean/ecs/paths/cluster.yaml
+  /ocean/aws/ecs/cluster/{EcsClusterName}/import:
+    $ref: ../services/ocean/ecs/paths/cluster-import.yaml
+  /ocean/aws/ecs/cluster/{oceanClusterId}/log:
+    $ref: ../services/ocean/ecs/paths/clusterFetchElastilog.yaml
+  /ocean/aws/ecs/cluster/{oceanClusterId}/rightSizing/suggestion:
+    $ref: ../services/ocean/ecs/paths/right-sizing-recommend.yaml
+  /ocean/aws/ecs/cluster/import:
+    $ref: ../services/ocean/ecs/paths/upgrade-from-eg.yaml
+  /ocean/aws/ecs/cluster/{oceanClusterId}/roll:
+    $ref: ../services/ocean/ecs/paths/cluster-rolls.yaml
+  /ocean/aws/ecs/cluster/{oceanClusterId}/roll/{ROLL_ID}:
+    $ref: ../services/ocean/ecs/paths/cluster-roll.yaml
+  /ocean/aws/ecs/cluster/{oceanClusterId}/containerInstances:
+    $ref: ../services/ocean/ecs/paths/cluster-container-instances.yaml
+  /ocean/aws/ecs/launchSpec:
+    $ref: ../services/ocean/ecs/paths/cluster-launchSpecs.yaml
+  /ocean/aws/ecs/launchSpec/{oceanLaunchSpecId}:
+    $ref: ../services/ocean/ecs/paths/cluster-launchSpec.yaml
+  /ocean/aws/ecs/cluster/{oceanClusterId}/fargateMigration:
+    $ref: ../services/ocean/ecs/paths/fargate-import-to-exist.yaml
+  /ocean/aws/ecs/cluster/{oceanClusterId}/fargateMigration/serviceDiscovery:
+    $ref: ../services/ocean/ecs/paths/fargate-service-discovery.yaml
+  /ocean/aws/ecs/cluster/{oceanClusterId}/fargateMigration/status:
+    $ref: ../services/ocean/ecs/paths/fargate-migration-status.yaml
+  /ocean/aws/ecs/cluster/fargate/import:
+    $ref: ../services/ocean/ecs/paths/fargate-import-to-new.yaml
+  /ocean/aws/k8s/cluster:
+    $ref: ../services/ocean/aws/paths/clusters.yaml
+  /ocean/aws/k8s/cluster/{oceanClusterId}:
+    $ref: ../services/ocean/aws/paths/cluster.yaml
+  /ocean/k8s/cluster/{oceanClusterId}/controllerHeartbeat:
+    $ref: ../services/ocean/aws/paths/controllerHeartbeat.yaml
+  /ocean/aws/k8s/cluster/{clusterIdentifier}/log:
+    $ref: ../services/ocean/aws/paths/clusterFetchElastilog.yaml
+  /ocean/aws/k8s/cluster/autoScalingGroup/import:
+    $ref: ../services/ocean/aws/paths/importASG.yaml
+  /ocean/aws/k8s/cluster/{oceanClusterId}/rightSizing/suggestion:
+    $ref: ../services/ocean/aws/paths/rightSizing.yaml
+  /ocean/aws/k8s/cluster/{oceanClusterId}/loadBalancer/attach:
+    $ref: ../services/ocean/aws/paths/cluster-attachLb.yaml
+  /ocean/aws/k8s/cluster/{oceanClusterId}/loadBalancer/detach:
+    $ref: ../services/ocean/aws/paths/cluster-detachLb.yaml
+  /mcs/kubernetes/cluster/{clusterIdentifier}/costs:
+    $ref: ../services/ocean/aws/paths/clusterCosts.yaml
+  /mcs/ecs/cluster/{clusterName}/costs:
+    $ref: ../services/ocean/ecs/paths/cluster-costs.yaml
+  /ocean/aws/k8s/cluster/import:
+    $ref: ../services/ocean/aws/paths/upgradeElastigroupToOcean.yaml
+  /ocean/aws/k8s/cluster/{oceanClusterId}/roll:
+    $ref: ../services/ocean/aws/paths/clusters-roll.yaml
+  /ocean/aws/k8s/cluster/{oceanClusterId}/roll/{ROLL_ID}:
+    $ref: ../services/ocean/aws/paths/cluster-roll.yaml
+  /ocean/aws/k8s/cluster/{oceanClusterId}/nodes:
+    $ref: ../services/ocean/aws/paths/cluster-nodes.yaml
+  /ocean/aws/k8s/cluster/{oceanClusterId}/detachInstances:
+    $ref: ../services/ocean/aws/paths/detachInstances.yaml
+  /ocean/aws/k8s/cluster/{oceanClusterId}/aggregatedCosts:
+    $ref: ../services/ocean/aws/paths/cluster-aggregated-costs.yaml
+  /ocean/aws/k8s/launchSpec:
+    $ref: ../services/ocean/aws/paths/clusters-launchSpec.yaml
+  /ocean/aws/k8s/launchSpec/{oceanLaunchSpecId}:
+    $ref: ../services/ocean/aws/paths/cluster-launchSpec.yaml
+  /ocean/aws/k8s/launchSpec/autoScalingGroup/import:
+    $ref: ../services/ocean/aws/paths/importASG-launchSpec.yaml
+  /ocean/aws/k8s/launchSpec/eksNodeGroup/import:
+    $ref: ../services/ocean/aws/paths/importEksNodeGroup-launchSpec.yaml
+  /ocean/onPrem/k8s/cluster:
+    $ref: ../services/ocean/onpremise/paths/clusters.yaml
+  /ocean/onPrem/k8s/cluster/{oceanClusterId}:
+    $ref: ../services/ocean/onpremise/paths/cluster.yaml
+  /ocean/gcp/k8s/cluster:
+    $ref: ../services/ocean/gke/paths/clusters.yaml
+  /ocean/gcp/k8s/cluster/{oceanClusterId}:
+    $ref: ../services/ocean/gke/paths/cluster.yaml
+  /ocean/gcp/k8s/cluster/{oceanClusterId}/reImport:
+    $ref: ../services/ocean/gke/paths/reImport.yaml
+  /ocean/gcp/k8s/cluster/{oceanClusterId}/log:
+    $ref: ../services/ocean/gke/paths/clusterFetchElastilog.yaml
+  /ocean/gcp/k8s/cluster/{oceanClusterId}/rightSizing/suggestion:
+    $ref: ../services/ocean/gke/paths/rightSizing.yaml
+  #    $ref: ../services/ocean/gke/paths/rightSizingLegacy.yaml - deprecated
+  /ocean/gcp/k8s/launchSpec:
+    $ref: ../services/ocean/gke/paths/clusters-launchSpec.yaml
+  /ocean/gcp/k8s/launchSpec/import:
+    $ref: ../services/ocean/gke/paths/clusters-launchSpec-import.yaml
+  /ocean/gcp/k8s/launchSpec/{oceanLaunchSpecId}:
+    $ref: ../services/ocean/gke/paths/cluster-launchSpec.yaml
+  /ocean/gcp/k8s/cluster/{oceanClusterId}/roll:
+    $ref: ../services/ocean/gke/paths/clusters-roll.yaml
+  /ocean/gcp/k8s/cluster/{oceanClusterId}/roll/{ROLL_ID}:
+    $ref: ../services/ocean/gke/paths/cluster-roll.yaml
+  /ocean/gcp/k8s/cluster/{oceanClusterId}/nodes:
+    $ref: ../services/ocean/gke/paths/cluster-nodes.yaml
+  /ocean/gcp/k8s/cluster/import:
+    $ref: ../services/ocean/gke/paths/upgradeElastigroupToOcean.yaml
+  /ocean/gcp/k8s/cluster/gke/import:
+    $ref: ../services/ocean/gke/paths/clusters-import.yaml
+  /ocean/gcp/k8s/launchSpec/{oceanLaunchSpecId}/launchNodes:
+    $ref: ../services/ocean/gke/paths/cluster-launchSpec-launchNodes.yaml
+  /ocean/azure/k8s/cluster:
+    $ref: ../services/ocean/aks/paths/clusters.yaml
+  /ocean/azure/k8s/cluster/{oceanClusterId}:
+    $ref: ../services/ocean/aks/paths/cluster.yaml
+  /ocean/azure/k8s/cluster/{oceanClusterId}/roll:
+    $ref: ../services/ocean/aks/paths/cluster-rolls.yaml
+  /ocean/azure/k8s/cluster/{oceanClusterId}/roll/{clusterRollId}:
+    $ref: ../services/ocean/aks/paths/cluster-roll.yaml
+  /ocean/azure/k8s/cluster/{oceanClusterId}/nodes:
+    $ref: ../services/ocean/aks/paths/cluster-nodes.yaml
+  /ocean/azure/k8s/cluster/aks/import/{acdIdentifier}:
+    $ref: ../services/ocean/aks/paths/importCluster.yaml
+  /ocean/azure/k8s/cluster/{oceanClusterId}/detachVms:
+    $ref: ../services/ocean/aks/paths/oceanDetachVms.yaml
+  /ocean/azure/k8s/virtualNodeGroup:
+    $ref: ../services/ocean/aks/paths/virtualNodeGroups.yaml
+  /ocean/azure/k8s/virtualNodeGroup/{virtualNodeGroupId}:
+    $ref: ../services/ocean/aks/paths/virtualNodeGroup.yaml
+  /ocean/azure/k8s/virtualNodeGroup/{virtualNodeGroupId}/launchVms:
+    $ref: ../services/ocean/aks/paths/virtualNodeGroupLaunch.yaml
+  /ocean/azure/k8s/cluster/{oceanClusterId}/rightSizing/suggestion:
+    $ref: ../services/ocean/aks/paths/rightSizing.yaml
+  /ocean/azure/k8s/cluster/{oceanClusterId}/log:
+    $ref: ../services/ocean/aks/paths/clusterFetchElastilog.yaml
+  /ocean/aws/k8s/launchSpec/{oceanLaunchSpecId}/launchNodes:
+    $ref: ../services/ocean/aws/paths/cluster-launchSpec-launchNodes.yaml
+  /ocean/aws/ecs/launchSpec/{oceanLaunchSpecId}/launchContainerInstances:
+    $ref: ../services/ocean/ecs/paths/cluster-launchSpec-launchContainerInstances.yaml
+  /ocean/k8s/extendedResourceDefinition:
+    $ref: ../services/ocean/commons/paths/extendedResourceDefinitions.yaml
+  /ocean/k8s/extendedResourceDefinition/{oceanExtendedResourceDefinitionId}:
+    $ref: ../services/ocean/commons/paths/extendedResourceDefinition.yaml
+  /ocean/insights/k8s/cluster:
+    $ref: ../services/ocean/oceanInsights/paths/clusters.yaml
+  /ocean/insights/k8s/cluster/{OCEAN_INSIGHT_ID}:
+    $ref: ../services/ocean/oceanInsights/paths/cluster.yaml
+  /ocean/cd/cluster:
+    $ref: ../services/ocean/cd/paths/clusters.yaml
+  /ocean/cd/cluster/{clusterId}:
+    $ref: ../services/ocean/cd/paths/cluster.yaml
+  /ocean/cd/verificationProvider:
+    $ref: ../services/ocean/cd/paths/verificationProviders.yaml
+  /ocean/cd/verificationProvider/{name}:
+    $ref: ../services/ocean/cd/paths/verificationProvider.yaml
+  /ocean/cd/verificationTemplate:
+    $ref: ../services/ocean/cd/paths/verificationTemplates.yaml
+  /ocean/cd/verificationTemplate/{name}:
+    $ref: ../services/ocean/cd/paths/verificationTemplate.yaml
+  /ocean/cd/strategy:
+    $ref: ../services/ocean/cd/paths/strategies.yaml
+  /ocean/cd/strategy/{strategyName}:
+    $ref: ../services/ocean/cd/paths/strategy.yaml
+  /ocean/cd/rolloutSpec:
+    $ref: ../services/ocean/cd/paths/rolloutSpecs.yaml
+  /ocean/cd/rolloutSpec/{rolloutSpecName}:
+    $ref: ../services/ocean/cd/paths/rolloutSpec.yaml
+  /ocean/cd/rollout/{rolloutId}:
+    $ref: ../services/ocean/cd/paths/rollout.yaml
+  /ocean/cd/rollout:
+    $ref: ../services/ocean/cd/paths/rollouts.yaml
+  /ocean/cd/rollout/{rolloutId}/status:
+    $ref: ../services/ocean/cd/paths/rolloutStatus.yaml
+  /ocean/spark/cluster:
+    $ref: ../services/ocean/spark/paths/clusters.yaml
+  /ocean/spark/cluster/{clusterId}:
+    $ref: ../services/ocean/spark/paths/cluster.yaml
+  /ocean/spark/cluster/{clusterId}/appCompletionTrend:
+    $ref: ../services/ocean/spark/paths/clusterAppCompletionTrend.yaml
+  /ocean/spark/cluster/{clusterId}/appLoadHistory:
+    $ref: ../services/ocean/spark/paths/clusterAppLoadHistory.yaml
+  /ocean/spark/cluster/{clusterId}/statistics:
+    $ref: ../services/ocean/spark/paths/clusterStatistics.yaml
+  /ocean/spark/app:
+    $ref: ../services/ocean/spark/paths/applications.yaml
+  /ocean/spark/cluster/{clusterId}/app:
+    $ref: ../services/ocean/spark/paths/clusterApplications.yaml
+  /ocean/spark/cluster/{clusterId}/app/{applicationId}:
+    $ref: ../services/ocean/spark/paths/clusterApplication.yaml
+  /ocean/spark/cluster/{clusterId}/app/{applicationId}/issues:
+    $ref: ../services/ocean/spark/paths/clusterApplicationIssues.yaml
+  /ocean/spark/cluster/{clusterId}/app/{applicationId}/log/live:
+    $ref: ../services/ocean/spark/paths/clusterApplicationLogsLive.yaml
+  /ocean/spark/cluster/{clusterId}/app/{applicationId}/log/archive:
+    $ref: ../services/ocean/spark/paths/clusterApplicationLogsArchive.yaml
+  /ocean/spark/cluster/{clusterId}/app/{applicationId}/executor-log/archive:
+    $ref: ../services/ocean/spark/paths/clusterApplicationExecutorLogsArchive.yaml
+  /ocean/spark/cluster/{clusterId}/app/{applicationId}/kubeEvent/live:
+    $ref: ../services/ocean/spark/paths/clusterApplicationKubeEventsLive.yaml
+  /ocean/spark/configTemplate:
+    $ref: ../services/ocean/spark/paths/configTemplates.yaml
+  /ocean/spark/cluster/{clusterId}/configTemplate:
+    $ref: ../services/ocean/spark/paths/clusterConfigTemplates.yaml
+  /ocean/spark/cluster/{clusterId}/configTemplate/{configTemplateId}:
+    $ref: ../services/ocean/spark/paths/clusterConfigTemplate.yaml
+  /ocean/spark/job:
+    $ref: ../services/ocean/spark/paths/jobs.yaml
+  /ocean/spark/cluster/{clusterId}/job:
+    $ref: ../services/ocean/spark/paths/clusterJobs.yaml
+  /ocean/spark/cluster/{clusterId}/job/{jobId}:
+    $ref: ../services/ocean/spark/paths/clusterJob.yaml
+  /ocean/spark/cluster/{clusterId}/job/{jobId}/config:
+    $ref: ../services/ocean/spark/paths/jobConfig.yaml
+  /ocean/spark/cluster/{clusterId}/virtualNodeGroup:
+    $ref: ../services/ocean/spark/paths/virtualNodeGroup.yaml
