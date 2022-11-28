@@ -1,53 +1,67 @@
 type: object
-title: Ocean CD Verification CloufWatch Metric
+title: Ocean CD Verification CloudWatch Metric
 properties:
   duration:
     type: string
     example: 1m
   metricDataQueries:
     type: array
+    description: The metric queries to be returned. A single MetricData call can include as many as 500 MetricDataQuery structures. Each of these structures can specify either a metric to retrieve, a Metrics Insights query, or a math expression to perform on retrieved data.
     items:
+      required:
+        -id
       type: object
       properties:
         id:
           type: string
-        expression:
-          type: string
-        label:
-          type: string
+          description: The response ID. must be unique and not null. This object can contain characters, letters, numbers and underscore. The first letter must be a lowercase letter.
         metricStat:
           type: object
+          description: The metric to be returned, along with statistics, period, and units. Use this parameter only if this object is retrieving a metric and not performing a math expression on returned data. WITHIN ONE METRICDATAQUERY OBJECT, YOU MUST SPECIFY EITHER EXPRESSION OR METRICSTAT BUT NOT BOTH.
           properties:
             metric:
+              required:
+                -metricName
               type: object
+              description: The metric to return, including the metric name, namespace, and dimensions.
               properties:
+                metricName:
+                  type: string
+                  description: The name of the metric.
+                namespace:
+                  type: string
+                  description: The namespace of the metric.
                 dimensions:
                   type: array
+                  description: A dimension is a name/value pair that is part of the identity of a metric. Because dimensions are part of the unique identifier for a metric, whenever you add a unique name/value pair to one of your metrics, you are creating a new variation of that metric. You can assign up to 30 dimensions to a metric.
                   items:
                     type: object
                     properties:
                       name:
                         type: string
-                        example: "name"
+                        description: The name of the dimensions. These names must contain only ASCII characters, must include at least one non-whitespace character, and cannot start with a colon(':')
                       value:
                         type: string
-                        example: "value"
-                metricName:
-                  type: string
-                  example: "metricName"
-                namespace:
-                  type: string
-                  example: "namespace"
-            expression:
-              type: string
+                        description: The value of the dimensions. These values must contain only ASCII characters and must include at least one non-whitespace character.
             period:
               type: integer
+              description: The granularity, in seconds, of the returned data points. For metrics with regular resolution, a period can be as short as one minute (60 seconds) and must be a multiple of 60. For high-resolution metrics that are collected at intervals of less than one minute, the period can be 1, 5, 10, 30, 60, or any multiple of 60. High-resolution metrics are those metrics stored by a PutMetricData call that includes a StorageResolution of 1 second.
             stat:
               type: string
+              description: The statistic to return. It can include any CloudWatch statistic or extended statistic.
             unit:
               type: string
-        period:
-          type: integer
+              description: This defines what unit you want to use when storing the metric.
+              enum: [Seconds, Microseconds, Milliseconds,Bytes,Kilobytes,Megabytes,Gigabytes,Terabytes,Bits,Kilobits,Megabits,Gigabits,Terabits,Percent,Count,Bytes/Second,Kilobytes/Second,Megabytes/Second,Gigabytes/Second,Terabytes/Second,Bits/Second,Kilobits/Second,Megabits/Second,Gigabits/Second,Terabits/Second,Count/Second,None]
+        expression:
+          type: string
+          description: This field can contain either a Metrics Insights query, or a metric math expression to be performed on the returned data. WITHIN ONE METRICDATAQUERY OBJECT, YOU MUST SPECIFY EITHER EXPRESSION OR METRICSTAT BUT NOT BOTH.
+        label:
+          type: string
+          description: A human-readable label for this metric or expression. This is especially useful if this is an expression, so that you know what the value represents. If the metric or expression is shown in a CloudWatch dashboard widget, the label is shown. If Label is omitted, CloudWatch generates a default.
         returnData:
           type: boolean
-
+          description: This option indicates whether to return the timestamps and raw data values of this metric. If you are performing this call just to do math expressions and do not also need the raw data returned, you can specify False . If you omit this, the default of True is used.
+        period:
+          type: integer
+          description: The granularity, in seconds, of the returned data points. For metrics with regular resolution, a period can be as short as one minute (60 seconds) and must be a multiple of 60. For high-resolution metrics that are collected at intervals of less than one minute, the period can be 1, 5, 10, 30, 60, or any multiple of 60. High-resolution metrics are those metrics stored by a PutMetricData call that includes a StorageResolution of 1 second.
