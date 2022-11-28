@@ -53,7 +53,7 @@ properties:
       type: string
       example: "1"
   preferredZone:
-    type: String
+    type: string
     description: |
       The AZ to prioritize when launching VMs.
       * If no markets are available in the Preferred AZ, VMs will be launched in the non-preferred AZs.
@@ -459,7 +459,7 @@ properties:
                 Tag value for all resources.
                 * Maximum length of 512 characters.
               example: "staging"
-        max: 44
+        maximum: 44
       managedServiceIdentities:
         type: array
         writeOnly: true
@@ -498,11 +498,9 @@ properties:
               type: string
               description: |
                 Required on compute.launchSpecification.extensions object
-              required: true
               example: "extensionName"
             type:
               type: string
-              required: true
               description: |
                 Required on compute.launchSpecification.extensions object
               example: "customScript"
@@ -510,7 +508,6 @@ properties:
               type: string
               description: |
                 Required on compute.launchSpecification.extensions object
-              required: true
               example: "Microsoft.Azure.Extensions"
             apiVersion:
               type: string
@@ -519,7 +516,6 @@ properties:
               example: "2.0"
             minorVersionAutoUpgrade:
               type: boolean
-              required: true
               description: |
                 Required on compute.launchSpecification.extensions object
               example: true
@@ -560,8 +556,8 @@ properties:
                 The type of the data disk.
               enum: [ Standard_LRS, Premium_LRS, StandardSSD_LRS, UltraSSD_LRS ]
               example: "Standard_LRS"
-        min: 0
-        max: 4
+        minimum: 0
+        maximum: 4
       osDisk:
         type: object
         description: |
@@ -603,30 +599,28 @@ properties:
               properties:
                 resourceGroupName:
                   type: string
-                  required: true
                   description: |
                     The resource group name of the key vault
                 name:
                   type: string
-                  required: true
                   description: |
                     The name of the key vault
             vaultCertificates:
               type: array
-              required: true
               description: |
                 The required certificate references
               items:
                 type: object
+                required:
+                  - certificateUrl
+                  - certificateStore
                 properties:
                   certificateUrl:
                     type: string
-                    required: true
                     description: |
                       The URL of the certificate under the key vault
                   certificateStore:
                     type: string
-                    required: true
                     description: |
                       The certificate store directory the VM. The directory is created in the LocalMachine account.
                       * This field is required only when using windows OS type
@@ -641,13 +635,11 @@ properties:
         properties:
           isEnabled:
             type: boolean
-            required: true
             description:
               "Allows you to enable and disable the configuration of boot diagnostics at launch"
             example: true
           type:
             type: string
-            required: true
             description: Defines the storage type on VM launch  in Azure.
             enum: [ managed, unmanaged ]
             example: managed
@@ -659,5 +651,11 @@ properties:
               * StorageUri is required if the type is unmanaged.
               * StorageUri must be ‘null’ in case the boot diagnostics type is managed.
             example: "https://example.blob.core.windows.net/"
-
+      licenseType:
+        type: string
+        description: |
+          Specify an existing Azure license type to use when launching new VMs.
+          * Valid values for Windows OS: "Windows_Server", "Windows_Client"
+          * Valid values for Linux OS: "RHEL_BYOS", "SLES_BYOS"
+        example: "Windows_Client"
 
