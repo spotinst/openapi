@@ -37342,6 +37342,375 @@
         }
       }
     },
+    "/ocean/aws/k8s/cluster/{oceanClusterId}/instanceTypeFiltersSimulation": {
+      "post": {
+        "summary": "Instance Types Filters Simulation",
+        "description": "Returns all instances types that match the given filters. These instance types will be used if the cluster is configured with these filters.\n",
+        "operationId": "oceanAwsInstanceTypeFiltersSimulation",
+        "tags": [
+          "Ocean AWS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          },
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "filters"
+                    ],
+                    "properties": {
+                      "filters": {
+                        "type": "object",
+                        "description": "List of filters. The Instance types that match with all filters compose the Ocean's whitelist parameter.  Cannot be configured together with whitelist/blacklist.\n",
+                        "title": "InstanceTypesFilters",
+                        "properties": {
+                          "minVcpu": {
+                            "type": "integer",
+                            "description": "Minimum number of vcpus available.\n",
+                            "minimum": 0,
+                            "example": 2
+                          },
+                          "maxVcpu": {
+                            "type": "integer",
+                            "description": "Maximum number of vcpus available.\n",
+                            "minimum": 1,
+                            "example": 16
+                          },
+                          "minMemoryGiB": {
+                            "type": "double",
+                            "description": "Minimum amount of Memory (GiB).\n",
+                            "minimum": 0,
+                            "example": 8
+                          },
+                          "maxMemoryGiB": {
+                            "type": "double",
+                            "description": "Maximum amount of Memory (GiB).\n",
+                            "minimum": 0,
+                            "example": 16
+                          },
+                          "minGpu": {
+                            "type": "integer",
+                            "description": "Minimum total number of GPUs.\n",
+                            "minimum": 0,
+                            "example": 0
+                          },
+                          "maxGpu": {
+                            "type": "integer",
+                            "description": "Maximum total number of GPUs.\n",
+                            "minimum": 1,
+                            "example": 4
+                          },
+                          "includeFamilies": {
+                            "type": "array",
+                            "description": "Types belonging to a family from the IncludeFamilies will be available for scaling (asterisk wildcard is also supported). For example, C* will include instance types from these families: c5, c4, c4a, etc.\n",
+                            "items": {
+                              "type": "string"
+                            },
+                            "example": [
+                              "c5*",
+                              "g5"
+                            ]
+                          },
+                          "excludeFamilies": {
+                            "type": "array",
+                            "description": "Types belonging to a family from the ExcludeFamilies will not be available for scaling (asterisk wildcard is also supported). For example, C* will exclude instance types from these families: c5, c4, c4a, etc.\n",
+                            "items": {
+                              "type": "string"
+                            },
+                            "example": [
+                              "t2",
+                              "R4*"
+                            ]
+                          },
+                          "excludeMetal": {
+                            "type": "boolean",
+                            "default": false,
+                            "description": "In case excludeMetal is set to true, metal types will not be available for scaling.\n",
+                            "example": true
+                          },
+                          "isEnaSupported": {
+                            "type": "boolean",
+                            "description": "Ena is supported or not.\n",
+                            "example": true
+                          },
+                          "architectures": {
+                            "type": "array",
+                            "description": "The filtered instance types will support at least one of the architectures from this list.\n",
+                            "items": {
+                              "type": "string",
+                              "enum": [
+                                "i386",
+                                "x86_64",
+                                "arm64"
+                              ]
+                            },
+                            "example": [
+                              "i386",
+                              "x86_64"
+                            ]
+                          },
+                          "virtualizationTypes": {
+                            "type": "array",
+                            "description": "The filtered instance types will support at least one of the virtualization types from this list.\n",
+                            "items": {
+                              "type": "string",
+                              "enum": [
+                                "hvm",
+                                "paravirtual"
+                              ]
+                            },
+                            "example": [
+                              "hvm"
+                            ]
+                          },
+                          "categories": {
+                            "type": "array",
+                            "description": "The filtered instance types will belong to one of the categories types from this list.\n",
+                            "items": {
+                              "type": "string",
+                              "enum": [
+                                "Accelerated_computing",
+                                "Compute_optimized",
+                                "General_purpose",
+                                "Memory_optimized",
+                                "Storage_optimized"
+                              ]
+                            },
+                            "example": [
+                              "Accelerated_computing",
+                              "Compute_optimized"
+                            ]
+                          },
+                          "minEnis": {
+                            "type": "integer",
+                            "description": "Minimum number of network interfaces (ENIs).\n",
+                            "minimum": 0,
+                            "example": 2
+                          },
+                          "diskTypes": {
+                            "type": "array",
+                            "description": "The filtered instance types will have one of the disk type from this list.\n",
+                            "items": {
+                              "type": "string",
+                              "enum": [
+                                "NVMe",
+                                "EBS",
+                                "SSD",
+                                "HDD"
+                              ]
+                            },
+                            "example": [
+                              "NVMe",
+                              "EBS"
+                            ]
+                          },
+                          "hypervisor": {
+                            "type": "array",
+                            "description": "The filtered instance types will have a hypervisor type from this list.\n",
+                            "items": {
+                              "type": "string",
+                              "enum": [
+                                "nitro",
+                                "xen"
+                              ]
+                            },
+                            "example": [
+                              "nitro"
+                            ]
+                          },
+                          "rootDeviceTypes": {
+                            "type": "array",
+                            "description": "The filtered instance types will have a root device types from this list.\n",
+                            "items": {
+                              "type": "string",
+                              "enum": [
+                                "ebs",
+                                "instance-store"
+                              ]
+                            },
+                            "example": [
+                              "ebs"
+                            ]
+                          },
+                          "minNetworkPerformance": {
+                            "type": "integer",
+                            "description": "Minimum Bandwidth in Gib/s of network performance.\n",
+                            "minimum": 0,
+                            "example": 2
+                          },
+                          "maxNetworkPerformance": {
+                            "type": "integer",
+                            "description": "Maximum Bandwidth in Gib/s of network performance.\n",
+                            "minimum": 1,
+                            "example": 20
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ocean Instance Types Filters Simulation Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/aws/k8s/cluster/o-abcd1234/instanceTypeFiltersSimulation"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "filteredInstanceTypes": {
+                                    "type": "array",
+                                    "description": "The simulated instance types.\n",
+                                    "items": {
+                                      "type": "string"
+                                    },
+                                    "example": [
+                                      "g5.xlarge",
+                                      "c5.2xlarge",
+                                      "c5ad.2xlarge",
+                                      "c5d.2xlarge",
+                                      "c5a.2xlarge"
+                                    ]
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:aws:k8s:instanceTypesFilters:simulation"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/aws/k8s/cluster/{oceanClusterId}/allowedInstanceTypes": {
+      "get": {
+        "summary": "Allowed Instance Types",
+        "description": "Return the list of the allowed Ocean cluster instance types.\n",
+        "operationId": "oceanAwsGetAllowedInstanceTypes",
+        "tags": [
+          "Ocean AWS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          },
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean Allowed Instance Types Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/aws/k8s/cluster/0-12345abc/allowedInstanceTypes"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "instanceTypes": {
+                                    "type": "array",
+                                    "description": "The allowed Ocean cluster instance types.\n",
+                                    "items": {
+                                      "type": "string"
+                                    },
+                                    "example": [
+                                      "c3.large",
+                                      "c5.large"
+                                    ]
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:aws:k8s:allowedInstanceTypes"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/ocean/aws/k8s/cluster/{oceanClusterId}/loadBalancer/attach": {
       "put": {
         "summary": "Attach Load Balancers",
@@ -38293,6 +38662,9 @@
                                     "r5.large",
                                     "r5.xlarge"
                                   ]
+                                },
+                                "filters": {
+                                  "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D~1instanceTypeFiltersSimulation/post/requestBody/content/application~1json/schema/allOf/0/properties/filters"
                                 }
                               }
                             },
