@@ -57,7 +57,7 @@ properties:
     properties:
       performAt:
         type: string
-        enum: [timeWindow, never, always]
+        enum: [ timeWindow, never, always ]
         description: |
           Settings for maintenance strategy.
           default: "always"
@@ -67,6 +67,19 @@ properties:
     items:
       type: string
     description: |
-      Valid format: "ddd:hh:mm-ddd:hh:mm (day:hour(0-23):minute(0-59))", not empty if revertToSpot.performAt = timeWindow
+      Defines the windows of which to revert to spot.
+      * <a style=color:red>Requires the following format: "ddd:hh:mm-ddd:hh:mm (day:hour(0-23):minute(0-59))".</a>
+      * <a style=color:red>Must be not empty if revertToSpot.performAt = timeWindow.</a>
     example:
       - "Mon:03:00-Wed:02:30"
+  odWindows:
+    type: array
+    items:
+      type: string
+    description: |
+      * Define the time windows in which the underlying VM will be set as an on-demand lifecycle type.
+      * During the entire time window, the rest of the strategy process will be paused.
+      * Switching between on-demand and Spot VM types at the enter/exit of the time window will trigger the recycling of the stateful node.
+      * <a style=color:red>Requires the following format: "ddd:hh:mm-ddd:hh:mm (day:hour(0-23):minute(0-59))".</a>
+    example:
+      - "Sun:23:00-Mon:02:30"
