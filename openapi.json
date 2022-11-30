@@ -59106,6 +59106,694 @@
         }
       }
     },
+    "/ocean/aws/k8s/cluster/{oceanId}/migration/discovery": {
+      "summary": "Ocean for AWS",
+      "get": {
+        "summary": "Get Migration Discovery",
+        "description": "Get information about nodes which can be migrated into Ocean.\n",
+        "operationId": "oceanAwsGetMigrationDiscovery",
+        "tags": [
+          "Ocean AWS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          },
+          {
+            "in": "query",
+            "name": "shouldFetchPods",
+            "example": "true",
+            "description": "Should fetch data about running pods for each node.\n",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Migration Discovery Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "ocean/aws/k8s/cluster/o-abcd1234/migration/discovery"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "title": "Workload migration discovery details",
+                                "type": "object",
+                                "properties": {
+                                  "instances": {
+                                    "type": "array",
+                                    "description": "List of information about available nodes which can be migrated to the Ocean cluster.",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "k8sNodeName": {
+                                          "type": "string",
+                                          "description": "The kubernetes node name.",
+                                          "example": "ip-111-11-11-111.us-west-1.compute.internal"
+                                        },
+                                        "asgName": {
+                                          "type": "string",
+                                          "description": "The ASG name the node belongs.",
+                                          "example": "asg-name"
+                                        },
+                                        "instanceId": {
+                                          "type": "string",
+                                          "description": "The instance id.",
+                                          "example": "i-asdfjk3989"
+                                        },
+                                        "launchSpecId": {
+                                          "type": "string",
+                                          "description": "The best match of Virtual Node Group to which the node could belong.",
+                                          "example": "ols-1234ascv"
+                                        },
+                                        "runningPods": {
+                                          "type": "integer",
+                                          "description": "The number of running pods on the node (appears if shouldFetchPods was true).",
+                                          "example": "6"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:aws:k8s:cluster:migration:discovery"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/aws/k8s/cluster/{oceanId}/migration": {
+      "summary": "Ocean for AWS",
+      "post": {
+        "summary": "Create Migration",
+        "description": "Create a migration for a given existing instances.\n",
+        "operationId": "oceanAwsPostMigration",
+        "tags": [
+          "Ocean AWS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "migration"
+                    ],
+                    "properties": {
+                      "migration": {
+                        "type": "object",
+                        "description": "Migration update configuration.\n",
+                        "required": [
+                          "instanceIds",
+                          "shouldTerminateDrainedNodes",
+                          "shouldEvictStandAlonePods",
+                          "forcePodEvictionOnPdbFailure",
+                          "batchSize"
+                        ],
+                        "properties": {
+                          "instanceIds": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "A list of instance ids that should be migrated to the Ocean cluster.",
+                            "example": [
+                              "i-a12345",
+                              "i-b12345"
+                            ]
+                          },
+                          "shouldTerminateDrainedNodes": {
+                            "type": "boolean",
+                            "example": true,
+                            "description": "Ocean will terminate the old instances once the pods that reside on them are migrated, and the old instances are fully drained.\n"
+                          },
+                          "shouldEvictStandAlonePods": {
+                            "type": "boolean",
+                            "example": true,
+                            "description": "Ocean will terminate pods that do not belong to a Kubernetes deployment. This means that you would need to launch the pod manually (after the migration) due to the fact that there is no object that would do it automatically.\n"
+                          },
+                          "forcePodEvictionOnPdbFailure": {
+                            "type": "boolean",
+                            "example": true,
+                            "description": "Ocean will force the Pod eviction from the instance, even if the distributed budget is not satisfied.\n"
+                          },
+                          "batchSize": {
+                            "type": "integer",
+                            "example": 50,
+                            "description": "Indicates (in percentage) the batch size of the migration (meaning, how many nodes to migrate in each batch).\\\nCannot be null.\n",
+                            "minimum": 1,
+                            "maximum": 50
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Migration Create",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "ocean/aws/k8s/cluster/o-1234567/migration"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
+                        },
+                        "response": {
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "properties": {
+                                  "id": {
+                                    "example": "owm-6e3819ae",
+                                    "description": "The migration identifier of a specific migration.\n",
+                                    "schema": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:aws:k8s:cluster:migration"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "put": {
+        "summary": "Stop Migration",
+        "description": "Stop an ongoing Workload Migration.\n",
+        "operationId": "oceanAwsPutMigration",
+        "tags": [
+          "Ocean AWS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          },
+          {
+            "in": "query",
+            "name": "migrationId",
+            "example": "owm-6e3819ae",
+            "description": "The migration identifier of a specific migration.\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "migration"
+                    ],
+                    "properties": {
+                      "migration": {
+                        "required": [
+                          "state"
+                        ],
+                        "type": "object",
+                        "description": "Migration update configuration.\n",
+                        "properties": {
+                          "shouldTerminateDrainedNodes": {
+                            "type": "boolean",
+                            "example": true,
+                            "default": false,
+                            "description": "Ocean will terminate the old instances once the pods that reside on them are migrated, and the old instances are fully drained.\n"
+                          },
+                          "state": {
+                            "type": "string",
+                            "description": "The only allowed state to update is to \"STOPPED\". This state will stop a running migration.\n",
+                            "example": "STOPPED"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Migrations Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "ocean/aws/k8s/cluster/o-1234567/migration/owm-abc1234"
+                            },
+                            "method": {
+                              "example": "PUT"
+                            }
+                          }
+                        },
+                        "response": {
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "properties": {
+                                  "id": {
+                                    "example": "owm-6e3819ae",
+                                    "description": "The migration identifier of a specific migration.\n",
+                                    "schema": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "oceanId": {
+                                    "type": "string",
+                                    "description": "The identifier of the ocean cluster belong the migration.\n",
+                                    "example": "o-12e31234"
+                                  },
+                                  "state": {
+                                    "type": "string",
+                                    "description": "if update succeeded, the return value should be \"STOPPED\".\n",
+                                    "example": "STOPPED"
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:aws:k8s:cluster:migration"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "get": {
+        "summary": "List Migrations summary",
+        "description": "Get summary of migrations history for an Ocean cluster.\n",
+        "operationId": "oceanAwsGetMigrations",
+        "tags": [
+          "Ocean AWS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Migrations Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "ocean/aws/k8s/cluster/o-1234567/migration"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "title": "Workload migration summary",
+                                "description": "Workload migration summary of Ocean cluster.",
+                                "properties": {
+                                  "Id": {
+                                    "type": "string",
+                                    "example": "owm-1234567",
+                                    "description": "The migration id.\n"
+                                  },
+                                  "state": {
+                                    "type": "string",
+                                    "description": "The latest state of this migration.\n",
+                                    "enum": [
+                                      "STARTING",
+                                      "AWAIT_REPLACEMENTS",
+                                      "HANDLE_UNSCHEDULE",
+                                      "DRAIN_NODES",
+                                      "VALIDATE_DRAIN",
+                                      "STOPPING",
+                                      "ERROR",
+                                      "RESCHEDULE_NODES",
+                                      "TERMINATE_NODES",
+                                      "AWAIT_TERMINATION",
+                                      "FINISHED_ERROR",
+                                      "STOPPED",
+                                      "FINISHED"
+                                    ],
+                                    "example": "FINISHED"
+                                  },
+                                  "createdAt": {
+                                    "type": "string",
+                                    "example": "2021-10-01T05:51:06.000Z",
+                                    "description": "When this migration was created.\n"
+                                  },
+                                  "completedAt": {
+                                    "type": "string",
+                                    "example": "2021-10-01T05:51:06.000Z",
+                                    "description": "When this migration was completed.\n"
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:aws:k8s:cluster:migration"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/aws/k8s/cluster/{oceanId}/migration/{migrationId}": {
+      "summary": "Ocean for AWS",
+      "get": {
+        "summary": "Get Migration Status",
+        "description": "Get Migration full info and status for an Ocean cluster.\n",
+        "operationId": "oceanAwsGetMigrationStatus",
+        "tags": [
+          "Ocean AWS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          },
+          {
+            "in": "path",
+            "name": "migrationId",
+            "example": "owm-6e3819ae",
+            "description": "The migration identifier of a specific migration.\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Migration Status Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "ocean/aws/k8s/cluster/o-abcd1234/migration/owm-abcd1234"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "title": "Workload migration",
+                                "description": "Workload migration status of Ocean cluster.",
+                                "properties": {
+                                  "Id": {
+                                    "type": "string",
+                                    "example": "owm-1234567",
+                                    "description": "The migration id.\n"
+                                  },
+                                  "oceanId": {
+                                    "type": "string",
+                                    "example": "o-abcd1234",
+                                    "description": "The Ocean cluster identifier. Required for Launch Spec creation.\n"
+                                  },
+                                  "status": {
+                                    "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanId%7D~1migration/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/state"
+                                  },
+                                  "newInstances": {
+                                    "type": "array",
+                                    "title": "Workload migration details",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "instanceId": {
+                                          "type": "string",
+                                          "description": "The instance ID.",
+                                          "example": "i-asdfjk3989"
+                                        },
+                                        "k8sNodeName": {
+                                          "type": "string",
+                                          "description": "The kubernetes node name.",
+                                          "example": "ip-111-11-11-111.us-west-1.compute.internal"
+                                        },
+                                        "asgName": {
+                                          "type": "string",
+                                          "description": "The ASG name the node belongs.",
+                                          "example": "asg-name"
+                                        },
+                                        "state": {
+                                          "type": "string",
+                                          "description": "The instance state.",
+                                          "example": "RUNNING"
+                                        },
+                                        "podDetails": {
+                                          "type": "array",
+                                          "description": "in case migration instance status is \"REQUIRES_MANUAL_MIGRATION\" then the following pod data will appear.",
+                                          "items": {
+                                            "properties": {
+                                              "id": {
+                                                "type": "string",
+                                                "description": "The pod ID.",
+                                                "example": "abc123-abc123-abc123-abc123"
+                                              },
+                                              "name": {
+                                                "type": "string",
+                                                "description": "The pod name.",
+                                                "example": "podName"
+                                              },
+                                              "kind": {
+                                                "type": "string",
+                                                "description": "The pod kind, currently divided into STAND_ALONE_POD & UNKNOWN",
+                                                "example": "STAND_ALONE_POD"
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "runningPods": {
+                                          "type": "integer",
+                                          "description": "The number of running pods.",
+                                          "example": "6"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "oldInstances": {
+                                    "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanId%7D~1migration~1%7BmigrationId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/newInstances"
+                                  },
+                                  "unscheduledPodIds": {
+                                    "type": "string",
+                                    "example": "o-abcd1234",
+                                    "description": "List of the unscedueled pod ids.\n"
+                                  },
+                                  "newUnscheduledPodIds": {
+                                    "type": "string",
+                                    "example": "o-abcd1234",
+                                    "description": "List of the new unscedueled pod ids.\n"
+                                  },
+                                  "migrationConfig": {
+                                    "type": "object",
+                                    "description": "The object specifying the configuration flags when migration created.\n",
+                                    "properties": {
+                                      "shouldTerminateDrainedNodes": {
+                                        "type": "boolean",
+                                        "example": true,
+                                        "description": "Ocean will terminate the old instances once the pods that reside on them are migrated, and the old instances are fully drained.\n"
+                                      },
+                                      "shouldEvictStandAlonePods": {
+                                        "type": "boolean",
+                                        "example": true,
+                                        "description": "Ocean will terminate pods that do not belong to a Kubernetes deployment. This means that you would need to launch the pod manually (after the migration) due to the fact that there is no object that would do it automatically.\n"
+                                      }
+                                    }
+                                  },
+                                  "createdAt": {
+                                    "type": "string",
+                                    "example": "2021-10-01T05:51:06.000Z",
+                                    "description": "When this migration was created.\n"
+                                  },
+                                  "erroredAt": {
+                                    "type": "string",
+                                    "example": "2021-10-01T05:51:06.000Z",
+                                    "description": "When this migration received an error.\n"
+                                  },
+                                  "stoppedAt": {
+                                    "type": "string",
+                                    "example": "2021-10-01T05:51:06.000Z",
+                                    "description": "When this migration was stopped.\n"
+                                  },
+                                  "completedAt": {
+                                    "type": "string",
+                                    "example": "2021-10-01T05:51:06.000Z",
+                                    "description": "When this migration was completed.\n"
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:aws:k8s:cluster:migration"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/ocean/insights/k8s/cluster": {
       "summary": "Ocean Insights",
       "post": {
