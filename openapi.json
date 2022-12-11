@@ -63310,6 +63310,153 @@
         }
       }
     },
+    "/ocean/cd/workload/{workloadName}/namespace/{namespace}/graph": {
+      "summary": "Ocean CD",
+      "get": {
+        "summary": "Ocean CD Describe Workload Graph",
+        "description": "Ocean CD workload graph.\n",
+        "operationId": "OceanCDWorkloadGraph",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "workloadName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "app",
+            "description": "Workload name\n"
+          },
+          {
+            "in": "path",
+            "name": "namespace",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "default",
+            "description": "Workload's namespace name\n"
+          },
+          {
+            "in": "query",
+            "name": "clusterId",
+            "example": "prod-cluster",
+            "description": "Cluster id where the workload is running\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "example": "SpotDeployment",
+            "description": "Kind of workload, currently only SpotDeployment is supported\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean CD Rollout Status Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "response": {
+                          "type": "object",
+                          "description": "response body\n",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "allOf": [
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "rolloutId": {
+                                        "type": "string",
+                                        "example": "rol-123456"
+                                      },
+                                      "namespace": {
+                                        "type": "string",
+                                        "example": "default"
+                                      },
+                                      "clusterId": {
+                                        "type": "string",
+                                        "example": "cluster"
+                                      },
+                                      "status": {
+                                        "type": "string",
+                                        "enum": [
+                                          "deallocating",
+                                          "manualPausing",
+                                          "manualPaused",
+                                          "canceled",
+                                          "pending",
+                                          "inProgress",
+                                          "finished",
+                                          "failed",
+                                          "paused",
+                                          "verifying",
+                                          "backgroundVerifying",
+                                          "invalidSpec",
+                                          "aborting",
+                                          "aborted",
+                                          "failurePolicyPausing",
+                                          "failurePolicyPaused"
+                                        ],
+                                        "example": "finished"
+                                      },
+                                      "failureReasonType": {
+                                        "type": "string",
+                                        "enum": [
+                                          "phaseVerification",
+                                          "backgroundVerification",
+                                          "kubernetes",
+                                          "manualRollback"
+                                        ],
+                                        "example": "kubernetes"
+                                      },
+                                      "startTime": {
+                                        "type": "string",
+                                        "example": "2018-11-05T12:55:50.000+0000"
+                                      },
+                                      "endTime": {
+                                        "type": "string",
+                                        "example": "2018-11-05T12:58:15.000+0000"
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/ocean/spark/cluster": {
       "summary": "Ocean Spark",
       "post": {
