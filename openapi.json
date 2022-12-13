@@ -61276,328 +61276,7 @@
                                         "type": "array",
                                         "items": {
                                           "type": "object",
-                                          "required": [
-                                            "name",
-                                            "provider"
-                                          ],
-                                          "title": "Ocean CD Verification Metric",
-                                          "properties": {
-                                            "name": {
-                                              "type": "string"
-                                            },
-                                            "dryRun": {
-                                              "type": "boolean",
-                                              "example": false,
-                                              "description": "should the metric have an impact on the result of the rollout"
-                                            },
-                                            "interval": {
-                                              "type": "string",
-                                              "example": "5m",
-                                              "description": "defines an interval string (30s, 5m, 1h) between each verification measurements. If omitted, will perform a single measurement"
-                                            },
-                                            "initialDelay": {
-                                              "type": "string",
-                                              "description": "how long the should wait before starting this metric measurements",
-                                              "example": "1m"
-                                            },
-                                            "count": {
-                                              "type": "integer",
-                                              "description": "the number of times to run the measurement. If both interval and count are omitted, the effective count is 1. If only interval is specified, metric runs indefinitely. If count > 1, interval must be specified.",
-                                              "example": 10
-                                            },
-                                            "successCondition": {
-                                              "type": "string",
-                                              "description": "expression which determines if a measurement is considered successful. The keyword `result` is a variable reference to the value of measurement. Results can be both structured data or primitive.",
-                                              "example": "result[0] <= 0.95"
-                                            },
-                                            "failureCondition": {
-                                              "type": "string",
-                                              "description": "an expression which determines if a measurement is considered failed. If both success and failure conditions are specified, and the measurement does not fall into either condition, the measurement is considered Inconclusive",
-                                              "example": "result[0] >= 1.2"
-                                            },
-                                            "failureLimit": {
-                                              "type": "integer",
-                                              "description": "the maximum number of times the measurement is allowed to fail, before the entire metric is considered Failed default is 0"
-                                            },
-                                            "inconclusiveLimit": {
-                                              "type": "integer",
-                                              "description": "the maximum number of times the measurement is allowed to measure Inconclusive, before the entire metric is considered Inconclusive default is 0"
-                                            },
-                                            "consecutiveErrorLimit": {
-                                              "type": "integer",
-                                              "description": "the maximum number of times the measurement is allowed to error in succession, before the metric is considered error default is 4"
-                                            },
-                                            "provider": {
-                                              "type": "object",
-                                              "title": "Ocean CD Verification Metric Provider, only one provider type can be defined",
-                                              "properties": {
-                                                "prometheus": {
-                                                  "type": "object",
-                                                  "required": [
-                                                    "query"
-                                                  ],
-                                                  "title": "Ocean CD Verification Prometheus Metric",
-                                                  "properties": {
-                                                    "query": {
-                                                      "type": "string"
-                                                    }
-                                                  }
-                                                },
-                                                "newRelic": {
-                                                  "type": "object",
-                                                  "title": "Ocean CD Verification NewRelic Metric",
-                                                  "properties": {
-                                                    "profile": {
-                                                      "type": "string",
-                                                      "description": "the name of the secret holding NR account configuration"
-                                                    },
-                                                    "query": {
-                                                      "type": "string",
-                                                      "description": "a raw newrelic NRQL query to perform"
-                                                    }
-                                                  }
-                                                },
-                                                "datadog": {
-                                                  "type": "object",
-                                                  "title": "Ocean CD Verification Datadog Metric",
-                                                  "properties": {
-                                                    "duration": {
-                                                      "type": "string",
-                                                      "example": "1m"
-                                                    },
-                                                    "query": {
-                                                      "type": "string"
-                                                    }
-                                                  }
-                                                },
-                                                "cloudWatch": {
-                                                  "type": "object",
-                                                  "title": "Ocean CD Verification CloudWatch Metric",
-                                                  "properties": {
-                                                    "duration": {
-                                                      "type": "string",
-                                                      "example": "1m"
-                                                    },
-                                                    "metricDataQueries": {
-                                                      "type": "array",
-                                                      "description": "The metric queries to be returned. A single MetricData call can include as many as 500 MetricDataQuery structures. Each of these structures can specify either a metric to retrieve, a Metrics Insights query, or a math expression to perform on retrieved data.",
-                                                      "items": {
-                                                        "required": "-id",
-                                                        "type": "object",
-                                                        "properties": {
-                                                          "id": {
-                                                            "type": "string",
-                                                            "description": "The response ID. must be unique and not null. This object can contain characters, letters, numbers and underscore. The first letter must be a lowercase letter."
-                                                          },
-                                                          "metricStat": {
-                                                            "type": "object",
-                                                            "description": "The metric to be returned, along with statistics, period, and units. Use this parameter only if this object is retrieving a metric and not performing a math expression on returned data. WITHIN ONE METRICDATAQUERY OBJECT, YOU MUST SPECIFY EITHER EXPRESSION OR METRICSTAT BUT NOT BOTH.",
-                                                            "properties": {
-                                                              "metric": {
-                                                                "required": "-metricName",
-                                                                "type": "object",
-                                                                "description": "The metric to return, including the metric name, namespace, and dimensions.",
-                                                                "properties": {
-                                                                  "metricName": {
-                                                                    "type": "string",
-                                                                    "description": "The name of the metric."
-                                                                  },
-                                                                  "namespace": {
-                                                                    "type": "string",
-                                                                    "description": "The namespace of the metric."
-                                                                  },
-                                                                  "dimensions": {
-                                                                    "type": "array",
-                                                                    "description": "A dimension is a name/value pair that is part of the identity of a metric. Because dimensions are part of the unique identifier for a metric, whenever you add a unique name/value pair to one of your metrics, you are creating a new variation of that metric. You can assign up to 30 dimensions to a metric.",
-                                                                    "items": {
-                                                                      "type": "object",
-                                                                      "properties": {
-                                                                        "name": {
-                                                                          "type": "string",
-                                                                          "description": "The name of the dimensions. These names must contain only ASCII characters, must include at least one non-whitespace character, and cannot start with a colon(':')"
-                                                                        },
-                                                                        "value": {
-                                                                          "type": "string",
-                                                                          "description": "The value of the dimensions. These values must contain only ASCII characters and must include at least one non-whitespace character."
-                                                                        }
-                                                                      }
-                                                                    }
-                                                                  }
-                                                                }
-                                                              },
-                                                              "period": {
-                                                                "type": "integer",
-                                                                "description": "The granularity, in seconds, of the returned data points. For metrics with regular resolution, a period can be as short as one minute (60 seconds) and must be a multiple of 60. For high-resolution metrics that are collected at intervals of less than one minute, the period can be 1, 5, 10, 30, 60, or any multiple of 60. High-resolution metrics are those metrics stored by a PutMetricData call that includes a StorageResolution of 1 second."
-                                                              },
-                                                              "stat": {
-                                                                "type": "string",
-                                                                "description": "The statistic to return. It can include any CloudWatch statistic or extended statistic."
-                                                              },
-                                                              "unit": {
-                                                                "type": "string",
-                                                                "description": "This defines what unit you want to use when storing the metric.",
-                                                                "enum": [
-                                                                  "Seconds",
-                                                                  "Microseconds",
-                                                                  "Milliseconds",
-                                                                  "Bytes",
-                                                                  "Kilobytes",
-                                                                  "Megabytes",
-                                                                  "Gigabytes",
-                                                                  "Terabytes",
-                                                                  "Bits",
-                                                                  "Kilobits",
-                                                                  "Megabits",
-                                                                  "Gigabits",
-                                                                  "Terabits",
-                                                                  "Percent",
-                                                                  "Count",
-                                                                  "Bytes/Second",
-                                                                  "Kilobytes/Second",
-                                                                  "Megabytes/Second",
-                                                                  "Gigabytes/Second",
-                                                                  "Terabytes/Second",
-                                                                  "Bits/Second",
-                                                                  "Kilobits/Second",
-                                                                  "Megabits/Second",
-                                                                  "Gigabits/Second",
-                                                                  "Terabits/Second",
-                                                                  "Count/Second",
-                                                                  "None"
-                                                                ]
-                                                              }
-                                                            }
-                                                          },
-                                                          "expression": {
-                                                            "type": "string",
-                                                            "description": "This field can contain either a Metrics Insights query, or a metric math expression to be performed on the returned data. WITHIN ONE METRICDATAQUERY OBJECT, YOU MUST SPECIFY EITHER EXPRESSION OR METRICSTAT BUT NOT BOTH."
-                                                          },
-                                                          "label": {
-                                                            "type": "string",
-                                                            "description": "A human-readable label for this metric or expression. This is especially useful if this is an expression, so that you know what the value represents. If the metric or expression is shown in a CloudWatch dashboard widget, the label is shown. If Label is omitted, CloudWatch generates a default."
-                                                          },
-                                                          "returnData": {
-                                                            "type": "boolean",
-                                                            "description": "This option indicates whether to return the timestamps and raw data values of this metric. If you are performing this call just to do math expressions and do not also need the raw data returned, you can specify False . If you omit this, the default of True is used."
-                                                          },
-                                                          "period": {
-                                                            "type": "integer",
-                                                            "description": "The granularity, in seconds, of the returned data points. For metrics with regular resolution, a period can be as short as one minute (60 seconds) and must be a multiple of 60. For high-resolution metrics that are collected at intervals of less than one minute, the period can be 1, 5, 10, 30, 60, or any multiple of 60. High-resolution metrics are those metrics stored by a PutMetricData call that includes a StorageResolution of 1 second."
-                                                          }
-                                                        }
-                                                      }
-                                                    }
-                                                  }
-                                                },
-                                                "web": {
-                                                  "type": "object",
-                                                  "title": "Ocean CD Verification Web Metric",
-                                                  "properties": {
-                                                    "method": {
-                                                      "type": "string",
-                                                      "description": "the method of the web metric (empty defaults to GET)"
-                                                    },
-                                                    "url": {
-                                                      "type": "string",
-                                                      "description": "the address of the web metric"
-                                                    },
-                                                    "headers": {
-                                                      "type": "array",
-                                                      "description": "optional HTTP headers to use in the request",
-                                                      "items": {
-                                                        "type": "object",
-                                                        "properties": {
-                                                          "key": {
-                                                            "type": "string"
-                                                          },
-                                                          "value": {
-                                                            "type": "string"
-                                                          }
-                                                        }
-                                                      }
-                                                    },
-                                                    "body": {
-                                                      "type": "string",
-                                                      "description": "the body of the we metric (must be POST/PUT)"
-                                                    },
-                                                    "timeoutSeconds": {
-                                                      "type": "integer",
-                                                      "description": "the timeout for the request in seconds default is 10"
-                                                    },
-                                                    "jsonPath": {
-                                                      "type": "string",
-                                                      "description": "a JSON Path to use as the result variable default is \"{$}\""
-                                                    },
-                                                    "insecure": {
-                                                      "type": "boolean",
-                                                      "description": "skips host TLS verification"
-                                                    }
-                                                  }
-                                                },
-                                                "job": {
-                                                  "type": "object",
-                                                  "title": "Ocean CD Verification Job Metric",
-                                                  "properties": {
-                                                    "spec": {
-                                                      "type": "object",
-                                                      "description": "the job spec require to run the metric",
-                                                      "properties": {
-                                                        "backoffLimit": {
-                                                          "type": "integer",
-                                                          "description": "Specifies the number of retries before marking this job failed"
-                                                        },
-                                                        "template": {
-                                                          "type": "object",
-                                                          "description": "Describes the pod that will be created when executing a job",
-                                                          "properties": {
-                                                            "spec": {
-                                                              "type": "object",
-                                                              "description": "Specification of the desired behavior of the pod",
-                                                              "properties": {
-                                                                "containers": {
-                                                                  "type": "array",
-                                                                  "description": "List of containers belonging to the pod",
-                                                                  "items": {
-                                                                    "type": "object",
-                                                                    "properties": {
-                                                                      "name": {
-                                                                        "type": "string",
-                                                                        "description": "container name"
-                                                                      },
-                                                                      "command": {
-                                                                        "type": "array",
-                                                                        "items": {
-                                                                          "type": "string"
-                                                                        },
-                                                                        "description": "container entry point"
-                                                                      },
-                                                                      "image": {
-                                                                        "type": "string",
-                                                                        "description": "container image name"
-                                                                      }
-                                                                    }
-                                                                  }
-                                                                },
-                                                                "restartPolicy": {
-                                                                  "type": "string",
-                                                                  "description": "Restart policy for all containers within the pod",
-                                                                  "enum": [
-                                                                    "Never",
-                                                                    "OnFailure"
-                                                                  ],
-                                                                  "example": "Never"
-                                                                }
-                                                              }
-                                                            }
-                                                          }
-                                                        }
-                                                      }
-                                                    }
-                                                  }
-                                                }
-                                              }
-                                            }
-                                          }
+                                          "$ref": "#/paths/~1ocean~1cd~1rollout~1%7BrolloutId%7D~1definition/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/phaseVerifications/items/properties/metrics/items"
                                         }
                                       }
                                     }
@@ -61712,7 +61391,7 @@
                             "type": "array",
                             "items": {
                               "type": "object",
-                              "$ref": "#/paths/~1ocean~1cd~1verificationTemplate/post/requestBody/content/application~1json/schema/allOf/0/properties/verificationTemplate/properties/metrics/items"
+                              "$ref": "#/paths/~1ocean~1cd~1rollout~1%7BrolloutId%7D~1definition/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/phaseVerifications/items/properties/metrics/items"
                             }
                           }
                         }
@@ -61781,7 +61460,7 @@
                             "type": "array",
                             "items": {
                               "type": "object",
-                              "$ref": "#/paths/~1ocean~1cd~1verificationTemplate/post/requestBody/content/application~1json/schema/allOf/0/properties/verificationTemplate/properties/metrics/items"
+                              "$ref": "#/paths/~1ocean~1cd~1rollout~1%7BrolloutId%7D~1definition/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/phaseVerifications/items/properties/metrics/items"
                             }
                           }
                         }
@@ -62377,17 +62056,7 @@
                                                     },
                                                     "fieldRef": {
                                                       "type": "object",
-                                                      "title": "Ocean CD Verification argument value from field ref",
-                                                      "description": "Defines the field path from where to get the value of an argument\n",
-                                                      "properties": {
-                                                        "fieldPath": {
-                                                          "type": "string",
-                                                          "example": "metadata.labels['app']"
-                                                        }
-                                                      },
-                                                      "required": [
-                                                        "fieldPath"
-                                                      ]
+                                                      "$ref": "#/paths/~1ocean~1cd~1rollout~1%7BrolloutId%7D~1definition/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/phaseVerifications/items/properties/args/items/properties/valueFrom/properties/fieldRef"
                                                     }
                                                   }
                                                 }
@@ -62923,6 +62592,34 @@
     },
     "/ocean/cd/rollout/{rolloutId}": {
       "summary": "Ocean CD",
+      "get": {
+        "summary": "Ocean CD Describe Rollout by ID",
+        "description": "Ocean CD single rollout.\n",
+        "operationId": "OceanCDRolloutSingle",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rolloutId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "rol-123456",
+            "description": "The identifier of the Ocean CD rollout\n"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/paths/~1ocean~1cd~1rollout/get/responses/200"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
       "put": {
         "summary": "Ocean CD Rollout Actions",
         "description": "Execute action on an existing Ocean CD rollout.\n",
@@ -63033,26 +62730,7 @@
                                     "properties": {
                                       "spotDeployment": {
                                         "type": "object",
-                                        "required": [
-                                          "spotDeployment"
-                                        ],
-                                        "properties": {
-                                          "name": {
-                                            "type": "string"
-                                          },
-                                          "oldVersion": {
-                                            "type": "string"
-                                          },
-                                          "newVersion": {
-                                            "type": "string"
-                                          },
-                                          "oldManifest": {
-                                            "type": "string"
-                                          },
-                                          "newManifest": {
-                                            "type": "string"
-                                          }
-                                        }
+                                        "$ref": "#/paths/~1ocean~1cd~1rollout~1%7BrolloutId%7D~1resource/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/spotDeployment"
                                       },
                                       "namespace": {
                                         "type": "string"
@@ -63113,14 +62791,6 @@
                                       "id": {
                                         "type": "string",
                                         "example": "rol-exampleRollout"
-                                      },
-                                      "createdAt": {
-                                        "type": "string",
-                                        "example": "2018-11-05T12:55:50.000+0000"
-                                      },
-                                      "updatedAt": {
-                                        "type": "string",
-                                        "example": "2018-11-05T12:58:15.000+0000"
                                       }
                                     }
                                   }
@@ -63293,6 +62963,1209 @@
                                     }
                                   }
                                 ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/cd/rollout/latest": {
+      "summary": "Ocean CD",
+      "get": {
+        "summary": "Ocean CD Describe Latest Rollouts",
+        "description": "Ocean CD Latest rollout/s.\n",
+        "operationId": "OceanCDRolloutLatest",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "spotDeployment",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "spotDeployment-name",
+            "description": "SpotDeployment name configured"
+          },
+          {
+            "in": "query",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "namespace-name",
+            "description": "namespace name configured"
+          },
+          {
+            "in": "query",
+            "name": "clusterId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "cluster-id",
+            "description": "clusterId configured."
+          },
+          {
+            "in": "query",
+            "name": "count",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": 1,
+            "description": "How many responses intended, sorted from the last one down."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean CD Rollout List Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "response": {
+                          "type": "object",
+                          "description": "response body\n",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "allOf": [
+                                  {
+                                    "type": "object",
+                                    "required": [
+                                      "rollout"
+                                    ],
+                                    "properties": {
+                                      "spotDeployment": {
+                                        "type": "object",
+                                        "required": [
+                                          "spotDeployment"
+                                        ],
+                                        "properties": {
+                                          "name": {
+                                            "type": "string"
+                                          },
+                                          "isLiveApplied": {
+                                            "type": "Boolean"
+                                          },
+                                          "revision": {
+                                            "type": "integer"
+                                          },
+                                          "oldVersion": {
+                                            "type": "string"
+                                          },
+                                          "newVersion": {
+                                            "type": "string"
+                                          },
+                                          "oldManifest": {
+                                            "type": "string"
+                                          },
+                                          "newManifest": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "namespace": {
+                                        "type": "string"
+                                      },
+                                      "clusterId": {
+                                        "type": "string"
+                                      },
+                                      "originalRolloutId": {
+                                        "type": "string"
+                                      },
+                                      "newRolloutId": {
+                                        "type": "string"
+                                      },
+                                      "strategy": {
+                                        "type": "string"
+                                      },
+                                      "strategyType": {
+                                        "type": "string"
+                                      },
+                                      "strategyName": {
+                                        "type": "string"
+                                      },
+                                      "status": {
+                                        "type": "string",
+                                        "enum": [
+                                          "deallocating",
+                                          "manualPausing",
+                                          "manualPaused",
+                                          "canceled",
+                                          "pending",
+                                          "inProgress",
+                                          "finished",
+                                          "failed",
+                                          "paused",
+                                          "aborting",
+                                          "aborted"
+                                        ]
+                                      },
+                                      "startTime": {
+                                        "type": "string",
+                                        "example": "2018-11-05T12:55:50.000+0000"
+                                      },
+                                      "endTime": {
+                                        "type": "string",
+                                        "example": "2018-11-05T12:58:15.000+0000"
+                                      },
+                                      "rolloutSpec": {
+                                        "type": "string"
+                                      },
+                                      "cloudProvider": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "id": {
+                                        "type": "string",
+                                        "example": "rol-exampleRollout"
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/cd/rollout/ongoing": {
+      "summary": "Ocean CD",
+      "get": {
+        "summary": "Ocean CD Describe Ongoing Rollouts",
+        "description": "Ocean CD Ongoing rollouts.\n",
+        "operationId": "OceanCDRolloutsOngoing",
+        "tags": [
+          "Ocean CD"
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean CD Rollout List Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "response": {
+                          "type": "object",
+                          "description": "response body\n",
+                          "properties": {
+                            "items": {
+                              "items": {
+                                "properties": {
+                                  "rollouts": {
+                                    "type": "long",
+                                    "example": 1,
+                                    "description": "The amount of ongoing rollouts."
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/cd/rollout/{rolloutId}/verification": {
+      "summary": "Ocean CD",
+      "get": {
+        "summary": "Ocean CD Describe Rollout Verification",
+        "description": "Ocean CD rollout verification.\n",
+        "operationId": "OceanCDRolloutVerification",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rolloutId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "rol-123456",
+            "description": "The identifier of the Ocean CD Verification Response\n"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean CD Rollout Verification Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "response": {
+                          "type": "object",
+                          "description": "response body\n",
+                          "properties": {
+                            "items": {
+                              "items": {
+                                "type": "object",
+                                "title": "Ocean CD Rollouts Phase",
+                                "description": "Represents object of Rollout Phase\n",
+                                "properties": {
+                                  "metricName": {
+                                    "type": "string",
+                                    "example": "prometheus-metric",
+                                    "description": "Name of the metric.\n"
+                                  },
+                                  "startTime": {
+                                    "type": "Date",
+                                    "example": "2018-11-05T12:55:50.000+0000"
+                                  },
+                                  "status": {
+                                    "type": "string",
+                                    "enum": [
+                                      "pending",
+                                      "running",
+                                      "inProgress",
+                                      "successful",
+                                      "failed",
+                                      "error"
+                                    ],
+                                    "example": "successful",
+                                    "description": "The status of the verification.\n"
+                                  },
+                                  "message": {
+                                    "type": "string",
+                                    "description": "The message of the verification.\n"
+                                  },
+                                  "failureCondition": {
+                                    "type": "string",
+                                    "example": "result[0] >= 1000000",
+                                    "description": "The failure condition decided for the verification.\n"
+                                  },
+                                  "successCondition": {
+                                    "type": "string",
+                                    "example": "result[0] < 1000000",
+                                    "description": "The Success condition decided for the verification.\n"
+                                  },
+                                  "query": {
+                                    "type": "string",
+                                    "example": "sum(container_cpu_usage_seconds_total{namespace=\"analysis-namespace\", endpoint=\"https-metrics\"})",
+                                    "description": "The query that will provide the result to check with the failure/success condition.\n"
+                                  },
+                                  "failureLimit": {
+                                    "type": "Integer",
+                                    "example": 1,
+                                    "description": "The max amount of failures.\n"
+                                  },
+                                  "interval": {
+                                    "type": "string",
+                                    "example": "5s",
+                                    "description": "The interval of the verification.\n"
+                                  },
+                                  "count": {
+                                    "type": "Integer",
+                                    "example": 3,
+                                    "description": "The count.\n"
+                                  },
+                                  "dataPoints": {
+                                    "type": "array",
+                                    "description": "Data points\n",
+                                    "items": {
+                                      "type": "object",
+                                      "title": "Ocean CD Rollouts Event",
+                                      "description": "Represents object of Rollout Event\n",
+                                      "properties": {
+                                        "timestamp": {
+                                          "type": "Date",
+                                          "example": "5s",
+                                          "description": "The timestamp of the dataPoint.\n"
+                                        },
+                                        "value": {
+                                          "type": "string",
+                                          "example": "[11.374236757]",
+                                          "description": "The value of the dataPoint.\n"
+                                        },
+                                        "status": {
+                                          "type": "string",
+                                          "example": "Successful",
+                                          "description": "The status of the dataPoint.\n"
+                                        },
+                                        "message": {
+                                          "type": "string",
+                                          "example": "failure message",
+                                          "description": "The message of the dataPoint.\n"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "provider": {
+                                    "type": "string",
+                                    "enum": [
+                                      "datadog",
+                                      "newRelic",
+                                      "prometheus",
+                                      "cloudWatch",
+                                      "web",
+                                      "job"
+                                    ],
+                                    "example": "prometheus",
+                                    "description": "The provider of the verifications.\n"
+                                  },
+                                  "step": {
+                                    "type": "string",
+                                    "example": "Background",
+                                    "description": "The step from the failure/success comes from.\n"
+                                  },
+                                  "providerDetails": {
+                                    "type": "object",
+                                    "description": "The provider details\n",
+                                    "properties": {
+                                      "job": {
+                                        "type": "object",
+                                        "description": "The provider Job\n",
+                                        "properties": {
+                                          "containers": {
+                                            "type": "array",
+                                            "description": "List of containers\n",
+                                            "items": {
+                                              "type": "object",
+                                              "properties": {
+                                                "name": {
+                                                  "type": "string",
+                                                  "example": "nginx",
+                                                  "description": "List of containers\n"
+                                                },
+                                                "image": {
+                                                  "type": "string",
+                                                  "example": "public.ecr.aws/nginx/nginx:1.22",
+                                                  "description": "Image\n"
+                                                },
+                                                "command": {
+                                                  "type": "array",
+                                                  "description": "List of commands\n",
+                                                  "items": {
+                                                    "type": "String",
+                                                    "example": "echo"
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/cd/rollout/{rolloutId}/definition": {
+      "summary": "Ocean CD",
+      "get": {
+        "summary": "Ocean CD Describe Rollout Definition",
+        "description": "Ocean CD rollout definition.\n",
+        "operationId": "OceanCDRolloutDefinition",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rolloutId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "rol-123456",
+            "description": "The identifier of the Ocean CD Definition Response\n"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean CD Rollout Definition Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "response": {
+                          "type": "object",
+                          "description": "response body\n",
+                          "properties": {
+                            "items": {
+                              "items": {
+                                "properties": {
+                                  "rolloutSpec": {
+                                    "type": "object",
+                                    "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/0"
+                                  },
+                                  "strategy": {
+                                    "type": "object",
+                                    "title": "Ocean CD Strategy",
+                                    "description": "Ocean CD strategy. Use in RolloutSpec to decide what strategy to use when applying `SpotDeployment`\n",
+                                    "properties": {
+                                      "canary": {
+                                        "type": "object",
+                                        "$ref": "#/paths/~1ocean~1cd~1strategy/post/requestBody/content/application~1json/schema/allOf/0/properties/strategy/properties/canary"
+                                      }
+                                    },
+                                    "required": [
+                                      "name",
+                                      "canary"
+                                    ]
+                                  },
+                                  "phaseVerifications": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "title": "Ocean CD Strategy Verification",
+                                      "description": "Represents list of verification to run\n",
+                                      "properties": {
+                                        "args": {
+                                          "description": "List of verification arguments",
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "title": "Ocean CD Verification argument value from",
+                                            "description": "Defines from where to get the value of an argument\n",
+                                            "properties": {
+                                              "name": {
+                                                "type": "string"
+                                              },
+                                              "value": {
+                                                "type": "string"
+                                              },
+                                              "valueFrom": {
+                                                "type": "object",
+                                                "title": "Ocean CD argument value from",
+                                                "description": "Defines from where to get the value of an argument\n",
+                                                "properties": {
+                                                  "podTemplateHashValue": {
+                                                    "type": "string"
+                                                  },
+                                                  "fieldRef": {
+                                                    "type": "object",
+                                                    "title": "Ocean CD Verification argument value from field ref",
+                                                    "description": "Defines the field path from where to get the value of an argument\n",
+                                                    "properties": {
+                                                      "fieldPath": {
+                                                        "type": "string",
+                                                        "example": "metadata.labels['app']"
+                                                      }
+                                                    },
+                                                    "required": [
+                                                      "fieldPath"
+                                                    ]
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "metrics": {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "required": [
+                                              "name",
+                                              "provider"
+                                            ],
+                                            "title": "Ocean CD Verification Metric",
+                                            "properties": {
+                                              "name": {
+                                                "type": "string"
+                                              },
+                                              "dryRun": {
+                                                "type": "boolean",
+                                                "example": false,
+                                                "description": "should the metric have an impact on the result of the rollout"
+                                              },
+                                              "interval": {
+                                                "type": "string",
+                                                "example": "5m",
+                                                "description": "defines an interval string (30s, 5m, 1h) between each verification measurements. If omitted, will perform a single measurement"
+                                              },
+                                              "initialDelay": {
+                                                "type": "string",
+                                                "description": "how long the should wait before starting this metric measurements",
+                                                "example": "1m"
+                                              },
+                                              "count": {
+                                                "type": "integer",
+                                                "description": "the number of times to run the measurement. If both interval and count are omitted, the effective count is 1. If only interval is specified, metric runs indefinitely. If count > 1, interval must be specified.",
+                                                "example": 10
+                                              },
+                                              "successCondition": {
+                                                "type": "string",
+                                                "description": "expression which determines if a measurement is considered successful. The keyword `result` is a variable reference to the value of measurement. Results can be both structured data or primitive.",
+                                                "example": "result[0] <= 0.95"
+                                              },
+                                              "failureCondition": {
+                                                "type": "string",
+                                                "description": "an expression which determines if a measurement is considered failed. If both success and failure conditions are specified, and the measurement does not fall into either condition, the measurement is considered Inconclusive",
+                                                "example": "result[0] >= 1.2"
+                                              },
+                                              "failureLimit": {
+                                                "type": "integer",
+                                                "description": "the maximum number of times the measurement is allowed to fail, before the entire metric is considered Failed default is 0"
+                                              },
+                                              "inconclusiveLimit": {
+                                                "type": "integer",
+                                                "description": "the maximum number of times the measurement is allowed to measure Inconclusive, before the entire metric is considered Inconclusive default is 0"
+                                              },
+                                              "consecutiveErrorLimit": {
+                                                "type": "integer",
+                                                "description": "the maximum number of times the measurement is allowed to error in succession, before the metric is considered error default is 4"
+                                              },
+                                              "provider": {
+                                                "type": "object",
+                                                "title": "Ocean CD Verification Metric Provider, only one provider type can be defined",
+                                                "properties": {
+                                                  "prometheus": {
+                                                    "type": "object",
+                                                    "required": [
+                                                      "query"
+                                                    ],
+                                                    "title": "Ocean CD Verification Prometheus Metric",
+                                                    "properties": {
+                                                      "query": {
+                                                        "type": "string"
+                                                      }
+                                                    }
+                                                  },
+                                                  "newRelic": {
+                                                    "type": "object",
+                                                    "title": "Ocean CD Verification NewRelic Metric",
+                                                    "properties": {
+                                                      "profile": {
+                                                        "type": "string",
+                                                        "description": "the name of the secret holding NR account configuration"
+                                                      },
+                                                      "query": {
+                                                        "type": "string",
+                                                        "description": "a raw newrelic NRQL query to perform"
+                                                      }
+                                                    }
+                                                  },
+                                                  "datadog": {
+                                                    "type": "object",
+                                                    "title": "Ocean CD Verification Datadog Metric",
+                                                    "properties": {
+                                                      "duration": {
+                                                        "type": "string",
+                                                        "example": "1m"
+                                                      },
+                                                      "query": {
+                                                        "type": "string"
+                                                      }
+                                                    }
+                                                  },
+                                                  "cloudWatch": {
+                                                    "type": "object",
+                                                    "title": "Ocean CD Verification CloudWatch Metric",
+                                                    "properties": {
+                                                      "duration": {
+                                                        "type": "string",
+                                                        "example": "1m"
+                                                      },
+                                                      "metricDataQueries": {
+                                                        "type": "array",
+                                                        "description": "The metric queries to be returned. A single MetricData call can include as many as 500 MetricDataQuery structures. Each of these structures can specify either a metric to retrieve, a Metrics Insights query, or a math expression to perform on retrieved data.",
+                                                        "items": {
+                                                          "required": "-id",
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "id": {
+                                                              "type": "string",
+                                                              "description": "The response ID. must be unique and not null. This object can contain characters, letters, numbers and underscore. The first letter must be a lowercase letter."
+                                                            },
+                                                            "metricStat": {
+                                                              "type": "object",
+                                                              "description": "The metric to be returned, along with statistics, period, and units. Use this parameter only if this object is retrieving a metric and not performing a math expression on returned data. WITHIN ONE METRICDATAQUERY OBJECT, YOU MUST SPECIFY EITHER EXPRESSION OR METRICSTAT BUT NOT BOTH.",
+                                                              "properties": {
+                                                                "metric": {
+                                                                  "required": "-metricName",
+                                                                  "type": "object",
+                                                                  "description": "The metric to return, including the metric name, namespace, and dimensions.",
+                                                                  "properties": {
+                                                                    "metricName": {
+                                                                      "type": "string",
+                                                                      "description": "The name of the metric."
+                                                                    },
+                                                                    "namespace": {
+                                                                      "type": "string",
+                                                                      "description": "The namespace of the metric."
+                                                                    },
+                                                                    "dimensions": {
+                                                                      "type": "array",
+                                                                      "description": "A dimension is a name/value pair that is part of the identity of a metric. Because dimensions are part of the unique identifier for a metric, whenever you add a unique name/value pair to one of your metrics, you are creating a new variation of that metric. You can assign up to 30 dimensions to a metric.",
+                                                                      "items": {
+                                                                        "type": "object",
+                                                                        "properties": {
+                                                                          "name": {
+                                                                            "type": "string",
+                                                                            "description": "The name of the dimensions. These names must contain only ASCII characters, must include at least one non-whitespace character, and cannot start with a colon(':')"
+                                                                          },
+                                                                          "value": {
+                                                                            "type": "string",
+                                                                            "description": "The value of the dimensions. These values must contain only ASCII characters and must include at least one non-whitespace character."
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                },
+                                                                "period": {
+                                                                  "type": "integer",
+                                                                  "description": "The granularity, in seconds, of the returned data points. For metrics with regular resolution, a period can be as short as one minute (60 seconds) and must be a multiple of 60. For high-resolution metrics that are collected at intervals of less than one minute, the period can be 1, 5, 10, 30, 60, or any multiple of 60. High-resolution metrics are those metrics stored by a PutMetricData call that includes a StorageResolution of 1 second."
+                                                                },
+                                                                "stat": {
+                                                                  "type": "string",
+                                                                  "description": "The statistic to return. It can include any CloudWatch statistic or extended statistic."
+                                                                },
+                                                                "unit": {
+                                                                  "type": "string",
+                                                                  "description": "This defines what unit you want to use when storing the metric.",
+                                                                  "enum": [
+                                                                    "Seconds",
+                                                                    "Microseconds",
+                                                                    "Milliseconds",
+                                                                    "Bytes",
+                                                                    "Kilobytes",
+                                                                    "Megabytes",
+                                                                    "Gigabytes",
+                                                                    "Terabytes",
+                                                                    "Bits",
+                                                                    "Kilobits",
+                                                                    "Megabits",
+                                                                    "Gigabits",
+                                                                    "Terabits",
+                                                                    "Percent",
+                                                                    "Count",
+                                                                    "Bytes/Second",
+                                                                    "Kilobytes/Second",
+                                                                    "Megabytes/Second",
+                                                                    "Gigabytes/Second",
+                                                                    "Terabytes/Second",
+                                                                    "Bits/Second",
+                                                                    "Kilobits/Second",
+                                                                    "Megabits/Second",
+                                                                    "Gigabits/Second",
+                                                                    "Terabits/Second",
+                                                                    "Count/Second",
+                                                                    "None"
+                                                                  ]
+                                                                }
+                                                              }
+                                                            },
+                                                            "expression": {
+                                                              "type": "string",
+                                                              "description": "This field can contain either a Metrics Insights query, or a metric math expression to be performed on the returned data. WITHIN ONE METRICDATAQUERY OBJECT, YOU MUST SPECIFY EITHER EXPRESSION OR METRICSTAT BUT NOT BOTH."
+                                                            },
+                                                            "label": {
+                                                              "type": "string",
+                                                              "description": "A human-readable label for this metric or expression. This is especially useful if this is an expression, so that you know what the value represents. If the metric or expression is shown in a CloudWatch dashboard widget, the label is shown. If Label is omitted, CloudWatch generates a default."
+                                                            },
+                                                            "returnData": {
+                                                              "type": "boolean",
+                                                              "description": "This option indicates whether to return the timestamps and raw data values of this metric. If you are performing this call just to do math expressions and do not also need the raw data returned, you can specify False . If you omit this, the default of True is used."
+                                                            },
+                                                            "period": {
+                                                              "type": "integer",
+                                                              "description": "The granularity, in seconds, of the returned data points. For metrics with regular resolution, a period can be as short as one minute (60 seconds) and must be a multiple of 60. For high-resolution metrics that are collected at intervals of less than one minute, the period can be 1, 5, 10, 30, 60, or any multiple of 60. High-resolution metrics are those metrics stored by a PutMetricData call that includes a StorageResolution of 1 second."
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  },
+                                                  "web": {
+                                                    "type": "object",
+                                                    "title": "Ocean CD Verification Web Metric",
+                                                    "properties": {
+                                                      "method": {
+                                                        "type": "string",
+                                                        "description": "the method of the web metric (empty defaults to GET)"
+                                                      },
+                                                      "url": {
+                                                        "type": "string",
+                                                        "description": "the address of the web metric"
+                                                      },
+                                                      "headers": {
+                                                        "type": "array",
+                                                        "description": "optional HTTP headers to use in the request",
+                                                        "items": {
+                                                          "type": "object",
+                                                          "properties": {
+                                                            "key": {
+                                                              "type": "string"
+                                                            },
+                                                            "value": {
+                                                              "type": "string"
+                                                            }
+                                                          }
+                                                        }
+                                                      },
+                                                      "body": {
+                                                        "type": "string",
+                                                        "description": "the body of the we metric (must be POST/PUT)"
+                                                      },
+                                                      "timeoutSeconds": {
+                                                        "type": "integer",
+                                                        "description": "the timeout for the request in seconds default is 10"
+                                                      },
+                                                      "jsonPath": {
+                                                        "type": "string",
+                                                        "description": "a JSON Path to use as the result variable default is \"{$}\""
+                                                      },
+                                                      "insecure": {
+                                                        "type": "boolean",
+                                                        "description": "skips host TLS verification"
+                                                      }
+                                                    }
+                                                  },
+                                                  "job": {
+                                                    "type": "object",
+                                                    "title": "Ocean CD Verification Job Metric",
+                                                    "properties": {
+                                                      "spec": {
+                                                        "type": "object",
+                                                        "description": "the job spec require to run the metric",
+                                                        "properties": {
+                                                          "backoffLimit": {
+                                                            "type": "integer",
+                                                            "description": "Specifies the number of retries before marking this job failed"
+                                                          },
+                                                          "template": {
+                                                            "type": "object",
+                                                            "description": "Describes the pod that will be created when executing a job",
+                                                            "properties": {
+                                                              "spec": {
+                                                                "type": "object",
+                                                                "description": "Specification of the desired behavior of the pod",
+                                                                "properties": {
+                                                                  "containers": {
+                                                                    "type": "array",
+                                                                    "description": "List of containers belonging to the pod",
+                                                                    "items": {
+                                                                      "type": "object",
+                                                                      "properties": {
+                                                                        "name": {
+                                                                          "type": "string",
+                                                                          "description": "container name"
+                                                                        },
+                                                                        "command": {
+                                                                          "type": "array",
+                                                                          "items": {
+                                                                            "type": "string"
+                                                                          },
+                                                                          "description": "container entry point"
+                                                                        },
+                                                                        "image": {
+                                                                          "type": "string",
+                                                                          "description": "container image name"
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  },
+                                                                  "restartPolicy": {
+                                                                    "type": "string",
+                                                                    "description": "Restart policy for all containers within the pod",
+                                                                    "enum": [
+                                                                      "Never",
+                                                                      "OnFailure"
+                                                                    ],
+                                                                    "example": "Never"
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "backgroundVerifications": {
+                                    "type": "array",
+                                    "items": {
+                                      "$ref": "#/paths/~1ocean~1cd~1rollout~1%7BrolloutId%7D~1definition/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/phaseVerifications/items"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/cd/rollout/{rolloutId}/resource": {
+      "summary": "Ocean CD",
+      "get": {
+        "summary": "Ocean CD Describe Rollout Resource",
+        "description": "Ocean CD Resource\n",
+        "operationId": "OceanCDRolloutResource",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rolloutId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "rol-123456",
+            "description": "The identifier of the Ocean CD Resource Response\n"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean CD Rollout Resource Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "response": {
+                          "type": "object",
+                          "description": "response body\n",
+                          "properties": {
+                            "items": {
+                              "items": {
+                                "properties": {
+                                  "events": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "title": "Ocean CD Rollouts Event",
+                                      "description": "Represents object of Rollout Event\n",
+                                      "properties": {
+                                        "lastTimestamp": {
+                                          "type": "string",
+                                          "example": "2018-06-20T11:35:01.745Z"
+                                        },
+                                        "type": {
+                                          "type": "string"
+                                        },
+                                        "reason": {
+                                          "type": "string"
+                                        },
+                                        "object": {
+                                          "type": "string"
+                                        },
+                                        "message": {
+                                          "type": "string"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "replicaSets": {
+                                    "type": "object",
+                                    "title": "Ocean CD Rollouts replicaSet Resource",
+                                    "description": "Represents object of Rollout replicaSet Resource\n",
+                                    "properties": {
+                                      "stable": {
+                                        "type": "object",
+                                        "title": "Ocean CD Rollouts ReplicaSet",
+                                        "description": "Represents object of Rollout ReplicaSet\n",
+                                        "properties": {
+                                          "lastTimestamp": {
+                                            "type": "string\"",
+                                            "example": "2018-06-20T11:35:01.745Z"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          },
+                                          "reason": {
+                                            "type": "string"
+                                          },
+                                          "object": {
+                                            "type": "string"
+                                          },
+                                          "message": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "latest": {
+                                        "type": "object",
+                                        "$ref": "#/paths/~1ocean~1cd~1rollout~1%7BrolloutId%7D~1resource/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/replicaSets/properties/stable"
+                                      }
+                                    }
+                                  },
+                                  "pods": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "title": "Ocean CD Rollouts Pod",
+                                      "description": "Represents object of Rollout Pod\n",
+                                      "properties": {
+                                        "name": {
+                                          "type": "string"
+                                        },
+                                        "containersReadiness": {
+                                          "type": "string"
+                                        },
+                                        "ready": {
+                                          "type": "boolean"
+                                        },
+                                        "status": {
+                                          "type": "string"
+                                        },
+                                        "restarts": {
+                                          "type": "integer"
+                                        },
+                                        "version": {
+                                          "type": "string"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "services": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "title": "Ocean CD Rollouts ReplicaSet",
+                                      "description": "Represents object of Rollout ReplicaSet\n",
+                                      "properties": {
+                                        "name": {
+                                          "type": "string"
+                                        },
+                                        "type": {
+                                          "type": "string"
+                                        },
+                                        "clusterIp": {
+                                          "type": "string"
+                                        },
+                                        "externalIp": {
+                                          "type": "string"
+                                        },
+                                        "ports": {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "string"
+                                          }
+                                        },
+                                        "version": {
+                                          "type": "string"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "spotDeployment": {
+                                    "type": "object",
+                                    "required": [
+                                      "spotDeployment"
+                                    ],
+                                    "properties": {
+                                      "name": {
+                                        "type": "string"
+                                      },
+                                      "oldVersion": {
+                                        "type": "string"
+                                      },
+                                      "newVersion": {
+                                        "type": "string"
+                                      },
+                                      "oldManifest": {
+                                        "type": "string"
+                                      },
+                                      "newManifest": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/cd/rollout/{rolloutId}/phase": {
+      "summary": "Ocean CD",
+      "get": {
+        "summary": "Ocean CD Describe Rollout Phase",
+        "description": "Ocean CD Rollout phase.\n",
+        "operationId": "OceanCDRolloutPhase",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rolloutId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "rol-123456",
+            "description": "The identifier of the Ocean CD phase\n"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean CD Rollout Resource Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "response": {
+                          "type": "object",
+                          "description": "response body\n",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "title": "Ocean CD Rollouts Phase",
+                                "description": "Represents object of Rollout Phase\n",
+                                "properties": {
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "status": {
+                                    "type": "string"
+                                  },
+                                  "startTime": {
+                                    "type": "string",
+                                    "example": "2018-06-20T11:35:01.745Z"
+                                  },
+                                  "pausedAt": {
+                                    "type": "string",
+                                    "example": "2018-06-20T11:35:01.745Z"
+                                  },
+                                  "verifiedAt": {
+                                    "type": "string",
+                                    "example": "2018-06-20T11:35:01.745Z"
+                                  },
+                                  "endTime": {
+                                    "type": "string",
+                                    "example": "2018-06-20T11:35:01.745Z"
+                                  },
+                                  "trafficPercentage": {
+                                    "type": "string"
+                                  },
+                                  "verifications": {
+                                    "type": "array",
+                                    "items": {
+                                      "$ref": "#/paths/~1ocean~1cd~1rollout~1%7BrolloutId%7D~1verification/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items"
+                                    }
+                                  }
+                                }
                               }
                             }
                           }
