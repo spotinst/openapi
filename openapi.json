@@ -64386,9 +64386,82 @@
                                         "additionalProperties": {
                                           "type": "string"
                                         },
-                                        "description": "Extra annotations to the ingress load balancer service. This is useful to configure properties of the load balancer \ndeployed by the ingress controller, like the nature of the load balancer (e.g. ELB, NLB, ALB on AWS), \nthe security groups, or various timeouts.\n",
+                                        "description": "DEPRECATED: Use `loadBalancer.serviceAnnotations` instead. \nAnnotations to add to the ingress load balancer service. This is useful to configure properties of the managed load balancer, \nlike the nature of the load balancer (e.g. ELB, NLB, ALB on AWS), \nthe security groups, or various timeouts.\n",
                                         "example": {
                                           "service.beta.kubernetes.io/aws-load-balancer-security-groups": "sg-03ba056e31f183482"
+                                        }
+                                      },
+                                      "controller": {
+                                        "type": "object",
+                                        "description": "The object specifying the Ocean Spark Ingress Controller configuration.\n",
+                                        "properties": {
+                                          "managed": {
+                                            "type": "boolean",
+                                            "default": true,
+                                            "example": true,
+                                            "description": "Should an ingress controller managed by Ocean for Apache Spark be installed on the cluster.\n"
+                                          }
+                                        }
+                                      },
+                                      "loadBalancer": {
+                                        "type": "object",
+                                        "description": "The object specifying the Ocean Spark Ingress Load Balancer configuration.\n",
+                                        "properties": {
+                                          "managed": {
+                                            "type": "boolean",
+                                            "default": true,
+                                            "example": true,
+                                            "description": "Should a load balancer managed by Ocean for Apache Spark be provisioned for the cluster. \nSet this to false if you want to use an existing load balancer (only available on AWS).\n"
+                                          },
+                                          "targetGroupArn": {
+                                            "type": "string",
+                                            "description": "The ARN of a target group that the Ocean for Apache Spark ingress controller will be bound to.\nSet this to use an existing load balancer with Ocean for Apache Spark.\nHas no effect if using a managed load balancer. Only available on AWS.\n",
+                                            "example": "arn:aws:elasticloadbalancing:us-east-1:XXXXXXXXXXXX:targetgroup/my-spark-cluster-tg/XXXXXXXXXXXXXXXX"
+                                          },
+                                          "serviceAnnotations": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                              "type": "string"
+                                            },
+                                            "description": "Annotations to add to the ingress controller load balancer service. This is useful to configure properties \nof the managed load balancer, like the nature of the load balancer (e.g. ELB, NLB, ALB on AWS), \nthe security groups, or various timeouts.\n",
+                                            "example": {
+                                              "service.beta.kubernetes.io/aws-load-balancer-security-groups": "sg-XXXXXXXXXXXXXXXXX"
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "customEndpoint": {
+                                        "type": "object",
+                                        "description": "The object specifying the Ocean Spark Ingress Custom Endpoint configuration.\n",
+                                        "properties": {
+                                          "enabled": {
+                                            "type": "boolean",
+                                            "default": false,
+                                            "example": false,
+                                            "description": "Should the Ocean for Apache Spark control plane address the cluster using a custom address.\nUse this to specify the DNS address of an externally provisioned (unmanaged) load balancer.\n"
+                                          },
+                                          "address": {
+                                            "type": "string",
+                                            "description": "The address the Ocean for Apache Spark control plane will use when addressing the cluster.\n",
+                                            "example": "my-spark-cluster-nlb-8cbb8da7XXXXXXXX.elb.us-east-1.amazonaws.com"
+                                          }
+                                        }
+                                      },
+                                      "privateLink": {
+                                        "type": "object",
+                                        "description": "The object specifying the Ocean Spark Ingress Private Link configuration. Only available on AWS.\n",
+                                        "properties": {
+                                          "enabled": {
+                                            "type": "boolean",
+                                            "default": false,
+                                            "example": false,
+                                            "description": "Should the Ocean for Apache Spark control plane address the cluster via an AWS Private Link.\n"
+                                          },
+                                          "vpcEndpointService": {
+                                            "type": "string",
+                                            "description": "The name of the VPC Endpoint Service the Ocean for Apache Spark control plane should bind to.\n",
+                                            "example": "com.amazonaws.vpce.eu-north-1.vpce-svc-XXXXXXXXXXXXXXXXX"
+                                          }
                                         }
                                       }
                                     }
