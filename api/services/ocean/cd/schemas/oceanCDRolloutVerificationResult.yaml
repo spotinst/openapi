@@ -1,0 +1,104 @@
+type: object
+title: Ocean CD Rollouts Phase
+description: >
+  Represents object of Rollout Phase
+properties:
+  metricName:
+    type: "string"
+    example: "prometheus-metric"
+    description: >
+      Name of the metric.
+  startTime:
+    type: "Date"
+    example: "2018-11-05T12:55:50.000+0000"
+  status:
+    type: "string"
+    enum: [ pending, running, inProgress, successful, failed, error ]
+    example: "successful"
+    description: >
+      The status of the verification.
+  message:
+    type: "string"
+    description: >
+      The message of the verification.
+  failureCondition:
+    type: "string"
+    example: "result[0] >= 1000000"
+    description: >
+      The failure condition decided for the verification.
+  successCondition:
+    type: "string"
+    example: "result[0] < 1000000"
+    description: >
+      The Success condition decided for the verification.
+  query:
+    type: "string"
+    example: "sum(container_cpu_usage_seconds_total{namespace=\"analysis-namespace\", endpoint=\"https-metrics\"})"
+    description: >
+      The query that will provide the result to check with the failure/success condition.
+  failureLimit:
+    type: "Integer"
+    example: 1
+    description: >
+      The max amount of failures.
+  interval:
+    type: "string"
+    example: "5s"
+    description: >
+      The interval of the verification.
+  count:
+    type: "Integer"
+    example: 3
+    description: >
+      The count.
+  dataPoints:
+    type: "array"
+    description: >
+      Data points
+    items:
+      $ref: "./oceanCDRolloutDataPoints.yaml"
+  provider:
+    type: "string"
+    enum: [ datadog, newRelic, prometheus, cloudWatch, web, job ]
+    example: "prometheus"
+    description: >
+      The provider of the verifications.
+  step:
+    type: "string"
+    example: "Background"
+    description: >
+      The step from the failure/success comes from.
+  providerDetails:
+    type: "object"
+    description: >
+      The provider details
+    properties:
+      job:
+       type: "object"
+       description: >
+          The provider Job
+       properties:
+         containers:
+           type: "array"
+           description: >
+             List of containers
+           items:
+             type: object
+             properties:
+               name:
+                 type: "string"
+                 example: "nginx"
+                 description: >
+                   List of containers
+               image:
+                 type: "string"
+                 example: "public.ecr.aws/nginx/nginx:1.22"
+                 description: >
+                   Image
+               command:
+                 type: "array"
+                 description: >
+                   List of commands
+                 items:
+                   type: String
+                   example: "echo"
