@@ -18727,9 +18727,9 @@
                                         "statistic": {
                                           "type": "string",
                                           "description": "Statistic by which to evaluate the selected metric.\n",
-                                          "example": "Average",
+                                          "example": "average",
                                           "enum": [
-                                            "Average",
+                                            "average",
                                             "total",
                                             "minimum",
                                             "maximum",
@@ -18778,7 +18778,6 @@
                                         "namespace": {
                                           "type": "string",
                                           "description": "Should be one of the namespaces:\n* Microsoft.AnalysisServices/servers\n* Microsoft.ApiManagement/service\n* Microsoft.Automation/automationAccounts\n* Microsoft.Batch/batchAccounts\n* Microsoft.Cache/redis\n* Microsoft.Compute\n* Microsoft.CognitiveServices/accounts\n* Microsoft.ContainerInstance/containerGroups\n* Microsoft.ContainerService/managedClusters\n* Microsoft.CustomerInsights/hubs\n* Microsoft.DataFactory/datafactories\n* Microsoft.DataFactory/factories\n* Microsoft.DataLakeAnalytics/accounts\n* Microsoft.DataLakeStore/accounts\n* Microsoft.DBforMariaDB/servers\n* Microsoft.DBforMySQL/servers\n* Microsoft.DBforPostgreSQL/servers\n* Microsoft.Devices/IotHubs\n* Microsoft.Devices/provisioningServices\n* Microsoft.DocumentDB/databaseAccounts\n* Microsoft.EventGrid/topics\n* Microsoft.EventGrid/eventSubscriptions\n* Microsoft.EventGrid/extensionTopics\n* Microsoft.EventHub/namespaces\n* Microsoft.EventHub/clusters\n* Microsoft.HDInsight/clusters\n* Microsoft.Insights/AutoscaleSettings\n* Microsoft.Insights/Components\n* Microsoft.KeyVault/vaults\n* Microsoft.Kusto/Clusters\n* Microsoft.LocationBasedServices/accounts\n* Microsoft.Logic/workflows\n* Microsoft.NetApp/netAppAccounts/capacityPools/Volumes\n* Microsoft.NetApp/netAppAccounts/capacityPools\n* Microsoft.Network/networkInterfaces\n* Microsoft.Network/loadBalancers\n* Microsoft.Network/dnszones\n* Microsoft.Network/publicIPAddresses\n* Microsoft.Network/applicationGateways\n* Microsoft.Network/virtualNetworkGateways\n* Microsoft.Network/expressRouteCircuits\n* Microsoft.Network/expressRouteCircuits/peerings\n* Microsoft.Network/connections\n* Microsoft.Network/trafficManagerProfiles\n* Microsoft.Network/networkWatchers/connectionMonitors\n* Microsoft.Network/frontdoors\n* Microsoft.NotificationHubs/Namespaces/NotificationHubs\n* Microsoft.OperationalInsights/workspaces\n* Microsoft.PowerBIDedicated/capacities\n* Microsoft.Relay/namespaces\n* Microsoft.Search/searchServices\n* Microsoft.ServiceBus/namespaces\n* Microsoft.SignalRService/SignalR\n* Microsoft.Sql/servers/databases\n* Microsoft.Sql/servers/elasticPools\n* Microsoft.Sql/managedInstances\n* Microsoft.Storage/storageAccounts\n* Microsoft.Storage/storageAccounts/blobServices\n* Microsoft.Storage/storageAccounts/fileServices\n* Microsoft.Storage/storageAccounts/queueServices\n* Microsoft.Storage/storageAccounts/tableServices\n* Microsoft.StreamAnalytics/streamingjobs\n* Microsoft.TimeSeriesInsights/environments\n* Microsoft.TimeSeriesInsights/environments/eventsources\n* Microsoft.Web/serverfarms\n* Microsoft.Web/sites (excluding functions)\n* Microsoft.Web/sites (functions)\n* Microsoft.Web/sites/slots\n* Microsoft.Web/hostingEnvironments/multiRolePools\n* Microsoft.Web/hostingEnvironments/workerPools\n",
-                                          "default": "Microsoft.Compute",
                                           "example": "Microsoft.Network/applicationGateways"
                                         },
                                         "period": {
@@ -19652,6 +19651,221 @@
                               }
                             }
                           },
+                          "scheduling": {
+                            "type": "object",
+                            "title": "Stateless Group Scheduling",
+                            "description": "Define cron-based scheduled tasks.\n",
+                            "properties": {
+                              "tasks": {
+                                "type": "array",
+                                "description": "A list of scheduling tasks.\nNote: The type of each task defines the behavior of the cron execution.\n",
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "allOf": [
+                                        {
+                                          "$ref": "#/paths/~1azure~1compute~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/scheduling/properties/tasks/items/anyOf/0/allOf/0"
+                                        },
+                                        {
+                                          "type": "object",
+                                          "title": "Scaling Scheduled Task",
+                                          "description": "This is a scheduled task that will allow to change the group's capacty. If the target\nis changed, then VMs will either be scaled up or down.\nNote: At least one of the following must be configured: [scaleTargetCapacity, scaleMaxCapacity, scaleMinCapacity]\n",
+                                          "required": [
+                                            "type"
+                                          ],
+                                          "properties": {
+                                            "type": {
+                                              "type": "string",
+                                              "enum": [
+                                                "scale"
+                                              ],
+                                              "description": "Define cron-based scheduled tasks.\n"
+                                            },
+                                            "scaleTargetCapacity": {
+                                              "type": "integer",
+                                              "description": "This will set the defined target group capacity when the scheduling task is triggered.\n",
+                                              "minimum": 0
+                                            },
+                                            "scaleMaxCapacity": {
+                                              "type": "integer",
+                                              "description": "This will set the defined maximum group capacity when the scheduling task is triggered.\n",
+                                              "minimum": 0
+                                            },
+                                            "scaleMinCapacity": {
+                                              "type": "integer",
+                                              "description": "This will set the defined maximum group capacity when the scheduling task is triggered.\n",
+                                              "minimum": 0
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "allOf": [
+                                        {
+                                          "$ref": "#/paths/~1azure~1compute~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/scheduling/properties/tasks/items/anyOf/0/allOf/0"
+                                        },
+                                        {
+                                          "type": "object",
+                                          "title": "Scale Up Scheduled Task",
+                                          "description": "This is a scheduled task that will allow to add VMs to the group's target capacity by a specific count.\n",
+                                          "required": [
+                                            "adjustment",
+                                            "type"
+                                          ],
+                                          "properties": {
+                                            "type": {
+                                              "type": "string",
+                                              "enum": [
+                                                "scaleUp"
+                                              ],
+                                              "description": "Defines the type of the scheduled task.\n"
+                                            },
+                                            "adjustment": {
+                                              "type": "integer",
+                                              "description": "This will increase the target capacity by the defined amount when the scheduling task is triggered.\n",
+                                              "minimum": 1,
+                                              "example": 1
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "allOf": [
+                                        {
+                                          "$ref": "#/paths/~1azure~1compute~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/scheduling/properties/tasks/items/anyOf/0/allOf/0"
+                                        },
+                                        {
+                                          "type": "object",
+                                          "title": "Scale Down Scheduled Task",
+                                          "description": "This is a scheduled task that will allow to remove VMs from the group's target capacity by a specific count.\n",
+                                          "required": [
+                                            "adjustment",
+                                            "type"
+                                          ],
+                                          "properties": {
+                                            "type": {
+                                              "type": "string",
+                                              "enum": [
+                                                "scaleDown"
+                                              ],
+                                              "description": "Defines the type of the scheduled task.\n"
+                                            },
+                                            "adjustment": {
+                                              "type": "integer",
+                                              "description": "This will decrease the target capacity by the defined amount when the scheduling task is triggered.\n",
+                                              "minimum": 1,
+                                              "example": 1
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "allOf": [
+                                        {
+                                          "$ref": "#/paths/~1azure~1compute~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/scheduling/properties/tasks/items/anyOf/0/allOf/0"
+                                        },
+                                        {
+                                          "type": "object",
+                                          "title": "Scale Up Percentage Scheduled Task",
+                                          "description": "This is a scheduled task that will allow to add VMs to the group's target capacity by a percentage of the group's current target.\n",
+                                          "required": [
+                                            "adjustmentPercentage",
+                                            "type"
+                                          ],
+                                          "properties": {
+                                            "type": {
+                                              "type": "string",
+                                              "enum": [
+                                                "scaleUpPercentage"
+                                              ],
+                                              "description": "Defines the type of the scheduled task.\n"
+                                            },
+                                            "adjustmentPercentage": {
+                                              "type": "integer",
+                                              "description": "This will increase the target capacity by the defined percentage value when the scheduling task is triggered.\nThis will set the target capacity by the defined percentage of the current target when the scheduling task triggers.\n",
+                                              "minimum": 1,
+                                              "maximum": 100
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "allOf": [
+                                        {
+                                          "$ref": "#/paths/~1azure~1compute~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/scheduling/properties/tasks/items/anyOf/0/allOf/0"
+                                        },
+                                        {
+                                          "type": "object",
+                                          "title": "Scale Down Percentage Scheduled Task",
+                                          "description": "This is a scheduled task that will allow to remove VMs from the group's target capacity by a percentage of the group's current target.\n",
+                                          "required": [
+                                            "adjustmentPercentage",
+                                            "type"
+                                          ],
+                                          "properties": {
+                                            "type": {
+                                              "type": "string",
+                                              "enum": [
+                                                "percentageScaleDown"
+                                              ],
+                                              "description": "Defines the type of the scheduled task.\n"
+                                            },
+                                            "adjustmentPercentage": {
+                                              "type": "integer",
+                                              "description": "This will decrease the target capacity by the defined percentage value when the scheduling task is triggered.\n",
+                                              "minimum": 1,
+                                              "maximum": 100
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "allOf": [
+                                        {
+                                          "$ref": "#/paths/~1azure~1compute~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/scheduling/properties/tasks/items/anyOf/0/allOf/0"
+                                        },
+                                        {
+                                          "type": "object",
+                                          "title": "Deployment Scheduled Task",
+                                          "description": "This is a scheduled task that will allow the deployment of an Elastigroup.\n",
+                                          "required": [
+                                            "batchSizePercentage",
+                                            "gracePeriod",
+                                            "type"
+                                          ],
+                                          "properties": {
+                                            "type": {
+                                              "type": "string",
+                                              "enum": [
+                                                "deployment"
+                                              ],
+                                              "description": "Defines the type of the scheduled task.\n"
+                                            },
+                                            "batchSizePercentage": {
+                                              "type": "integer",
+                                              "description": "Indicates the timeout (in seconds) to wait until the VM becomes healthy, based on the healthCheckType.\n",
+                                              "minimum": 1,
+                                              "maximum": 100
+                                            },
+                                            "gracePeriod": {
+                                              "type": "integer",
+                                              "description": "Indicates (in seconds) the timeout to wait until instance become healthy based on the healthCheckType.\n",
+                                              "minimum": 1
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          },
                           "createdAt": {
                             "type": "string",
                             "readOnly": true,
@@ -19883,17 +20097,20 @@
                           "target": {
                             "type": "integer",
                             "description": "Desired number of VMs for Elastigroup to maintain.\n",
-                            "example": 8
+                            "example": 8,
+                            "minimum": 0
                           },
                           "minimum": {
                             "type": "integer",
                             "example": 2,
-                            "description": "Minimum number of VMs.\n"
+                            "description": "Minimum number of VMs.\n",
+                            "minimum": 0
                           },
                           "maximum": {
                             "type": "integer",
                             "example": 10,
-                            "description": "Maximum number of VMs.\n"
+                            "description": "Maximum number of VMs.\n",
+                            "minimum": 0
                           }
                         }
                       }
@@ -21190,6 +21407,234 @@
                                 }
                               }
                             }
+                          },
+                          "scheduling": {
+                            "description": "Define cron-based scheduled tasks.\n",
+                            "properties": {
+                              "tasks": {
+                                "type": "array",
+                                "description": "A list of scheduling tasks.\nNote: The type of each task defines the behavior of the cron execution.\n",
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "allOf": [
+                                        {
+                                          "type": "object",
+                                          "required": [
+                                            "isEnabled",
+                                            "cronExpression"
+                                          ],
+                                          "properties": {
+                                            "isEnabled": {
+                                              "type": "string",
+                                              "description": "A list of scheduling tasks.\n"
+                                            },
+                                            "cronExpression": {
+                                              "type": "string",
+                                              "description": "A valid cron expression.\nThe cron is running in UTC time zone and is in Unix cron format of Cron Expression Validator Script.\n",
+                                              "example": "0 1 * * *"
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "object",
+                                          "title": "Scaling Scheduled Task",
+                                          "description": "This is a scheduled task that will allow to change the group's capacty. If the target\nis changed, then VMs will either be scaled up or down.\nNote: At least one of the following must be configured: [scaleTargetCapacity, scaleMaxCapacity, scaleMinCapacity]\n",
+                                          "required": [
+                                            "type"
+                                          ],
+                                          "properties": {
+                                            "type": {
+                                              "type": "string",
+                                              "enum": [
+                                                "scale"
+                                              ],
+                                              "description": "Define cron-based scheduled tasks.\n"
+                                            },
+                                            "scaleTargetCapacity": {
+                                              "type": "integer",
+                                              "description": "This will set the defined target group capacity when the scheduling task is triggered.\n",
+                                              "minimum": 0
+                                            },
+                                            "scaleMaxCapacity": {
+                                              "type": "integer",
+                                              "description": "This will set the defined maximum group capacity when the scheduling task is triggered.\n",
+                                              "minimum": 0
+                                            },
+                                            "scaleMinCapacity": {
+                                              "type": "integer",
+                                              "description": "This will set the defined maximum group capacity when the scheduling task is triggered.\n",
+                                              "minimum": 0
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "allOf": [
+                                        {
+                                          "$ref": "#/paths/~1azure~1compute~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/scheduling/properties/tasks/items/anyOf/0/allOf/0"
+                                        },
+                                        {
+                                          "type": "object",
+                                          "title": "Scale Up Scheduled Task",
+                                          "description": "This is a scheduled task that will allow to add VMs to the group's target capacity by a specific count.\n",
+                                          "required": [
+                                            "adjustment",
+                                            "type"
+                                          ],
+                                          "properties": {
+                                            "type": {
+                                              "type": "string",
+                                              "enum": [
+                                                "scaleUp"
+                                              ],
+                                              "description": "Defines the type of the scheduled task.\n"
+                                            },
+                                            "adjustment": {
+                                              "type": "integer",
+                                              "description": "This will increase the target capacity by the defined amount when the scheduling task is triggered.\n",
+                                              "minimum": 1,
+                                              "example": 1
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "allOf": [
+                                        {
+                                          "$ref": "#/paths/~1azure~1compute~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/scheduling/properties/tasks/items/anyOf/0/allOf/0"
+                                        },
+                                        {
+                                          "type": "object",
+                                          "title": "Scale Down Scheduled Task",
+                                          "description": "This is a scheduled task that will allow to remove VMs from the group's target capacity by a specific count.\n",
+                                          "required": [
+                                            "adjustment",
+                                            "type"
+                                          ],
+                                          "properties": {
+                                            "type": {
+                                              "type": "string",
+                                              "enum": [
+                                                "scaleDown"
+                                              ],
+                                              "description": "Defines the type of the scheduled task.\n"
+                                            },
+                                            "adjustment": {
+                                              "type": "integer",
+                                              "description": "This will decrease the target capacity by the defined amount when the scheduling task is triggered.\n",
+                                              "minimum": 1,
+                                              "example": 1
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "allOf": [
+                                        {
+                                          "$ref": "#/paths/~1azure~1compute~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/scheduling/properties/tasks/items/anyOf/0/allOf/0"
+                                        },
+                                        {
+                                          "type": "object",
+                                          "title": "Scale Up Percentage Scheduled Task",
+                                          "description": "This is a scheduled task that will allow to add VMs to the group's target capacity by a percentage of the group's current target.\n",
+                                          "required": [
+                                            "adjustmentPercentage",
+                                            "type"
+                                          ],
+                                          "properties": {
+                                            "type": {
+                                              "type": "string",
+                                              "enum": [
+                                                "scaleUpPercentage"
+                                              ],
+                                              "description": "Defines the type of the scheduled task.\n"
+                                            },
+                                            "adjustmentPercentage": {
+                                              "type": "integer",
+                                              "description": "This will increase the target capacity by the defined percentage value when the scheduling task is triggered.\nThis will set the target capacity by the defined percentage of the current target when the scheduling task triggers.\n",
+                                              "minimum": 1,
+                                              "maximum": 100
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "allOf": [
+                                        {
+                                          "$ref": "#/paths/~1azure~1compute~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/scheduling/properties/tasks/items/anyOf/0/allOf/0"
+                                        },
+                                        {
+                                          "type": "object",
+                                          "title": "Scale Down Percentage Scheduled Task",
+                                          "description": "This is a scheduled task that will allow to remove VMs from the group's target capacity by a percentage of the group's current target.\n",
+                                          "required": [
+                                            "adjustmentPercentage",
+                                            "type"
+                                          ],
+                                          "properties": {
+                                            "type": {
+                                              "type": "string",
+                                              "enum": [
+                                                "percentageScaleDown"
+                                              ],
+                                              "description": "Defines the type of the scheduled task.\n"
+                                            },
+                                            "adjustmentPercentage": {
+                                              "type": "integer",
+                                              "description": "This will decrease the target capacity by the defined percentage value when the scheduling task is triggered.\n",
+                                              "minimum": 1,
+                                              "maximum": 100
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "allOf": [
+                                        {
+                                          "$ref": "#/paths/~1azure~1compute~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/scheduling/properties/tasks/items/anyOf/0/allOf/0"
+                                        },
+                                        {
+                                          "type": "object",
+                                          "title": "Deployment Scheduled Task",
+                                          "description": "This is a scheduled task that will allow the deployment of an Elastigroup.\n",
+                                          "required": [
+                                            "batchSizePercentage",
+                                            "gracePeriod",
+                                            "type"
+                                          ],
+                                          "properties": {
+                                            "type": {
+                                              "type": "string",
+                                              "enum": [
+                                                "deployment"
+                                              ],
+                                              "description": "Defines the type of the scheduled task.\n"
+                                            },
+                                            "batchSizePercentage": {
+                                              "type": "integer",
+                                              "description": "Indicates the timeout (in seconds) to wait until the VM becomes healthy, based on the healthCheckType.\n",
+                                              "minimum": 1,
+                                              "maximum": 100
+                                            },
+                                            "gracePeriod": {
+                                              "type": "integer",
+                                              "description": "Indicates (in seconds) the timeout to wait until instance become healthy based on the healthCheckType.\n",
+                                              "minimum": 1
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              }
+                            }
                           }
                         }
                       }
@@ -22002,6 +22447,9 @@
                                   "health": {
                                     "$ref": "#/paths/~1azure~1compute~1group~1%7BgroupId%7D/put/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/health"
                                   },
+                                  "scheduling": {
+                                    "$ref": "#/paths/~1azure~1compute~1group~1%7BgroupId%7D/put/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/scheduling"
+                                  },
                                   "createdAt": {
                                     "type": "string",
                                     "readOnly": true,
@@ -22762,7 +23210,8 @@
             "example": 5,
             "description": "Number of VMs to scale down\n",
             "schema": {
-              "type": "integer"
+              "type": "integer",
+              "minimum": 1
             },
             "required": true
           }
@@ -22798,7 +23247,8 @@
             "example": 5,
             "description": "Number of VMs to scale up\n",
             "schema": {
-              "type": "integer"
+              "type": "integer",
+              "minimum": 1
             },
             "required": true
           }
@@ -23634,7 +24084,8 @@
                     "type": "object",
                     "required": [
                       "vmName",
-                      "signalType"
+                      "signalType",
+                      "resourceGroupName"
                     ],
                     "properties": {
                       "vmName": {
@@ -23650,6 +24101,11 @@
                         ],
                         "example": "vmReady",
                         "description": "The specific signal you want to trigger.\n"
+                      },
+                      "resourceGroupName": {
+                        "type": "string",
+                        "example": "TestResourceGroup",
+                        "description": "This is the resource group of the Elastigroup or Stateful Node.\n"
                       }
                     }
                   }
@@ -23900,7 +24356,7 @@
             "in": "query",
             "name": "RESOURCE_ID",
             "example": "vm-12345678",
-            "description": "Filter log extracted entires related to a specific resource id Default: Null\n",
+            "description": "Filter log extracted entries related to a specific resource id Default: Null\n",
             "schema": {
               "type": "string"
             }
@@ -44454,7 +44910,7 @@
                           },
                           "proxyAddress": {
                             "type": "string",
-                            "description": "The public hostname / IP where you installed the the Spot HCS\n",
+                            "description": "The public hostname / IP where you installed the Spot HCS\n",
                             "example": "51.22.125.47",
                             "required": true
                           },
