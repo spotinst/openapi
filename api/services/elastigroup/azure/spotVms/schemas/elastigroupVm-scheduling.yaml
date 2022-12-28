@@ -1,2 +1,155 @@
 type: object
-title: Elastigroup Scheduling
+title: Stateless Group Scheduling
+description: |
+  Define cron-based scheduled tasks.
+properties:
+  tasks:
+    type: array
+    description: |
+      A list of scheduling tasks.
+      Note: The type of each task defines the behavior of the cron execution.
+    items:
+      anyOf:
+        - allOf:
+            - $ref: "elastigroupVm-base-scheduling-task.yaml"
+            - type: object
+              title: Scaling Scheduled Task
+              description: |
+                This is a scheduled task that will allow to change the group's capacty. If the target
+                is changed, then VMs will either be scaled up or down.
+                Note: At least one of the following must be configured: [scaleTargetCapacity, scaleMaxCapacity, scaleMinCapacity]
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum: [ scale ]
+                  description: |
+                    Define cron-based scheduled tasks.
+                scaleTargetCapacity:
+                  type: integer
+                  description: |
+                    This will set the defined target group capacity when the scheduling task is triggered.
+                  minimum: 0
+                scaleMaxCapacity:
+                  type: integer
+                  description: |
+                    This will set the defined maximum group capacity when the scheduling task is triggered.
+                  minimum: 0
+                scaleMinCapacity:
+                  type: integer
+                  description: |
+                    This will set the defined maximum group capacity when the scheduling task is triggered.
+                  minimum: 0
+        - allOf:
+            - $ref: "elastigroupVm-base-scheduling-task.yaml"
+            - type: object
+              title: Scale Up Scheduled Task
+              description: |
+                This is a scheduled task that will allow to add VMs to the group's target capacity by a specific count.
+              required:
+                - adjustment
+                - type
+              properties:
+                type:
+                  type: string
+                  enum: [ scaleUp ]
+                  description: |
+                    Defines the type of the scheduled task.
+                adjustment:
+                  type: integer
+                  description: |
+                    This will increase the target capacity by the defined amount when the scheduling task is triggered.
+                  minimum: 1
+                  example: 1
+        - allOf:
+            - $ref: "elastigroupVm-base-scheduling-task.yaml"
+            - type: object
+              title: Scale Down Scheduled Task
+              description: |
+                This is a scheduled task that will allow to remove VMs from the group's target capacity by a specific count.
+              required:
+                - adjustment
+                - type
+              properties:
+                type:
+                  type: string
+                  enum: [ scaleDown ]
+                  description: |
+                    Defines the type of the scheduled task.
+                adjustment:
+                  type: integer
+                  description: |
+                    This will decrease the target capacity by the defined amount when the scheduling task is triggered.
+                  minimum: 1
+                  example: 1
+        - allOf:
+            - $ref: "elastigroupVm-base-scheduling-task.yaml"
+            - type: object
+              title: Scale Up Percentage Scheduled Task
+              description: |
+                This is a scheduled task that will allow to add VMs to the group's target capacity by a percentage of the group's current target.
+              required:
+                - adjustmentPercentage
+                - type
+              properties:
+                type:
+                  type: string
+                  enum: [ scaleUpPercentage ]
+                  description: |
+                    Defines the type of the scheduled task.
+                adjustmentPercentage:
+                  type: integer
+                  description: |
+                    This will increase the target capacity by the defined percentage value when the scheduling task is triggered.
+                    This will set the target capacity by the defined percentage of the current target when the scheduling task triggers.
+                  minimum: 1
+                  maximum: 100
+        - allOf:
+            - $ref: "elastigroupVm-base-scheduling-task.yaml"
+            - type: object
+              title: Scale Down Percentage Scheduled Task
+              description: |
+                This is a scheduled task that will allow to remove VMs from the group's target capacity by a percentage of the group's current target.
+              required:
+                - adjustmentPercentage
+                - type
+              properties:
+                type:
+                  type: string
+                  enum: [ percentageScaleDown ]
+                  description: |
+                    Defines the type of the scheduled task.
+                adjustmentPercentage:
+                  type: integer
+                  description: |
+                    This will decrease the target capacity by the defined percentage value when the scheduling task is triggered.
+                  minimum: 1
+                  maximum: 100
+        - allOf:
+            - $ref: "elastigroupVm-base-scheduling-task.yaml"
+            - type: object
+              title: Deployment Scheduled Task
+              description: |
+                This is a scheduled task that will allow the deployment of an Elastigroup.
+              required:
+                - batchSizePercentage
+                - gracePeriod
+                - type
+              properties:
+                type:
+                  type: string
+                  enum: [ deployment ]
+                  description: |
+                    Defines the type of the scheduled task.
+                batchSizePercentage:
+                  type: integer
+                  description: |
+                    Indicates the timeout (in seconds) to wait until the VM becomes healthy, based on the healthCheckType.
+                  minimum: 1
+                  maximum: 100
+                gracePeriod:
+                  type: integer
+                  description: |
+                    Indicates (in seconds) the timeout to wait until instance become healthy based on the healthCheckType.
+                  minimum: 1
