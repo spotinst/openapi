@@ -1,7 +1,18 @@
 put:
-  summary: "Reimport Cluster"
-  description: >
-    Re-import the AKS Cluster configuration
+  summary: "ReImport Cluster"
+  description: |
+    In the special case that Ocean has already imported an AKS cluster and we need to reimport it again (because the customer has updated the AKS cluster through Azure directly). The reimport process will reimport and immediately update the Ocean cluster configuration from the given AKS cluster.
+    The ReImport Cluster API call returns a JSON formatted Ocean cluster specification after the update of the given AKS cluster.
+    
+    Prerequisites:
+    * To initiate the reimport from AKS, run the following script on a machine with the kubectl command-line tool installed and configured (Ensure the correct context is set in kube config.)
+    ```
+    curl -fsSL https://spotinst-public.s3.amazonaws.com/integrations/kubernetes/aks/spot-aks-connector/init.sh | \
+    bash -s acd-12345678
+    ```
+    * The import identifier has the prefix “acd-“ followed by eight characters. Use the same identifier as input for this API call.
+    * Please make sure the results K8S job is running on an updated node (i.e. node that was updated by Azure directly)
+    * Learn more about the [Import from AKS](https://docs.spot.io/ocean/getting-started/aks?id=import-process-overview) process.
   operationId: "oceanAKSClusterReImport"
   tags:
     - "Ocean AKS"
