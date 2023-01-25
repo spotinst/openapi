@@ -23080,7 +23080,7 @@
                     "type": "string",
                     "example": 300,
                     "description": "The time in seconds to allow the virtual machine be be drained from incoming TCP connections and detached from MLB before terminating it.\n",
-                    "default": 300
+                    "default": 120
                   }
                 }
               }
@@ -31306,6 +31306,145 @@
                           }
                         }
                       }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/gcp/costs": {
+      "get": {
+        "summary": "Get Costs Per Account",
+        "description": "Retrieve costs up to one year back per specified account over a specified time period.",
+        "operationId": "gcpCostsPerAccount",
+        "tags": [
+          "Elastigroup GCP"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "accountId",
+            "example": "act-12345678",
+            "description": "The Spot account ID for which the cost information should be returned.\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "fromDate",
+            "example": "2016-01-10T00:00:00.000Z",
+            "description": "* The start date of the requested time period. \n* Date values following either a date format (YYYY-MM-DDTHH:mm:ss.SSSZ) or Unix milliseconds timestamp (1668078050004).\n* <a style=color:red>The value cannot be earlier than 1 year back.</a>\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "toDate",
+            "example": "2016-01-10T01:00:00.000Z",
+            "description": "* The end date of the requested time period. \n* Date values following either a date format (YYYY-MM-DDTHH:mm:ss.SSSZ) or Unix milliseconds timestamp (1668078050004).\n* <a style=color:red>The maximum of time period length is 90 days.</a>\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Costs Per Account Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "allOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "request": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "example": "67582d0c-108b-4ef7-9fdc-d39678a30844"
+                                },
+                                "url": {
+                                  "type": "string",
+                                  "example": "/gcp/gce/costs"
+                                },
+                                "method": {
+                                  "type": "string",
+                                  "example": "GET"
+                                },
+                                "timestamp": {
+                                  "type": "string",
+                                  "example": "2016-01-10T01:00:00.000Z"
+                                }
+                              }
+                            },
+                            "response": {
+                              "type": "object",
+                              "properties": {
+                                "kind": {
+                                  "type": "string",
+                                  "example": "spotinst:gcp:costs"
+                                },
+                                "items": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "title": "spotinst:gcp:costs",
+                                    "properties": {
+                                      "preemptible": {
+                                        "type": "object",
+                                        "properties": {
+                                          "runningHours": {
+                                            "description": "The sum of preemptible running hours.",
+                                            "type": "number",
+                                            "format": "number",
+                                            "example": 1470.8
+                                          },
+                                          "actualCosts": {
+                                            "description": "The actual cost of the preemptible instances.",
+                                            "type": "number",
+                                            "format": "number",
+                                            "example": 107.3
+                                          },
+                                          "potentialCosts": {
+                                            "description": "The OD cost of the running preemptible instances.",
+                                            "type": "number",
+                                            "format": "number",
+                                            "example": 378.41
+                                          },
+                                          "savingsPercentage": {
+                                            "description": "The total savings percentage.",
+                                            "type": "number",
+                                            "format": "number",
+                                            "example": 71.64
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                },
+                                "count": {
+                                  "type": "integer",
+                                  "example": 1
+                                }
+                              }
+                            }
+                          }
+                        }
+                      ]
                     }
                   ]
                 }
