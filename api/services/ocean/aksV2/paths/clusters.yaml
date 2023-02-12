@@ -1,0 +1,58 @@
+summary: Ocean for AKS
+
+post:
+  summary: "Create Cluster"
+  description: | 
+    todo noa
+    Creates an Ocean entity according to a given specification.
+
+    Prerequisite:
+
+    Kubenet-based AKS clusters only: The permissions needed in the Azure managed service identity (MSI) for Ocean to use when provisioning new nodes should be adjusted. Run the displayed script on a workstation with an Owner permissions token for the Azure environment. [Learn more](https://docs.spot.io/ocean/getting-started/aks?id=additional-steps-for-kubenet-based-clusters).
+
+    Notes:
+
+    1. The Ocean Controller is used to monitor the cluster resources and report back to Ocean SaaS. A properly functioning controller is mandatory for Ocean to operate. To install the Controller, run the following script on a machine with kubectl command line tool installed and configured:
+
+    ```
+    #!/usr/bin/env bash
+    curl -fsSL http://spotinst-public.s3.amazonaws.com/integrations/kubernetes/cluster-controller/scripts/init.sh | \
+    SPOTINST_TOKEN=<ENTER YOUR TOKEN HERE> \
+    SPOTINST_ACCOUNT=<ENTER YOUR SPOTINST ACCOUNT ID HERE> \
+    SPOTINST_CLUSTER_IDENTIFIER=<ENTER YOUR CLUSTER IDENTIFIER HERE> \
+    bash
+    ```
+
+    2. It is recommended to import all necessary information from the existing AKS cluster using the Ocean [AKS Cluster Import](https://docs.spot.io/api/#operation/oceanAKSClusterImport) API call and use its output to create a fully configured Ocean cluster.
+  operationId: "oceanAKSClusterCreate"
+  tags:
+    - "Ocean AKS V2"
+  parameters:
+    - $ref: "../../../../commons/parameters/accountId.yaml"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          allOf:
+            - $ref:  "../schemas/ocean.yaml"
+  responses:
+    200:
+      $ref: "../responses/oceanClusterCreate.yaml"
+    400:
+      description: "Bad Request"
+
+get:
+  summary: "List Clusters"
+  description: |
+    List the configurations for all Ocean clusters in the specified account.
+  operationId: "oceanAKSClusterList"
+  tags:
+    - "Ocean AKS V2"
+  parameters:
+    - $ref: "../../../../commons/parameters/accountId.yaml"
+  responses:
+    200:
+      $ref: "../responses/oceanClusterList.yaml"
+    400:
+      description: "Bad Request"
