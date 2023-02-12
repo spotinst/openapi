@@ -44511,11 +44511,18 @@
                 "allOf": [
                   {
                     "type": "object",
+                    "required": [
+                      "migration"
+                    ],
                     "properties": {
                       "migration": {
                         "title": "Migration",
                         "description": "Migration Configuration",
                         "type": "object",
+                        "required": [
+                          "originalInstanceId",
+                          "region"
+                        ],
                         "properties": {
                           "shouldKeepPrivateIp": {
                             "required": true,
@@ -44567,7 +44574,7 @@
                               "properties": {
                                 "name": {
                                   "type": "string",
-                                  "description": "Region's Name",
+                                  "description": "Availability Zone name",
                                   "example": "us-west-2c"
                                 },
                                 "subnetIds": {
@@ -44591,7 +44598,7 @@
         },
         "responses": {
           "200": {
-            "description": "Elastigroup Response",
+            "description": "Migration Response",
             "content": {
               "application/json": {
                 "schema": {
@@ -44612,10 +44619,13 @@
                                 "properties": {
                                   "migrationId": {
                                     "type": "string",
+                                    "title": "The id of the migration",
+                                    "description": "In order to fetch migration status, you can utilize this id as a `Get Instance Migration Status` API call input",
                                     "example": "smg-123"
                                   },
                                   "managedInstanceId": {
                                     "type": "string",
+                                    "title": "Managed Instance ID",
                                     "example": "smi-123"
                                   },
                                   "data": {
@@ -44623,23 +44633,249 @@
                                     "properties": {
                                       "originalInstanceId": {
                                         "type": "string",
+                                        "title": "Instance id",
+                                        "description": "Original AWS EC2 Instance id",
                                         "example": "i-123"
                                       },
                                       "shouldKeepPrivateIp": {
                                         "type": "boolean",
+                                        "title": "Should keep private IP",
+                                        "example": true
+                                      },
+                                      "shouldTerminateInstance": {
+                                        "type": "boolean",
+                                        "title": "Should terminate instance",
                                         "example": true
                                       }
                                     }
                                   },
                                   "state": {
                                     "type": "string",
+                                    "title": "Migration state",
+                                    "description": "On initiation, the migration would be in the following state - `MIGRATE_START`. Possible end states for the migration are -  `MIGRATE_CANCEL`, `MIGRATE_FINISH`, `MIGRATE_ERROR`.",
                                     "example": "MIGRATE_START"
                                   }
                                 }
                               }
                             },
                             "kind": {
-                              "example": "potinst:aws:ec2:managedInstance:migration"
+                              "example": "spotinst:aws:ec2:managedInstance:migration"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/aws/ec2/managedInstance/migration/bulk": {
+      "post": {
+        "summary": "Import Multiple Instances from AWS",
+        "description": "<ul> <li>Import multiple stateful instances from AWS into Managed Instance, preserving both instance data and persistence settings.\n<li>This call initiates migration for all instances and returns the associated migration IDs.\n<li>To check the status of multiple migrations, use the `Get Multiple Instance Migration Status` call.\n<li>Note: The response contains a `failures` field. In the event that one or more instances failed to migrate, this field will provide the corresponding resource IDs and error messages. If all migrations were successful, this field will return an empty list. <ul>\n",
+        "operationId": "AWSManagedInstanceBulkImportInstanceFromAWS",
+        "tags": [
+          "Managed Instance AWS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "migrations"
+                    ],
+                    "properties": {
+                      "migrations": {
+                        "title": "Migrations",
+                        "description": "List of Migration requests",
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "title": "Migration",
+                          "description": "Migration request",
+                          "required": [
+                            "originalInstanceId",
+                            "region"
+                          ],
+                          "properties": {
+                            "shouldKeepPrivateIp": {
+                              "type": "boolean",
+                              "example": false,
+                              "description": "Set whether the instance should keep its private ip or not\n"
+                            },
+                            "originalInstanceId": {
+                              "type": "string",
+                              "example": "i-123",
+                              "description": "The instance ID on AWS\n"
+                            },
+                            "region": {
+                              "type": "string",
+                              "example": "us-east-1",
+                              "description": "Set instance's region\n"
+                            },
+                            "shouldTerminateInstance": {
+                              "type": "boolean",
+                              "example": false,
+                              "description": "Set true or false whether to terminate the instance in AWS. Note: If shouldKeepPrivateIp is true, then shouldTerminateInstance must be true. Otherwise an error will be returned.\n"
+                            },
+                            "managedInstanceName": {
+                              "type": "string",
+                              "example": "us-east-1",
+                              "description": "Set Managed Instance name\n"
+                            },
+                            "product": {
+                              "type": "string",
+                              "example": "Linux/UNIX",
+                              "description": "Set instance's product\n"
+                            },
+                            "spotInstanceTypes": {
+                              "type": "array",
+                              "description": "List of possible instance types for the Managed Instance\n",
+                              "items": {
+                                "type": "string",
+                                "example": "m3.large"
+                              }
+                            },
+                            "availabilityZones": {
+                              "title": "Availability Zones",
+                              "description": "List of availability zones for the Managed Instance. Should exist only if shouldKeepPrivateIp is false.",
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "name": {
+                                    "type": "string",
+                                    "description": "Availability Zone name",
+                                    "example": "us-west-2c"
+                                  },
+                                  "subnetIds": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string",
+                                      "example": "subnet-fdfb00a0"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Bulk Migration Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "title": "Migration",
+                                "properties": {
+                                  "migrationId": {
+                                    "type": "string",
+                                    "title": "The id of the migration",
+                                    "description": "In order to fetch migration status, you can utilize this id as a `Get Instance Migration Status` API call input",
+                                    "example": "smg-123"
+                                  },
+                                  "managedInstanceId": {
+                                    "type": "string",
+                                    "title": "Managed Instance ID",
+                                    "example": "smi-123"
+                                  },
+                                  "data": {
+                                    "type": "object",
+                                    "properties": {
+                                      "originalInstanceId": {
+                                        "type": "string",
+                                        "title": "Instance id",
+                                        "description": "Original AWS EC2 Instance id",
+                                        "example": "i-123"
+                                      },
+                                      "managedInstanceName": {
+                                        "type": "string",
+                                        "title": "Managed Instance name",
+                                        "description": "Your chosen Managed Instance name, so you would be able to distinct between your requests",
+                                        "example": "MI-PROD-123"
+                                      },
+                                      "shouldKeepPrivateIp": {
+                                        "type": "boolean",
+                                        "title": "Should keep private IP",
+                                        "example": true
+                                      },
+                                      "shouldTerminateInstance": {
+                                        "type": "boolean",
+                                        "title": "Should terminate instance",
+                                        "example": true
+                                      }
+                                    }
+                                  },
+                                  "state": {
+                                    "type": "string",
+                                    "title": "Migration state",
+                                    "description": "On initiation, the migration would be in the following state - `MIGRATE_START`. Possible end states for the migration are -  `MIGRATE_CANCEL`, `MIGRATE_FINISH`, `MIGRATE_ERROR`.",
+                                    "example": "MIGRATE_START"
+                                  }
+                                }
+                              }
+                            },
+                            "failures": {
+                              "type": "array",
+                              "title": "Failed instances",
+                              "description": "AWS EC2 instances that we failed to start migrating. In case there are no failures, would return empty list",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "resourceId": {
+                                    "type": "string",
+                                    "title": "Original Instance Id",
+                                    "example": "i-456"
+                                  },
+                                  "errorMessage": {
+                                    "title": "Error Message",
+                                    "type": "string",
+                                    "description": "Failure reason",
+                                    "example": "Failed to create migration for managed instance"
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:aws:ec2:managedInstance:migration"
                             }
                           }
                         }
@@ -44681,7 +44917,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Elastigroup Response",
+            "description": "Managed Instance Migration Status Response",
             "content": {
               "application/json": {
                 "schema": {
@@ -44698,29 +44934,143 @@
                             "items": {
                               "type": "array",
                               "items": {
+                                "$ref": "#/paths/~1aws~1ec2~1managedInstance~1migration~1search/post/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:aws:ec2:managedInstance:migration"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/aws/ec2/managedInstance/migration/search": {
+      "post": {
+        "summary": "Get Multiple Instance Migration Status",
+        "description": "<ul> <li>Retrieve the status of a previously initiated multiple instance migrations.\n<li>To initiate multiple instance migrations from AWS, use the `Import Multiple Instances From AWS` call.\n<li>Upon initiation, the migration will be in the state of `MIGRATE_START`.\n<li>Possible final states for each migration include `MIGRATE_CANCEL`, `MIGRATE_FINISH`, and `MIGRATE_ERROR`. <ul>\n",
+        "operationId": "AWSManagedInstanceGetMultipleInstanceMigrationStatus",
+        "tags": [
+          "Managed Instance AWS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "migrationIds"
+                    ],
+                    "properties": {
+                      "migrationIds": {
+                        "title": "Migration Ids",
+                        "description": "List of Migration ids. Use the `migrationId` field received in a `Import Multiple Instances from AWS` response",
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "title": "Migration Id",
+                          "example": [
+                            "smg-1234",
+                            "smi-5678"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Bulk Managed Instance Migration Status Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "example": [
+                                {
+                                  "migrationId": "smg-1234",
+                                  "managedInstanceId": "smi-1234",
+                                  "instanceId": "i-1234",
+                                  "state": "MIGRATE_START",
+                                  "stateDescription": "Current state description"
+                                },
+                                {
+                                  "migrationId": "smg-5678",
+                                  "managedInstanceId": "smi-5678",
+                                  "instanceId": "i-5678",
+                                  "state": "MIGRATE_START",
+                                  "stateDescription": "Current state description"
+                                }
+                              ],
+                              "items": {
                                 "type": "object",
                                 "properties": {
                                   "migrationId": {
                                     "type": "string",
-                                    "example": "smg-123"
+                                    "title": "Stateful Migration id",
+                                    "example": "smg-1234"
                                   },
                                   "managedInstanceId": {
                                     "type": "string",
-                                    "example": "smi-123"
-                                  },
-                                  "state": {
-                                    "type": "string",
-                                    "example": "MIGRATE_START"
+                                    "title": "Managed Instance id",
+                                    "example": "smi-1234"
                                   },
                                   "instanceId": {
                                     "type": "string",
-                                    "example": "i-123"
+                                    "title": "AWS EC2 Instance id",
+                                    "example": "i-1234"
+                                  },
+                                  "state": {
+                                    "type": "string",
+                                    "title": "Current migration state",
+                                    "example": "MIGRATE_START"
+                                  },
+                                  "stateDescription": {
+                                    "type": "string",
+                                    "title": "Current state description",
+                                    "example": "Creating an image from the instance"
                                   }
                                 }
                               }
                             },
                             "kind": {
-                              "example": "potinst:aws:ec2:managedInstance:migration"
+                              "example": "spotinst:aws:ec2:managedInstance:migration"
+                            },
+                            "count": {
+                              "type": "integer",
+                              "example": 2
                             }
                           }
                         }
@@ -44792,18 +45142,16 @@
                             }
                           }
                         },
-                        "example": {
-                          "managedInstanceStates": [
-                            {
-                              "id": "smi-12345678",
-                              "state": "PAUSE"
-                            },
-                            {
-                              "id": "smi-12345679",
-                              "state": "RESUME"
-                            }
-                          ]
-                        }
+                        "example": [
+                          {
+                            "id": "smi-12345678",
+                            "state": "PAUSE"
+                          },
+                          {
+                            "id": "smi-12345679",
+                            "state": "RESUME"
+                          }
+                        ]
                       }
                     }
                   }
