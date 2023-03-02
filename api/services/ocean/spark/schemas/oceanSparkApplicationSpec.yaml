@@ -32,6 +32,9 @@ properties:
       type: string
     title: Imagepullsecrets
     type: array
+  interactive:
+    title: Interactive
+    type: boolean
   initContainerImage:
     title: Initcontainerimage
     type: string
@@ -59,11 +62,16 @@ properties:
     type: string
   memoryOverheadFactor:
     title: Memoryoverheadfactor
-    type: string
+    type: number
   availabilityZone:
     title: Availabilityzone
     type: string
     description: The availability zone to use for the Spark application pods. Leave this empty and Ocean Spark will choose the best availability zone for the Spark application
+  priority:
+    title: Priority
+    type: string
+    example: "low"
+    description: The priority of the Spark application.
   pythonVersion:
     $ref: '#/components/schemas/PythonVersion'
   sparkConf:
@@ -413,6 +421,21 @@ components:
             type: string
           title: Pyfiles
           type: array
+        packages:
+          items:
+            type: string
+          title: Packages
+          type: array
+        excludePackages:
+          items:
+            type: string
+          title: Excludepackages
+          type: array
+        repositories:
+          items:
+            type: string
+          title: Repositories
+          type: array
       title: Dependencies
       type: object
     DownwardAPIProjection:
@@ -498,8 +521,7 @@ components:
           title: Corerequest
           type: string
         cores:
-          title: Cores
-          type: integer
+          $ref: "cores.yaml"
         env:
           $ref: '#/components/schemas/Env'
         envSecretKeyRefs:
@@ -636,8 +658,7 @@ components:
           title: Corerequest
           type: string
         cores:
-          title: Cores
-          type: integer
+          $ref: "cores.yaml"
         env:
           $ref: '#/components/schemas/Env'
         envSecretKeyRefs:
