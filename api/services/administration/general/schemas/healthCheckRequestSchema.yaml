@@ -5,11 +5,13 @@ properties:
   healthCheck:
     type: object
     description: Group
+    required:
+      - resourceId
+      - proxyAddress
     properties:
       resourceId:
         type: string
         example: 21126
-        required: true
         description: >
           Spot Resource ID
       name:
@@ -22,7 +24,6 @@ properties:
         description: >
           The public hostname / IP where you installed the Spot HCS
         example: 51.22.125.47
-        required: true
       proxyPort:
         description: >
           The port of the HCS.
@@ -32,46 +33,47 @@ properties:
         example: 80
       check:
         type: object
+        required:
+          - protocol
+          - port
+          - endpoint
+          - unhealthyThreshold
+          - healthyThreshold
+          - interval
+          - timeout
         properties:
           protocol:
             type: string
-            required: true
             example: http
             description: >
               The protocol to use to connect with the instance. Valid values: http https
           port:
             description: >
               The port to use to connect with the instance
-            required: true
             type: integer
             example: 80
           endpoint:
             description: >
               The destination for the request
-            required: true
             type: string
             example: index.html
           unhealthyThreshold:
             description: >
               The number of consecutive failed health checks that must occur before declaring an instance unhealthy
-            required: true
             type: integer
             example: 2
           healthyThreshold:
             description: >
               The number of consecutive successful health checks that must occur before declaring an instance healthy
-            required: true
             type: integer
             example: 2
           interval:
             description: >
               The amount of time (in seconds) between each health check. Minimum value is 10
-            required: true
             type: integer
             example: 30
           timeout:
             description: >
               The amount of time (in seconds) to wait when receiving a response from the health check
-            required: true
             type: integer
             example: 60
