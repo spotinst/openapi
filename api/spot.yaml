@@ -84,11 +84,12 @@ tags:
       description: Ocean Concepts and Tutorials
       url: https://docs.spot.io/ocean/
 
-  - name: Ocean On-Premise
-    description: Ocean On-Premise API - Understand cost drivers within your on-premise clusters and compare the costs to the Ocean Cloud.
-    externalDocs:
-      description: Ocean Concepts and Tutorials
-      url: https://docs.spot.io/ocean/
+#  Deprecated - not deleted for future use
+#  - name: Ocean On-Premise
+#    description: Ocean On-Premise API - Understand cost drivers within your on-premise clusters and compare the costs to the Ocean Cloud.
+#    externalDocs:
+#      description: Ocean Concepts and Tutorials
+#      url: https://docs.spot.io/ocean/
 
   - name: Ocean Insights
     description: |
@@ -189,7 +190,7 @@ x-tagGroups:
       - Ocean ECS
       - Ocean GKE
       - Ocean AKS
-      - Ocean On-Premise
+#      - Ocean On-Premise
       - Ocean Insights
       - Ocean CD
       - Ocean Spark
@@ -418,6 +419,8 @@ paths:
     $ref: services/elastigroup/gcp/paths/group-scale-up.yaml
   /gcp/gce/group/{groupId}/scale/down:
     $ref: services/elastigroup/gcp/paths/group-scale-down.yaml
+  /gcp/costs:
+    $ref: services/elastigroup/gcp/paths/costs.yaml
   /gcp/gce/group/{groupId}/costs:
     $ref: services/elastigroup/gcp/paths/group-costs.yaml
   /gcp/gce/group/{groupId}/roll:
@@ -442,6 +445,10 @@ paths:
     $ref: services/ocean/ecs/paths/clusterFetchElastilog.yaml
   /ocean/aws/ecs/cluster/{oceanClusterId}/rightSizing/suggestion:
     $ref: services/ocean/ecs/paths/right-sizing-recommend.yaml
+  /ocean/aws/ecs/cluster/{oceanClusterId}/instanceTypeFiltersSimulation:
+    $ref: services/ocean/ecs/paths/instanceTypeFiltersSimulation.yaml
+  /ocean/aws/ecs/cluster/{oceanClusterId}/allowedInstanceTypes:
+    $ref: services/ocean/ecs/paths/allowedInstanceTypes.yaml
   /ocean/aws/ecs/cluster/import:
     $ref: services/ocean/ecs/paths/upgrade-from-eg.yaml
   /ocean/aws/ecs/cluster/{oceanClusterId}/roll:
@@ -462,6 +469,8 @@ paths:
     $ref: services/ocean/ecs/paths/fargate-migration-status.yaml
   /ocean/aws/ecs/cluster/fargate/import:
     $ref: services/ocean/ecs/paths/fargate-import-to-new.yaml
+  /ocean/aws/ecs/cluster/{oceanClusterId}/aggregatedCosts:
+    $ref: services/ocean/ecs/paths/cluster-aggregated-costs.yaml
   /aws/ec2/group/{groupId}/clusterRoll:
     $ref: services/elastigroup/aws/paths/ecsGroupClusterRoll.yaml
   /aws/ec2/group/{groupId}/clusterRoll/{rollId}:
@@ -502,8 +511,6 @@ paths:
     $ref: services/ocean/aws/paths/cluster-attachLb.yaml
   /ocean/aws/k8s/cluster/{oceanClusterId}/loadBalancer/detach:
     $ref: services/ocean/aws/paths/cluster-detachLb.yaml
-  /mcs/kubernetes/cluster/{clusterIdentifier}/costs:
-    $ref: services/ocean/aws/paths/clusterCosts.yaml
   /mcs/ecs/cluster/{clusterName}/costs:
     $ref: services/ocean/ecs/paths/cluster-costs.yaml
   /ocean/aws/k8s/cluster/import:
@@ -526,10 +533,10 @@ paths:
     $ref: services/ocean/aws/paths/importASG-launchSpec.yaml
   /ocean/aws/k8s/launchSpec/eksNodeGroup/import:
     $ref: services/ocean/aws/paths/importEksNodeGroup-launchSpec.yaml
-  /ocean/onPrem/k8s/cluster:
-    $ref: services/ocean/onpremise/paths/clusters.yaml
-  /ocean/onPrem/k8s/cluster/{oceanClusterId}:
-    $ref: services/ocean/onpremise/paths/cluster.yaml
+#  /ocean/onPrem/k8s/cluster:
+#    $ref: services/ocean/onpremise/paths/clusters.yaml
+#  /ocean/onPrem/k8s/cluster/{oceanClusterId}:
+#    $ref: services/ocean/onpremise/paths/cluster.yaml
   /aws/ec2/managedInstance:
     $ref: services/managedInstance/aws/paths/managed.yaml
   /aws/ec2/managedInstance/{MI_ID}:
@@ -548,8 +555,12 @@ paths:
     $ref: services/managedInstance/aws/paths/managedIDDeleteVolume.yaml
   /aws/ec2/managedInstance/migration:
     $ref: services/managedInstance/aws/paths/migration-mi.yaml
+  /aws/ec2/managedInstance/migration/bulk:
+    $ref: services/managedInstance/aws/paths/bulkMigrationMi.yaml
   /aws/ec2/managedInstance/migration/{MIGRATION_ID}:
     $ref: services/managedInstance/aws/paths/migrationStatus-mi.yaml
+  /aws/ec2/managedInstance/migration/search:
+    $ref: services/managedInstance/aws/paths/bulkMigrationStatusMi.yaml
   /aws/ec2/managedInstance/state:
     $ref: services/managedInstance/aws/paths/state/updateManagedInstanceStates.yaml
   /audit/events:
@@ -665,6 +676,8 @@ paths:
     $ref: services/ocean/aks/paths/cluster-nodes.yaml
   /ocean/azure/k8s/cluster/aks/import/{acdIdentifier}:
     $ref: services/ocean/aks/paths/importCluster.yaml
+  /ocean/azure/k8s/cluster/{oceanClusterId}/aks/reimport/{acdIdentifier}:
+    $ref: services/ocean/aks/paths/reImportCluster.yaml
   /ocean/azure/k8s/cluster/{oceanClusterId}/detachVms:
     $ref: services/ocean/aks/paths/oceanDetachVms.yaml
   /ocean/azure/k8s/virtualNodeGroup:
@@ -733,6 +746,20 @@ paths:
     $ref: services/ocean/cd/paths/rolloutResource.yaml
   /ocean/cd/rollout/{rolloutId}/phase:
     $ref: services/ocean/cd/paths/rolloutPhase.yaml
+  /ocean/cd/workload:
+    $ref: services/ocean/cd/paths/workloads.yaml
+  /ocean/cd/workload/namespace/{namespace}/deployment/{deploymentName}/migrate:
+    $ref: services/ocean/cd/paths/workloadMigration.yaml
+  /ocean/cd/workload/{workloadId}/activeOperation:
+    $ref: services/ocean/cd/paths/workloadActiveOperations.yaml
+  /ocean/cd/workload/{workloadId}/revision:
+    $ref: services/ocean/cd/paths/workloadRevision.yaml
+  /ocean/cd/workload/{workloadId}/restart:
+    $ref: services/ocean/cd/paths/workloadRestart.yaml
+  /ocean/cd/workload/{workloadId}/revision/{revisionId}/retry:
+    $ref: services/ocean/cd/paths/workloadRetry.yaml
+  /ocean/cd/workload/{workloadId}/revision/{revisionId}/rollback:
+    $ref: services/ocean/cd/paths/workloadRollback.yaml
   /ocean/cd/workload/{workloadName}/namespace/{namespace}/graph:
     $ref: services/ocean/cd/paths/workloadGraph.yaml
   /ocean/spark/cluster:
