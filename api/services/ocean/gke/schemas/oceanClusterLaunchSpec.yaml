@@ -203,3 +203,56 @@ properties:
     readOnly: true
     format: date-time
     example: "2019-06-10T15:06:13.000Z"
+  networkInterfaces:
+      type: array
+      required:
+        - accessConfigs
+        - network
+      description: >
+        Settings for network interfaces
+      items:
+        type: object
+        properties:
+          network:
+            type: string
+            example: default
+          projectId:
+            type: string
+            description: >
+              Use a network resource from a different project. Set the project identifier to use its network resource.
+              This parameter is relevant only if the network resource is in a different project.
+            example: test-project
+          accessConfigs:
+            type: array
+            required:
+              - name
+              - type
+            items:
+              properties:
+                  name:
+                    type: string
+                    example: external-nat
+                  type:
+                    type: string
+                    description: >
+                      Possible values: ONE_TO_ONE_NAT
+                    example: ONE_TO_ONE_NAT
+          aliasIpRanges:
+            type: array
+            required:
+              - ipCidrRange
+              - subnetworkRangeName
+            description:
+              use the imported node pool’s associated aliasIpRange to assign secondary IP addresses to the nodes. Cannot be changed after VNG creation.
+            items:
+              properties:
+                ipCidrRange:
+                  type: string
+                  description: >
+                    specify the IP address range in CIDR notation that can be used for the alias IP addresses associated with the imported node pool.
+                  example: "/24"
+                subnetworkRangeName:
+                  type: string
+                  description: >
+                    specify the IP address range for the subnet secondary IP range.
+                  example: gke-test-native-vpc-pods-5cb557f7
