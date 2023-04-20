@@ -63683,27 +63683,35 @@
                                       },
                                       "spotDeployment": {
                                         "type": "object",
-                                        "title": "Ocean CD Spot Deployment Selector",
-                                        "description": "Used to match the rolloutspec to a `SpotDeployment` resource\n",
-                                        "properties": {
-                                          "clusterId": {
-                                            "type": "string",
-                                            "description": "Existing Ocean CD cluster identifier where the matching `SpotDeployment` exists"
+                                        "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/rolloutSpec/properties/spotDeployments/items"
+                                      },
+                                      "spotDeployments": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "object",
+                                          "title": "Ocean CD Spot Deployment Selector",
+                                          "description": "Used to match the rolloutspec to a `SpotDeployment` resource. You must specify either `SpotDeployment` OR `SpotDeployments` but not both. In case you are using `SpotDeployment`, `traffic` manager is optional.\n",
+                                          "properties": {
+                                            "clusterId": {
+                                              "type": "string",
+                                              "description": "Existing Ocean CD cluster identifier where the matching `SpotDeployment` exists"
+                                            },
+                                            "namespace": {
+                                              "type": "string",
+                                              "description": "Should equal the namespace where the matching `SpotDeployment` exists"
+                                            },
+                                            "name": {
+                                              "type": "string",
+                                              "description": "The name of the `SpotDeployment` resource"
+                                            }
                                           },
-                                          "namespace": {
-                                            "type": "string",
-                                            "description": "Should equal the namespace where the matching `SpotDeployment` exists"
-                                          },
-                                          "name": {
-                                            "type": "string",
-                                            "description": "The name of the `SpotDeployment` resource"
-                                          }
+                                          "required": [
+                                            "clusterId",
+                                            "namespace",
+                                            "name"
+                                          ]
                                         },
-                                        "required": [
-                                          "clusterId",
-                                          "namespace",
-                                          "name"
-                                        ]
+                                        "description": "You must specify either `SpotDeployment` OR `SpotDeployments` but not both. Every SpotDeployment has to be unique. If more than one `SpotDeployment` has been configured, no `traffic` managers can be set as part of the RolloutSpec. For such case ensure that each of the chosen SpotDeployments are being exposed with different Kubernetes services"
                                       },
                                       "strategy": {
                                         "type": "object",
@@ -63774,7 +63782,7 @@
                                       "traffic": {
                                         "type": "object",
                                         "title": "Ocean CD Rollout Spec Traffic",
-                                        "description": "hosts all the supported service meshes supported to enable more fine-grained traffic routing\n",
+                                        "description": "hosts all the supported service meshes supported to enable more fine-grained traffic routing. In case `SpotDeployments` contains more than one SpotDeployment `traffic` manager may not be configured.\n",
                                         "properties": {
                                           "canaryService": {
                                             "type": "string",
@@ -64052,9 +64060,7 @@
                                     },
                                     "required": [
                                       "name",
-                                      "spotDeployment",
-                                      "strategy",
-                                      "traffic"
+                                      "strategy"
                                     ]
                                   },
                                   {
@@ -64155,7 +64161,14 @@
                         "properties": {
                           "spotDeployment": {
                             "type": "object",
-                            "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/rolloutSpec/properties/spotDeployment"
+                            "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/rolloutSpec/properties/spotDeployments/items"
+                          },
+                          "spotDeployments": {
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/rolloutSpec/properties/spotDeployments/items"
+                            },
+                            "description": "You must specify either `SpotDeployment` OR `SpotDeployments` but not both. Every SpotDeployment has to be unique. If more than one `SpotDeployment` has been configured, no `traffic` managers can be set as part of the RolloutSpec. For such case ensure that each of the chosen SpotDeployments are being exposed with different Kubernetes services"
                           },
                           "strategy": {
                             "type": "object",
@@ -64171,9 +64184,7 @@
                           }
                         },
                         "required": [
-                          "spotDeployment",
-                          "strategy",
-                          "traffic"
+                          "strategy"
                         ]
                       }
                     }
@@ -64229,7 +64240,14 @@
                         "properties": {
                           "spotDeployment": {
                             "type": "object",
-                            "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/rolloutSpec/properties/spotDeployment"
+                            "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/rolloutSpec/properties/spotDeployments/items"
+                          },
+                          "spotDeployments": {
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/rolloutSpec/properties/spotDeployments/items"
+                            },
+                            "description": "You must specify either `SpotDeployment` OR `SpotDeployments` but not both. Every SpotDeployment has to be unique. If more than one `SpotDeployment` has been configured, no `traffic` managers can be set as part of the RolloutSpec. For such case ensure that each of the chosen SpotDeployments are being exposed with different Kubernetes services"
                           },
                           "strategy": {
                             "type": "object",
