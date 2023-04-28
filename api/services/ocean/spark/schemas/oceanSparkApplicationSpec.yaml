@@ -897,8 +897,17 @@ components:
       type: string
     InstanceAllowList:
       title: InstanceAllowList
-      description: 'A list of instance families (like `i3` or `m5d` on AWS, `n2-highmem` or `n2-standard` on GCP) or specific instance types (like `i3.large` or `m5d.xlarge`, `n2-highmem-4` or `n2-standard-2` on GCP) to target'
-      type: string
+      description: |
+        Restricts what instances can by used by pods:
+
+        - On AWS, can be an instance type (ex: `i3.large`, `m5d.xlarge`) or an instance family (ex: `i3`, `m5d`).
+        - On GCP, can be a machine type + VCPU spec (ex: `n2-highmem-4`, `n2-standard-2`) or a machine type (ex: `n2-highmem`, `n2-standard`).
+        - On Azure, can be a VM size (ex: `standard_a2_v2`, `standard_e16-8_v3`) or a group of VM sizes (ex: `standard_a_v2`, `standard_e_v3`).
+          The group name is obtained by removing the number of vCPU (and constrained vCPU if there is one) from the VM size, and does not
+          necessarily map to a VM series. For Azure, this field is **not** case sensitive.
+      type: array
+      items:
+        type: string
     ISCSIVolumeSource:
       properties:
         chapAuthDiscovery:
