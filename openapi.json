@@ -42439,6 +42439,505 @@
         }
       }
     },
+    "/ocean/aws/k8s/cluster/{oceanClusterId}/aggregatedCosts/summary": {
+      "post": {
+        "summary": "Get Cluster Aggregated Summary Costs",
+        "description": "Provides Kubernetes cluster summary usage and costs over a time interval which can be grouped and/or filtered by label/annotaion,\\\nfor example - application name (webapp, backend), environment (production, staging), version etc.\\\nThe response will contain a breakdown of the cluster resource costs($) in terms of compute (CPU, memory), storage (block, file, rootVolume).\nThe response will group the cluster usage costs based on preselected default of application namespace or user selected label or annotation.\n",
+        "operationId": "oceanK8sClusterAggregatedSummaryCosts",
+        "tags": [
+          "Ocean AWS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          },
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "endTime",
+                      "startTime"
+                    ],
+                    "properties": {
+                      "startTime": {
+                        "type": "string",
+                        "example": "2018-06-20T11:35:02.745Z",
+                        "description": "Beginning date value using either the date format \"yyyy-MM-dd'T'HH:mm:ss'Z'\" or ms \"1494751821472\".\n"
+                      },
+                      "endTime": {
+                        "type": "string",
+                        "example": "2018-06-22T11:30:01.745Z",
+                        "description": "End date value using either the date format \"yyyy-MM-dd'T'HH:mm:ss'Z'\" or ms \"1494751821472\".\n"
+                      },
+                      "groupBy": {
+                        "type": "string",
+                        "description": "The parameter we want to group the costs by.\n",
+                        "default": "namespace",
+                        "example": "namespace.label.env",
+                        "enum": [
+                          "namespace",
+                          "namespace.label.${labelKey}",
+                          "resource.label.${labelKey}",
+                          "resource.annotation.${annotationKey}",
+                          "namespace.annotation.${annotationKey}"
+                        ]
+                      },
+                      "filter": {
+                        "type": "object",
+                        "description": "Describe how to filter the costs. Optional field.",
+                        "required": [
+                          "scope",
+                          "conditions"
+                        ],
+                        "properties": {
+                          "scope": {
+                            "type": "string",
+                            "enum": [
+                              "namespace",
+                              "resource"
+                            ]
+                          },
+                          "conditions": {
+                            "type": "object",
+                            "required": [
+                              "anyMatch"
+                            ],
+                            "properties": {
+                              "anyMatch": {
+                                "type": "array",
+                                "description": "Array of conditions set that OR operator is applied between them.\n",
+                                "items": {
+                                  "type": "object",
+                                  "required": [
+                                    "allMatch"
+                                  ],
+                                  "properties": {
+                                    "allMatch": {
+                                      "type": "array",
+                                      "description": "Array of conditions that AND operator is applied between them.\\\nFor example, (label env equals prod) AND (label app exists)\n",
+                                      "items": {
+                                        "type": "object",
+                                        "description": "The basic expression of a condition",
+                                        "required": [
+                                          "type",
+                                          "key",
+                                          "operator"
+                                        ],
+                                        "properties": {
+                                          "type": {
+                                            "type": "string",
+                                            "enum": [
+                                              "label",
+                                              "annotation"
+                                            ]
+                                          },
+                                          "key": {
+                                            "type": "string",
+                                            "description": "May be any string, but shouldn't be empty.\n",
+                                            "example": "env"
+                                          },
+                                          "operator": {
+                                            "type": "string",
+                                            "enum": [
+                                              "equals",
+                                              "notEquals",
+                                              "exists",
+                                              "notExists"
+                                            ]
+                                          },
+                                          "value": {
+                                            "type": "string",
+                                            "description": "Required whenever the operator is \"equals\" or \"notEquals\".\n",
+                                            "example": "prod"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                },
+                                "example": [
+                                  {
+                                    "allMatch": [
+                                      {
+                                        "type": "label",
+                                        "key": "env",
+                                        "operator": "equals",
+                                        "value": "prod"
+                                      },
+                                      {
+                                        "type": "label",
+                                        "key": "app",
+                                        "operator": "exists"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "allMatch": [
+                                      {
+                                        "type": "annotation",
+                                        "key": "meta.data",
+                                        "operator": "exists"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ocean Cluster Aggregated Summary Costs Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/aws/k8s/cluster/o-abcd1234/aggregatedCosts/summary"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "result": {
+                                    "type": "object",
+                                    "properties": {
+                                      "totalForDuration": {
+                                        "type": "object",
+                                        "properties": {
+                                          "startTime": {
+                                            "type": "string",
+                                            "example": "2018-06-20T11:35:01.745Z",
+                                            "description": "Beginning date value using either the date format \"yyyy-MM-dd'T'HH:mm:ss'Z'\" or ms \"1494751821472\".\n"
+                                          },
+                                          "endTime": {
+                                            "type": "string",
+                                            "example": "2018-06-22T11:30:01.745Z",
+                                            "description": "End date value using either the date format \"yyyy-MM-dd'T'HH:mm:ss'Z'\" or ms \"1494751821472\".\n"
+                                          },
+                                          "summary": {
+                                            "type": "object",
+                                            "properties": {
+                                              "total": {
+                                                "type": "number",
+                                                "example": 41772.882658035785,
+                                                "description": "The total costs of cluster in a given time range"
+                                              },
+                                              "compute": {
+                                                "type": "object",
+                                                "properties": {
+                                                  "total": {
+                                                    "type": "number",
+                                                    "example": 40668.1299631538,
+                                                    "description": "The total compute costs of the cluster in a given time range"
+                                                  },
+                                                  "workloads": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                      "total": {
+                                                        "type": "number",
+                                                        "example": 39882.13803327978
+                                                      }
+                                                    }
+                                                  },
+                                                  "headroom": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                      "total": {
+                                                        "type": "number",
+                                                        "example": 0
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                              "storage": {
+                                                "type": "object",
+                                                "properties": {
+                                                  "total": {
+                                                    "type": "number",
+                                                    "example": 1104.7526948819868,
+                                                    "description": "The total storage costs of the cluster in given time range"
+                                                  },
+                                                  "block": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                      "total": {
+                                                        "type": "number",
+                                                        "example": 1104.7526948819868
+                                                      },
+                                                      "ebsPv": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "total": {
+                                                            "type": "number",
+                                                            "example": 1104.7526948819868
+                                                          }
+                                                        }
+                                                      },
+                                                      "nonPv": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "total": {
+                                                            "type": "number",
+                                                            "example": 0
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  },
+                                                  "file": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                      "total": {
+                                                        "type": "number",
+                                                        "example": 0
+                                                      },
+                                                      "efsPv": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "total": {
+                                                            "type": "number",
+                                                            "example": 0
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                              "networking": {
+                                                "type": "object",
+                                                "properties": {
+                                                  "totalCost": {
+                                                    "type": "number",
+                                                    "example": 0.00278988928,
+                                                    "description": "The total costs of cluster's networking in a given time range"
+                                                  },
+                                                  "totalUsage": {
+                                                    "type": "number",
+                                                    "example": 0.03154064,
+                                                    "description": "The total usages of cluster's networking in a given time range"
+                                                  },
+                                                  "total": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                      "in": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "cost": {
+                                                            "type": "number",
+                                                            "example": 0.00139494464
+                                                          },
+                                                          "usage": {
+                                                            "type": "number",
+                                                            "example": 0.01577032
+                                                          }
+                                                        }
+                                                      },
+                                                      "out": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "cost": {
+                                                            "type": "number",
+                                                            "example": 0.00139494464
+                                                          },
+                                                          "usage": {
+                                                            "type": "number",
+                                                            "example": 0.01577032
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  },
+                                                  "internet": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                      "in": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "cost": {
+                                                            "type": "number",
+                                                            "example": 0.000693972
+                                                          },
+                                                          "usage": {
+                                                            "type": "number",
+                                                            "example": 0.0077108
+                                                          }
+                                                        }
+                                                      },
+                                                      "out": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "cost": {
+                                                            "type": "number",
+                                                            "example": 0.000693972
+                                                          },
+                                                          "usage": {
+                                                            "type": "number",
+                                                            "example": 0.0077108
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  },
+                                                  "interAZ": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                      "in": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "cost": {
+                                                            "type": "number",
+                                                            "example": 0.0000035003200000000003
+                                                          },
+                                                          "usage": {
+                                                            "type": "number",
+                                                            "example": 0.000175016
+                                                          }
+                                                        }
+                                                      },
+                                                      "out": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "cost": {
+                                                            "type": "number",
+                                                            "example": 0.0000035003200000000003
+                                                          },
+                                                          "usage": {
+                                                            "type": "number",
+                                                            "example": 0.000175016
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  },
+                                                  "intraAZ": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                      "in": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "cost": {
+                                                            "type": "number",
+                                                            "example": 0.000693972
+                                                          },
+                                                          "usage": {
+                                                            "type": "number",
+                                                            "example": 0.0077108
+                                                          }
+                                                        }
+                                                      },
+                                                      "out": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "cost": {
+                                                            "type": "number",
+                                                            "example": 0.000693972
+                                                          },
+                                                          "usage": {
+                                                            "type": "number",
+                                                            "example": 0.0077108
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  },
+                                                  "interRegion": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                      "in": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "cost": {
+                                                            "type": "number",
+                                                            "example": 0.0000035003200000000003
+                                                          },
+                                                          "usage": {
+                                                            "type": "number",
+                                                            "example": 0.000175016
+                                                          }
+                                                        }
+                                                      },
+                                                      "out": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "cost": {
+                                                            "type": "number",
+                                                            "example": 0.0000035003200000000003
+                                                          },
+                                                          "usage": {
+                                                            "type": "number",
+                                                            "example": 0.000175016
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "ocean:k8s:cluster:aggregatedCosts:summary"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/ocean/aws/k8s/launchSpec": {
       "post": {
         "summary": "Create Virtual Node Group",
