@@ -1319,6 +1319,38 @@
                                     "example": true
                                   }
                                 }
+                              },
+                              "volumeAttachments": {
+                                "type": "object",
+                                "title": "AWS Volume Attachments",
+                                "description": "Any volumes specified in this field will be automatically attached to every instance launched in the group.\nIf your group has more than one instance or you want to share the same volume between several instances,\nit's important to use [Amazon EBS Multi-Attach supported volumes](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volumes-multi.html)\nto enable concurrent attachment of the volumes to multiple instances. This ensures that your volumes can be effectively\nshared among instances in your group.\n",
+                                "required": [
+                                  "volumes"
+                                ],
+                                "properties": {
+                                  "volumes": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "required": [
+                                        "volumeId",
+                                        "deviceName"
+                                      ],
+                                      "properties": {
+                                        "volumeId": {
+                                          "type": "string",
+                                          "description": "The volume id to attach\n",
+                                          "example": "vol-1234567"
+                                        },
+                                        "deviceName": {
+                                          "type": "string",
+                                          "description": "The device name to attach. When you attach a volume to your instance, you include a device name for the volume.\nDo not use a device name that is reserved for the root volume (for example - `/dev/sda1` or `/dev/xvda`).\n",
+                                          "example": "/dev/sdb"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
                               }
                             }
                           },
@@ -4013,6 +4045,9 @@
                                 "us-east-1b"
                               ]
                             }
+                          },
+                          "volumeAttachments": {
+                            "$ref": "#/paths/~1aws~1ec2~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/compute/properties/volumeAttachments"
                           },
                           "launchSpecification": {
                             "type": "object",
@@ -44423,6 +44458,9 @@
                                 "type": "string",
                                 "example": "Linux/UNIX",
                                 "description": "Operation system type. Possible values: Linux/UNIX, SUSE Linux, Windows, Red Hat Enterprise Linux In case of EC2 classic: Linux/UNIX (Amazon VPC), SUSE Linux (Amazon VPC), Windows (Amazon VPC), Red Hat Enterprise Linux (Amazon VPC)\n"
+                              },
+                              "volumeAttachments": {
+                                "$ref": "#/paths/~1aws~1ec2~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/compute/properties/volumeAttachments"
                               },
                               "launchSpecification": {
                                 "type": "object",
