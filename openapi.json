@@ -63238,10 +63238,6 @@
                                             "type": "string"
                                           }
                                         }
-                                      },
-                                      "notification": {
-                                        "type": "object",
-                                        "$ref": "#/paths/~1ocean~1cd~1cluster~1%7BclusterId%7D/put/requestBody/content/application~1json/schema/allOf/0/properties/notification"
                                       }
                                     }
                                   },
@@ -63304,73 +63300,6 @@
         "responses": {
           "200": {
             "$ref": "#/paths/~1ocean~1cd~1cluster/get/responses/200"
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
-      },
-      "put": {
-        "summary": "Update Ocean CD Cluster",
-        "description": "Update Ocean CD cluster notification settings.\n",
-        "operationId": "OceanCDClusterUpdate",
-        "tags": [
-          "Ocean CD"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "clusterId",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "example": "cluster-prod",
-            "description": "The identifier of the Ocean CD cluster\n"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "type": "object",
-                    "title": "Ocean CD Cluster Notification Request",
-                    "description": "Ocean CD cluster notification request entity.\n",
-                    "properties": {
-                      "notification": {
-                        "type": "object",
-                        "required": [
-                          "notification"
-                        ],
-                        "properties": {
-                          "minutesWithoutHeartbeat": {
-                            "type": "number",
-                            "example": 4,
-                            "description": "Number of minutes without receiving cluster controller heartbeat\n"
-                          },
-                          "providers": {
-                            "type": "array",
-                            "description": "List of notification provider names\n",
-                            "items": {
-                              "type": "string",
-                              "example": "provider1"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Ok"
           },
           "400": {
             "description": "Bad Request"
@@ -66969,6 +66898,110 @@
         }
       }
     },
+    "/ocean/cd/rollout/{rolloutId}/strategyOverride": {
+      "summary": "Ocean CD",
+      "get": {
+        "summary": "Ocean CD Describe Rollout Overriden Strategy",
+        "description": "Ocean CD Rollout Overriden Strategy.\n",
+        "operationId": "OceanCDRolloutStrategyOverride",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rolloutId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "rol-123456",
+            "description": "The identifier of the Ocean CD Rollout\n"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean CD Rollout Resource Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "response": {
+                          "type": "object",
+                          "description": "response body\n",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "title": "Ocean CD Rollout Strategy Override",
+                                "description": "Represents object of Rollout Strategy Override\n",
+                                "properties": {
+                                  "rolloutId": {
+                                    "type": "string",
+                                    "example": "rol-123456",
+                                    "description": "The identifier of the Ocean CD Rollout\n"
+                                  },
+                                  "isOverridden": {
+                                    "type": "boolean",
+                                    "example": true,
+                                    "description": "Flag to show wether we were able to override strategy\n"
+                                  },
+                                  "newStrategy": {
+                                    "type": "string",
+                                    "description": "\"The name of the new strategy to use\"\n"
+                                  },
+                                  "oldStrategy": {
+                                    "type": "string",
+                                    "description": "\"The name of the strategy to override\"\n"
+                                  },
+                                  "failureReason": {
+                                    "type": "string",
+                                    "description": "\"Show the failure reason in case we weren't able to override strategy\"\n"
+                                  },
+                                  "spotDeploymentSelector": {
+                                    "type": "object",
+                                    "description": "\"The reference SpotDeployment selector\"\n",
+                                    "title": "Ocean CD Spot Deployment Selector",
+                                    "properties": {
+                                      "clusterId": {
+                                        "type": "string",
+                                        "description": "Ocean CD cluster identifier for the references `SpotDeployment`"
+                                      },
+                                      "namespace": {
+                                        "type": "string",
+                                        "description": "The namespace where the `SpotDeployment` resource exists"
+                                      },
+                                      "name": {
+                                        "type": "string",
+                                        "description": "The name of the `SpotDeployment` resource"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/ocean/cd/workload": {
       "summary": "Ocean CD",
       "get": {
@@ -67064,557 +67097,7 @@
         }
       }
     },
-    "/ocean/cd/workload/namespace/{namespace}/deployment/{deploymentName}/migrate": {
-      "summary": "Ocean CD",
-      "get": {
-        "summary": "Ocean CD Describe Workload's Migration Process",
-        "description": "Describe How To Migrate Deployment CRD To SpotDeployment DRD.\n",
-        "operationId": "OceanCDCWorkloadsMigrate",
-        "tags": [
-          "Ocean CD"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "namespace",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "example": "namespace=namespace-name",
-            "description": "The workload's namespace\n"
-          },
-          {
-            "in": "path",
-            "name": "deploymentName",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "example": "deploymentName=deployment-name",
-            "description": "The identifier name of the Ocean CD Deployment\n"
-          },
-          {
-            "in": "query",
-            "name": "clusterId",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "example": "prod-cluster",
-            "description": "Cluster id where the workload is running\n"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Ocean CD Workload Migration Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "response": {
-                          "type": "object",
-                          "description": "response body\n",
-                          "properties": {
-                            "items": {
-                              "type": "array",
-                              "items": {
-                                "allOf": [
-                                  {
-                                    "type": "object",
-                                    "required": [
-                                      "workload"
-                                    ],
-                                    "properties": {
-                                      "apiVersion": {
-                                        "type": "string",
-                                        "description": "Workload's CRD ApiVersion.\n"
-                                      },
-                                      "kind": {
-                                        "type": "string",
-                                        "description": "Workload's CRD kind.\n"
-                                      },
-                                      "metaData": {
-                                        "type": "object",
-                                        "title": "Ocean CD Workload Migration MetaData",
-                                        "description": "Contains Workload's Migration MetaData.\n",
-                                        "properties": {
-                                          "annotations": {
-                                            "type": "object",
-                                            "additionalProperties": {
-                                              "type": "string"
-                                            }
-                                          },
-                                          "clusterName": {
-                                            "type": "string"
-                                          },
-                                          "creationTimestamp": {
-                                            "type": "string"
-                                          },
-                                          "deletionGracePeriodSeconds": {
-                                            "type": "number",
-                                            "format": "int64"
-                                          },
-                                          "deletionTimestamp": {
-                                            "type": "string"
-                                          },
-                                          "finalizers": {
-                                            "type": "array",
-                                            "items": {
-                                              "type": "string"
-                                            }
-                                          },
-                                          "generateName": {
-                                            "type": "string"
-                                          },
-                                          "generation": {
-                                            "type": "number",
-                                            "format": "int64"
-                                          },
-                                          "labels": {
-                                            "type": "object",
-                                            "additionalProperties": {
-                                              "type": "string"
-                                            },
-                                            "description": "Workload's CRD labels\n"
-                                          },
-                                          "managedFields": {
-                                            "type": "array",
-                                            "items": {
-                                              "type": "object",
-                                              "properties": {
-                                                "apiVersion": {
-                                                  "type": "string"
-                                                },
-                                                "fieldsType": {
-                                                  "type": "string"
-                                                },
-                                                "fieldsV1": {
-                                                  "type": "object",
-                                                  "properties": {
-                                                    "additionalProperties": {
-                                                      "type": "object",
-                                                      "additionalProperties": {
-                                                        "type": "object"
-                                                      }
-                                                    }
-                                                  }
-                                                },
-                                                "manager": {
-                                                  "type": "string"
-                                                },
-                                                "operation": {
-                                                  "type": "string"
-                                                },
-                                                "subresource": {
-                                                  "type": "string"
-                                                },
-                                                "time": {
-                                                  "type": "string"
-                                                },
-                                                "additionalProperties": {
-                                                  "type": "object",
-                                                  "additionalProperties": {
-                                                    "type": "object"
-                                                  }
-                                                }
-                                              }
-                                            }
-                                          },
-                                          "name": {
-                                            "type": "string",
-                                            "description": "Workload's name\n"
-                                          },
-                                          "namespace": {
-                                            "type": "string",
-                                            "description": "Workload's namespace name\n"
-                                          },
-                                          "ownerReferences": {
-                                            "type": "array",
-                                            "items": {
-                                              "type": "object",
-                                              "properties": {
-                                                "apiVersion": {
-                                                  "type": "string"
-                                                },
-                                                "blockOwnerDeletion": {
-                                                  "type": "boolean"
-                                                },
-                                                "controller": {
-                                                  "type": "boolean"
-                                                },
-                                                "kind": {
-                                                  "type": "string"
-                                                },
-                                                "name": {
-                                                  "type": "string"
-                                                },
-                                                "uid": {
-                                                  "type": "string"
-                                                },
-                                                "additionalProperties": {
-                                                  "type": "object",
-                                                  "additionalProperties": {
-                                                    "type": "object"
-                                                  }
-                                                }
-                                              }
-                                            }
-                                          },
-                                          "resourceVersion": {
-                                            "type": "string"
-                                          },
-                                          "selfLink": {
-                                            "type": "string"
-                                          },
-                                          "uid": {
-                                            "type": "string"
-                                          },
-                                          "additionalProperties": {
-                                            "type": "object",
-                                            "additionalProperties": {
-                                              "type": "object"
-                                            }
-                                          }
-                                        }
-                                      },
-                                      "spec": {
-                                        "type": "object",
-                                        "title": "Ocean CD Workload Migration SpotDeployment Spec",
-                                        "description": "Contains Workload's Migration SpotDeployment Spec.\n",
-                                        "properties": {
-                                          "minReadySeconds": {
-                                            "type": "integer"
-                                          },
-                                          "paused": {
-                                            "type": "boolean"
-                                          },
-                                          "progressDeadlineSeconds": {
-                                            "type": "integer"
-                                          },
-                                          "revisionHistoryLimit": {
-                                            "type": "integer"
-                                          },
-                                          "selector": {
-                                            "type": "object",
-                                            "properties": {
-                                              "matchExpressions": {
-                                                "type": "array",
-                                                "items": {
-                                                  "type": "object",
-                                                  "properties": {
-                                                    "key": {
-                                                      "type": "string"
-                                                    },
-                                                    "operator": {
-                                                      "type": "string"
-                                                    },
-                                                    "values": {
-                                                      "type": "array",
-                                                      "items": {
-                                                        "type": "string"
-                                                      }
-                                                    },
-                                                    "additionalProperties": {
-                                                      "type": "object",
-                                                      "additionalProperties": {
-                                                        "type": "object"
-                                                      }
-                                                    }
-                                                  }
-                                                }
-                                              },
-                                              "matchLabels": {
-                                                "type": "object",
-                                                "additionalProperties": {
-                                                  "type": "string"
-                                                }
-                                              },
-                                              "additionalProperties": {
-                                                "type": "object",
-                                                "additionalProperties": {
-                                                  "type": "object"
-                                                }
-                                              }
-                                            }
-                                          },
-                                          "replicas": {
-                                            "type": "integer"
-                                          },
-                                          "template": {
-                                            "type": "object",
-                                            "properties": {
-                                              "metadata": {
-                                                "type": "object",
-                                                "$ref": "#/paths/~1ocean~1cd~1workload~1namespace~1%7Bnamespace%7D~1deployment~1%7BdeploymentName%7D~1migrate/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/0/properties/metaData"
-                                              },
-                                              "spec": {
-                                                "type": "object",
-                                                "properties": {
-                                                  "activeDeadlineSeconds": {
-                                                    "type": "number",
-                                                    "format": "int64"
-                                                  },
-                                                  "affinity": {
-                                                    "type": "object"
-                                                  },
-                                                  "automountServiceAccountToken": {
-                                                    "type": "boolean"
-                                                  },
-                                                  "containers": {
-                                                    "type": "array",
-                                                    "items": {
-                                                      "type": "object"
-                                                    }
-                                                  },
-                                                  "dnsConfig": {
-                                                    "type": "object"
-                                                  },
-                                                  "dnsPolicy": {
-                                                    "type": "string"
-                                                  },
-                                                  "enableServiceLinks": {
-                                                    "type": "boolean"
-                                                  },
-                                                  "ephemeralContainers": {
-                                                    "type": "array",
-                                                    "items": {
-                                                      "type": "object"
-                                                    }
-                                                  },
-                                                  "hostAliases": {
-                                                    "type": "array",
-                                                    "items": {
-                                                      "type": "object"
-                                                    }
-                                                  },
-                                                  "hostIPC": {
-                                                    "type": "boolean"
-                                                  },
-                                                  "hostNetwork": {
-                                                    "type": "boolean"
-                                                  },
-                                                  "hostPID": {
-                                                    "type": "boolean"
-                                                  },
-                                                  "hostName": {
-                                                    "type": "string"
-                                                  },
-                                                  "imagePullSecrets": {
-                                                    "type": "array",
-                                                    "items": {
-                                                      "type": "object"
-                                                    }
-                                                  },
-                                                  "initContainers": {
-                                                    "type": "array",
-                                                    "items": {
-                                                      "type": "object"
-                                                    }
-                                                  },
-                                                  "nodeName": {
-                                                    "type": "string"
-                                                  },
-                                                  "nodeSelector": {
-                                                    "type": "object",
-                                                    "additionalProperties": {
-                                                      "type": "string"
-                                                    }
-                                                  },
-                                                  "os": {
-                                                    "type": "object"
-                                                  },
-                                                  "overhead": {
-                                                    "type": "object",
-                                                    "additionalProperties": {
-                                                      "type": "object"
-                                                    }
-                                                  },
-                                                  "preemptionPolicy": {
-                                                    "type": "string"
-                                                  },
-                                                  "priority": {
-                                                    "type": "integer"
-                                                  },
-                                                  "priorityClassName": {
-                                                    "type": "string"
-                                                  },
-                                                  "readinessGates": {
-                                                    "type": "array",
-                                                    "items": {
-                                                      "type": "object"
-                                                    }
-                                                  },
-                                                  "restartPolicy": {
-                                                    "type": "string"
-                                                  },
-                                                  "runtimeClassName": {
-                                                    "type": "string"
-                                                  },
-                                                  "schedulerName": {
-                                                    "type": "string"
-                                                  },
-                                                  "securityContext": {
-                                                    "type": "object"
-                                                  },
-                                                  "serviceAccount": {
-                                                    "type": "string"
-                                                  },
-                                                  "serviceAccountName": {
-                                                    "type": "string"
-                                                  },
-                                                  "setHostnameAsFQDN": {
-                                                    "type": "boolean"
-                                                  },
-                                                  "shareProcessNamespace": {
-                                                    "type": "boolean"
-                                                  },
-                                                  "subdomain": {
-                                                    "type": "string"
-                                                  },
-                                                  "terminationGracePeriodSeconds": {
-                                                    "type": "number",
-                                                    "format": "int64"
-                                                  },
-                                                  "tolerations": {
-                                                    "type": "array",
-                                                    "items": {
-                                                      "type": "object"
-                                                    }
-                                                  },
-                                                  "topologySpreadConstraints": {
-                                                    "type": "array",
-                                                    "items": {
-                                                      "type": "object"
-                                                    }
-                                                  },
-                                                  "volumes": {
-                                                    "type": "array",
-                                                    "items": {
-                                                      "type": "object"
-                                                    }
-                                                  },
-                                                  "additionalProperties": {
-                                                    "type": "object",
-                                                    "additionalProperties": {
-                                                      "type": "object"
-                                                    }
-                                                  }
-                                                }
-                                              },
-                                              "additionalProperties": {
-                                                "type": "object",
-                                                "additionalProperties": {
-                                                  "type": "object"
-                                                }
-                                              }
-                                            }
-                                          }
-                                        }
-                                      },
-                                      "status": {
-                                        "type": "object",
-                                        "title": "Ocean CD Workload Migration SpotDeployment Status",
-                                        "description": "Contains Workload's Migration SpotDeployment Status.\n",
-                                        "properties": {
-                                          "observedGeneration": {
-                                            "type": "integer"
-                                          },
-                                          "replicas": {
-                                            "type": "integer"
-                                          },
-                                          "updatedReplicas": {
-                                            "type": "integer"
-                                          },
-                                          "readyReplicas": {
-                                            "type": "integer"
-                                          },
-                                          "availableReplicas": {
-                                            "type": "integer"
-                                          },
-                                          "unavailableReplicas": {
-                                            "type": "integer"
-                                          },
-                                          "conditions": {
-                                            "type": "array",
-                                            "items": {
-                                              "type": "object",
-                                              "properties": {
-                                                "lastTransitionTime": {
-                                                  "type": "string"
-                                                },
-                                                "lastUpdateTime": {
-                                                  "type": "string"
-                                                },
-                                                "message": {
-                                                  "type": "string"
-                                                },
-                                                "reason": {
-                                                  "type": "string"
-                                                },
-                                                "status": {
-                                                  "type": "string"
-                                                },
-                                                "type": {
-                                                  "type": "string"
-                                                },
-                                                "additionalProperties": {
-                                                  "type": "object"
-                                                }
-                                              }
-                                            }
-                                          },
-                                          "collisionCount": {
-                                            "type": "integer"
-                                          },
-                                          "revision": {
-                                            "type": "integer"
-                                          },
-                                          "liveVersionDate": {
-                                            "type": "string",
-                                            "example": "2018-11-05T12:55:50.000+0000"
-                                          },
-                                          "liveVersionImages": {
-                                            "type": "object",
-                                            "additionalProperties": {
-                                              "type": "string"
-                                            }
-                                          },
-                                          "phase": {
-                                            "type": "string"
-                                          }
-                                        }
-                                      }
-                                    }
-                                  },
-                                  {
-                                    "type": "object"
-                                  }
-                                ]
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
-      }
-    },
-    "/ocean/cd/workload/{workloadId}/activeOperation": {
+    "/ocean/cd/workload/{workloadName}/namespace/{namespace}/activeOperation": {
       "summary": "Ocean CD",
       "get": {
         "summary": "Ocean CD Describe Workload's Active Operations",
@@ -67626,12 +67109,43 @@
         "parameters": [
           {
             "in": "path",
-            "name": "workloadId",
+            "name": "workloadName",
             "schema": {
               "type": "string"
             },
             "required": true,
-            "description": "The workload's Id\n"
+            "example": "app",
+            "description": "Workload name\n"
+          },
+          {
+            "in": "path",
+            "name": "namespace",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "default",
+            "description": "Workload's namespace name\n"
+          },
+          {
+            "in": "query",
+            "name": "clusterId",
+            "example": "prod-cluster",
+            "description": "Cluster id where the workload is running\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "example": "SpotDeployment",
+            "description": "Workload's k8s Kind, currently only SpotDeployment is supported\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
           }
         ],
         "responses": {
@@ -67704,7 +67218,7 @@
         }
       }
     },
-    "/ocean/cd/workload/{workloadId}/revision": {
+    "/ocean/cd/workload/{workloadName}/namespace/{namespace}/revision": {
       "summary": "Ocean CD",
       "get": {
         "summary": "Ocean CD Describe Workload's Revision",
@@ -67716,12 +67230,43 @@
         "parameters": [
           {
             "in": "path",
-            "name": "workloadId",
+            "name": "workloadName",
             "schema": {
               "type": "string"
             },
             "required": true,
-            "description": "The workload's Id\n"
+            "example": "app",
+            "description": "Workload name\n"
+          },
+          {
+            "in": "path",
+            "name": "namespace",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "default",
+            "description": "Workload's namespace name\n"
+          },
+          {
+            "in": "query",
+            "name": "clusterId",
+            "example": "prod-cluster",
+            "description": "Cluster id where the workload is running\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "example": "SpotDeployment",
+            "description": "Workload's k8s Kind, currently only SpotDeployment is supported\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
           }
         ],
         "responses": {
@@ -67790,7 +67335,7 @@
         }
       }
     },
-    "/ocean/cd/workload/{workloadId}/restart": {
+    "/ocean/cd/workload/{workloadName}/namespace/{namespace}/restart": {
       "summary": "Ocean CD",
       "put": {
         "summary": "Ocean CD Restart Workload",
@@ -67802,55 +67347,39 @@
         "parameters": [
           {
             "in": "path",
-            "name": "workloadId",
+            "name": "workloadName",
             "schema": {
               "type": "string"
             },
             "required": true,
-            "description": "The workload's Id\n"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Ok"
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
-      }
-    },
-    "/ocean/cd/workload/{workloadId}/revision/{revisionId}/retry": {
-      "summary": "Ocean CD",
-      "put": {
-        "summary": "Ocean CD Retry Workload",
-        "description": "Retry Workload By WorkloadId,RevisionId And RolloutId\n",
-        "operationId": "OceanCDCWorkloadRetry",
-        "tags": [
-          "Ocean CD"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workloadId",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "description": "The workload's Id\n"
+            "example": "app",
+            "description": "Workload name\n"
           },
           {
             "in": "path",
-            "name": "revisionId",
+            "name": "namespace",
             "schema": {
               "type": "string"
             },
             "required": true,
-            "description": "Relevant Revision Id\n"
+            "example": "default",
+            "description": "Workload's namespace name\n"
           },
           {
             "in": "query",
-            "name": "rolloutId",
+            "name": "clusterId",
+            "example": "prod-cluster",
+            "description": "Cluster id where the workload is running\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "example": "SpotDeployment",
+            "description": "Workload's k8s Kind, currently only SpotDeployment is supported\n",
             "schema": {
               "type": "string"
             },
@@ -67867,24 +67396,35 @@
         }
       }
     },
-    "/ocean/cd/workload/{workloadId}/revision/{revisionId}/rollback": {
+    "/ocean/cd/workload/{workloadName}/namespace/{namespace}/revision/{revisionId}/retry": {
       "summary": "Ocean CD",
       "put": {
-        "summary": "Ocean CD Rollback Workload",
-        "description": "Rollback Workload By WorkloadId,RevisionId And RolloutId\n",
-        "operationId": "OceanCDCWorkloadRollback",
+        "summary": "Ocean CD Retry Workload",
+        "description": "Retry Workload By WorkloadId,RevisionId And RolloutId\n",
+        "operationId": "OceanCDCWorkloadRetry",
         "tags": [
           "Ocean CD"
         ],
         "parameters": [
           {
             "in": "path",
-            "name": "workloadId",
+            "name": "workloadName",
             "schema": {
               "type": "string"
             },
             "required": true,
-            "description": "The workload's Id\n"
+            "example": "app",
+            "description": "Workload name\n"
+          },
+          {
+            "in": "path",
+            "name": "namespace",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "default",
+            "description": "Workload's namespace name\n"
           },
           {
             "in": "path",
@@ -67897,7 +67437,89 @@
           },
           {
             "in": "query",
-            "name": "rolloutId",
+            "name": "clusterId",
+            "example": "prod-cluster",
+            "description": "Cluster id where the workload is running\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "example": "SpotDeployment",
+            "description": "Workload's k8s Kind, currently only SpotDeployment is supported\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/cd/workload/{workloadName}/namespace/{namespace}/revision/{revisionId}/rollback": {
+      "summary": "Ocean CD",
+      "put": {
+        "summary": "Ocean CD Rollback Workload",
+        "description": "Rollback Workload By WorkloadId,RevisionId And RolloutId\n",
+        "operationId": "OceanCDCWorkloadRollback",
+        "tags": [
+          "Ocean CD"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "workloadName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "app",
+            "description": "Workload name\n"
+          },
+          {
+            "in": "path",
+            "name": "namespace",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "default",
+            "description": "Workload's namespace name\n"
+          },
+          {
+            "in": "path",
+            "name": "revisionId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Relevant Revision Id\n"
+          },
+          {
+            "in": "query",
+            "name": "clusterId",
+            "example": "prod-cluster",
+            "description": "Cluster id where the workload is running\n",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "example": "SpotDeployment",
+            "description": "Workload's k8s Kind, currently only SpotDeployment is supported\n",
             "schema": {
               "type": "string"
             },
