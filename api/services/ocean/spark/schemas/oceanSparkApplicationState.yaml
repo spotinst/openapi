@@ -4,9 +4,7 @@ description: >
 
   Transient states:
 
-  * `NEW`: The application creation request was received. The spark-submit operation is pending.
-
-  * `SUBMITTED`: The spark-submit operation was successful.
+  * `PENDING`: The spark-submit operation was successful.
   The Spark driver pod is now pending: the k8s cluster must find room for it and download its Docker image.
 
   * `RUNNING`: The Spark driver pod starts running. It will now execute your application code.
@@ -16,16 +14,19 @@ description: >
 
   * `COMPLETED`: The application completed successfully.
 
-  * `FAILED`: The application exited with a non-zero exit code.
+  * `COMPLETED_WITH_WARNINGS`: The application completed, but some non-fatal errors were found in the Spark Event Log.
 
-  * `SUBMISSION_FAILED`: The Spark application could not be started
-  because the spark-submit operation failed.
+  * `FAILED`: The application exited with a non-zero exit code.
+  
+  * `KILLED`: The application was manually killed before completion.
+  
+  * `TIMED_OUT`: The application was programmatically killed before completion because it was either pending or running longer than the timeout defined.
 example: "RUNNING"
 enum:
-- NEW
-- SUBMITTED
+- PENDING
 - RUNNING
 - COMPLETED
+- COMPLETED_WITH_WARNINGS
 - FAILED
-- SUBMISSION_FAILED
-- UNKNOWN
+- KILLED
+- TIMED_OUT
