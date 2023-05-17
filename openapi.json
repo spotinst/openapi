@@ -67876,13 +67876,13 @@
                                       "appNamespaces": {
                                         "type": "array",
                                         "items": {
-                                          "type": "string",
-                                          "example": [
-                                            "spark-apps",
-                                            "spark-apps-extra-ns-1",
-                                            "spark-apps-extra-ns-2"
-                                          ]
+                                          "type": "string"
                                         },
+                                        "example": [
+                                          "spark-apps",
+                                          "spark-apps-extra-ns-1",
+                                          "spark-apps-extra-ns-2"
+                                        ],
                                         "description": "List of Kubernetes namespaces that Spark applications can run in. The default namespace `spark-apps` is always included in the list.\n"
                                       }
                                     }
@@ -68120,6 +68120,11 @@
                                         "description": "The Kubernetes API of the Ocean Spark cluster\n",
                                         "example": "v1.21.2-eks-0389ca3"
                                       },
+                                      "operatorVersion": {
+                                        "type": "string",
+                                        "description": "The version of the Ocean Spark operator running in the Ocean Spark cluster\n",
+                                        "example": "0.1.30"
+                                      },
                                       "operatorLastHeartbeat": {
                                         "type": "string",
                                         "format": "date-time",
@@ -68332,8 +68337,7 @@
                                   },
                                   "completed": {
                                     "type": "number",
-                                    "description": "The number of apps successfully completed between >= start and < end\n",
-                                    "example": "2021-11-18T17:09:37+00:00"
+                                    "description": "The number of apps successfully completed between >= start and < end\n"
                                   },
                                   "failed": {
                                     "type": "number",
@@ -68343,7 +68347,7 @@
                                     "type": "number",
                                     "description": "The number of apps killed between >= start and <end\n"
                                   },
-                                  "timed_out": {
+                                  "timedOut": {
                                     "type": "number",
                                     "description": "The number of apps that timed-out between >= start and < end\n"
                                   }
@@ -68524,10 +68528,10 @@
                                         ],
                                         "properties": {
                                           "createdAt": {
-                                            "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/createdAt"
+                                            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/createdAt"
                                           },
                                           "updatedAt": {
-                                            "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/updatedAt"
+                                            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/updatedAt"
                                           },
                                           "total": {
                                             "type": "integer",
@@ -68549,10 +68553,10 @@
                                         ],
                                         "properties": {
                                           "createdAt": {
-                                            "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/createdAt"
+                                            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/createdAt"
                                           },
                                           "updatedAt": {
-                                            "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/updatedAt"
+                                            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/updatedAt"
                                           },
                                           "sparkCoresDurationSeconds": {
                                             "format": "time-delta",
@@ -68570,6 +68574,9 @@
                                           "efficiencyPercent": {
                                             "type": "number",
                                             "description": "The fraction of the time that Spark executor cores are running Spark tasks.\n"
+                                          },
+                                          "availability": {
+                                            "type": "string"
                                           }
                                         }
                                       }
@@ -68639,13 +68646,7 @@
             "required": false,
             "description": "Optionally filter on the submission source of the Spark application\n",
             "schema": {
-              "description": "The source that initiated the application submission",
-              "example": "public-api",
-              "type": "string",
-              "enum": [
-                "public-api",
-                "jupyter-enterprise-gateway"
-              ]
+              "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/submissionSource"
             }
           },
           {
@@ -68874,6 +68875,12 @@
                                                 "displayName": {
                                                   "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/1/properties/displayName"
                                                 },
+                                                "accountId": {
+                                                  "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/accountId"
+                                                },
+                                                "organizationId": {
+                                                  "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/organizationId"
+                                                },
                                                 "userId": {
                                                   "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/5/schema"
                                                 },
@@ -68887,7 +68894,7 @@
                                                   "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/4/schema"
                                                 },
                                                 "submissionSource": {
-                                                  "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/3/schema"
+                                                  "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/submissionSource"
                                                 },
                                                 "job": {
                                                   "type": "object",
@@ -68901,7 +68908,7 @@
                                                       "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/jobId/allOf/0"
                                                     },
                                                     "displayName": {
-                                                      "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/displayName"
+                                                      "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/displayName"
                                                     }
                                                   }
                                                 },
@@ -68916,6 +68923,9 @@
                                                   "format": "date-time",
                                                   "description": "The time when the Spark application terminated.\n",
                                                   "example": "2021-11-18T17:09:37+00:00"
+                                                },
+                                                "killRequestedAt": {
+                                                  "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/1/properties/killRequestedAt"
                                                 },
                                                 "liveLog": {
                                                   "type": "object",
@@ -68937,6 +68947,9 @@
                                                 },
                                                 "metrics": {
                                                   "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1statistics/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/metrics"
+                                                },
+                                                "cores": {
+                                                  "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0/components/schemas/DriverSpec/properties/cores"
                                                 }
                                               }
                                             }
@@ -69113,6 +69126,10 @@
                             "title": "Imagepullsecrets",
                             "type": "array"
                           },
+                          "interactive": {
+                            "title": "Interactive",
+                            "type": "boolean"
+                          },
                           "initContainerImage": {
                             "title": "Initcontainerimage",
                             "type": "string"
@@ -69148,12 +69165,18 @@
                           },
                           "memoryOverheadFactor": {
                             "title": "Memoryoverheadfactor",
-                            "type": "string"
+                            "type": "number"
                           },
                           "availabilityZone": {
                             "title": "Availabilityzone",
                             "type": "string",
                             "description": "The availability zone to use for the Spark application pods. Leave this empty and Ocean Spark will choose the best availability zone for the Spark application"
+                          },
+                          "priority": {
+                            "title": "Priority",
+                            "type": "string",
+                            "example": "low",
+                            "description": "The priority of the Spark application."
                           },
                           "pythonVersion": {
                             "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0/components/schemas/PythonVersion"
@@ -69559,6 +69582,27 @@
                                   },
                                   "title": "Pyfiles",
                                   "type": "array"
+                                },
+                                "packages": {
+                                  "items": {
+                                    "type": "string"
+                                  },
+                                  "title": "Packages",
+                                  "type": "array"
+                                },
+                                "excludePackages": {
+                                  "items": {
+                                    "type": "string"
+                                  },
+                                  "title": "Excludepackages",
+                                  "type": "array"
+                                },
+                                "repositories": {
+                                  "items": {
+                                    "type": "string"
+                                  },
+                                  "title": "Repositories",
+                                  "type": "array"
                                 }
                               },
                               "title": "Dependencies",
@@ -69664,8 +69708,9 @@
                                   "type": "string"
                                 },
                                 "cores": {
-                                  "title": "Cores",
-                                  "type": "integer"
+                                  "type": "number",
+                                  "description": "The number of cores allocated to the Spark application. It is 0 if the application is completed.\n",
+                                  "example": 1
                                 },
                                 "env": {
                                   "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0/components/schemas/Env"
@@ -69850,8 +69895,7 @@
                                   "type": "string"
                                 },
                                 "cores": {
-                                  "title": "Cores",
-                                  "type": "integer"
+                                  "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0/components/schemas/DriverSpec/properties/cores"
                                 },
                                 "env": {
                                   "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0/components/schemas/Env"
@@ -72393,6 +72437,15 @@
                   },
                   "configTemplateId": {
                     "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1configTemplate/post/requestBody/content/application~1json/schema/properties/id"
+                  },
+                  "submissionSource": {
+                    "description": "The source that initiated the application submission",
+                    "example": "public-api",
+                    "type": "string",
+                    "enum": [
+                      "public-api",
+                      "jupyter-enterprise-gateway"
+                    ]
                   }
                 }
               }
@@ -72449,6 +72502,12 @@
                                         "description": "A non-unique free-form name for the Spark application used in the Spot console. Defaults to the application ID.",
                                         "example": "Daily Reporting 2021-08-18"
                                       },
+                                      "accountId": {
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/accountId"
+                                      },
+                                      "organizationId": {
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/organizationId"
+                                      },
                                       "userId": {
                                         "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/5/schema"
                                       },
@@ -72462,7 +72521,7 @@
                                         "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/4/schema"
                                       },
                                       "submissionSource": {
-                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/3/schema"
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/submissionSource"
                                       },
                                       "job": {
                                         "type": "object",
@@ -72476,7 +72535,7 @@
                                             "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/jobId/allOf/0"
                                           },
                                           "displayName": {
-                                            "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/displayName"
+                                            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/displayName"
                                           }
                                         }
                                       },
@@ -72493,6 +72552,12 @@
                                         "type": "string",
                                         "format": "date-time",
                                         "description": "The time when the Spark application terminated.\n",
+                                        "example": "2021-11-18T17:09:37+00:00"
+                                      },
+                                      "killRequestedAt": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "description": "The time when the Spark application kill was requested at.\n",
                                         "example": "2021-11-18T17:09:37+00:00"
                                       },
                                       "liveLog": {
@@ -72512,6 +72577,47 @@
                                             "example": "/ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/kubeEvents/live"
                                           }
                                         }
+                                      },
+                                      "sparkEventLog": {
+                                        "type": "object",
+                                        "properties": {
+                                          "createdAt": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "description": "The time when the Spark event log was created.\n",
+                                            "example": "2019-08-24T14:15:22Z"
+                                          },
+                                          "updatedAt": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "description": "The time when the Spark event log was last updated.\n",
+                                            "example": "2019-08-24T14:15:22Z"
+                                          },
+                                          "availability": {
+                                            "type": "string",
+                                            "description": "The availability of the Spark event log.\n",
+                                            "example": "COMPLETE"
+                                          }
+                                        }
+                                      },
+                                      "configurationTemplate": {
+                                        "type": "object",
+                                        "description": "The configuration template used to create the Spark application.\n",
+                                        "properties": {
+                                          "id": {
+                                            "type": "string",
+                                            "description": "The ID of the configuration template.\n",
+                                            "example": "string"
+                                          },
+                                          "displayName": {
+                                            "type": "string",
+                                            "description": "The display name of the configuration template.\n",
+                                            "example": "string"
+                                          }
+                                        }
+                                      },
+                                      "cores": {
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0/components/schemas/DriverSpec/properties/cores"
                                       }
                                     }
                                   }
@@ -72606,6 +72712,12 @@
                                       "displayName": {
                                         "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/1/properties/displayName"
                                       },
+                                      "accountId": {
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/accountId"
+                                      },
+                                      "organizationId": {
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/organizationId"
+                                      },
                                       "userId": {
                                         "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/5/schema"
                                       },
@@ -72619,7 +72731,7 @@
                                         "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/4/schema"
                                       },
                                       "submissionSource": {
-                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/3/schema"
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/submissionSource"
                                       },
                                       "job": {
                                         "type": "object",
@@ -72633,7 +72745,7 @@
                                             "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/jobId/allOf/0"
                                           },
                                           "displayName": {
-                                            "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/displayName"
+                                            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/displayName"
                                           }
                                         }
                                       },
@@ -72651,6 +72763,9 @@
                                         "format": "date-time",
                                         "description": "The time when the Spark application terminated.\n",
                                         "example": "2021-11-18T17:09:37+00:00"
+                                      },
+                                      "killRequestedAt": {
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/1/properties/killRequestedAt"
                                       },
                                       "liveLog": {
                                         "type": "object",
@@ -72672,6 +72787,35 @@
                                       },
                                       "metrics": {
                                         "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1statistics/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/metrics"
+                                      },
+                                      "sparkEventLog": {
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/1/properties/sparkEventLog"
+                                      },
+                                      "configurationTemplate": {
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/1/properties/configurationTemplate"
+                                      },
+                                      "cores": {
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0/components/schemas/DriverSpec/properties/cores"
+                                      },
+                                      "archiveLog": {
+                                        "type": "object",
+                                        "description": "The archive log of the Spark application.\n",
+                                        "properties": {
+                                          "logsArchiveUrl": {
+                                            "type": "string",
+                                            "format": "uri",
+                                            "description": "The URL of the archive log of the Spark application.\n",
+                                            "example": "string"
+                                          },
+                                          "availability": {
+                                            "type": "string",
+                                            "description": "The availability of the archive log of the Spark application.\n",
+                                            "example": "PENDING"
+                                          }
+                                        }
+                                      },
+                                      "executorLogs": {
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app~1%7BapplicationId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/1/properties/archiveLog"
                                       }
                                     }
                                   }
@@ -72758,6 +72902,12 @@
                                       "displayName": {
                                         "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/1/properties/displayName"
                                       },
+                                      "accountId": {
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/accountId"
+                                      },
+                                      "organizationId": {
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/organizationId"
+                                      },
                                       "userId": {
                                         "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/5/schema"
                                       },
@@ -72771,7 +72921,7 @@
                                         "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/4/schema"
                                       },
                                       "submissionSource": {
-                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/3/schema"
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/submissionSource"
                                       },
                                       "startedAt": {
                                         "type": "string",
@@ -72784,6 +72934,9 @@
                                         "format": "date-time",
                                         "description": "The time when the Spark application terminated.\n",
                                         "example": "2021-11-18T17:09:37+00:00"
+                                      },
+                                      "killRequestedAt": {
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/1/properties/killRequestedAt"
                                       },
                                       "liveLog": {
                                         "type": "object",
@@ -72802,6 +72955,9 @@
                                             "example": "/ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/kubeEvents/live"
                                           }
                                         }
+                                      },
+                                      "cores": {
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0/components/schemas/DriverSpec/properties/cores"
                                       }
                                     }
                                   }
@@ -72886,22 +73042,11 @@
                                   "stacktrace": {
                                     "title": "Stacktrace",
                                     "type": "string"
-                                  },
-                                  "createdAt": {
-                                    "title": "Createdat",
-                                    "type": "string",
-                                    "format": "date-time"
-                                  },
-                                  "deletedAt": {
-                                    "title": "Deletedat",
-                                    "type": "string",
-                                    "format": "date-time"
                                   }
                                 },
                                 "required": [
                                   "errorType",
-                                  "stacktrace",
-                                  "createdAt"
+                                  "stacktrace"
                                 ]
                               }
                             }
@@ -73131,6 +73276,9 @@
                                       },
                                       "clusterId": {
                                         "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/1/schema"
+                                      },
+                                      "controllerClusterId": {
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
                                       },
                                       "config": {
                                         "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0"
@@ -73374,7 +73522,7 @@
         ],
         "responses": {
           "200": {
-            "description": "A list of Ocean Spark jobs (can be a single job)",
+            "description": "A paginated list of Ocean Spark jobs",
             "content": {
               "application/json": {
                 "schema": {
@@ -73392,236 +73540,65 @@
                             "items": {
                               "type": "array",
                               "items": {
-                                "type": "object",
-                                "required": [
-                                  "id",
-                                  "displayName",
-                                  "accountId",
-                                  "organizationId",
-                                  "clusterId",
-                                  "controllerClusterId",
-                                  "createdAt",
-                                  "updatedAt"
-                                ],
-                                "description": "The description of an Ocean Spark job\n",
-                                "properties": {
-                                  "internalId": {
-                                    "type": "string",
-                                    "example": "fa61bb92-4bb7-49aa-87d3-7823bd263d1e",
-                                    "description": "An internal ID describing the entity. As a user of Ocean Spark, you will never need this ID.\n\nPlease use the `id` to interact with the API.\n"
+                                "allOf": [
+                                  {
+                                    "$ref": "#/paths/~1ocean~1spark~1app/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/0"
                                   },
-                                  "id": {
-                                    "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/jobId/allOf/0"
-                                  },
-                                  "displayName": {
-                                    "type": "string",
-                                    "description": "A non-unique free-form name for the job used in the Spot console. Defaults to the job ID.\n",
-                                    "example": "Daily Reporting"
-                                  },
-                                  "controllerClusterId": {
-                                    "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
-                                  },
-                                  "clusterId": {
-                                    "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/1/schema"
-                                  },
-                                  "createdAt": {
-                                    "type": "string",
-                                    "format": "date-time",
-                                    "example": "2018-10-10T10:50:29.000+0000",
-                                    "description": "The field on which to sort. For now, we only support filtering on CREATED_AT."
-                                  },
-                                  "updatedAt": {
-                                    "type": "string",
-                                    "format": "date-time",
-                                    "example": "2018-10-10T10:50:29.000+0000",
-                                    "description": "The time when the entity was last updated"
-                                  },
-                                  "lastApp": {
-                                    "type": "object",
-                                    "required": [
-                                      "internalId",
-                                      "id",
-                                      "displayName",
-                                      "accountId",
-                                      "organizationId",
-                                      "userId",
-                                      "clusterId",
-                                      "controllerClusterId",
-                                      "appState",
-                                      "submissionSource",
-                                      "createdAt",
-                                      "updatedAt"
-                                    ],
-                                    "allOf": [
-                                      {
-                                        "$ref": "#/paths/~1aws~1emr~1mrScaler/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/1"
-                                      },
-                                      {
-                                        "type": "object",
-                                        "description": "The description of a Spark application\n",
-                                        "properties": {
-                                          "internalId": {
-                                            "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/internalId"
-                                          },
-                                          "id": {
-                                            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/appId"
-                                          },
-                                          "displayName": {
-                                            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/1/properties/displayName"
-                                          },
-                                          "userId": {
-                                            "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/5/schema"
-                                          },
-                                          "clusterId": {
-                                            "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/1/schema"
-                                          },
-                                          "controllerClusterId": {
-                                            "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
-                                          },
-                                          "appState": {
-                                            "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/4/schema"
-                                          },
-                                          "submissionSource": {
-                                            "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/3/schema"
-                                          },
-                                          "job": {
-                                            "type": "object",
-                                            "description": "The job to which the application belongs. A job is collection of Spark applications, typically a workload run on a schedule.\n",
-                                            "required": [
-                                              "id",
-                                              "displayName"
-                                            ],
-                                            "properties": {
-                                              "id": {
-                                                "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/jobId/allOf/0"
-                                              },
-                                              "displayName": {
-                                                "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/displayName"
-                                              }
-                                            }
-                                          },
-                                          "config": {
-                                            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0"
-                                          },
-                                          "startedAt": {
-                                            "type": "string",
-                                            "format": "date-time",
-                                            "description": "The time when the Spark application started running (the app state becomes RUNNING). This is not the time when the application launch was requested (this is `createdAt`).\n",
-                                            "example": "2021-11-18T17:09:37+00:00"
-                                          },
-                                          "endedAt": {
-                                            "type": "string",
-                                            "format": "date-time",
-                                            "description": "The time when the Spark application terminated.\n",
-                                            "example": "2021-11-18T17:09:37+00:00"
-                                          },
-                                          "log": {
-                                            "type": "object",
-                                            "description": "API pointers to endpoints serving logs and events related to the Spark application",
-                                            "properties": {
-                                              "logsStreamUrl": {
-                                                "type": "string",
-                                                "format": "uri",
-                                                "description": "URL of the endpoint serving the live driver logs",
-                                                "example": "/ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/logs/live"
-                                              },
-                                              "kubeEventsStreamUrl": {
-                                                "type": "string",
-                                                "format": "uri",
-                                                "description": "URL of the endpoint serving a stream of Kubernetes events",
-                                                "example": "/ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/kubeEvents/live"
-                                              }
-                                            }
-                                          },
-                                          "metrics": {
-                                            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1statistics/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/metrics"
-                                          }
-                                        }
-                                      }
-                                    ]
-                                  },
-                                  "history": {
-                                    "description": "The most recent Spark applications in this job.",
-                                    "type": "array",
-                                    "items": {
-                                      "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/lastApp"
-                                    }
-                                  },
-                                  "trends": {
+                                  {
                                     "type": "object",
                                     "properties": {
-                                      "inputDataBytes": {
-                                        "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/trends/properties/costCents"
-                                      },
-                                      "outputDataBytes": {
-                                        "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/trends/properties/costCents"
-                                      },
-                                      "costCents": {
-                                        "type": "object",
-                                        "required": [
-                                          "last",
-                                          "deltaLast10"
-                                        ],
-                                        "description": "A description of the recent trend of this metric\n",
-                                        "properties": {
-                                          "last": {
-                                            "type": "integer",
-                                            "example": 49,
-                                            "description": "The most recent value of this metric"
-                                          },
-                                          "deltaLast10": {
-                                            "type": "number",
-                                            "example": 0.2,
-                                            "description": "The relative variation of the most recent value of this metric compared to the median of the previous 10 values"
-                                          }
-                                        }
-                                      },
-                                      "sparkCoresDurationSeconds": {
-                                        "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/trends/properties/durationSeconds"
-                                      },
-                                      "durationSeconds": {
-                                        "type": "object",
-                                        "required": [
-                                          "last",
-                                          "deltaLast10"
-                                        ],
-                                        "description": "A description of the recent trend of this metric\n",
-                                        "properties": {
-                                          "last": {
-                                            "type": "integer",
-                                            "example": 3600,
-                                            "description": "The most recent value of this metric"
-                                          },
-                                          "deltaLast10": {
-                                            "type": "number",
-                                            "example": 0.2,
-                                            "description": "The relative variation of the most recent value of this metric compared to the median of the previous 10 values"
-                                          }
-                                        }
-                                      },
-                                      "efficiencyPercent": {
-                                        "type": "object",
-                                        "required": [
-                                          "last",
-                                          "deltaLast10"
-                                        ],
-                                        "description": "A description of the recent trend of this metric\n",
-                                        "properties": {
-                                          "last": {
-                                            "type": "number",
-                                            "example": 0.8,
-                                            "description": "The most recent value of this metric"
-                                          },
-                                          "deltaLast10": {
-                                            "type": "number",
-                                            "example": 0.2,
-                                            "description": "The relative variation of the most recent value of this metric compared to the median of the previous 10 values"
+                                      "page": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "object",
+                                          "required": [
+                                            "id",
+                                            "displayName",
+                                            "accountId",
+                                            "organizationId",
+                                            "clusterId",
+                                            "controllerClusterId",
+                                            "createdAt",
+                                            "updatedAt"
+                                          ],
+                                          "description": "The description of an Ocean Spark job\n",
+                                          "properties": {
+                                            "id": {
+                                              "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/jobId/allOf/0"
+                                            },
+                                            "displayName": {
+                                              "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/displayName"
+                                            },
+                                            "controllerClusterId": {
+                                              "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
+                                            },
+                                            "clusterId": {
+                                              "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/1/schema"
+                                            },
+                                            "organizationId": {
+                                              "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/organizationId"
+                                            },
+                                            "accountId": {
+                                              "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/accountId"
+                                            },
+                                            "createdAt": {
+                                              "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/createdAt"
+                                            },
+                                            "updatedAt": {
+                                              "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/updatedAt"
+                                            },
+                                            "lastApp": {
+                                              "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/lastApp"
+                                            },
+                                            "config": {
+                                              "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0"
+                                            }
                                           }
                                         }
                                       }
                                     }
                                   }
-                                }
+                                ]
                               }
                             }
                           }
@@ -73724,14 +73701,23 @@
                                 ],
                                 "description": "The description of an Ocean Spark job with config\n",
                                 "properties": {
-                                  "internalId": {
-                                    "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/internalId"
-                                  },
                                   "id": {
                                     "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/jobId/allOf/0"
                                   },
                                   "displayName": {
-                                    "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/displayName"
+                                    "type": "string",
+                                    "description": "A non-unique free-form name for the job used in the Spot console. Defaults to the job ID.\n",
+                                    "example": "Daily Reporting"
+                                  },
+                                  "organizationId": {
+                                    "type": "integer",
+                                    "example": 606012341234,
+                                    "description": "The ID of the organization"
+                                  },
+                                  "accountId": {
+                                    "type": "string",
+                                    "example": "act-123456789",
+                                    "description": "The ID of the account where the entity lives"
                                   },
                                   "controllerClusterId": {
                                     "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
@@ -73740,10 +73726,116 @@
                                     "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/1/schema"
                                   },
                                   "createdAt": {
-                                    "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/createdAt"
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "example": "2018-10-10T10:50:29.000+0000",
+                                    "description": "The field on which to sort. For now, we only support filtering on CREATED_AT."
                                   },
                                   "updatedAt": {
-                                    "$ref": "#/paths/~1ocean~1spark~1job/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/updatedAt"
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "example": "2018-10-10T10:50:29.000+0000",
+                                    "description": "The time when the entity was last updated"
+                                  },
+                                  "lastApp": {
+                                    "type": "object",
+                                    "required": [
+                                      "id",
+                                      "displayName",
+                                      "accountId",
+                                      "organizationId",
+                                      "userId",
+                                      "clusterId",
+                                      "controllerClusterId",
+                                      "appState",
+                                      "submissionSource",
+                                      "createdAt",
+                                      "updatedAt"
+                                    ],
+                                    "allOf": [
+                                      {
+                                        "$ref": "#/paths/~1aws~1emr~1mrScaler/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/1"
+                                      },
+                                      {
+                                        "type": "object",
+                                        "description": "The description of a Spark application\n",
+                                        "properties": {
+                                          "id": {
+                                            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/appId"
+                                          },
+                                          "displayName": {
+                                            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/1/properties/displayName"
+                                          },
+                                          "accountId": {
+                                            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/accountId"
+                                          },
+                                          "organizationId": {
+                                            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/organizationId"
+                                          },
+                                          "userId": {
+                                            "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/5/schema"
+                                          },
+                                          "clusterId": {
+                                            "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/1/schema"
+                                          },
+                                          "controllerClusterId": {
+                                            "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
+                                          },
+                                          "appState": {
+                                            "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/4/schema"
+                                          },
+                                          "submissionSource": {
+                                            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/submissionSource"
+                                          },
+                                          "startedAt": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "description": "The time when the Spark application started running (the app state becomes RUNNING). This is not the time when the application launch was requested (this is `createdAt`).\n",
+                                            "example": "2021-11-18T17:09:37+00:00"
+                                          },
+                                          "endedAt": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "description": "The time when the Spark application terminated.\n",
+                                            "example": "2021-11-18T17:09:37+00:00"
+                                          },
+                                          "killRequestedAt": {
+                                            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/1/properties/killRequestedAt"
+                                          },
+                                          "liveLog": {
+                                            "type": "object",
+                                            "description": "API pointers to endpoints serving logs and events related to the Spark application",
+                                            "properties": {
+                                              "logsStreamUrl": {
+                                                "type": "string",
+                                                "format": "uri",
+                                                "description": "URL of the endpoint serving the live driver logs",
+                                                "example": "/ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/logs/live"
+                                              },
+                                              "kubeEventsStreamUrl": {
+                                                "type": "string",
+                                                "format": "uri",
+                                                "description": "URL of the endpoint serving a stream of Kubernetes events",
+                                                "example": "/ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/kubeEvents/live"
+                                              }
+                                            }
+                                          },
+                                          "metrics": {
+                                            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1statistics/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/metrics"
+                                          },
+                                          "cores": {
+                                            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0/components/schemas/DriverSpec/properties/cores"
+                                          }
+                                        }
+                                      }
+                                    ]
+                                  },
+                                  "history": {
+                                    "description": "The most recent Spark applications in this job.",
+                                    "type": "array",
+                                    "items": {
+                                      "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/lastApp"
+                                    }
                                   },
                                   "config": {
                                     "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0"
@@ -73807,7 +73899,74 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200"
+            "description": "An Ocean Spark job",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "response": {
+                          "type": "object",
+                          "description": "response body\n",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "required": [
+                                  "id",
+                                  "displayName",
+                                  "accountId",
+                                  "organizationId",
+                                  "clusterId",
+                                  "controllerClusterId",
+                                  "createdAt",
+                                  "updatedAt"
+                                ],
+                                "description": "The description of an Ocean Spark job with config\n",
+                                "properties": {
+                                  "internalId": {
+                                    "type": "string",
+                                    "example": "fa61bb92-4bb7-49aa-87d3-7823bd263d1e",
+                                    "description": "An internal ID describing the entity. As a user of Ocean Spark, you will never need this ID.\n\nPlease use the `id` to interact with the API.\n"
+                                  },
+                                  "id": {
+                                    "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/jobId/allOf/0"
+                                  },
+                                  "displayName": {
+                                    "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/displayName"
+                                  },
+                                  "controllerClusterId": {
+                                    "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
+                                  },
+                                  "clusterId": {
+                                    "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/1/schema"
+                                  },
+                                  "createdAt": {
+                                    "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/createdAt"
+                                  },
+                                  "updatedAt": {
+                                    "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/updatedAt"
+                                  },
+                                  "config": {
+                                    "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
