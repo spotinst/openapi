@@ -32,6 +32,9 @@ properties:
       type: string
     title: Imagepullsecrets
     type: array
+  interactive:
+    title: Interactive
+    type: boolean
   initContainerImage:
     title: Initcontainerimage
     type: string
@@ -41,6 +44,16 @@ properties:
     title: Labels
     type: object
     description: Labels to be attached to the custom resource of the application.
+  logCollection:
+    title: LogCollection
+    type: object
+    additionalProperties: false
+    description: Configure the application logs collection
+    properties:
+      collectAppLogs:
+        title: CollectAppLogs
+        type: boolean
+        description: Set this parameter to override the cluster configuration on driver and executor log collection. If set to false, no logs will be saved for this application.
   mainApplicationFile:
     title: Mainapplicationfile
     type: string
@@ -49,11 +62,16 @@ properties:
     type: string
   memoryOverheadFactor:
     title: Memoryoverheadfactor
-    type: string
+    type: number
   availabilityZone:
     title: Availabilityzone
     type: string
     description: The availability zone to use for the Spark application pods. Leave this empty and Ocean Spark will choose the best availability zone for the Spark application
+  priority:
+    title: Priority
+    type: string
+    example: "low"
+    description: The priority of the Spark application.
   pythonVersion:
     $ref: '#/components/schemas/PythonVersion'
   sparkConf:
@@ -84,6 +102,18 @@ properties:
       $ref: '#/components/schemas/Volume'
     title: Volumes
     type: array
+  namespace:
+    title: Namespace
+    type: string
+    description: The Kubernetes namespace the Spark application should run in. 
+      The provided namespace must be present in the cluster's Spark app namespace list. 
+      If empty, Ocean Spark will use the default 'spark-apps' namespace
+  serviceAccountName:
+    title: ServiceAccountName
+    type: string
+    description: The Kubernetes service account to assign to the Spark application pods
+      If empty Ocean Spark will use the default `spark-driver` service account
+
 
 components:
   schemas:
@@ -391,6 +421,21 @@ components:
             type: string
           title: Pyfiles
           type: array
+        packages:
+          items:
+            type: string
+          title: Packages
+          type: array
+        excludePackages:
+          items:
+            type: string
+          title: Excludepackages
+          type: array
+        repositories:
+          items:
+            type: string
+          title: Repositories
+          type: array
       title: Dependencies
       type: object
     DownwardAPIProjection:
@@ -476,8 +521,7 @@ components:
           title: Corerequest
           type: string
         cores:
-          title: Cores
-          type: integer
+          $ref: "cores.yaml"
         env:
           $ref: '#/components/schemas/Env'
         envSecretKeyRefs:
@@ -614,8 +658,7 @@ components:
           title: Corerequest
           type: string
         cores:
-          title: Cores
-          type: integer
+          $ref: "cores.yaml"
         env:
           $ref: '#/components/schemas/Env'
         envSecretKeyRefs:
@@ -875,8 +918,17 @@ components:
       type: string
     InstanceAllowList:
       title: InstanceAllowList
-      description: 'A list of instance families (like `i3` or `m5d` on AWS, `n2-highmem` or `n2-standard` on GCP) or specific instance types (like `i3.large` or `m5d.xlarge`, `n2-highmem-4` or `n2-standard-2` on GCP) to target'
-      type: string
+      description: |
+        Restricts what instances can by used by pods:
+
+        - On AWS, can be an instance type (ex: `i3.large`, `m5d.xlarge`) or an instance family (ex: `i3`, `m5d`).
+        - On GCP, can be a machine type + VCPU spec (ex: `n2-highmem-4`, `n2-standard-2`) or a machine type (ex: `n2-highmem`, `n2-standard`).
+        - On Azure, can be a VM size (ex: `standard_a2_v2`, `standard_e16-8_v3`) or a group of VM sizes (ex: `standard_a_v2`, `standard_e_v3`).
+          The group name is obtained by removing the number of vCPU (and constrained vCPU if there is one) from the VM size, and does not
+          necessarily map to a VM series. For Azure, this field is **not** case sensitive.
+      type: array
+      items:
+        type: string
     ISCSIVolumeSource:
       properties:
         chapAuthDiscovery:
