@@ -5,18 +5,14 @@ post:
   description: |
     Creates an Ocean entity according to a given specification.
 
-    Notes:
-    <ol>
-      <li>
-      The Ocean Controller is used to monitor the cluster resources and report back to Ocean SaaS. A properly functioning controller is mandatory for Ocean to operate.
-      <ul>
-        <li>
-        To install the Controller using Kubectl, run the following script on a machine with kubectl command line tool installed and configured:
-        </li>
-      </ul>
-      </li>
-    </ol>
-    
+    <p>Notes:<br></p>
+
+    It is recommended to import all necessary information from the existing AKS cluster using the Ocean [AKS Cluster Import](https://docs.spot.io/api/#operation/oceanAKSV2ClusterImport) API call and use its output to create a fully configured Ocean cluster.
+
+    <p>The Ocean Controller is used to monitor the cluster resources and report back to Ocean SaaS. <b>A properly functioning controller is mandatory for Ocean to operate.</b><br>
+    The controller can be installed on the cluster using Kubectl or Helm.<br>
+    To install the Controller using Kubectl, run the following script on a machine with kubectl command line tool installed and configured:</p>
+
     ```bash
     #!/usr/bin/env bash
     curl -fsSL http://spotinst-public.s3.amazonaws.com/integrations/kubernetes/cluster-controller/scripts/init.sh | \
@@ -26,17 +22,10 @@ post:
     ENABLE_OCEAN_METRIC_EXPORTER=false \
     bash
     ```
-    
-      <li list-style-position= "inside"><li>
-      The Ocean Controller is used to monitor the cluster resources and report back to Ocean SaaS. A properly functioning controller is mandatory for Ocean to operate.
-      <ul>
-        <li>
-        To install the Controller using Helm 3.x:
-           * For installation using Helm 2.x additional step is needed to grant Tiller access. [View documentation](https://docs.spot.io/ocean/tutorials/spot-kubernetes-controller/install-with-helm)
-           * Please configure all chart's values using the set command line argument or a values. yaml file. [Ocean controller help chart artifact](https://artifacthub.io/packages/helm/spotinst/spotinst-kubernetes-cluster-controller).
-        <\li>
-      </ul>
-      <\li><\li>
+
+    To install the Controller using Helm 3.x:
+       * For installation using Helm 2.x additional step is needed to grant Tiller access. [View documentation](https://docs.spot.io/ocean/tutorials/spot-kubernetes-controller/install-with-helm)
+       * Please configure all chart's values using the set command line argument or a values. yaml file. [Ocean controller help chart artifact](https://artifacthub.io/packages/helm/spotinst/spotinst-kubernetes-cluster-controller).
     
     ```bash
     helm repo add spotinst https://spotinst.github.io/spotinst-kubernetes-helm-charts \
@@ -51,12 +40,6 @@ post:
     --namespace="spot-ocean" \
     --set namespace="spot-ocean"
     ```
-    
-    <ol>
-      <li>
-      It is recommended to import all necessary information from the existing AKS cluster using the Ocean [AKS Cluster Import](https://docs.spot.io/api/#operation/oceanAKSClusterImport) API call and use its output to create a fully configured Ocean cluster.
-      </li>
-    </ol>
 
   operationId: "oceanAKSV2ClusterCreate"
   tags:
@@ -69,7 +52,7 @@ post:
       application/json:
         schema:
           allOf:
-            - $ref:  "../schemas/ocean.yaml"
+            - $ref:  "../schemas/create/ocean.yaml"
   responses:
     200:
       $ref: "../responses/oceanClusterCreate.yaml"
