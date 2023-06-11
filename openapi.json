@@ -63847,10 +63847,11 @@
                                         "example": "latency-validation"
                                       },
                                       "args": {
-                                        "description": "List of verification arguments",
+                                        "description": "List of verification arguments. You may specify either `value` OR `valueFrom` but not both. In case `args`:`value` is already defined in the RolloutSpec entity, there is no need to also specify it in the VerificationTemplate entity",
                                         "type": "array",
                                         "items": {
                                           "type": "object",
+                                          "description": "",
                                           "title": "Ocean CD Verification Template argument",
                                           "properties": {
                                             "name": {
@@ -64773,7 +64774,7 @@
                                       "traffic": {
                                         "type": "object",
                                         "title": "Ocean CD Rollout Spec Traffic",
-                                        "description": "hosts all the supported service meshes supported to enable more fine-grained traffic routing. In case `SpotDeployments` contains more than one SpotDeployment `traffic` manager may not be configured.\n",
+                                        "description": "Hosts all of the supported service meshes needed to enable more fine-grained traffic routing. In case `SpotDeployments` contains more than one SpotDeployment `traffic` manager may not be configured.\n",
                                         "properties": {
                                           "canaryService": {
                                             "type": "string",
@@ -64845,19 +64846,22 @@
                                               },
                                               "destinationRule": {
                                                 "type": "object",
-                                                "title": "Ocean CD Rollout Spec Trafic Istio Destination rule",
-                                                "description": "References an Istio DestinationRule to modify and shape traffic\n",
+                                                "title": "Ocean CD Rollout Spec Traffic Istio Destination rule",
+                                                "description": "It references to an Istio DestinationRule to modify and shape traffic.  `DestinationRule` field belongs only to the Subset Level approach\n",
                                                 "properties": {
                                                   "name": {
                                                     "type": "string",
+                                                    "example": "rollout-destrule",
                                                     "description": "Holds the name of the DestinationRule"
                                                   },
                                                   "canarySubsetName": {
                                                     "type": "string",
+                                                    "example": "canary",
                                                     "description": "The subset name to modify labels with canary version"
                                                   },
                                                   "stableSubsetName": {
                                                     "type": "string",
+                                                    "example": "stable",
                                                     "description": "The subset name to modify labels with stable version"
                                                   }
                                                 }
@@ -64874,17 +64878,25 @@
                                             "properties": {
                                               "annotationPrefix": {
                                                 "type": "string",
+                                                "example": "customingress.nginx.ingress.kubernetes.io",
                                                 "description": "Has to match the configured annotation prefix on the nginx ingress controller"
                                               },
                                               "stableIngress": {
                                                 "type": "string",
+                                                "example": "rollouts-demo-ingress-nginx",
                                                 "description": "Refers to the name of an `Ingress` resource in the same namespace as the `SpotDeployment`"
                                               },
                                               "additionalIngressAnnotations": {
                                                 "type": "object",
                                                 "additionalProperties": {
                                                   "type": "string"
-                                                }
+                                                },
+                                                "example": [
+                                                  {
+                                                    "cluster-by-header": "x-Canary",
+                                                    "cluster-by-header-value": "iwantsit"
+                                                  }
+                                                ]
                                               }
                                             },
                                             "required": [
@@ -64898,31 +64910,37 @@
                                             "properties": {
                                               "ingress": {
                                                 "type": "string",
+                                                "example": "rollouts-demo-ingress",
                                                 "description": "Refers to the name of an `Ingress` resource in the same namespace as the `SpotDeployment`"
                                               },
                                               "servicePort": {
                                                 "type": "integer",
+                                                "example": 80,
                                                 "description": "Refers to the port that the Ingress action should route traffic to"
                                               },
                                               "rootService": {
                                                 "type": "string",
+                                                "example": "rollouts-demo-root",
                                                 "description": "References the service in the ingress to the controller should add the action to"
                                               },
                                               "stickinessConfig": {
                                                 "type": "object",
-                                                "title": "Ocean CD Rollout Spec Trafic ALB Stickiness config",
-                                                "description": "Allows to specify further settings on the ForwaredConfig\n",
+                                                "title": "Ocean CD Rollout Spec Traffic ALB Stickiness config",
+                                                "description": "Allows to specify further settings on the ForwardConfig\n",
                                                 "properties": {
                                                   "enabled": {
-                                                    "type": "boolean"
+                                                    "type": "boolean",
+                                                    "example": true
                                                   },
                                                   "durationSeconds": {
-                                                    "type": "integer"
+                                                    "type": "integer",
+                                                    "example": 3600
                                                   }
                                                 }
                                               },
                                               "annotationPrefix": {
                                                 "type": "string",
+                                                "example": "custom.alb.ingress.kubernetes.io",
                                                 "description": "Has to match the configured annotation prefix on the alb ingress controller"
                                               }
                                             },
@@ -64934,15 +64952,17 @@
                                           },
                                           "smi": {
                                             "type": "object",
-                                            "title": "Ocean CD Rollout Spec Trafic Smi",
+                                            "title": "Ocean CD Rollout Spec Traffic SMI",
                                             "description": "Holds TrafficSplit specific configuration to route traffic\n",
                                             "properties": {
                                               "rootService": {
                                                 "type": "string",
+                                                "example": "rollouts-demo-root",
                                                 "description": "Holds the name of that clients use to communicate."
                                               },
                                               "trafficSplitName": {
                                                 "type": "string",
+                                                "example": "rollout-example-traffic-split",
                                                 "description": "Holds the name of the TrafficSplit"
                                               }
                                             }
@@ -64964,64 +64984,19 @@
                                               }
                                             }
                                           },
-                                          "appMesh": {
-                                            "type": "object",
-                                            "title": "Ocean CD Rollout Spec Trafic Istio",
-                                            "description": "Holds specific configuration to use AppMesh to route traffic\n",
-                                            "properties": {
-                                              "virtualService": {
-                                                "type": "object",
-                                                "title": "Ocean CD Rollout Spec Trafic App Mesh Virtual Service",
-                                                "description": "Holds information on the virtual service the rollout needs to modify\n",
-                                                "properties": {
-                                                  "name": {
-                                                    "type": "string",
-                                                    "description": "Holds the name of the VirtualService"
-                                                  },
-                                                  "routes": {
-                                                    "description": "A list of HTTP routes within VirtualService",
-                                                    "type": "array",
-                                                    "items": {
-                                                      "type": "string"
-                                                    }
-                                                  }
-                                                }
-                                              },
-                                              "virtualNodeGroup": {
-                                                "type": "object",
-                                                "title": "Ocean CD Rollout Spec Trafic App Mesh Virtual Service",
-                                                "description": "Holds information about targets used for routing traffic to a virtual service\n",
-                                                "properties": {
-                                                  "canaryVirtualNodeRef": {
-                                                    "type": "object",
-                                                    "title": "Ocean CD Rollout Spec Trafic App Mesh Virtual Service",
-                                                    "description": "Holds a reference to VirtualNode.appmesh.k8s.aws\n",
-                                                    "properties": {
-                                                      "name": {
-                                                        "type": "string",
-                                                        "description": "Holds the name of the VirtualNode"
-                                                      }
-                                                    }
-                                                  },
-                                                  "stableVirtualNodeRef": {
-                                                    "type": "object",
-                                                    "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/0/properties/traffic/properties/appMesh/properties/virtualNodeGroup/properties/canaryVirtualNodeRef"
-                                                  }
-                                                }
-                                              }
-                                            }
-                                          },
                                           "pingPong": {
                                             "type": "object",
-                                            "title": "Ocean CD Rollout Spec Trafic PingPong",
-                                            "description": "Holds the ping and pong services\n",
+                                            "title": "Ocean CD Rollout Spec Traffic PingPong",
+                                            "description": "Holds the ping and pong services. You can use `pingPong` field only when using ALB as a traffic manager with the IP Mode approach\n",
                                             "properties": {
                                               "pingService": {
                                                 "type": "string",
+                                                "example": "rollouts-demo-canary",
                                                 "description": "Holds the name of the ping service"
                                               },
                                               "pongService": {
                                                 "type": "string",
+                                                "example": "rollouts-demo-stable",
                                                 "description": "Holds the name of the pong service"
                                               }
                                             }
