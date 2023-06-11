@@ -4,7 +4,7 @@ get:
     Get the configurations for a specified Ocean cluster.
   operationId: "oceanAKSClusterGet"
   tags:
-    - "Ocean AKS (Deprecated)"
+    - "Ocean AKS"
   parameters:
     - $ref: "../../../../commons/parameters/accountId.yaml"
     - $ref: "../../commons/parameters/oceanClusterId.yaml"
@@ -17,22 +17,28 @@ get:
 put:
   summary: "Update Cluster"
   description: |
-    All Ocean parameters are updatable, excluding aks and controllerClusterId.
+    Update a specified Ocean cluster.
     <br />
     This API supports partial updates, so specific fields can be updated separately.
-  operationId: "oceanAKSClusterUpdate"
+
+    Notes:
+    <br />
+    When labels, tags and taints are updated in the VNG template, all <b>existing</b> nodes from VNGs that inherit these properties
+    from the tamplate will be updated as well.
+
+  operationId: "oceanAKSV2ClusterUpdate"
   tags:
-    - "Ocean AKS (Deprecated)"
+    - "Ocean AKS"
   parameters:
-    - $ref: "../../commons/parameters/oceanClusterId.yaml"
     - $ref: "../../../../commons/parameters/accountId.yaml"
+    - $ref: "../../commons/parameters/oceanClusterId.yaml"
   requestBody:
     required: true
     content:
       application/json:
         schema:
           allOf:
-            - $ref: "../schemas/ocean.yaml"
+            - $ref: "../schemas/update/ocean.yaml"
   responses:
     200:
       $ref: "../responses/oceanClusterUpdate.yaml"
@@ -43,17 +49,14 @@ delete:
   summary: "Delete Cluster"
   description: |
     Delete a specified Ocean cluster.
-  operationId: "oceanAKSClusterDelete"
+  operationId: "oceanAKSV2ClusterDelete"
   tags:
-    - "Ocean AKS (Deprecated)"
+    - "Ocean AKS"
   parameters:
-      - $ref: "../../../../commons/parameters/accountId.yaml"
-      - $ref: "../../commons/parameters/oceanClusterId.yaml"
+    - $ref: "../../../../commons/parameters/accountId.yaml"
+    - $ref: "../../commons/parameters/oceanClusterId.yaml"
   responses:
     200:
       $ref: "../responses/oceanClusterDelete.yaml"
     400:
       description: "Bad Request"
-
-
-
