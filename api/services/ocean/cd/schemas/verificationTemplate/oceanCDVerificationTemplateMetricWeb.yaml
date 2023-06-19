@@ -1,32 +1,48 @@
 type: object
 title: Ocean CD Verification Web Metric
+required:
+  - url
 properties:
   method:
     type: string
-    description: the method of the web metric (empty defaults to GET)
+    example: GET
+    description: The method of the web metric (empty defaults to GET)
+    enum: [GET, POST, PUT]
   url:
     type: string
-    description: the address of the web metric
+    example: "https://oceancd.com/api/v1/metrics?clusterId={{ args.clusterId }}"
+    description: The address of the web metric
   headers:
     type: array
-    description: optional HTTP headers to use in the request
+    description: Optional HTTP headers to use in the request
     items:
       type: object
+      required:
+        - key
+        - value
       properties:
         key:
           type: string
+          example: Authorization
+          description: The name of a header
         value:
+          description: The value of a header
+          example: "Bearer {{ args.token }}"
           type: string
   body:
     type: string
-    description: the body of the we metric (must be POST/PUT)
+    example: "{\"key\": \"test\"}"
+    description: The body of the web metric (applies only for the POST/PUT methods)
   timeoutSeconds:
     type: integer
-    description: the timeout for the request in seconds default is 10
+    example: 10
+    description: The timeout for the request in seconds. Default is 10
   jsonPath:
     type: string
-    description: a JSON Path to use as the result variable default is "{$}"
+    example: "{$.data}"
+    description: A JSON Path to use as the result variable. Default is "{$}"
   insecure:
     type: boolean
-    description: skips host TLS verification
+    example: false
+    description: Skips host TLS verification
 
