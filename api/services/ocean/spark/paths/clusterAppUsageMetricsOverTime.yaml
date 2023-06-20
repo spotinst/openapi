@@ -1,0 +1,67 @@
+summary: Ocean Spark
+
+get:
+  summary: "Get Cluster App Usage Metrics Over Time"
+  description: >
+    Aggregates app usage into time series buckets grouping by either jobs or users.
+  operationId: "OceanSparkClusterAppUsageMetricsOverTime"
+  tags:
+    - "Ocean Spark"
+  parameters:
+    - $ref: "../../../../commons/parameters/nonRequiredAccountId.yaml"
+    - $ref: "../parameters/path/oceanSparkClusterId.yaml"
+    - $ref: "../parameters/query/minCreatedAt.yaml"
+    - $ref: "../parameters/query/maxCreatedAt.yaml"
+    - in: query
+      name: groupBy
+      required: false
+      description: >
+        Optionally specify the usage grouping for the app usage aggregation
+      schema:
+        description: >
+          The grouping that should be applied to the aggregation
+
+          * `job`: Group the costs by a job
+
+          * `user`: Group the costs by user
+
+        example: "job"
+        enum:
+          - job
+          - user
+        type: string
+    - in: query
+      name: metric
+      required: false
+      description: >
+        Optionally specify the usage grouping for the app usage aggregation
+      schema:
+        description: >
+          The metric that should be applied aggregated
+
+          * `cloud-costs`: Aggregate cloud costs
+
+          * `app-hours`: Aggregate app hours
+
+          * `core-hours`: Aggregate core hours
+
+        example: "cloud-costs"
+        enum:
+          - cloud-costs
+          - app-hours
+          - core-hours
+        type: string
+    - required: false
+      schema:
+        title: MaxEntriesPerBucket
+        type: integer
+        default: 9
+        description: >
+          Optionally specify the number of entries per bucket, remaining items will be added to the `other` bucket
+      name: maxEntriesPerBucket
+      in: query
+  responses:
+    200:
+      $ref: "../responses/clusterAppUsageMetricsOverTime.yaml"
+    400:
+      description: "Bad Request"
