@@ -63828,6 +63828,9 @@
                     "type": "object",
                     "title": "Ocean CD Verification Template Request",
                     "description": "Ocean CD Verification Template request entity.\n",
+                    "required": [
+                      "verificationTemplate"
+                    ],
                     "properties": {
                       "verificationTemplate": {
                         "type": "object",
@@ -63851,14 +63854,14 @@
       },
       "get": {
         "summary": "List Ocean CD Verification Templates",
-        "description": "List all Ocean CD clusters.\n",
+        "description": "List all Ocean CD Verification Templates.\n",
         "operationId": "OceanCDVerificationTemplateList",
         "tags": [
           "Ocean CD"
         ],
         "responses": {
           "200": {
-            "description": "Ocean CD Verificaton Template Response",
+            "description": "Ocean CD Verification Template Response",
             "content": {
               "application/json": {
                 "schema": {
@@ -63883,25 +63886,32 @@
                                       "name",
                                       "metrics"
                                     ],
+                                    "description": "The object specifying a set of metrics that need to be analyzed during the rollout, and the values that are considered successful or failed",
                                     "properties": {
                                       "name": {
                                         "type": "string",
-                                        "description": "Identifier name for Ocean CD Verification Template. Must be a unique name",
-                                        "example": "latency-validation"
+                                        "example": "latency-validation",
+                                        "description": "Identifier name for Ocean CD Verification Template. Must be a unique name"
                                       },
                                       "args": {
                                         "description": "List of verification arguments. You may specify either `value` OR `valueFrom` but not both. In case `args`:`value` is already defined in the RolloutSpec entity, there is no need to also specify it in the VerificationTemplate entity",
                                         "type": "array",
                                         "items": {
                                           "type": "object",
-                                          "description": "",
                                           "title": "Ocean CD Verification Template argument",
+                                          "required": [
+                                            "name"
+                                          ],
                                           "properties": {
                                             "name": {
-                                              "type": "string"
+                                              "type": "string",
+                                              "example": "root-password",
+                                              "description": "Name of an argument"
                                             },
                                             "value": {
-                                              "type": "string"
+                                              "type": "string",
+                                              "example": 12345678,
+                                              "description": "String representation of data"
                                             },
                                             "valueFrom": {
                                               "type": "object",
@@ -63910,11 +63920,20 @@
                                                 "secretKeyRef": {
                                                   "type": "object",
                                                   "title": "Ocean CD Verification Template Secret Key Ref",
+                                                  "description": "Secret key to use",
+                                                  "required": [
+                                                    "name",
+                                                    "key"
+                                                  ],
                                                   "properties": {
                                                     "name": {
+                                                      "description": "Name of the secret key",
+                                                      "example": "root-password-secret",
                                                       "type": "string"
                                                     },
                                                     "key": {
+                                                      "description": "Name of the field that stores data",
+                                                      "example": "root-password",
                                                       "type": "string"
                                                     }
                                                   }
@@ -63939,11 +63958,13 @@
                                     "properties": {
                                       "createdAt": {
                                         "type": "string",
-                                        "example": "2018-11-05T12:55:50.000+0000"
+                                        "example": "2018-11-05T12:55:50.000+0000",
+                                        "description": "The time when the Verification Template was created"
                                       },
                                       "updatedAt": {
                                         "type": "string",
-                                        "example": "2018-11-05T12:58:15.000+0000"
+                                        "example": "2018-11-05T12:58:15.000+0000",
+                                        "description": "The last time when the Verification Template was changed"
                                       }
                                     }
                                   }
@@ -63997,7 +64018,7 @@
       },
       "put": {
         "summary": "Update Ocean CD Verification Template",
-        "description": "Full Update of Ocean CD Verification Template configuration.\n*All non included fields will be nullified*\n",
+        "description": "Full update of Ocean CD Verification Template configuration.\n*All non included fields will be nullified*\n",
         "operationId": "OceanCDVerificationTemplateUpdate",
         "tags": [
           "Ocean CD"
@@ -64024,6 +64045,9 @@
                     "type": "object",
                     "title": "Ocean CD Verification Template Request",
                     "description": "Ocean CD Verification Template request entity.\n",
+                    "required": [
+                      "verificationTemplate"
+                    ],
                     "properties": {
                       "verificationTemplate": {
                         "type": "object",
@@ -64094,11 +64118,17 @@
                     "type": "object",
                     "title": "Ocean CD Verification Template Request",
                     "description": "Ocean CD Verification Template request entity.\n",
+                    "required": [
+                      "verificationTemplate"
+                    ],
                     "properties": {
                       "verificationTemplate": {
                         "type": "object",
                         "title": "Ocean CD Verification Template",
                         "description": "Ocean CD Verification Template spec entity.\n",
+                        "required": [
+                          "metrics"
+                        ],
                         "properties": {
                           "args": {
                             "description": "List of verification arguments",
@@ -66310,49 +66340,54 @@
                                             "title": "Ocean CD Verification Metric",
                                             "properties": {
                                               "name": {
-                                                "type": "string"
+                                                "type": "string",
+                                                "example": "5xx-errors",
+                                                "description": "Name of the verification metric"
                                               },
                                               "dryRun": {
                                                 "type": "boolean",
                                                 "example": false,
-                                                "description": "should the metric have an impact on the result of the rollout"
+                                                "description": "Defines whether the metric should have an impact on the result of the rollout"
                                               },
                                               "interval": {
                                                 "type": "string",
                                                 "example": "5m",
-                                                "description": "defines an interval string (30s, 5m, 1h) between each verification measurements. If omitted, will perform a single measurement"
+                                                "description": "Defines an interval string (30s, 5m, 1h) between each verification measurements. If omitted, will perform a single measurement"
                                               },
                                               "initialDelay": {
                                                 "type": "string",
-                                                "description": "how long the should wait before starting this metric measurements",
+                                                "description": "How long to wait before starting this metric measurements",
                                                 "example": "1m"
                                               },
                                               "count": {
                                                 "type": "integer",
-                                                "description": "the number of times to run the measurement. If both interval and count are omitted, the effective count is 1. If only interval is specified, metric runs indefinitely. If count > 1, interval must be specified.",
+                                                "description": "The number of times to run the measurement. If both interval and count are omitted, the effective count is 1. If only interval is specified, metric runs indefinitely. If count > 1, interval must be specified",
                                                 "example": 10
                                               },
                                               "successCondition": {
                                                 "type": "string",
-                                                "description": "expression which determines if a measurement is considered successful. The keyword `result` is a variable reference to the value of measurement. Results can be both structured data or primitive. if successCondition is set, then failureCondition is not allowed.",
+                                                "description": "Expression which determines if a measurement is considered successful. The keyword `result` is a variable reference to the value of measurement. Results can be both structured data or primitive. If successCondition is set, then failureCondition is not allowed",
                                                 "example": "result[0] <= 0.95"
                                               },
                                               "failureCondition": {
                                                 "type": "string",
-                                                "description": "an expression which determines if a measurement is considered failed. if failureCondition is set, then successCondition is not allowed.",
+                                                "description": "An expression which determines if a measurement is considered failed. If failureCondition is set, then successCondition is not allowed",
                                                 "example": "result[0] >= 1.2"
                                               },
                                               "failureLimit": {
                                                 "type": "integer",
-                                                "description": "the maximum number of times the measurement is allowed to fail, before the entire metric is considered Failed default is 0"
+                                                "example": 2,
+                                                "description": "The maximum number of times the measurement is allowed to fail, before the entire metric is considered failed. Default is 0"
                                               },
                                               "consecutiveErrorLimit": {
                                                 "type": "integer",
-                                                "description": "the maximum number of times the measurement is allowed to error in succession, before the metric is considered error default is 4"
+                                                "example": 4,
+                                                "description": "The maximum number of times the measurement is allowed to error in succession, before the metric is considered error. Default is 4"
                                               },
                                               "provider": {
                                                 "type": "object",
                                                 "title": "Ocean CD Verification Metric Provider, only one provider type can be defined",
+                                                "description": "The name of the monitoring tool chosen for the metric",
                                                 "properties": {
                                                   "prometheus": {
                                                     "type": "object",
@@ -66362,48 +66397,65 @@
                                                     "title": "Ocean CD Verification Prometheus Metric",
                                                     "properties": {
                                                       "query": {
-                                                        "type": "string"
+                                                        "type": "string",
+                                                        "description": "A request for information retrieved from Prometheus",
+                                                        "example": "http_requests_total{status!~\"5..\"}\""
                                                       }
                                                     }
                                                   },
                                                   "newRelic": {
                                                     "type": "object",
                                                     "title": "Ocean CD Verification NewRelic Metric",
+                                                    "required": [
+                                                      "query"
+                                                    ],
                                                     "properties": {
                                                       "profile": {
                                                         "type": "string",
-                                                        "description": "the name of the secret holding NR account configuration"
+                                                        "example": "account-12345678",
+                                                        "description": "The name of the secret holding NR account configuration"
                                                       },
                                                       "query": {
                                                         "type": "string",
-                                                        "description": "a raw newrelic NRQL query to perform"
+                                                        "example": "FROM Metric SELECT count(*)",
+                                                        "description": "A raw newrelic NRQL query to perform"
                                                       }
                                                     }
                                                   },
                                                   "datadog": {
                                                     "type": "object",
                                                     "title": "Ocean CD Verification Datadog Metric",
+                                                    "required": [
+                                                      "query"
+                                                    ],
                                                     "properties": {
                                                       "duration": {
                                                         "type": "string",
+                                                        "description": "The period of time in the past started from the current time indicating the collected in this period data to be returned",
                                                         "example": "1m"
                                                       },
                                                       "query": {
-                                                        "type": "string"
+                                                        "type": "string",
+                                                        "description": "A request for information retrieved from Datadog",
+                                                        "example": "avg:kubernetes.cpu.user.total{*}"
                                                       }
                                                     }
                                                   },
                                                   "cloudWatch": {
                                                     "type": "object",
                                                     "title": "Ocean CD Verification CloudWatch Metric",
+                                                    "required": [
+                                                      "metricDataQueries"
+                                                    ],
                                                     "properties": {
                                                       "duration": {
                                                         "type": "string",
+                                                        "description": "The period of time in the past started from the current time indicating the collected in this period data to be returned",
                                                         "example": "1m"
                                                       },
                                                       "metricDataQueries": {
                                                         "type": "array",
-                                                        "description": "The metric queries to be returned. A single MetricData call can include as many as 500 MetricDataQuery structures. Each of these structures can specify either a metric to retrieve, a Metrics Insights query, or a math expression to perform on retrieved data.",
+                                                        "description": "The metric queries to be returned. A single MetricData call can include as many as 500 MetricDataQuery structures. Each of these structures can specify either a metric to retrieve, a Metrics Insights query, or a math expression to perform on retrieved data",
                                                         "items": {
                                                           "required": [
                                                             "id"
@@ -66412,40 +66464,49 @@
                                                           "properties": {
                                                             "id": {
                                                               "type": "string",
-                                                              "description": "The response ID. must be unique and not null. This object can contain characters, letters, numbers and underscore. The first letter must be a lowercase letter."
+                                                              "example": "utilization",
+                                                              "description": "The response ID. Must be unique and not null. This object can contain characters, letters, numbers and underscore. The first letter must be a lowercase letter"
                                                             },
                                                             "metricStat": {
                                                               "type": "object",
-                                                              "description": "The metric to be returned, along with statistics, period, and units. Use this parameter only if this object is retrieving a metric and not performing a math expression on returned data. WITHIN ONE METRICDATAQUERY OBJECT, YOU MUST SPECIFY EITHER EXPRESSION OR METRICSTAT BUT NOT BOTH.",
+                                                              "description": "The metric to be returned, along with statistics, period, and units. Use this parameter only if this object is retrieving a metric and not performing a math expression on returned data. WITHIN ONE METRICDATAQUERY OBJECT, YOU MUST SPECIFY EITHER EXPRESSION OR METRICSTAT BUT NOT BOTH",
                                                               "properties": {
                                                                 "metric": {
                                                                   "required": [
                                                                     "metricName"
                                                                   ],
                                                                   "type": "object",
-                                                                  "description": "The metric to return, including the metric name, namespace, and dimensions.",
+                                                                  "description": "The metric to return, including the metric name, namespace, and dimensions",
                                                                   "properties": {
                                                                     "metricName": {
                                                                       "type": "string",
-                                                                      "description": "The name of the metric."
+                                                                      "example": "CPUUtilization",
+                                                                      "description": "The name of the metric"
                                                                     },
                                                                     "namespace": {
                                                                       "type": "string",
-                                                                      "description": "The namespace of the metric."
+                                                                      "example": "AWS/EC2",
+                                                                      "description": "The namespace of the metric"
                                                                     },
                                                                     "dimensions": {
                                                                       "type": "array",
-                                                                      "description": "A dimension is a name/value pair that is part of the identity of a metric. Because dimensions are part of the unique identifier for a metric, whenever you add a unique name/value pair to one of your metrics, you are creating a new variation of that metric. You can assign up to 30 dimensions to a metric.",
+                                                                      "description": "A dimension is a name/value pair that is part of the identity of a metric. Because dimensions are part of the unique identifier for a metric, whenever you add a unique name/value pair to one of your metrics, you are creating a new variation of that metric. You can assign up to 30 dimensions to a metric",
                                                                       "items": {
                                                                         "type": "object",
+                                                                        "required": [
+                                                                          "name",
+                                                                          "value"
+                                                                        ],
                                                                         "properties": {
                                                                           "name": {
                                                                             "type": "string",
+                                                                            "example": "InstanceId",
                                                                             "description": "The name of the dimensions. These names must contain only ASCII characters, must include at least one non-whitespace character, and cannot start with a colon(':')"
                                                                           },
                                                                           "value": {
                                                                             "type": "string",
-                                                                            "description": "The value of the dimensions. These values must contain only ASCII characters and must include at least one non-whitespace character."
+                                                                            "example": "i-1234567890abcdef",
+                                                                            "description": "The value of the dimensions. These values must contain only ASCII characters and must include at least one non-whitespace character"
                                                                           }
                                                                         }
                                                                       }
@@ -66454,15 +66515,18 @@
                                                                 },
                                                                 "period": {
                                                                   "type": "integer",
-                                                                  "description": "The granularity, in seconds, of the returned data points. For metrics with regular resolution, a period can be as short as one minute (60 seconds) and must be a multiple of 60. For high-resolution metrics that are collected at intervals of less than one minute, the period can be 1, 5, 10, 30, 60, or any multiple of 60. High-resolution metrics are those metrics stored by a PutMetricData call that includes a StorageResolution of 1 second."
+                                                                  "example": 300,
+                                                                  "description": "The granularity, in seconds, of the returned data points. For metrics with regular resolution, a period can be as short as one minute (60 seconds) and must be a multiple of 60. For high-resolution metrics that are collected at intervals of less than one minute, the period can be 1, 5, 10, 30, 60, or any multiple of 60. High-resolution metrics are those metrics stored by a PutMetricData call that includes a StorageResolution of 1 second"
                                                                 },
                                                                 "stat": {
                                                                   "type": "string",
-                                                                  "description": "The statistic to return. It can include any CloudWatch statistic or extended statistic."
+                                                                  "example": "Average",
+                                                                  "description": "The statistic to return. It can include any CloudWatch statistic or extended statistic"
                                                                 },
                                                                 "unit": {
                                                                   "type": "string",
-                                                                  "description": "This defines what unit you want to use when storing the metric.",
+                                                                  "example": "None",
+                                                                  "description": "This defines what unit you want to use when storing the metric",
                                                                   "enum": [
                                                                     "Seconds",
                                                                     "Microseconds",
@@ -66497,18 +66561,22 @@
                                                             },
                                                             "expression": {
                                                               "type": "string",
-                                                              "description": "This field can contain either a Metrics Insights query, or a metric math expression to be performed on the returned data. WITHIN ONE METRICDATAQUERY OBJECT, YOU MUST SPECIFY EITHER EXPRESSION OR METRICSTAT BUT NOT BOTH."
+                                                              "example": "SELECT AVG(CPUUtilization) FROM SCHEMA(\\\"AWS/EC2\\\", InstanceId)",
+                                                              "description": "This field can contain either a Metrics Insights query, or a metric math expression to be performed on the returned data. WITHIN ONE METRICDATAQUERY OBJECT, YOU MUST SPECIFY EITHER EXPRESSION OR METRICSTAT BUT NOT BOTH"
                                                             },
                                                             "label": {
                                                               "type": "string",
-                                                              "description": "A human-readable label for this metric or expression. This is especially useful if this is an expression, so that you know what the value represents. If the metric or expression is shown in a CloudWatch dashboard widget, the label is shown. If Label is omitted, CloudWatch generates a default."
+                                                              "example": "Cluster CpuUtilization",
+                                                              "description": "A human-readable label for this metric or expression. This is especially useful if this is an expression, so that you know what the value represents. If the metric or expression is shown in a CloudWatch dashboard widget, the label is shown. If Label is omitted, CloudWatch generates a default"
                                                             },
                                                             "returnData": {
                                                               "type": "boolean",
+                                                              "example": false,
                                                               "description": "This option indicates whether to return the timestamps and raw data values of this metric. If you are performing this call just to do math expressions and do not also need the raw data returned, you can specify False . If you omit this, the default of True is used."
                                                             },
                                                             "period": {
                                                               "type": "integer",
+                                                              "example": 300,
                                                               "description": "The granularity, in seconds, of the returned data points. For metrics with regular resolution, a period can be as short as one minute (60 seconds) and must be a multiple of 60. For high-resolution metrics that are collected at intervals of less than one minute, the period can be 1, 5, 10, 30, 60, or any multiple of 60. High-resolution metrics are those metrics stored by a PutMetricData call that includes a StorageResolution of 1 second."
                                                             }
                                                           }
@@ -66519,25 +66587,43 @@
                                                   "web": {
                                                     "type": "object",
                                                     "title": "Ocean CD Verification Web Metric",
+                                                    "required": [
+                                                      "url"
+                                                    ],
                                                     "properties": {
                                                       "method": {
                                                         "type": "string",
-                                                        "description": "the method of the web metric (empty defaults to GET)"
+                                                        "example": "GET",
+                                                        "description": "The method of the web metric (empty defaults to GET)",
+                                                        "enum": [
+                                                          "GET",
+                                                          "POST",
+                                                          "PUT"
+                                                        ]
                                                       },
                                                       "url": {
                                                         "type": "string",
-                                                        "description": "the address of the web metric"
+                                                        "example": "https://oceancd.com/api/v1/metrics?clusterId={{ args.clusterId }}",
+                                                        "description": "The address of the web metric"
                                                       },
                                                       "headers": {
                                                         "type": "array",
-                                                        "description": "optional HTTP headers to use in the request",
+                                                        "description": "Optional HTTP headers to use in the request",
                                                         "items": {
                                                           "type": "object",
+                                                          "required": [
+                                                            "key",
+                                                            "value"
+                                                          ],
                                                           "properties": {
                                                             "key": {
-                                                              "type": "string"
+                                                              "type": "string",
+                                                              "example": "Authorization",
+                                                              "description": "The name of a header"
                                                             },
                                                             "value": {
+                                                              "description": "The value of a header",
+                                                              "example": "Bearer {{ args.token }}",
                                                               "type": "string"
                                                             }
                                                           }
@@ -66545,62 +66631,88 @@
                                                       },
                                                       "body": {
                                                         "type": "string",
-                                                        "description": "the body of the we metric (must be POST/PUT)"
+                                                        "example": "{\"key\": \"test\"}",
+                                                        "description": "The body of the web metric (applies only for the POST/PUT methods)"
                                                       },
                                                       "timeoutSeconds": {
                                                         "type": "integer",
-                                                        "description": "the timeout for the request in seconds default is 10"
+                                                        "example": 10,
+                                                        "description": "The timeout for the request in seconds. Default is 10"
                                                       },
                                                       "jsonPath": {
                                                         "type": "string",
-                                                        "description": "a JSON Path to use as the result variable default is \"{$}\""
+                                                        "example": "{$.data}",
+                                                        "description": "A JSON Path to use as the result variable. Default is \"{$}\""
                                                       },
                                                       "insecure": {
                                                         "type": "boolean",
-                                                        "description": "skips host TLS verification"
+                                                        "example": false,
+                                                        "description": "Skips host TLS verification"
                                                       }
                                                     }
                                                   },
                                                   "job": {
                                                     "type": "object",
                                                     "title": "Ocean CD Verification Job Metric",
+                                                    "required": [
+                                                      "spec"
+                                                    ],
                                                     "properties": {
                                                       "spec": {
                                                         "type": "object",
-                                                        "description": "the job spec require to run the metric",
+                                                        "description": "The job spec require to run the metric",
+                                                        "required": [
+                                                          "template"
+                                                        ],
                                                         "properties": {
                                                           "backoffLimit": {
                                                             "type": "integer",
+                                                            "example": 1,
                                                             "description": "Specifies the number of retries before marking this job failed"
                                                           },
                                                           "template": {
                                                             "type": "object",
                                                             "description": "Describes the pod that will be created when executing a job",
+                                                            "required": [
+                                                              "spec"
+                                                            ],
                                                             "properties": {
                                                               "spec": {
                                                                 "type": "object",
                                                                 "description": "Specification of the desired behavior of the pod",
+                                                                "required": [
+                                                                  "containers",
+                                                                  "restartPolicy"
+                                                                ],
                                                                 "properties": {
                                                                   "containers": {
                                                                     "type": "array",
                                                                     "description": "List of containers belonging to the pod",
                                                                     "items": {
                                                                       "type": "object",
+                                                                      "required": [
+                                                                        "name",
+                                                                        "command",
+                                                                        "image"
+                                                                      ],
                                                                       "properties": {
                                                                         "name": {
                                                                           "type": "string",
-                                                                          "description": "container name"
+                                                                          "example": "hello",
+                                                                          "description": "The name of a container"
                                                                         },
                                                                         "command": {
                                                                           "type": "array",
+                                                                          "description": "The entry point of a container",
+                                                                          "example": "['sh', '-c', 'echo `Hello, world!`']",
                                                                           "items": {
                                                                             "type": "string"
-                                                                          },
-                                                                          "description": "container entry point"
+                                                                          }
                                                                         },
                                                                         "image": {
                                                                           "type": "string",
-                                                                          "description": "container image name"
+                                                                          "example": "nginx/nginx:1.21",
+                                                                          "description": "The image name of a container"
                                                                         }
                                                                       }
                                                                     }
