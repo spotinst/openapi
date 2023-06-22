@@ -64668,7 +64668,7 @@
       "summary": "Ocean CD",
       "post": {
         "summary": "Create Ocean CD Rollout Spec",
-        "description": "Create Ocean CD rollout spec.\n",
+        "description": "Create Ocean CD Rollout Spec.\n",
         "operationId": "OceanCDRolloutSpecCreate",
         "tags": [
           "Ocean CD"
@@ -64682,13 +64682,397 @@
                   {
                     "type": "object",
                     "title": "Ocean CD Rollout Spec Request",
-                    "description": "Ocean CD rollout spec request entity.\n",
+                    "description": "Ocean CD Rollout Spec request entity.\n",
                     "properties": {
                       "rolloutSpec": {
                         "type": "object",
-                        "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/0"
+                        "title": "Ocean CD Rollout Spec",
+                        "description": "Ocean CD Rollout Spec entity.\n",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "Identifier name for Ocean CD Rollout Spec. Must be unique",
+                            "example": "my-rolloutspec"
+                          },
+                          "spotDeployment": {
+                            "type": "object",
+                            "title": "Ocean CD Spot Deployment Selector",
+                            "description": "Represents the SpotDeployment selector\n",
+                            "required": [
+                              "clusterId",
+                              "namespace",
+                              "name"
+                            ],
+                            "properties": {
+                              "clusterId": {
+                                "type": "string",
+                                "description": "Ocean CD cluster identifier for the references `SpotDeployment`",
+                                "example": "aws-cluster"
+                              },
+                              "namespace": {
+                                "type": "string",
+                                "description": "The namespace where the `SpotDeployment` resource exists",
+                                "example": "us-region"
+                              },
+                              "name": {
+                                "type": "string",
+                                "example": "us-app",
+                                "description": "The name of the `SpotDeployment` resource"
+                              }
+                            }
+                          },
+                          "spotDeployments": {
+                            "type": "array",
+                            "description": "You must specify either `spotDeployment` OR `spotDeployments` but not both. Every SpotDeployment has to be unique. If more than one `SpotDeployment` has been configured, no `traffic` managers can be set as part of the RolloutSpec. For such case ensure that each of the chosen SpotDeployments are being exposed with different Kubernetes services",
+                            "items": {
+                              "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/rolloutSpec/properties/spotDeployment"
+                            }
+                          },
+                          "strategy": {
+                            "type": "object",
+                            "title": "Ocean CD Rollout Spec Strategy",
+                            "description": "Determines the Ocean CD strategy\n",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "description": "Ocean CD strategy name identifier",
+                                "example": "canary-strategy"
+                              },
+                              "args": {
+                                "type": "array",
+                                "description": "Arguments defined in Verification templates",
+                                "items": {
+                                  "type": "object",
+                                  "title": "Ocean CD Verification argument",
+                                  "description": "Represents Verification argument to inject to verification templates when running\n",
+                                  "properties": {
+                                    "name": {
+                                      "type": "string",
+                                      "description": "Name of an argument",
+                                      "example": "app"
+                                    },
+                                    "value": {
+                                      "type": "string",
+                                      "description": "Value of an argument",
+                                      "example": "my-application"
+                                    },
+                                    "valueFrom": {
+                                      "type": "object",
+                                      "title": "Ocean CD Verification argument value from",
+                                      "description": "Defines from where to get the value of an argument\n",
+                                      "required": [
+                                        "fieldRef"
+                                      ],
+                                      "properties": {
+                                        "fieldRef": {
+                                          "type": "object",
+                                          "title": "Ocean CD Verification argument value from field ref",
+                                          "description": "Defines the field path from where to get the value of an argument\n",
+                                          "properties": {
+                                            "fieldPath": {
+                                              "type": "string",
+                                              "description": "Path to SpotDeployment's field from where to get the value of an argument",
+                                              "example": "metadata.labels['app']"
+                                            }
+                                          },
+                                          "required": [
+                                            "fieldPath"
+                                          ]
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "required": [
+                                    "name"
+                                  ]
+                                }
+                              }
+                            },
+                            "required": [
+                              "name"
+                            ]
+                          },
+                          "traffic": {
+                            "type": "object",
+                            "title": "Ocean CD Rollout Spec Traffic",
+                            "description": "Hosts all of the supported service meshes needed to enable more fine-grained traffic routing. In case `SpotDeployments` contains more than one SpotDeployment the `traffic` manager may not be configured\n",
+                            "properties": {
+                              "canaryService": {
+                                "type": "string",
+                                "description": "The canary service name",
+                                "example": "canary-service"
+                              },
+                              "stableService": {
+                                "type": "string",
+                                "description": "The stable service name",
+                                "example": "stable-service"
+                              },
+                              "istio": {
+                                "type": "object",
+                                "title": "Ocean CD Rollout Spec Traffic Istio",
+                                "description": "Holds Istio specific configuration to route traffic\n",
+                                "properties": {
+                                  "virtualServices": {
+                                    "type": "array",
+                                    "description": "Defines a set of traffic routing rules to apply when a host is addressed",
+                                    "items": {
+                                      "type": "object",
+                                      "title": "Ocean CD Rollout Spec Traffic Istio Virtual Service",
+                                      "description": "Holds Istio specific configuration to route traffic\n",
+                                      "properties": {
+                                        "name": {
+                                          "type": "string",
+                                          "description": "Holds the name of the VirtualService",
+                                          "example": "service"
+                                        },
+                                        "routes": {
+                                          "description": "A list of HTTP routes within VirtualService",
+                                          "type": "array",
+                                          "items": {
+                                            "type": "string"
+                                          },
+                                          "example": [
+                                            "http-primary"
+                                          ]
+                                        },
+                                        "tlsRoutes": {
+                                          "type": "array",
+                                          "description": "A list of HTTPS routes within VirtualService",
+                                          "items": {
+                                            "type": "object",
+                                            "title": "Ocean CD Rollout Spec Traffic Istio Virtual Service TLS routes",
+                                            "description": "Holds Istio specific configuration to route traffic\n",
+                                            "properties": {
+                                              "port": {
+                                                "type": "integer",
+                                                "description": "The port of the TLS Route desired to be matched in the given Istio VirtualService",
+                                                "example": 443
+                                              },
+                                              "sniHosts": {
+                                                "description": "A list of all the SNI Hosts of the TLS Route desired to be matched in the given Istio VirtualService",
+                                                "type": "array",
+                                                "items": {
+                                                  "type": "string"
+                                                },
+                                                "example": [
+                                                  "spot.io"
+                                                ]
+                                              }
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "required": [
+                                        "name"
+                                      ]
+                                    }
+                                  },
+                                  "destinationRule": {
+                                    "type": "object",
+                                    "title": "Ocean CD Rollout Spec Traffic Istio Destination rule",
+                                    "description": "It references to an Istio DestinationRule to modify and shape traffic.  `DestinationRule` field belongs only to the Subset Level approach\n",
+                                    "required": [
+                                      "name",
+                                      "canarySubsetName",
+                                      "stableSubsetName"
+                                    ],
+                                    "properties": {
+                                      "name": {
+                                        "type": "string",
+                                        "example": "rollout-destrule",
+                                        "description": "Holds the name of the DestinationRule"
+                                      },
+                                      "canarySubsetName": {
+                                        "type": "string",
+                                        "example": "canary-subset",
+                                        "description": "The subset name to modify labels with the canary version"
+                                      },
+                                      "stableSubsetName": {
+                                        "type": "string",
+                                        "example": "stable-subset",
+                                        "description": "The subset name to modify labels with the stable version"
+                                      }
+                                    }
+                                  }
+                                },
+                                "required": [
+                                  "virtualServices"
+                                ]
+                              },
+                              "nginx": {
+                                "type": "object",
+                                "title": "Ocean CD Rollout Spec Traffic Nginx",
+                                "description": "Holds Nginx Ingress specific configuration to route traffic\n",
+                                "properties": {
+                                  "annotationPrefix": {
+                                    "type": "string",
+                                    "example": "customingress.nginx.ingress.kubernetes.io",
+                                    "description": "Has to match the configured annotation prefix on the Nginx ingress controller"
+                                  },
+                                  "stableIngress": {
+                                    "type": "string",
+                                    "example": "rollouts-demo-ingress-nginx",
+                                    "description": "Refers to the name of an `Ingress` resource in the same namespace as the `SpotDeployment`"
+                                  },
+                                  "additionalIngressAnnotations": {
+                                    "type": "object",
+                                    "description": "Provides additional features to add to the canary ingress (such as routing by header, cookie, etc). You can add these Kubernetes annotations to specific Ingress objects to customize their behavior. Above are found examples of accepted k8s keys. For the full list of supported keys, you may reach the following documentation - https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#canary",
+                                    "properties": {
+                                      "canary-by-header": {
+                                        "type": "string",
+                                        "example": "X-Canary",
+                                        "description": "Allows customizing the header value instead of using hardcoded values"
+                                      },
+                                      "key1": {
+                                        "type": "string",
+                                        "example": "value1",
+                                        "description": "Any of supported annotations"
+                                      }
+                                    }
+                                  }
+                                },
+                                "required": [
+                                  "stableIngress"
+                                ]
+                              },
+                              "alb": {
+                                "type": "object",
+                                "title": "Ocean CD Rollout Spec Traffic ALB",
+                                "description": "Holds ALB Ingress specific configuration to route traffic\n",
+                                "properties": {
+                                  "ingress": {
+                                    "type": "string",
+                                    "example": "rollouts-demo-ingress",
+                                    "description": "Refers to the name of an `Ingress` resource in the same namespace as the `SpotDeployment`"
+                                  },
+                                  "servicePort": {
+                                    "type": "integer",
+                                    "example": 80,
+                                    "description": "Refers to the port that the Ingress action should route traffic to"
+                                  },
+                                  "rootService": {
+                                    "type": "string",
+                                    "example": "rollouts-demo-root",
+                                    "description": "References the service in the ingress to the controller should add the action to"
+                                  },
+                                  "stickinessConfig": {
+                                    "type": "object",
+                                    "title": "Ocean CD Rollout Spec Traffic ALB Stickiness config",
+                                    "description": "Allows to specify further settings on the ForwardConfig\n",
+                                    "properties": {
+                                      "enabled": {
+                                        "type": "boolean",
+                                        "description": "Enables the load balancer to bind a user's session to a specific target.",
+                                        "example": true
+                                      },
+                                      "durationSeconds": {
+                                        "type": "integer",
+                                        "description": "Defines how long the load balancer should consistently route the user's request to the same target",
+                                        "example": 3600
+                                      }
+                                    }
+                                  },
+                                  "annotationPrefix": {
+                                    "type": "string",
+                                    "example": "custom.alb.ingress.kubernetes.io",
+                                    "description": "Has to match the configured annotation prefix on the alb ingress controller"
+                                  }
+                                },
+                                "required": [
+                                  "ingress",
+                                  "servicePort",
+                                  "rootService"
+                                ]
+                              },
+                              "smi": {
+                                "type": "object",
+                                "title": "Ocean CD Rollout Spec Traffic SMI",
+                                "description": "Holds TrafficSplit specific configuration to route traffic\n",
+                                "properties": {
+                                  "rootService": {
+                                    "type": "string",
+                                    "example": "rollouts-demo-root",
+                                    "description": "Holds the name of service that clients use to communicate"
+                                  },
+                                  "trafficSplitName": {
+                                    "type": "string",
+                                    "example": "rollout-example-traffic-split",
+                                    "description": "Holds the name of the TrafficSplit"
+                                  }
+                                }
+                              },
+                              "ambassador": {
+                                "type": "object",
+                                "title": "Ocean CD Rollout Spec Traffic Ambassador",
+                                "description": "Holds specific configuration to use Ambassador to route traffic\n",
+                                "properties": {
+                                  "mappings": {
+                                    "description": "A list of names of the Ambassador Mappings used to route traffic to the service",
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string",
+                                      "description": "The name of the Ambassador Mappings used to route traffic to the service",
+                                      "example": "stable-mapping"
+                                    }
+                                  }
+                                },
+                                "required": [
+                                  "mappings"
+                                ]
+                              },
+                              "pingPong": {
+                                "type": "object",
+                                "title": "Ocean CD Rollout Spec Traffic PingPong",
+                                "description": "Holds the ping and pong services. You can use `pingPong` field only when using ALB as a traffic manager with the IP Mode approach\n",
+                                "properties": {
+                                  "pingService": {
+                                    "type": "string",
+                                    "example": "rollouts-demo-canary",
+                                    "description": "Holds the name of the ping service"
+                                  },
+                                  "pongService": {
+                                    "type": "string",
+                                    "example": "rollouts-demo-stable",
+                                    "description": "Holds the name of the pong service"
+                                  }
+                                },
+                                "required": [
+                                  "pingService",
+                                  "pongService"
+                                ]
+                              }
+                            }
+                          },
+                          "failurePolicy": {
+                            "type": "object",
+                            "title": "Ocean CD Rollout Spec Failure Policy",
+                            "description": "Holds information on how to react when failure happens\n",
+                            "properties": {
+                              "action": {
+                                "type": "string",
+                                "description": "Choose an action to perform on failure. Default is `abort`",
+                                "enum": [
+                                  "abort",
+                                  "pause",
+                                  "promote"
+                                ],
+                                "example": "abort"
+                              }
+                            },
+                            "required": [
+                              "action"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "name",
+                          "strategy"
+                        ]
                       }
-                    }
+                    },
+                    "required": [
+                      "rolloutSpec"
+                    ]
                   }
                 ]
               }
@@ -64706,7 +65090,7 @@
       },
       "get": {
         "summary": "List Ocean CD Rollout Specs",
-        "description": "List all Ocean CD rollout specs.\n",
+        "description": "List all Ocean CD Rollout Specs.\n",
         "operationId": "OceanCDRolloutSpecList",
         "tags": [
           "Ocean CD"
@@ -64733,384 +65117,20 @@
                               "items": {
                                 "allOf": [
                                   {
-                                    "type": "object",
-                                    "title": "Ocean CD Rollout Spec",
-                                    "description": "Ocean CD rollout spec entity.\n",
-                                    "properties": {
-                                      "name": {
-                                        "type": "string",
-                                        "description": "Identifier name for Ocean CD Rollout Spec. Must be a unique name",
-                                        "example": "service-rolloutspec"
-                                      },
-                                      "spotDeployment": {
-                                        "type": "object",
-                                        "title": "Ocean CD Spot Deployment Selector",
-                                        "description": "Used to match the rolloutspec to a `SpotDeployment` resource. You must specify either `SpotDeployment` OR `SpotDeployments` but not both. In case you are using `SpotDeployment`, `traffic` manager is optional.\n",
-                                        "properties": {
-                                          "clusterId": {
-                                            "type": "string",
-                                            "description": "Existing Ocean CD cluster identifier where the matching `SpotDeployment` exists"
-                                          },
-                                          "namespace": {
-                                            "type": "string",
-                                            "description": "Should equal the namespace where the matching `SpotDeployment` exists"
-                                          },
-                                          "name": {
-                                            "type": "string",
-                                            "description": "The name of the `SpotDeployment` resource"
-                                          }
-                                        },
-                                        "required": [
-                                          "clusterId",
-                                          "namespace",
-                                          "name"
-                                        ]
-                                      },
-                                      "spotDeployments": {
-                                        "type": "array",
-                                        "items": {
-                                          "type": "object",
-                                          "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/rolloutSpec/properties/spotDeployment"
-                                        },
-                                        "example": [
-                                          {
-                                            "clusterId": "string",
-                                            "namespace": "string",
-                                            "name": "string"
-                                          },
-                                          {
-                                            "clusterId": "string",
-                                            "namespace": "string",
-                                            "name": "string"
-                                          }
-                                        ],
-                                        "description": "You must specify either `SpotDeployment` OR `SpotDeployments` but not both. Every SpotDeployment has to be unique. If more than one `SpotDeployment` has been configured, no `traffic` managers can be set as part of the RolloutSpec. For such case ensure that each of the chosen SpotDeployments are being exposed with different Kubernetes services"
-                                      },
-                                      "strategy": {
-                                        "type": "object",
-                                        "title": "Ocean CD Rollout Spec Strategy",
-                                        "description": "Determines the rollout spec strategy.\n",
-                                        "properties": {
-                                          "name": {
-                                            "type": "string",
-                                            "description": "Ocean CD strategy name identifier",
-                                            "example": "service-rolloutspec"
-                                          },
-                                          "args": {
-                                            "type": "array",
-                                            "items": {
-                                              "type": "object",
-                                              "title": "Ocean CD Verification argument",
-                                              "description": "Represents Verification argument to inject to verification templates when running\n",
-                                              "properties": {
-                                                "name": {
-                                                  "type": "string",
-                                                  "example": "app"
-                                                },
-                                                "value": {
-                                                  "type": "string",
-                                                  "example": "service"
-                                                },
-                                                "valueFrom": {
-                                                  "type": "object",
-                                                  "title": "Ocean CD Verification argument value from",
-                                                  "description": "Defines from where to get the value of an argument\n",
-                                                  "properties": {
-                                                    "fieldRef": {
-                                                      "type": "object",
-                                                      "$ref": "#/paths/~1ocean~1cd~1rollout~1%7BrolloutId%7D~1definition/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/phaseVerifications/items/properties/args/items/properties/valueFrom/properties/fieldRef"
-                                                    }
-                                                  }
-                                                }
-                                              },
-                                              "required": [
-                                                "name"
-                                              ]
-                                            }
-                                          }
-                                        },
-                                        "required": [
-                                          "name"
-                                        ]
-                                      },
-                                      "traffic": {
-                                        "type": "object",
-                                        "title": "Ocean CD Rollout Spec Traffic",
-                                        "description": "Hosts all of the supported service meshes needed to enable more fine-grained traffic routing. In case `SpotDeployments` contains more than one SpotDeployment `traffic` manager may not be configured.\n",
-                                        "properties": {
-                                          "canaryService": {
-                                            "type": "string",
-                                            "description": "Canary service name",
-                                            "example": "canary"
-                                          },
-                                          "stableService": {
-                                            "type": "string",
-                                            "description": "Stable service name",
-                                            "example": "stable"
-                                          },
-                                          "istio": {
-                                            "type": "object",
-                                            "title": "Ocean CD Rollout Spec Trafic Istio",
-                                            "description": "Holds Istio specific configuration to route traffic\n",
-                                            "properties": {
-                                              "virtualServices": {
-                                                "type": "array",
-                                                "items": {
-                                                  "type": "object",
-                                                  "title": "Ocean CD Rollout Spec Trafic Istio Virtual Service",
-                                                  "description": "Holds Istio specific configuration to route traffic\n",
-                                                  "properties": {
-                                                    "name": {
-                                                      "type": "string",
-                                                      "description": "Holds the name of the VirtualService",
-                                                      "example": "service"
-                                                    },
-                                                    "routes": {
-                                                      "description": "A list of HTTP routes within VirtualService",
-                                                      "type": "array",
-                                                      "items": {
-                                                        "type": "string"
-                                                      },
-                                                      "example": [
-                                                        "http-primary"
-                                                      ]
-                                                    },
-                                                    "tlsRoutes": {
-                                                      "type": "array",
-                                                      "items": {
-                                                        "type": "object",
-                                                        "title": "Ocean CD Rollout Spec Trafic Istio Virtual Service Tls routes",
-                                                        "description": "holds Istio specific configuration to route traffic\n",
-                                                        "properties": {
-                                                          "port": {
-                                                            "type": "integer",
-                                                            "description": "number of the TLS Route desired to be matched in the given Istio VirtualService",
-                                                            "example": 443
-                                                          },
-                                                          "sniHosts": {
-                                                            "description": "A list of all the SNI Hosts of the TLS Route desired to be matched in the given Istio VirtualService",
-                                                            "type": "array",
-                                                            "items": {
-                                                              "type": "string"
-                                                            },
-                                                            "example": [
-                                                              "spot.io"
-                                                            ]
-                                                          }
-                                                        }
-                                                      }
-                                                    }
-                                                  },
-                                                  "required": [
-                                                    "name"
-                                                  ]
-                                                }
-                                              },
-                                              "destinationRule": {
-                                                "type": "object",
-                                                "title": "Ocean CD Rollout Spec Traffic Istio Destination rule",
-                                                "description": "It references to an Istio DestinationRule to modify and shape traffic.  `DestinationRule` field belongs only to the Subset Level approach\n",
-                                                "properties": {
-                                                  "name": {
-                                                    "type": "string",
-                                                    "example": "rollout-destrule",
-                                                    "description": "Holds the name of the DestinationRule"
-                                                  },
-                                                  "canarySubsetName": {
-                                                    "type": "string",
-                                                    "example": "canary",
-                                                    "description": "The subset name to modify labels with canary version"
-                                                  },
-                                                  "stableSubsetName": {
-                                                    "type": "string",
-                                                    "example": "stable",
-                                                    "description": "The subset name to modify labels with stable version"
-                                                  }
-                                                }
-                                              }
-                                            },
-                                            "required": [
-                                              "virtualServices"
-                                            ]
-                                          },
-                                          "nginx": {
-                                            "type": "object",
-                                            "title": "Ocean CD Rollout Spec Trafic Nginx",
-                                            "description": "Holds Nginx Ingress specific configuration to route traffic\n",
-                                            "properties": {
-                                              "annotationPrefix": {
-                                                "type": "string",
-                                                "example": "customingress.nginx.ingress.kubernetes.io",
-                                                "description": "Has to match the configured annotation prefix on the nginx ingress controller"
-                                              },
-                                              "stableIngress": {
-                                                "type": "string",
-                                                "example": "rollouts-demo-ingress-nginx",
-                                                "description": "Refers to the name of an `Ingress` resource in the same namespace as the `SpotDeployment`"
-                                              },
-                                              "additionalIngressAnnotations": {
-                                                "type": "object",
-                                                "description": "Provides additional features to add to the canary ingress (such as routing by header, cookie, etc)",
-                                                "properties": {
-                                                  "key": {
-                                                    "type": "string",
-                                                    "example": "value",
-                                                    "description": "You can add these Kubernetes annotations to specific Ingress objects to customize their behavior. Above are found examples of accepted k8s keys. For the full list of supported keys, you may reach the following documentation - https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#canary",
-                                                    "enum": [
-                                                      "app-root",
-                                                      "affinity",
-                                                      "affinity-mode",
-                                                      "auth-realm",
-                                                      "auth-url",
-                                                      "canary-by-header",
-                                                      "canary-by-cookie",
-                                                      "enable-cors",
-                                                      "proxy-http-version"
-                                                    ]
-                                                  }
-                                                }
-                                              }
-                                            },
-                                            "required": [
-                                              "stableIngress"
-                                            ]
-                                          },
-                                          "alb": {
-                                            "type": "object",
-                                            "title": "Ocean CD Rollout Spec Trafic ALB",
-                                            "description": "Holds ALB Ingress specific configuration to route traffic\n",
-                                            "properties": {
-                                              "ingress": {
-                                                "type": "string",
-                                                "example": "rollouts-demo-ingress",
-                                                "description": "Refers to the name of an `Ingress` resource in the same namespace as the `SpotDeployment`"
-                                              },
-                                              "servicePort": {
-                                                "type": "integer",
-                                                "example": 80,
-                                                "description": "Refers to the port that the Ingress action should route traffic to"
-                                              },
-                                              "rootService": {
-                                                "type": "string",
-                                                "example": "rollouts-demo-root",
-                                                "description": "References the service in the ingress to the controller should add the action to"
-                                              },
-                                              "stickinessConfig": {
-                                                "type": "object",
-                                                "title": "Ocean CD Rollout Spec Traffic ALB Stickiness config",
-                                                "description": "Allows to specify further settings on the ForwardConfig\n",
-                                                "properties": {
-                                                  "enabled": {
-                                                    "type": "boolean",
-                                                    "example": true
-                                                  },
-                                                  "durationSeconds": {
-                                                    "type": "integer",
-                                                    "example": 3600
-                                                  }
-                                                }
-                                              },
-                                              "annotationPrefix": {
-                                                "type": "string",
-                                                "example": "custom.alb.ingress.kubernetes.io",
-                                                "description": "Has to match the configured annotation prefix on the alb ingress controller"
-                                              }
-                                            },
-                                            "required": [
-                                              "ingress",
-                                              "servicePort",
-                                              "rootService"
-                                            ]
-                                          },
-                                          "smi": {
-                                            "type": "object",
-                                            "title": "Ocean CD Rollout Spec Traffic SMI",
-                                            "description": "Holds TrafficSplit specific configuration to route traffic\n",
-                                            "properties": {
-                                              "rootService": {
-                                                "type": "string",
-                                                "example": "rollouts-demo-root",
-                                                "description": "Holds the name of that clients use to communicate."
-                                              },
-                                              "trafficSplitName": {
-                                                "type": "string",
-                                                "example": "rollout-example-traffic-split",
-                                                "description": "Holds the name of the TrafficSplit"
-                                              }
-                                            }
-                                          },
-                                          "ambassador": {
-                                            "type": "object",
-                                            "title": "Ocean CD Rollout Spec Trafic ALB",
-                                            "description": "Holds specific configuration to use Ambassador to route traffic\n",
-                                            "properties": {
-                                              "mappings": {
-                                                "description": "Refer to the name of the Ambassador Mappings used to route traffic to the service",
-                                                "type": "array",
-                                                "items": {
-                                                  "type": "string"
-                                                },
-                                                "example": [
-                                                  "stable-mapping"
-                                                ]
-                                              }
-                                            }
-                                          },
-                                          "pingPong": {
-                                            "type": "object",
-                                            "title": "Ocean CD Rollout Spec Traffic PingPong",
-                                            "description": "Holds the ping and pong services. You can use `pingPong` field only when using ALB as a traffic manager with the IP Mode approach\n",
-                                            "properties": {
-                                              "pingService": {
-                                                "type": "string",
-                                                "example": "rollouts-demo-canary",
-                                                "description": "Holds the name of the ping service"
-                                              },
-                                              "pongService": {
-                                                "type": "string",
-                                                "example": "rollouts-demo-stable",
-                                                "description": "Holds the name of the pong service"
-                                              }
-                                            }
-                                          }
-                                        }
-                                      },
-                                      "failurePolicy": {
-                                        "type": "object",
-                                        "title": "Ocean CD Rollout Spec Failure Policy",
-                                        "description": "Holds information on how to react when failure happens\n",
-                                        "properties": {
-                                          "action": {
-                                            "type": "string",
-                                            "description": "Choose an action to perform on failure",
-                                            "enum": [
-                                              "abort",
-                                              "pause",
-                                              "promote"
-                                            ],
-                                            "example": "abort"
-                                          }
-                                        },
-                                        "required": [
-                                          "action"
-                                        ]
-                                      }
-                                    },
-                                    "required": [
-                                      "name",
-                                      "strategy"
-                                    ]
+                                    "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/rolloutSpec"
                                   },
                                   {
                                     "type": "object",
                                     "properties": {
                                       "createdAt": {
                                         "type": "string",
+                                        "description": "The time when the Rollout Spec was created",
                                         "example": "2018-11-05T12:55:50.000+0000"
                                       },
                                       "updatedAt": {
                                         "type": "string",
-                                        "example": "2018-11-05T12:58:15.000+0000"
+                                        "example": "2018-11-05T12:58:15.000+0000",
+                                        "description": "The last time when the Rollout Spec was changed"
                                       }
                                     }
                                   }
@@ -65136,7 +65156,7 @@
       "summary": "Ocean CD",
       "get": {
         "summary": "Get Ocean CD Rollout Spec",
-        "description": "Get the configuration of an existing Ocean CD rollout spec.\n",
+        "description": "Get the configuration of an existing Ocean CD Rollout Spec.\n",
         "operationId": "oceanCDRolloutSpecGet",
         "tags": [
           "Ocean CD"
@@ -65164,7 +65184,7 @@
       },
       "put": {
         "summary": "Update Ocean CD Rollout Spec",
-        "description": "Full Update Ocean CD rollout spec configuration.\n*All non included fields will be nullified*\n",
+        "description": "Full update Ocean CD Rollout Spec configuration.\n*All non included fields will be nullified*\n",
         "operationId": "OceanCDRolloutSpecUpdate",
         "tags": [
           "Ocean CD"
@@ -65189,48 +65209,31 @@
                 "allOf": [
                   {
                     "type": "object",
-                    "title": "Ocean CD Rollout Spec Request",
-                    "description": "Ocean CD rollout spec request entity.\n",
+                    "title": "Ocean CD Rollout Spec Update Request",
+                    "description": "Ocean CD rollout spec UPDATE request entity.\n",
                     "properties": {
                       "rolloutSpec": {
                         "type": "object",
                         "title": "Ocean CD Rollout Spec",
-                        "description": "Ocean CD rollout spec entity.\n",
+                        "description": "Ocean CD rollout spec entity\n",
                         "properties": {
                           "spotDeployment": {
-                            "type": "object",
                             "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/rolloutSpec/properties/spotDeployment"
                           },
                           "spotDeployments": {
                             "type": "array",
+                            "description": "You must specify either `SpotDeployment` OR `SpotDeployments` but not both. Every SpotDeployment has to be unique. If more than one `SpotDeployment` has been configured, no `traffic` managers can be set as part of the RolloutSpec. For such case ensure that each of the chosen SpotDeployments are being exposed with different Kubernetes services",
                             "items": {
-                              "type": "object",
                               "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/rolloutSpec/properties/spotDeployment"
-                            },
-                            "example": [
-                              {
-                                "clusterId": "string",
-                                "namespace": "string",
-                                "name": "string"
-                              },
-                              {
-                                "clusterId": "string",
-                                "namespace": "string",
-                                "name": "string"
-                              }
-                            ],
-                            "description": "You must specify either `SpotDeployment` OR `SpotDeployments` but not both. Every SpotDeployment has to be unique. If more than one `SpotDeployment` has been configured, no `traffic` managers can be set as part of the RolloutSpec. For such case ensure that each of the chosen SpotDeployments are being exposed with different Kubernetes services"
+                            }
                           },
                           "strategy": {
-                            "type": "object",
                             "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/rolloutSpec/properties/strategy"
                           },
                           "traffic": {
-                            "type": "object",
                             "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/rolloutSpec/properties/traffic"
                           },
                           "failurePolicy": {
-                            "type": "object",
                             "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/rolloutSpec/properties/failurePolicy"
                           }
                         },
@@ -65238,7 +65241,10 @@
                           "strategy"
                         ]
                       }
-                    }
+                    },
+                    "required": [
+                      "rolloutSpec"
+                    ]
                   }
                 ]
               }
@@ -65256,7 +65262,7 @@
       },
       "patch": {
         "summary": "Patch Ocean CD Rollout Spec",
-        "description": "Partial update Ocean CD rollout spec configuration.\n",
+        "description": "Partial update Ocean CD Rollout Spec configuration.\n",
         "operationId": "OceanCDRolloutSpecPatch",
         "tags": [
           "Ocean CD"
@@ -65281,53 +65287,42 @@
                 "allOf": [
                   {
                     "type": "object",
-                    "title": "Ocean CD Rollout Spec Request",
-                    "description": "Ocean CD rollout spec request entity.\n",
+                    "title": "Ocean CD Rollout Spec Patch Request",
+                    "description": "Ocean CD rollout spec PATCH request entity.\n",
                     "properties": {
                       "rolloutSpec": {
                         "type": "object",
                         "title": "Ocean CD Rollout Spec",
-                        "description": "Ocean CD rollout spec entity.\n",
+                        "description": "Ocean CD rollout spec entity\n",
                         "properties": {
                           "spotDeployment": {
-                            "type": "object",
                             "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/rolloutSpec/properties/spotDeployment"
                           },
                           "spotDeployments": {
                             "type": "array",
+                            "description": "You must specify either `SpotDeployment` OR `SpotDeployments` but not both. Every SpotDeployment has to be unique. If more than one `SpotDeployment` has been configured, no `traffic` managers can be set as part of the RolloutSpec. For such case ensure that each of the chosen SpotDeployments are being exposed with different Kubernetes services",
                             "items": {
-                              "type": "object",
                               "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/rolloutSpec/properties/spotDeployment"
-                            },
-                            "example": [
-                              {
-                                "clusterId": "string",
-                                "namespace": "string",
-                                "name": "string"
-                              },
-                              {
-                                "clusterId": "string",
-                                "namespace": "string",
-                                "name": "string"
-                              }
-                            ],
-                            "description": "You must specify either `SpotDeployment` OR `SpotDeployments` but not both. Every SpotDeployment has to be unique. If more than one `SpotDeployment` has been configured, no `traffic` managers can be set as part of the RolloutSpec. For such case ensure that each of the chosen SpotDeployments are being exposed with different Kubernetes services"
+                            }
                           },
                           "strategy": {
-                            "type": "object",
                             "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/rolloutSpec/properties/strategy"
                           },
                           "traffic": {
-                            "type": "object",
                             "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/rolloutSpec/properties/traffic"
                           },
                           "failurePolicy": {
-                            "type": "object",
                             "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/rolloutSpec/properties/failurePolicy"
                           }
-                        }
+                        },
+                        "required": [
+                          "strategy"
+                        ]
                       }
-                    }
+                    },
+                    "required": [
+                      "rolloutSpec"
+                    ]
                   }
                 ]
               }
@@ -65345,7 +65340,7 @@
       },
       "delete": {
         "summary": "Delete Ocean CD Rollout Spec",
-        "description": "Delete an existing Ocean CD rollout spec.\n",
+        "description": "Delete an existing Ocean CD Rollout Spec.\n",
         "operationId": "OceanCDRolloutSpecDelete",
         "tags": [
           "Ocean CD"
@@ -66253,7 +66248,7 @@
                                 "properties": {
                                   "rolloutSpec": {
                                     "type": "object",
-                                    "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/0"
+                                    "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/post/requestBody/content/application~1json/schema/allOf/0/properties/rolloutSpec"
                                   },
                                   "strategy": {
                                     "type": "object",
@@ -66301,17 +66296,7 @@
                                                   },
                                                   "fieldRef": {
                                                     "type": "object",
-                                                    "title": "Ocean CD Verification argument value from field ref",
-                                                    "description": "Defines the field path from where to get the value of an argument\n",
-                                                    "properties": {
-                                                      "fieldPath": {
-                                                        "type": "string",
-                                                        "example": "metadata.labels['app']"
-                                                      }
-                                                    },
-                                                    "required": [
-                                                      "fieldPath"
-                                                    ]
+                                                    "$ref": "#/paths/~1ocean~1cd~1rolloutSpec/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/0/properties/strategy/properties/args/items/properties/valueFrom/properties/fieldRef"
                                                   }
                                                 }
                                               }
@@ -67121,17 +67106,25 @@
                                     "type": "object",
                                     "description": "\"The reference SpotDeployment selector\"\n",
                                     "title": "Ocean CD Spot Deployment Selector",
+                                    "required": [
+                                      "clusterId",
+                                      "namespace",
+                                      "name"
+                                    ],
                                     "properties": {
                                       "clusterId": {
                                         "type": "string",
-                                        "description": "Ocean CD cluster identifier for the references `SpotDeployment`"
+                                        "description": "Ocean CD cluster identifier for the references `SpotDeployment`",
+                                        "example": "aws-cluster"
                                       },
                                       "namespace": {
                                         "type": "string",
-                                        "description": "The namespace where the `SpotDeployment` resource exists"
+                                        "description": "The namespace where the `SpotDeployment` resource exists",
+                                        "example": "us-region"
                                       },
                                       "name": {
                                         "type": "string",
+                                        "example": "us-app",
                                         "description": "The name of the `SpotDeployment` resource"
                                       }
                                     }
