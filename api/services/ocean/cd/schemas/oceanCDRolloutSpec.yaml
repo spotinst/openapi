@@ -1,36 +1,24 @@
 type: object
 title: Ocean CD Rollout Spec
 description: >
-  Ocean CD rollout spec entity.
+  Ocean CD Rollout Spec entity.
 properties:
   name:
     type: string
-    description: Identifier name for Ocean CD Rollout Spec. Must be a unique name
-    example: service-rolloutspec
+    description: Identifier name for Ocean CD Rollout Spec. Must be unique
+    example: my-rolloutspec
   spotDeployment:
-    type: object
     $ref: "../schemas/oceanCDSpotDeploymentSelector.yaml"
   spotDeployments:
     type: array
+    description: You must specify either `spotDeployment` OR `spotDeployments` but not both. Every SpotDeployment has to be unique. If more than one `SpotDeployment` has been configured, no `traffic` managers can be set as part of the RolloutSpec. For such case ensure that each of the chosen SpotDeployments are being exposed with different Kubernetes services
     items:
-      type: object
       $ref: "../schemas/oceanCDSpotDeploymentSelector.yaml"
-    example:
-      - clusterId: string
-        namespace: string
-        name: string
-      - clusterId: string
-        namespace: string
-        name: string
-    description: You must specify either `SpotDeployment` OR `SpotDeployments` but not both. Every SpotDeployment has to be unique. If more than one `SpotDeployment` has been configured, no `traffic` managers can be set as part of the RolloutSpec. For such case ensure that each of the chosen SpotDeployments are being exposed with different Kubernetes services
   strategy:
-    type: object
     $ref: "../schemas/oceanCDRolloutSpecStrategy.yaml"
   traffic:
-    type: object
     $ref: "../schemas/oceanCDRolloutSpecTraffic.yaml"
   failurePolicy:
-    type: object
     $ref: "../schemas/oceanCDRolloutSpecFailurePolicy.yaml"
 required:
   - name
