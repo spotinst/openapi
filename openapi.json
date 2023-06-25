@@ -64324,12 +64324,220 @@
                 "allOf": [
                   {
                     "type": "object",
-                    "title": "Ocean CD Environemt Request",
+                    "title": "Ocean CD Strategy Request",
                     "description": "Ocean CD strategy request.\n",
+                    "required": [
+                      "strategy"
+                    ],
                     "properties": {
                       "strategy": {
                         "type": "object",
-                        "$ref": "#/paths/~1ocean~1cd~1strategy/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/0"
+                        "title": "Ocean CD Strategy",
+                        "description": "Ocean CD strategy. Use in RolloutSpec to decide what strategy to use when applying `SpotDeployment`\n",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "Identifier name for Ocean CD Strategy. Must be unique",
+                            "example": "service-strategy"
+                          },
+                          "canary": {
+                            "type": "object",
+                            "title": "Ocean CD Strategy Canary",
+                            "description": "Represents Canary strategy\n",
+                            "properties": {
+                              "backgroundVerification": {
+                                "type": "object",
+                                "title": "Ocean CD Strategy Background Verification",
+                                "description": "Represents a list of background verifications to run\n",
+                                "properties": {
+                                  "templateNames": {
+                                    "description": "List of Verification template names",
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string",
+                                      "description": "Name of a Verification template",
+                                      "example": "verification-template-name"
+                                    }
+                                  }
+                                },
+                                "required": [
+                                  "templateNames"
+                                ]
+                              },
+                              "steps": {
+                                "type": "array",
+                                "description": "A set of separate conditions of rollout processing",
+                                "items": {
+                                  "type": "object",
+                                  "title": "Ocean CD Strategy Canary Step",
+                                  "description": "Defines a step of the canary strategy\n",
+                                  "properties": {
+                                    "name": {
+                                      "type": "string",
+                                      "description": "The name of a step",
+                                      "example": "first-step"
+                                    },
+                                    "setWeight": {
+                                      "type": "integer",
+                                      "description": "Defines the percentage that the new version should receive",
+                                      "example": 20
+                                    },
+                                    "setCanaryScale": {
+                                      "type": "object",
+                                      "title": "Ocean CD Strategy Canary Step Scale",
+                                      "description": "Defines how to scale the version without changing traffic weight\n",
+                                      "properties": {
+                                        "weight": {
+                                          "type": "integer",
+                                          "description": "Sets the percentage of replicas the new version should have",
+                                          "example": 20
+                                        },
+                                        "replicas": {
+                                          "type": "integer",
+                                          "description": "Sets the number of replicas the new version should have",
+                                          "example": 20
+                                        },
+                                        "matchTrafficWeight": {
+                                          "type": "boolean",
+                                          "description": "Defines whether a rollout should match the current canary's setWeight step",
+                                          "example": true
+                                        }
+                                      }
+                                    },
+                                    "verification": {
+                                      "type": "object",
+                                      "title": "Ocean CD Strategy Step Verification",
+                                      "description": "Represents list of verifications to run in a step\n",
+                                      "properties": {
+                                        "templateNames": {
+                                          "description": "List of Verification template names",
+                                          "type": "array",
+                                          "items": {
+                                            "type": "string"
+                                          },
+                                          "example": [
+                                            "5xx-errors"
+                                          ]
+                                        }
+                                      },
+                                      "required": [
+                                        "templateNames"
+                                      ]
+                                    },
+                                    "pause": {
+                                      "type": "object",
+                                      "title": "Ocean CD Strategy Step Pause",
+                                      "description": "Defines the duration of time to freeze the rollout\n",
+                                      "properties": {
+                                        "duration": {
+                                          "type": "string",
+                                          "description": "The amount of time to wait before moving to the next step",
+                                          "example": "5m"
+                                        }
+                                      }
+                                    },
+                                    "setHeaderRoute": {
+                                      "type": "object",
+                                      "title": "Ocean CD Strategy Canary Step Header",
+                                      "description": "Defines the list of HeaderRoutes to add to the Rollout\n",
+                                      "properties": {
+                                        "name": {
+                                          "type": "string",
+                                          "description": "The name of the HeaderRoute group",
+                                          "example": "set-header-1"
+                                        },
+                                        "match": {
+                                          "type": "array",
+                                          "description": "The matching rules for the header route",
+                                          "items": {
+                                            "type": "object",
+                                            "title": "Ocean CD Strategy Canary Step Header Match",
+                                            "description": "Defines a single header to add to the Rollout\n",
+                                            "properties": {
+                                              "headerName": {
+                                                "type": "string",
+                                                "description": "The name of the header",
+                                                "example": "User-Agent"
+                                              },
+                                              "headerValue": {
+                                                "type": "object",
+                                                "title": "Ocean CD Strategy Canary Step Header Match Value",
+                                                "description": "Defines a single header to add to the Rollout.\n<p style=color:red>Must be only one initialized from the following (exact, prefix, regex).</p>\n",
+                                                "properties": {
+                                                  "exact": {
+                                                    "type": "string",
+                                                    "description": "The exact header value",
+                                                    "example": "Mozilla"
+                                                  },
+                                                  "prefix": {
+                                                    "type": "string",
+                                                    "description": "The prefix of the value",
+                                                    "example": "Mozilla-"
+                                                  },
+                                                  "regex": {
+                                                    "type": "string",
+                                                    "description": "The value in a regex format",
+                                                    "example": "Mozilla(.*)"
+                                                  }
+                                                }
+                                              }
+                                            },
+                                            "required": [
+                                              "headerName",
+                                              "headerValue"
+                                            ]
+                                          }
+                                        }
+                                      },
+                                      "required": [
+                                        "name",
+                                        "match"
+                                      ]
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "required": [
+                              "steps"
+                            ]
+                          },
+                          "rolling": {
+                            "type": "object",
+                            "title": "Ocean CD Strategy Rolling Update",
+                            "description": "Represents Rolling Update strategy\n",
+                            "properties": {
+                              "steps": {
+                                "type": "array",
+                                "description": "A set of separate conditions of rollout processing",
+                                "items": {
+                                  "type": "object",
+                                  "title": "Ocean CD Strategy Rolling Update Step",
+                                  "description": "Defines a step of the rolling update strategy\n",
+                                  "properties": {
+                                    "name": {
+                                      "type": "string",
+                                      "description": "The name of a step",
+                                      "example": "first-step"
+                                    },
+                                    "verification": {
+                                      "$ref": "#/paths/~1ocean~1cd~1strategy/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/0/properties/canary/properties/steps/items/properties/verification"
+                                    },
+                                    "pause": {
+                                      "$ref": "#/paths/~1ocean~1cd~1strategy/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/0/properties/canary/properties/steps/items/properties/pause"
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "required": [
+                              "steps"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "name"
+                        ]
                       }
                     }
                   }
@@ -64376,222 +64584,19 @@
                               "items": {
                                 "allOf": [
                                   {
-                                    "type": "object",
-                                    "title": "Ocean CD Strategy",
-                                    "description": "Ocean CD strategy. Use in RolloutSpec to decide what strategy to use when applying `SpotDeployment`\n",
-                                    "properties": {
-                                      "name": {
-                                        "type": "string",
-                                        "description": "Identifier name for Ocean CD Strategy. Must be a unique name",
-                                        "example": "service-strategy"
-                                      },
-                                      "canary": {
-                                        "type": "object",
-                                        "title": "Ocean CD Strategy Canary",
-                                        "description": "Represents Canary strategy\n",
-                                        "properties": {
-                                          "backgroundVerification": {
-                                            "type": "object",
-                                            "title": "Ocean CD Strategy Background Verification",
-                                            "description": "Represents list of background verification to run\n",
-                                            "properties": {
-                                              "templateNames": {
-                                                "description": "List of Verification template names",
-                                                "type": "array",
-                                                "items": {
-                                                  "type": "string"
-                                                },
-                                                "example": [
-                                                  "verification-template-name"
-                                                ]
-                                              }
-                                            },
-                                            "required": [
-                                              "templateNames"
-                                            ]
-                                          },
-                                          "steps": {
-                                            "type": "array",
-                                            "items": {
-                                              "type": "object",
-                                              "title": "Ocean CD Strategy Canary",
-                                              "description": "defines a step of a canary strategy\n",
-                                              "properties": {
-                                                "name": {
-                                                  "type": "string",
-                                                  "description": "Step name",
-                                                  "example": "first-step"
-                                                },
-                                                "setWeight": {
-                                                  "type": "integer",
-                                                  "description": "Sets what percentage the new version should receive",
-                                                  "example": 20
-                                                },
-                                                "setCanaryScale": {
-                                                  "type": "object",
-                                                  "title": "Ocean CD Strategy Canary Step Scale",
-                                                  "description": "Defines how to scale the version without changing traffic weight\n",
-                                                  "properties": {
-                                                    "weight": {
-                                                      "type": "integer",
-                                                      "description": "Sets the percentage of replicas the version should have",
-                                                      "example": 20
-                                                    },
-                                                    "replicas": {
-                                                      "type": "integer",
-                                                      "description": "Sets the number of replicas the version should have",
-                                                      "example": 20
-                                                    },
-                                                    "matchTrafficWeight": {
-                                                      "type": "boolean",
-                                                      "example": true
-                                                    }
-                                                  }
-                                                },
-                                                "verification": {
-                                                  "type": "object",
-                                                  "title": "Ocean CD Strategy Step Verification",
-                                                  "description": "Represents list of verifications to run in current step\n",
-                                                  "properties": {
-                                                    "templateNames": {
-                                                      "description": "List of Verification template names",
-                                                      "type": "array",
-                                                      "items": {
-                                                        "type": "string"
-                                                      },
-                                                      "example": [
-                                                        "verification-template-name"
-                                                      ]
-                                                    }
-                                                  },
-                                                  "required": [
-                                                    "templateNames"
-                                                  ]
-                                                },
-                                                "pause": {
-                                                  "type": "object",
-                                                  "title": "Ocean CD Strategy Phase Pause",
-                                                  "description": "Defines the duration of time to freeze the rollout\n",
-                                                  "properties": {
-                                                    "duration": {
-                                                      "type": "string",
-                                                      "description": "The amount of time to wait before moving to the next step",
-                                                      "example": "5m"
-                                                    }
-                                                  }
-                                                },
-                                                "setHeaderRoute": {
-                                                  "type": "object",
-                                                  "title": "Ocean CD Strategy Canary Step Header",
-                                                  "description": "defines the list of HeaderRoutes to add to the Rollout\n",
-                                                  "properties": {
-                                                    "name": {
-                                                      "type": "string",
-                                                      "description": "the name of the HeaderRoute group.",
-                                                      "example": "set-header-1"
-                                                    },
-                                                    "match": {
-                                                      "type": "array",
-                                                      "items": {
-                                                        "type": "object",
-                                                        "title": "Ocean CD Strategy Canary Step Header Match",
-                                                        "description": "defines a single header to add to the Rollout\n",
-                                                        "properties": {
-                                                          "headerName": {
-                                                            "type": "string",
-                                                            "description": "the name of the header",
-                                                            "example": "User-Agent"
-                                                          },
-                                                          "headerValue": {
-                                                            "type": "object",
-                                                            "title": "Ocean CD Strategy Canary Step Header Match",
-                                                            "description": "defines a single header to add to the Rollout\n* <a style=color:red>Must be only one initialized from the following (exact, prefix, regex).</a>\n",
-                                                            "properties": {
-                                                              "exact": {
-                                                                "type": "string",
-                                                                "description": "the exact header value",
-                                                                "example": "Mozilla"
-                                                              },
-                                                              "prefix": {
-                                                                "type": "string",
-                                                                "description": "the prefix of the value",
-                                                                "example": "Mozilla"
-                                                              },
-                                                              "regex": {
-                                                                "type": "string",
-                                                                "description": "the value in a regex format",
-                                                                "example": "Mozilla(.*)"
-                                                              }
-                                                            }
-                                                          }
-                                                        },
-                                                        "required": [
-                                                          "headerName",
-                                                          "headerValue"
-                                                        ]
-                                                      }
-                                                    }
-                                                  },
-                                                  "required": [
-                                                    "name",
-                                                    "match"
-                                                  ]
-                                                }
-                                              }
-                                            }
-                                          }
-                                        },
-                                        "required": [
-                                          "steps"
-                                        ]
-                                      },
-                                      "rolling": {
-                                        "type": "object",
-                                        "title": "Ocean CD Strategy Rolling Update",
-                                        "description": "Represents Rolling Update strategy\n",
-                                        "properties": {
-                                          "steps": {
-                                            "type": "array",
-                                            "items": {
-                                              "type": "object",
-                                              "title": "Ocean CD Strategy Rolling Update Step",
-                                              "description": "Defines a step of a rolling update strategy\n",
-                                              "properties": {
-                                                "name": {
-                                                  "type": "string",
-                                                  "description": "Step name",
-                                                  "example": "first-step"
-                                                },
-                                                "verification": {
-                                                  "type": "object",
-                                                  "$ref": "#/paths/~1ocean~1cd~1strategy/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/0/properties/canary/properties/steps/items/properties/verification"
-                                                },
-                                                "pause": {
-                                                  "type": "object",
-                                                  "$ref": "#/paths/~1ocean~1cd~1strategy/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/0/properties/canary/properties/steps/items/properties/pause"
-                                                }
-                                              }
-                                            }
-                                          }
-                                        },
-                                        "required": [
-                                          "steps"
-                                        ]
-                                      }
-                                    },
-                                    "required": [
-                                      "name"
-                                    ]
+                                    "$ref": "#/paths/~1ocean~1cd~1strategy/post/requestBody/content/application~1json/schema/allOf/0/properties/strategy"
                                   },
                                   {
                                     "type": "object",
                                     "properties": {
                                       "createdAt": {
                                         "type": "string",
+                                        "description": "The time when the Strategy was created",
                                         "example": "2018-11-05T12:55:50.000+0000"
                                       },
                                       "updatedAt": {
                                         "type": "string",
+                                        "description": "The last time when the Strategy was changed",
                                         "example": "2018-11-05T12:58:15.000+0000"
                                       }
                                     }
@@ -64646,7 +64651,7 @@
       },
       "put": {
         "summary": "Update Ocean CD Strategy",
-        "description": "Full Update of Ocean CD strategy configuration.\n*All non included fields will be nullified*\n",
+        "description": "Full update of Ocean CD strategy configuration.\n*All non included fields will be nullified*\n",
         "operationId": "OceanCDStrategyUpdate",
         "tags": [
           "Ocean CD"
@@ -64671,6 +64676,9 @@
                 "allOf": [
                   {
                     "type": "object",
+                    "required": [
+                      "strategy"
+                    ],
                     "properties": {
                       "strategy": {
                         "type": "object",
@@ -64678,13 +64686,12 @@
                         "description": "Ocean CD strategy. Use in RolloutSpec to decide what strategy to use when applying `SpotDeployment`\n",
                         "properties": {
                           "canary": {
-                            "type": "object",
                             "$ref": "#/paths/~1ocean~1cd~1strategy/post/requestBody/content/application~1json/schema/allOf/0/properties/strategy/properties/canary"
+                          },
+                          "rolling": {
+                            "$ref": "#/paths/~1ocean~1cd~1strategy/post/requestBody/content/application~1json/schema/allOf/0/properties/strategy/properties/rolling"
                           }
-                        },
-                        "required": [
-                          "canary"
-                        ]
+                        }
                       }
                     }
                   }
@@ -64704,7 +64711,7 @@
       },
       "patch": {
         "summary": "Patch Ocean CD Strategy",
-        "description": "Partial update Ocean CD strategy configuration.\n",
+        "description": "Partial update of Ocean CD strategy configuration.\n",
         "operationId": "OceanCDStrategyPatch",
         "tags": [
           "Ocean CD"
@@ -64729,6 +64736,9 @@
                 "allOf": [
                   {
                     "type": "object",
+                    "required": [
+                      "strategy"
+                    ],
                     "properties": {
                       "strategy": {
                         "type": "object",
@@ -64736,13 +64746,12 @@
                         "description": "Ocean CD strategy. Use in RolloutSpec to decide what strategy to use when applying `SpotDeployment`\n",
                         "properties": {
                           "canary": {
-                            "type": "object",
                             "$ref": "#/paths/~1ocean~1cd~1strategy/post/requestBody/content/application~1json/schema/allOf/0/properties/strategy/properties/canary"
+                          },
+                          "rolling": {
+                            "$ref": "#/paths/~1ocean~1cd~1strategy/post/requestBody/content/application~1json/schema/allOf/0/properties/strategy/properties/rolling"
                           }
-                        },
-                        "required": [
-                          "canary"
-                        ]
+                        }
                       }
                     }
                   }
@@ -66381,7 +66390,6 @@
                                     "description": "Ocean CD strategy. Use in RolloutSpec to decide what strategy to use when applying `SpotDeployment`\n",
                                     "properties": {
                                       "canary": {
-                                        "type": "object",
                                         "$ref": "#/paths/~1ocean~1cd~1strategy/post/requestBody/content/application~1json/schema/allOf/0/properties/strategy/properties/canary"
                                       }
                                     },
