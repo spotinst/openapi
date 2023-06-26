@@ -225,89 +225,54 @@ properties:
             type: object
             description: |
               Instance Types
-            oneOf:
-              - required:
-                  - ondemand
+            required:
                   - spot
-                properties:
-                  ondemand:
-                    type: string
-                    description: |
-                      Available on demand instance type.
-                    example: "m3.medium"
-                  spot:
-                    type: array
-                    description: |
-                      Available Spot Instance types
-                    items:
+            properties:
+              ondemand:
+                type: string
+                description: |
+                  Available on demand instance type.
+                  Note: either ondemand or onDemandTypes must be defined, but not both.
+                example: "m3.medium"
+              onDemandTypes:
+                type: array
+                description: |
+                  Available on demand instance types.
+                  Note: either ondemand or onDemandTypes must be defined, but not both.
+                items:
+                  type: string
+                  example: [ "c3.large", "c4.large", "m3.large", "r3.large" ]
+              spot:
+                type: array
+                description: |
+                  Available Spot Instance types
+                items:
+                  type: string
+                  example: [ "c3.large", "c4.large", "m3.large", "r3.large" ]
+              preferredSpot:
+                type: array
+                description: |
+                  Prioritize a subset of spot instance types. Must be a subset of the selected spot instance types.
+                items:
+                  type: string
+                  example: [ "c4.large" ]
+              weights:
+                type: array
+                description: |
+                  Custom weight for each instance type (only valid in weight capacity unit)
+                items:
+                  type: object
+                  properties:
+                    instanceType:
                       type: string
-                      example: [ "c3.large", "c4.large", "m3.large", "r3.large" ]
-                  preferredSpot:
-                    type: array
-                    description: |
-                      Prioritize a subset of spot instance types. Must be a subset of the selected spot instance types.
-                    items:
-                      type: string
-                      example: [ "c4.large" ]
-                  weights:
-                    type: array
-                    description: |
-                      Custom weight for each instance type (only valid in weight capacity unit)
-                    items:
-                      type: object
-                      properties:
-                        instanceType:
-                          type: string
-                          description: |
-                            The instance type to customize its weight
-                          example: "c4.large"
-                        weightedCapacity:
-                          type: integer
-                          description: |
-                            The weight
-                          example: 8
-              - required:
-                  - onDemandTypes
-                  - spot
-                properties:
-                  onDemandTypes:
-                    type: array
-                    description: |
-                      Available on demand instance types.
-                    items:
-                      type: string
-                      example: [ "c3.large", "c4.large", "m3.large", "r3.large" ]
-                  spot:
-                    type: array
-                    description: |
-                      Available Spot Instance types.
-                    items:
-                      type: string
-                      example: [ "c3.large", "c4.large", "m3.large", "r3.large" ]
-                  preferredSpot:
-                    type: array
-                    description: |
-                      Prioritize a subset of spot instance types. Must be a subset of the selected spot instance types.
-                    items:
-                      type: string
-                      example: [ "c4.large" ]
-                  weights:
-                    type: array
-                    description: |
-                      Custom weight for each instance type (only valid in weight capacity unit)
-                    items:
-                      type: object
-                      properties:
-                        instanceType:
-                          type: string
-                          description: |
-                            The instance type to customize its weight
-                          example: "c4.large"
-                        weightedCapacity:
-                          type: integer
-                          description: |
-                            The weight
-                          example: 8
+                      description: |
+                        The instance type to customize its weight
+                      example: "c4.large"
+                    weightedCapacity:
+                      type: integer
+                      description: |
+                        The weight
+                      example: 8
           subnetIds:
             type: array
             description: |
