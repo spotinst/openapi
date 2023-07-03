@@ -67033,8 +67033,8 @@
       "summary": "Ocean CD",
       "get": {
         "summary": "List Ocean CD Workloads",
-        "description": "List all Ocean CD workloads.\n",
-        "operationId": "OceanCDCWorkloadsList",
+        "description": "List all Ocean CD workloads.",
+        "operationId": "OceanCDWorkloadsList",
         "tags": [
           "Ocean CD"
         ],
@@ -67053,7 +67053,7 @@
                       "properties": {
                         "response": {
                           "type": "object",
-                          "description": "response body\n",
+                          "description": "response body",
                           "properties": {
                             "items": {
                               "type": "array",
@@ -67061,55 +67061,55 @@
                                 "allOf": [
                                   {
                                     "type": "object",
-                                    "required": [
-                                      "workload"
-                                    ],
+                                    "title": "Ocean CD Workload",
+                                    "description": "Represents an application running within the associated Kubernetes cluster",
                                     "properties": {
                                       "name": {
                                         "type": "string",
-                                        "description": "Workload's name\n"
+                                        "description": "The name of the workload",
+                                        "example": "spotdeployment-app"
                                       },
                                       "namespace": {
                                         "type": "string",
-                                        "example": "namespace-name",
-                                        "description": "Workload's namespace name\n"
+                                        "description": "The Kubernetes namespace within which the workload exists",
+                                        "example": "oceancd"
                                       },
                                       "clusterId": {
                                         "type": "string",
-                                        "example": "prod-cluster",
-                                        "description": "Workload's cluster id\n"
+                                        "description": "The identifier name of Ocean CD cluster within which the workload exists",
+                                        "example": "prod-cluster"
                                       },
                                       "type": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "description": "The type of the workload",
+                                        "example": "spotDeployment"
                                       },
                                       "image": {
                                         "type": "string",
-                                        "example": "public.ecr.aws/nginx/nginx:1.22",
-                                        "description": "Workload's image\n"
+                                        "description": "The image of the workload",
+                                        "example": "nginx:1.22"
                                       },
                                       "revisions": {
                                         "type": "integer",
-                                        "example": 2,
-                                        "description": "The number of different versions applied to your SpotDeployment and deployed by OceanCD\n"
+                                        "description": "The number of different versions applied to the workload",
+                                        "example": 2
                                       },
                                       "desiredReplicas": {
                                         "type": "integer",
-                                        "description": "The number of the desired replicas\n"
+                                        "description": "The desired number of replicas",
+                                        "example": 4
                                       },
                                       "readyReplicas": {
                                         "type": "integer",
-                                        "description": "The number of the ready replicas\n"
+                                        "description": "The number of the ready replicas",
+                                        "example": 2
                                       },
                                       "updatedAt": {
                                         "type": "string",
-                                        "format": "date-time",
-                                        "example": "2018-11-05T12:55:50.000+0000",
-                                        "description": "The timestamp of latest update\n"
+                                        "description": "The last time when the workload was changed",
+                                        "example": "2018-11-05T12:55:50.000Z"
                                       }
                                     }
-                                  },
-                                  {
-                                    "type": "object"
                                   }
                                 ]
                               }
@@ -67132,57 +67132,18 @@
     "/ocean/cd/workload/{workloadName}/namespace/{namespace}/activeOperation": {
       "summary": "Ocean CD",
       "get": {
-        "summary": "Ocean CD Describe Workload's Active Operations",
-        "description": "Describe What Operation Are Active For Specific Workload.\n",
-        "operationId": "OceanCDCWorkloadActiveOperations",
+        "summary": "Get Ocean CD Workload's Active Operation",
+        "description": "Get the ongoing operation being applied to the workload.",
+        "operationId": "OceanCDWorkloadActiveOperation",
         "tags": [
           "Ocean CD"
         ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workloadName",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "example": "app",
-            "description": "Workload name\n"
-          },
-          {
-            "in": "path",
-            "name": "namespace",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "example": "default",
-            "description": "Workload's namespace name\n"
-          },
-          {
-            "in": "query",
-            "name": "clusterId",
-            "example": "prod-cluster",
-            "description": "Cluster id where the workload is running\n",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          },
-          {
-            "in": "query",
-            "name": "kind",
-            "example": "SpotDeployment",
-            "description": "Workload's k8s Kind, currently only SpotDeployment is supported\n",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          }
-        ],
+        "parameters": {
+          "$ref": "#/paths/~1ocean~1cd~1workload~1%7BworkloadName%7D~1namespace~1%7Bnamespace%7D~1graph/get/parameters"
+        },
         "responses": {
           "200": {
-            "description": "Ocean CD Workload Active Operations Response",
+            "description": "Ocean CD Workload Active Operation Response",
             "content": {
               "application/json": {
                 "schema": {
@@ -67195,7 +67156,7 @@
                       "properties": {
                         "response": {
                           "type": "object",
-                          "description": "response body\n",
+                          "description": "response body",
                           "properties": {
                             "items": {
                               "type": "array",
@@ -67203,34 +67164,35 @@
                                 "allOf": [
                                   {
                                     "type": "object",
-                                    "required": [
-                                      "workload"
-                                    ],
+                                    "title": "Ocean CD Workload Active Operation",
+                                    "description": "Indicates the ongoing operation being applied to the workload",
                                     "properties": {
                                       "workloadId": {
                                         "type": "integer",
-                                        "example": "405938231"
+                                        "description": "The ID of the workload",
+                                        "example": 405938231
                                       },
                                       "type": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "description": "The type of the operation",
+                                        "example": "retry"
                                       },
                                       "operationStatus": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "description": "The status of the operation",
+                                        "example": "finished"
                                       },
                                       "createdAt": {
                                         "type": "string",
-                                        "format": "date-time",
-                                        "example": "2018-11-05T12:55:50.000+0000"
+                                        "description": "The time when the operation was created",
+                                        "example": "2018-11-05T12:55:50.000Z"
                                       },
                                       "updatedAt": {
                                         "type": "string",
-                                        "format": "date-time",
-                                        "example": "2018-11-05T12:55:50.000+0000"
+                                        "description": "The last time when the operation was changed",
+                                        "example": "2018-11-05T12:55:50.000Z"
                                       }
                                     }
-                                  },
-                                  {
-                                    "type": "object"
                                   }
                                 ]
                               }
@@ -67253,54 +67215,15 @@
     "/ocean/cd/workload/{workloadName}/namespace/{namespace}/revision": {
       "summary": "Ocean CD",
       "get": {
-        "summary": "Ocean CD Describe Workload's Revision",
-        "description": "Describe Workload's Revision.\n",
-        "operationId": "OceanCDCWorkloadRevision",
+        "summary": "Get Ocean CD Workload's Revision",
+        "description": "Get Ocean CD Workload's revision.",
+        "operationId": "OceanCDWorkloadRevision",
         "tags": [
           "Ocean CD"
         ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workloadName",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "example": "app",
-            "description": "Workload name\n"
-          },
-          {
-            "in": "path",
-            "name": "namespace",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "example": "default",
-            "description": "Workload's namespace name\n"
-          },
-          {
-            "in": "query",
-            "name": "clusterId",
-            "example": "prod-cluster",
-            "description": "Cluster id where the workload is running\n",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          },
-          {
-            "in": "query",
-            "name": "kind",
-            "example": "SpotDeployment",
-            "description": "Workload's k8s Kind, currently only SpotDeployment is supported\n",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          }
-        ],
+        "parameters": {
+          "$ref": "#/paths/~1ocean~1cd~1workload~1%7BworkloadName%7D~1namespace~1%7Bnamespace%7D~1graph/get/parameters"
+        },
         "responses": {
           "200": {
             "description": "Ocean CD Workload Revision Response",
@@ -67309,11 +67232,14 @@
                 "schema": {
                   "allOf": [
                     {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
                       "type": "object",
                       "properties": {
                         "response": {
                           "type": "object",
-                          "description": "response body\n",
+                          "description": "response body",
                           "properties": {
                             "items": {
                               "type": "array",
@@ -67321,33 +67247,35 @@
                                 "allOf": [
                                   {
                                     "type": "object",
-                                    "required": [
-                                      "workload"
-                                    ],
+                                    "title": "Ocean CD Workload Revision",
+                                    "description": "Contains info about a workload's revision",
                                     "properties": {
                                       "revision": {
-                                        "type": "integer"
+                                        "type": "integer",
+                                        "description": "The order number of a workload version",
+                                        "example": 3
                                       },
                                       "rolloutId": {
                                         "type": "string",
+                                        "description": "The identifier of the Ocean CD rollout",
                                         "example": "rol-67c2d5c2d384"
                                       },
                                       "date": {
                                         "type": "string",
-                                        "format": "date-time",
-                                        "example": "2018-11-05T12:55:50.000+0000"
+                                        "description": "The time when the revision was defined",
+                                        "example": "2018-11-05T12:55:50.000Z"
                                       },
                                       "image": {
                                         "type": "string",
-                                        "example": "public.ecr.aws/nginx/nginx:1.22"
+                                        "description": "The image of the revision",
+                                        "example": "nginx:1.22"
                                       },
                                       "status": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "description": "The status of the revision",
+                                        "example": "degraded"
                                       }
                                     }
-                                  },
-                                  {
-                                    "type": "object"
                                   }
                                 ]
                               }
@@ -67371,53 +67299,14 @@
       "summary": "Ocean CD",
       "put": {
         "summary": "Ocean CD Restart Workload",
-        "description": "Restart Workload By WorkloadId.\n",
-        "operationId": "OceanCDCWorkloadRestart",
+        "description": "Restart Ocean CD workload.",
+        "operationId": "OceanCDWorkloadRestart",
         "tags": [
           "Ocean CD"
         ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workloadName",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "example": "app",
-            "description": "Workload name\n"
-          },
-          {
-            "in": "path",
-            "name": "namespace",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "example": "default",
-            "description": "Workload's namespace name\n"
-          },
-          {
-            "in": "query",
-            "name": "clusterId",
-            "example": "prod-cluster",
-            "description": "Cluster id where the workload is running\n",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          },
-          {
-            "in": "query",
-            "name": "kind",
-            "example": "SpotDeployment",
-            "description": "Workload's k8s Kind, currently only SpotDeployment is supported\n",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          }
-        ],
+        "parameters": {
+          "$ref": "#/paths/~1ocean~1cd~1workload~1%7BworkloadName%7D~1namespace~1%7Bnamespace%7D~1graph/get/parameters"
+        },
         "responses": {
           "200": {
             "description": "Ok"
@@ -67432,31 +67321,14 @@
       "summary": "Ocean CD",
       "put": {
         "summary": "Ocean CD Retry Workload",
-        "description": "Retry Workload By WorkloadId,RevisionId And RolloutId\n",
-        "operationId": "OceanCDCWorkloadRetry",
+        "description": "Retry Ocean CD workload.",
+        "operationId": "OceanCDWorkloadRetry",
         "tags": [
           "Ocean CD"
         ],
         "parameters": [
           {
-            "in": "path",
-            "name": "workloadName",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "example": "app",
-            "description": "Workload name\n"
-          },
-          {
-            "in": "path",
-            "name": "namespace",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "example": "default",
-            "description": "Workload's namespace name\n"
+            "$ref": "#/paths/~1ocean~1cd~1workload~1%7BworkloadName%7D~1namespace~1%7Bnamespace%7D~1graph/get/parameters"
           },
           {
             "in": "path",
@@ -67465,27 +67337,7 @@
               "type": "string"
             },
             "required": true,
-            "description": "Relevant Revision Id\n"
-          },
-          {
-            "in": "query",
-            "name": "clusterId",
-            "example": "prod-cluster",
-            "description": "Cluster id where the workload is running\n",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          },
-          {
-            "in": "query",
-            "name": "kind",
-            "example": "SpotDeployment",
-            "description": "Workload's k8s Kind, currently only SpotDeployment is supported\n",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
+            "description": "The associated revision ID"
           }
         ],
         "responses": {
@@ -67502,31 +67354,14 @@
       "summary": "Ocean CD",
       "put": {
         "summary": "Ocean CD Rollback Workload",
-        "description": "Rollback Workload By WorkloadId,RevisionId And RolloutId\n",
-        "operationId": "OceanCDCWorkloadRollback",
+        "description": "Rollback Ocean CD workload.",
+        "operationId": "OceanCDWorkloadRollback",
         "tags": [
           "Ocean CD"
         ],
         "parameters": [
           {
-            "in": "path",
-            "name": "workloadName",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "example": "app",
-            "description": "Workload name\n"
-          },
-          {
-            "in": "path",
-            "name": "namespace",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "example": "default",
-            "description": "Workload's namespace name\n"
+            "$ref": "#/paths/~1ocean~1cd~1workload~1%7BworkloadName%7D~1namespace~1%7Bnamespace%7D~1graph/get/parameters"
           },
           {
             "in": "path",
@@ -67535,27 +67370,7 @@
               "type": "string"
             },
             "required": true,
-            "description": "Relevant Revision Id\n"
-          },
-          {
-            "in": "query",
-            "name": "clusterId",
-            "example": "prod-cluster",
-            "description": "Cluster id where the workload is running\n",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          },
-          {
-            "in": "query",
-            "name": "kind",
-            "example": "SpotDeployment",
-            "description": "Workload's k8s Kind, currently only SpotDeployment is supported\n",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
+            "description": "The associated revision ID"
           }
         ],
         "responses": {
@@ -67571,8 +67386,8 @@
     "/ocean/cd/workload/{workloadName}/namespace/{namespace}/graph": {
       "summary": "Ocean CD",
       "get": {
-        "summary": "Ocean CD Describe Workload Graph",
-        "description": "Ocean CD workload graph.\n",
+        "summary": "Get Ocean CD Workload Graph",
+        "description": "Get Ocean CD workload graph.",
         "operationId": "OceanCDWorkloadGraph",
         "tags": [
           "Ocean CD"
@@ -67585,8 +67400,8 @@
               "type": "string"
             },
             "required": true,
-            "example": "app",
-            "description": "Workload name\n"
+            "description": "The name of the workload",
+            "example": "app"
           },
           {
             "in": "path",
@@ -67595,33 +67410,33 @@
               "type": "string"
             },
             "required": true,
-            "example": "default",
-            "description": "Workload's namespace name\n"
+            "description": "The Kubernetes namespace within which the workload exists",
+            "example": "oceancd"
           },
           {
             "in": "query",
             "name": "clusterId",
-            "example": "prod-cluster",
-            "description": "Cluster id where the workload is running\n",
             "schema": {
               "type": "string"
             },
-            "required": true
+            "required": true,
+            "description": "The identifier name of Ocean CD cluster within which the workload exists",
+            "example": "prod-cluster"
           },
           {
             "in": "query",
             "name": "kind",
-            "example": "SpotDeployment",
-            "description": "Kind of workload, currently only SpotDeployment is supported\n",
             "schema": {
               "type": "string"
             },
-            "required": true
+            "required": true,
+            "description": "The workload's Kubernetes kind. Currently only the `SpotDeployment` kind is supported",
+            "example": "SpotDeployment"
           }
         ],
         "responses": {
           "200": {
-            "description": "Ocean CD Rollout Status Response",
+            "description": "Ocean CD Workload Graph Response",
             "content": {
               "application/json": {
                 "schema": {
@@ -67634,7 +67449,7 @@
                       "properties": {
                         "response": {
                           "type": "object",
-                          "description": "response body\n",
+                          "description": "response body",
                           "properties": {
                             "items": {
                               "type": "array",
@@ -67645,18 +67460,27 @@
                                     "properties": {
                                       "rolloutId": {
                                         "type": "string",
+                                        "description": "The identifier of the Ocean CD rollout",
                                         "example": "rol-123456"
+                                      },
+                                      "name": {
+                                        "type": "string",
+                                        "description": "The workload name",
+                                        "example": "prod-app"
                                       },
                                       "namespace": {
                                         "type": "string",
-                                        "example": "default"
+                                        "description": "The Kubernetes namespace within which the workload exists",
+                                        "example": "oceancd"
                                       },
                                       "clusterId": {
                                         "type": "string",
-                                        "example": "cluster"
+                                        "description": "The identifier name of Ocean CD cluster within which the workload exists",
+                                        "example": "prod-cluster"
                                       },
                                       "status": {
                                         "type": "string",
+                                        "description": "The status of associated rollout",
                                         "enum": [
                                           "deallocating",
                                           "manualPausing",
@@ -67679,6 +67503,7 @@
                                       },
                                       "failureReasonType": {
                                         "type": "string",
+                                        "description": "The failure reason type",
                                         "enum": [
                                           "phaseVerification",
                                           "backgroundVerification",
@@ -67689,11 +67514,13 @@
                                       },
                                       "startTime": {
                                         "type": "string",
-                                        "example": "2018-11-05T12:55:50.000+0000"
+                                        "description": "The time when the rollout was started",
+                                        "example": "2018-11-05T12:55:50.000Z"
                                       },
                                       "endTime": {
                                         "type": "string",
-                                        "example": "2018-11-05T12:58:15.000+0000"
+                                        "description": "The time when the rollout was ended",
+                                        "example": "2018-11-05T12:58:15.000Z"
                                       }
                                     }
                                   }
