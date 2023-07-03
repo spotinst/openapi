@@ -519,9 +519,6 @@
                               "instanceTypes": {
                                 "type": "object",
                                 "description": "Instance Types\n",
-                                "required": [
-                                  "spot"
-                                ],
                                 "properties": {
                                   "ondemand": {
                                     "type": "string",
@@ -543,7 +540,7 @@
                                   },
                                   "spot": {
                                     "type": "array",
-                                    "description": "Available Spot Instance types\n",
+                                    "description": "Available Spot Instance types.  \nNote: Cannot be defined if 'resourceRequirements' is defined.\n",
                                     "items": {
                                       "type": "string",
                                       "example": [
@@ -554,9 +551,96 @@
                                       ]
                                     }
                                   },
+                                  "resourceRequirements": {
+                                    "type": "object",
+                                    "title": "Resource Requirements",
+                                    "description": "Required instance attributes. Instance types will be selected based on these requirements.\n",
+                                    "required": [
+                                      "requiredVCpu",
+                                      "requiredMemory"
+                                    ],
+                                    "properties": {
+                                      "requiredGpu": {
+                                        "type": "object",
+                                        "description": "Required instance GPU",
+                                        "properties": {
+                                          "minimum": {
+                                            "type": "integer",
+                                            "minimum": 1
+                                          },
+                                          "maximum": {
+                                            "type": "integer",
+                                            "maximum": 16
+                                          }
+                                        }
+                                      },
+                                      "requiredVCpu": {
+                                        "type": "object",
+                                        "description": "Required instance vCPU",
+                                        "properties": {
+                                          "minimum": {
+                                            "type": "integer",
+                                            "minimum": 1
+                                          },
+                                          "maximum": {
+                                            "type": "integer",
+                                            "maximum": 64
+                                          }
+                                        }
+                                      },
+                                      "requiredMemory": {
+                                        "type": "object",
+                                        "description": "Required instance memory (GiB)",
+                                        "properties": {
+                                          "minimum": {
+                                            "type": "integer",
+                                            "minimum": 1
+                                          },
+                                          "maximum": {
+                                            "type": "integer",
+                                            "maximum": 512
+                                          }
+                                        }
+                                      },
+                                      "excludedInstanceTypes": {
+                                        "type": "array",
+                                        "description": "Instance types to exclude",
+                                        "items": {
+                                          "type": "string",
+                                          "example": [
+                                            "c4.large"
+                                          ]
+                                        }
+                                      },
+                                      "excludedInstanceFamilies": {
+                                        "type": "array",
+                                        "description": "Instance families to exclude",
+                                        "items": {
+                                          "type": "string",
+                                          "example": [
+                                            "A",
+                                            "C",
+                                            "D"
+                                          ]
+                                        }
+                                      },
+                                      "excludedInstanceGenerations": {
+                                        "type": "array",
+                                        "description": "Instance generations to exclude",
+                                        "items": {
+                                          "type": "string",
+                                          "example": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                          ]
+                                        }
+                                      }
+                                    }
+                                  },
                                   "preferredSpot": {
                                     "type": "array",
-                                    "description": "Prioritize a subset of spot instance types. Must be a subset of the selected spot instance types.\n",
+                                    "description": "Prioritized subset of spot instance types. The list must be a subset of the selected spot instance \ntypes or meet the resource requirements if defined.\n",
                                     "items": {
                                       "type": "string",
                                       "example": [
@@ -3985,7 +4069,7 @@
                               },
                               "spot": {
                                 "type": "array",
-                                "description": "Available Spot Instance types.\n",
+                                "description": "Available Spot Instance types.  \nNote: Cannot be defined if 'resourceRequirements' is defined.\n",
                                 "items": {
                                   "type": "string",
                                   "example": [
@@ -3996,9 +4080,12 @@
                                   ]
                                 }
                               },
+                              "resourceRequirements": {
+                                "$ref": "#/paths/~1aws~1ec2~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/compute/properties/instanceTypes/properties/resourceRequirements"
+                              },
                               "preferredSpot": {
                                 "type": "array",
-                                "description": "Prioritize a subset of spot instance types. Must be a subset of the selected spot instance types.\n",
+                                "description": "Prioritized subset of spot instance types. The list must be a subset of the selected spot instance types or \nmeet the resource requirements if defined.\n",
                                 "items": {
                                   "type": "string",
                                   "example": [
@@ -42073,11 +42160,14 @@
                                       },
                                       "types": {
                                         "type": "array",
-                                        "description": "Set instance types settings\n",
+                                        "description": "Set instance types settings.  \nNote: Cannot be defined if 'resourceRequirements' is defined.\n",
                                         "items": {
                                           "type": "string",
                                           "example": "t2.micro"
                                         }
+                                      },
+                                      "resourceRequirements": {
+                                        "$ref": "#/paths/~1aws~1ec2~1group/post/requestBody/content/application~1json/schema/allOf/0/properties/group/properties/compute/properties/instanceTypes/properties/resourceRequirements"
                                       }
                                     }
                                   },
