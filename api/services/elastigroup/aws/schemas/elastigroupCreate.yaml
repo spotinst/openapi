@@ -106,6 +106,11 @@ properties:
               description: |
                 If there are available Reserved Instances or Savings Plans, Elastigroup will utilize them before using Spot instances
               example: false
+          restrictSingleAz:
+              type: boolean
+              description: |
+                Elastigroup will automatically scale your instances in the most available and cost efficient availability zone. Every evaluation will be done when there are no active instances in the group.
+              example: false
           drainingTimeout:
             type: integer
             example: 120
@@ -225,8 +230,6 @@ properties:
             type: object
             description: |
               Instance Types
-            required:
-                  - spot
             properties:
               ondemand:
                 type: string
@@ -245,14 +248,18 @@ properties:
               spot:
                 type: array
                 description: |
-                  Available Spot Instance types
+                  Available Spot Instance types.  
+                  Note: Cannot be defined if 'resourceRequirements' is defined.
                 items:
                   type: string
                   example: [ "c3.large", "c4.large", "m3.large", "r3.large" ]
+              resourceRequirements:
+                $ref: "./resourceRequirements.yaml"
               preferredSpot:
                 type: array
                 description: |
-                  Prioritize a subset of spot instance types. Must be a subset of the selected spot instance types.
+                  Prioritized subset of spot instance types. The list must be a subset of the selected spot instance 
+                  types or meet the resource requirements if defined.
                 items:
                   type: string
                   example: [ "c4.large" ]
