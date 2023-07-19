@@ -31,19 +31,32 @@ properties:
       ondemand:
         type: string
         description: |
-          Available Instance types
+          Available on demand instance type.
+          Note: Either ondemand or onDemandTypes can be defined, but not both.
         example: "m3.medium"
-      spot:
+      onDemandTypes:
         type: array
         description: |
-          Available Spot Instance types
+          Available on demand instance types.
+          Note: Either ondemand or onDemandTypes can be defined, but not both.
         items:
           type: string
           example: ["c3.large", "c4.large", "m3.large", "r3.large"]
+      spot:
+        type: array
+        description: |
+          Available Spot Instance types.  
+          Note: Cannot be defined if 'resourceRequirements' is defined.
+        items:
+          type: string
+          example: ["c3.large", "c4.large", "m3.large", "r3.large"]
+      resourceRequirements:
+        $ref: "./resourceRequirements.yaml"
       preferredSpot:
         type: array
         description: |
-          Prioritize a subset of spot instance types. Must be a subset of the selected spot instance types.
+          Prioritized subset of spot instance types. The list must be a subset of the selected spot instance types or 
+          meet the resource requirements if defined.
         items:
           type: string
           example: ["c4.large"]
@@ -107,6 +120,8 @@ properties:
     items:
       type: string
       example: ["us-east-1a","us-east-1b"]
+  volumeAttachments:
+    $ref: "./volumeAttachments.yaml"
   launchSpecification:
     type: object
     properties:
@@ -219,7 +234,7 @@ properties:
           An array of image objects. <br>
           Elastigroup can be configured with either imageId or images, but not both. <br>
           * Valid values: null, or an array with at least 1 element.
-          * Multiple AMIs aren't allowed with stateful groups / Managed Instance / Ocean
+          * Multiple AMIs aren't allowed with stateful groups / Stateful Node / Ocean
             or with the following third-party integrations: ECS / Nomad / Docker Swarm / Kubernetes
         items:
           $ref: "./elastigroupComputeLaunchSpecImage.yaml"

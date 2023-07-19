@@ -106,6 +106,11 @@ properties:
               description: |
                 If there are available Reserved Instances or Savings Plans, Elastigroup will utilize them before using Spot instances
               example: false
+          restrictSingleAz:
+              type: boolean
+              description: |
+                Elastigroup will automatically scale your instances in the most available and cost efficient availability zone. Every evaluation will be done when there are no active instances in the group.
+              example: false
           drainingTimeout:
             type: integer
             example: 120
@@ -197,7 +202,6 @@ properties:
         type: object
         title: Elastigroup Compute
         required:
-          - product
           - availabilityZones
           - launchSpecification
         properties:
@@ -226,26 +230,36 @@ properties:
             type: object
             description: |
               Instance Types
-            required:
-              - ondemand
-              - spot
             properties:
               ondemand:
                 type: string
                 description: |
-                  Available Instance types
+                  Available on demand instance type.
+                  Note: Either ondemand or onDemandTypes must be defined, but not both.
                 example: "m3.medium"
-              spot:
+              onDemandTypes:
                 type: array
                 description: |
-                  Available Spot Instance types
+                  Available on demand instance types.
+                  Note: Either ondemand or onDemandTypes must be defined, but not both.
                 items:
                   type: string
                   example: [ "c3.large", "c4.large", "m3.large", "r3.large" ]
+              spot:
+                type: array
+                description: |
+                  Available Spot Instance types.  
+                  Note: Cannot be defined if 'resourceRequirements' is defined.
+                items:
+                  type: string
+                  example: [ "c3.large", "c4.large", "m3.large", "r3.large" ]
+              resourceRequirements:
+                $ref: "./resourceRequirements.yaml"
               preferredSpot:
                 type: array
                 description: |
-                  Prioritize a subset of spot instance types. Must be a subset of the selected spot instance types.
+                  Prioritized subset of spot instance types. The list must be a subset of the selected spot instance 
+                  types or meet the resource requirements if defined.
                 items:
                   type: string
                   example: [ "c4.large" ]
@@ -426,7 +440,7 @@ properties:
                   An array of image objects. <br>
                   Elastigroup can be configured with either imageId or images, but not both. <br>
                   * Valid values: null, or an array with at least 1 element.
-                  * Multiple AMIs aren't allowed with stateful groups / Managed Instance / Ocean
+                  * Multiple AMIs aren't allowed with stateful groups / Stateful Node / Ocean
                     or with the following third-party integrations: ECS / Nomad / Docker Swarm / Kubernetes
                 items:
                   $ref: "./elastigroupComputeLaunchSpecImage.yaml"
@@ -716,6 +730,9 @@ properties:
                 default: true
                 example: true
 
+          volumeAttachments:
+            $ref: "./volumeAttachments.yaml"
+
       scaling:
         type: object
         title: Elastigroup Scaling
@@ -922,18 +939,6 @@ properties:
                     type: boolean
                     example: false
                     default: false
-          mesosphere:
-            type: object
-            properties:
-              apiServer:
-                type: string
-                example: 1.2.3.4
-          mlbRuntime:
-            type: object
-            properties:
-              deploymentId:
-                type: string
-                example: dp-rm0f5b912345
           nomad:
             type: object
             properties:
@@ -1018,36 +1023,6 @@ properties:
                     example: "PUBLIC KEY CERTIFICATE STR"
                     description: |
                       The certificates chain, first the client certificate then the ca certificate. (required)
-          chef:
-            type: object
-            properties:
-              chefServer:
-                type: string
-                example: https://master.host.com
-              organization:
-                type: string
-                example: ORGNAME
-              chefVersion:
-                type: string
-                example: 12.1
-              user:
-                type: string
-                example: User
-              pemKey:
-                type: string
-                example: Key
-          rightScale:
-            type: object
-            properties:
-              accountId:
-                type: string
-                example: ID
-              refreshToken:
-                type: string
-                example: TOKEN
-              region:
-                type: string
-                example: us-east-1
           opsWorks:
             type: object
             properties:

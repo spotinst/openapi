@@ -3,7 +3,6 @@ title: MI Compute
 required:
   - subnetIds
   - vpcId
-  - product
 properties:
   subnetIds:
     type: array
@@ -33,6 +32,8 @@ properties:
     description: >
       Operation system type. Possible values: Linux/UNIX, SUSE Linux, Windows, Red Hat Enterprise Linux
       In case of EC2 classic: Linux/UNIX (Amazon VPC), SUSE Linux (Amazon VPC), Windows (Amazon VPC), Red Hat Enterprise Linux (Amazon VPC)
+  volumeAttachments:
+    $ref: "../../../elastigroup/aws/schemas/volumeAttachments.yaml"
   launchSpecification:
     type: object
     properties:
@@ -48,11 +49,14 @@ properties:
               Comma separated list of available instance types for instance
           types:
             type: array
-            description: >
-              Set instance types settings
+            description: |
+              Set instance types settings.  
+              Note: Cannot be defined if 'resourceRequirements' is defined.
             items:
               type: string
               example: t2.micro
+          resourceRequirements:
+            $ref: "../../../elastigroup/aws/schemas/resourceRequirements.yaml"
       ebsOptimized:
         type: boolean
         example: false

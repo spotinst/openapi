@@ -72,7 +72,7 @@ tags:
       description: Ocean Concepts and Tutorials
       url: https://docs.spot.io/ocean/
 
-  - name: Ocean AKS
+  - name: Ocean AKS (Deprecated)
     description: Ocean - Serverless containers for Azure Kubernetes Service
     externalDocs:
       description: Ocean Concepts and Tutorials
@@ -84,6 +84,12 @@ tags:
 #    externalDocs:
 #      description: Ocean Concepts and Tutorials
 #      url: https://docs.spot.io/ocean/
+
+  - name: Ocean AKS
+    description: Ocean - Serverless containers for Azure Kubernetes Service
+    externalDocs:
+      description: Ocean Concepts and Tutorials
+      url: https://docs.spot.io/ocean/
 
   - name: Ocean Insights
     description: |
@@ -123,14 +129,14 @@ tags:
       description: AWS EMR Scaler Concepts and Tutorials
       url: https://docs.spot.io/elastigroup/tools-integrations/elastic-mapreduce/
 
-  - name: Managed Instance AWS
+  - name: Stateful Node AWS
     description: |
-      Managed Instance is a Spot solution for launching and managing a single compute instance.
+      Stateful Node is a Spot solution for launching and managing a single compute instance.
       On the AWS cloud, for a standard single instance workload, an On-Demand EC2 instance is launched.
       The instance is expected to be highly available, easily manageable, and integrate well with additional services and monitoring tools.
       For more information please review the concepts section.
     externalDocs:
-      description: Managed Instance for AWS Concepts and Tutorials
+      description: Stateful Node for AWS Concepts and Tutorials
       url: https://docs.spot.io/managed-instance/
 
   - name: Create an API Token
@@ -188,6 +194,7 @@ x-tagGroups:
       - Ocean Insights
       - Ocean CD
       - Ocean Spark
+      - Ocean AKS (Deprecated)
   - name: Elastigroup
     tags:
       - Elastigroup AWS
@@ -195,9 +202,9 @@ x-tagGroups:
       - Elastigroup GCP
       - Elastigroup Azure Spot VMs
       - Elastigroup Azure Stateful
-  - name: Managed Instance
+  - name: Stateful Node
     tags:
-      - Managed Instance AWS
+      - Stateful Node AWS
   - name: Services
     tags:
       - Audit Service
@@ -310,20 +317,6 @@ paths:
     $ref: services/elastigroup/aws/paths/elastigroup-deployment-status.yaml
   /aws/ec2/group/{groupId}/roll/{rollId}/action:
     $ref: services/elastigroup/aws/paths/elastigroup-deployment-action.yaml
-  /compute/azure/group:
-    $ref: services/elastigroup/azure/scaleSetVms/paths/groups.yaml
-  /compute/azure/group/{groupId}:
-    $ref: services/elastigroup/azure/scaleSetVms/paths/group.yaml
-  /compute/azure/group/{groupId}/status:
-    $ref: services/elastigroup/azure/scaleSetVms/paths/group-status.yaml
-  /compute/azure/group/{groupId}/detachInstances:
-    $ref: services/elastigroup/azure/scaleSetVms/paths/group-detach.yaml
-  /compute/azure/group/{groupId}/roll:
-    $ref: services/elastigroup/azure/scaleSetVms/paths/group-deployments.yaml
-  /compute/azure/group/{groupId}/roll/{rollId}:
-    $ref: services/elastigroup/azure/scaleSetVms/paths/roll.yaml
-  /compute/azure/group/{groupId}/roll/{deploymentId}:
-    $ref: services/elastigroup/azure/scaleSetVms/paths/group-deployment.yaml
   /azure/costs:
     $ref: services/elastigroup/azure/scaleSetVms/paths/costs.yaml
   /azure/compute/group/{groupId}:
@@ -518,6 +511,8 @@ paths:
     $ref: services/ocean/aws/paths/detachInstances.yaml
   /ocean/aws/k8s/cluster/{oceanClusterId}/aggregatedCosts:
     $ref:  services/ocean/aws/paths/cluster-aggregated-costs.yaml
+  /ocean/aws/k8s/cluster/{oceanClusterId}/aggregatedCosts/summary:
+    $ref: services/ocean/aws/paths/cluster-aggregated-costs-summary.yaml
   /ocean/aws/k8s/launchSpec:
     $ref: services/ocean/aws/paths/clusters-launchSpec.yaml
   /ocean/aws/k8s/launchSpec/{oceanLaunchSpecId}:
@@ -638,6 +633,8 @@ paths:
     $ref: services/ocean/gke/paths/clusterFetchElastilog.yaml
   /ocean/gcp/k8s/cluster/{oceanClusterId}/rightSizing/suggestion:
     $ref: services/ocean/gke/paths/rightSizing.yaml
+  /ocean/gcp/k8s/cluster/{oceanClusterId}/aggregatedCosts:
+    $ref: services/ocean/gke/paths/cluster-aggregated-costs.yaml
   #    $ref: services/ocean/gke/paths/rightSizingLegacy.yaml - deprecated
   /ocean/gcp/k8s/launchSpec:
     $ref: services/ocean/gke/paths/clusters-launchSpec.yaml
@@ -683,6 +680,22 @@ paths:
     $ref: services/ocean/aks/paths/rightSizing.yaml
   /ocean/azure/k8s/cluster/{oceanClusterId}/log:
     $ref: services/ocean/aks/paths/clusterFetchElastilog.yaml
+  /ocean/azure/np/cluster:
+      $ref: services/ocean/aksV2/paths/clusters.yaml
+  /ocean/azure/np/cluster/{oceanClusterId}:
+      $ref: services/ocean/aksV2/paths/cluster.yaml
+  /ocean/azure/np/cluster/aks/import:
+      $ref: services/ocean/aksV2/paths/importCluster.yaml
+  /ocean/azure/np/cluster/launchNewNodes:
+    $ref: services/ocean/aksV2/paths/clusterLaunchNodes.yaml
+  /ocean/azure/np/virtualNodeGroup:
+      $ref: services/ocean/aksV2/paths/virtualNodeGroups.yaml
+  /ocean/azure/np/virtualNodeGroup/{virtualNodeGroupId}:
+      $ref: services/ocean/aksV2/paths/virtualNodeGroup.yaml
+  /ocean/azure/np/virtualNodeGroup/import:
+      $ref: services/ocean/aksV2/paths/importVirtualNodeGroup.yaml
+  /ocean/azure/np/virtualNodeGroup/vmSizes:
+    $ref: services/ocean/aksV2/paths/virtualNodeGroupAllowedVmSizes.yaml
   /ocean/azure/k8s/cluster/{oceanClusterId}/aggregatedCosts:
     $ref: services/ocean/aks/paths/cluster-aggregated-costs.yaml
   /ocean/aws/k8s/launchSpec/{oceanLaunchSpecId}/launchNodes:
@@ -741,19 +754,19 @@ paths:
     $ref: services/ocean/cd/paths/rolloutResource.yaml
   /ocean/cd/rollout/{rolloutId}/phase:
     $ref: services/ocean/cd/paths/rolloutPhase.yaml
+  /ocean/cd/rollout/{rolloutId}/strategyOverride:
+    $ref: services/ocean/cd/paths/rolloutStrategyOverride.yaml
   /ocean/cd/workload:
     $ref: services/ocean/cd/paths/workloads.yaml
-  /ocean/cd/workload/namespace/{namespace}/deployment/{deploymentName}/migrate:
-    $ref: services/ocean/cd/paths/workloadMigration.yaml
-  /ocean/cd/workload/{workloadId}/activeOperation:
+  /ocean/cd/workload/{workloadName}/namespace/{namespace}/activeOperation:
     $ref: services/ocean/cd/paths/workloadActiveOperations.yaml
-  /ocean/cd/workload/{workloadId}/revision:
+  /ocean/cd/workload/{workloadName}/namespace/{namespace}/revision:
     $ref: services/ocean/cd/paths/workloadRevision.yaml
-  /ocean/cd/workload/{workloadId}/restart:
+  /ocean/cd/workload/{workloadName}/namespace/{namespace}/restart:
     $ref: services/ocean/cd/paths/workloadRestart.yaml
-  /ocean/cd/workload/{workloadId}/revision/{revisionId}/retry:
+  /ocean/cd/workload/{workloadName}/namespace/{namespace}/revision/{revisionId}/retry:
     $ref: services/ocean/cd/paths/workloadRetry.yaml
-  /ocean/cd/workload/{workloadId}/revision/{revisionId}/rollback:
+  /ocean/cd/workload/{workloadName}/namespace/{namespace}/revision/{revisionId}/rollback:
     $ref: services/ocean/cd/paths/workloadRollback.yaml
   /ocean/cd/workload/{workloadName}/namespace/{namespace}/graph:
     $ref: services/ocean/cd/paths/workloadGraph.yaml
