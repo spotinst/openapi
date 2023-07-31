@@ -1,105 +1,89 @@
 type: object
-title: Ocean CD Rollouts Phase
+title: Ocean CD Rollout Verification Result
 description: >
-  Represents object of Rollout Phase
+  Ocean CD rollout verification result entity
 properties:
   metricName:
-    type: "string"
-    example: "prometheus-metric"
-    description: >
-      Name of the metric.
+    type: string
+    description: The identifier name of the metric
+    example: prometheus-metric
   startTime:
     type: string
-    format: date-time
-    example: "2018-11-05T12:55:50.000+0000"
+    description: The timestamp representing the start time of verification
+    example: "2018-11-05T12:55:50.000Z"
   status:
-    type: "string"
+    type: string
     enum: [ pending, running, inProgress, successful, failed, error ]
-    example: "successful"
-    description: >
-      The status of the verification.
+    description: The status of the verification
+    example: successful
   message:
-    type: "string"
-    description: >
-      The message of the verification.
+    type: string
+    description: The message of the verification
+    example: Failed to get data
   failureCondition:
-    type: "string"
-    example: "result[0] >= 1000000"
-    description: >
-      The failure condition decided for the verification.
+    type: string
+    description: The expression which determines if a measurement is failed
+    example: result[0] >= 1000000
   successCondition:
-    type: "string"
-    example: "result[0] < 1000000"
-    description: >
-      The Success condition decided for the verification.
+    type: string
+    description: The expression which determines if a measurement is successful
+    example: result[0] < 1000000
   query:
-    type: "string"
+    type: string
+    description: The query that will provide the result to check with the failure/success condition
     example: "sum(container_cpu_usage_seconds_total{namespace=\"analysis-namespace\", endpoint=\"https-metrics\"})"
-    description: >
-      The query that will provide the result to check with the failure/success condition.
   failureLimit:
-    type: "integer"
+    type: integer
+    description: The maximum number of times the measurement is allowed to fail before the entire metric is considered failed. The default is 0
     example: 1
-    description: >
-      The max amount of failures.
   interval:
-    type: "string"
-    example: "5s"
-    description: >
-      The interval of the verification.
+    type: string
+    description: The interval between each verification measurement
+    example: 5s
   count:
-    type: "integer"
+    type: integer
     example: 3
-    description: >
-      The count.
+    description: The number of times the measurement has to run
   dataPoints:
-    type: "array"
-    description: >
-      Data points
+    type: array
+    description: The info about the verification measurements
     items:
       $ref: "./oceanCDRolloutDataPoints.yaml"
   provider:
-    type: "string"
+    type: string
+    description: The name of the chosen monitoring tool for the metric
     enum: [ datadog, newRelic, prometheus, cloudWatch, web, job ]
-    example: "prometheus"
-    description: >
-      The provider of the verifications.
+    example: prometheus
   step:
-    type: "string"
-    example: "Background"
-    description: >
-      The step from the failure/success comes from.
+    type: string
+    description: The step where the failure/success comes from
+    example: "1"
   providerDetails:
-    type: "object"
-    description: >
-      The provider details
+    type: object
+    description: The chosen for the metric monitoring tool's details
     properties:
       job:
-       type: "object"
-       description: >
-          The provider Job
+       type: object
+       description: The Job verification provider
        properties:
          containers:
-           type: "array"
-           description: >
-             List of containers
+           type: array
+           description: List of containers belonging to the pod
            items:
              type: object
+             description: A container belonging to the pod
              properties:
                name:
-                 type: "string"
-                 example: "nginx"
-                 description: >
-                   List of containers
-               image:
-                 type: "string"
-                 example: "public.ecr.aws/nginx/nginx:1.22"
-                 description: >
-                   Image
+                 type: string
+                 description: The name of a container
+                 example: hello
                command:
-                 type: "array"
-                 description: >
-                   List of commands
+                 type: array
+                 description: The entry point of a container
+                 example: ["sh", "-c", "echo", "Hello, world!"]
                  items:
                    type: string
-                   example: "echo"
+               image:
+                 type: string
+                 description: The image name of a container
+                 example: nginx:1.21

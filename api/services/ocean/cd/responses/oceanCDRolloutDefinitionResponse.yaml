@@ -4,27 +4,34 @@ content:
     schema:
       allOf:
         - $ref: "../../../../commons/schemas/responseWrapper.yaml"
-        - type: "object"
+        - type: object
           properties:
             response:
-              type: "object"
-              description: >
-                response body
+              type: object
+              description: response body
               properties:
                 items:
-                  items:
-                    properties:
-                      rolloutSpec:
-                        type: object
-                        $ref: "../schemas/oceanCDRolloutSpec.yaml"
-                      strategy:
-                        type: object
-                        $ref: "../schemas/oceanCDStrategyBase.yaml"
-                      phaseVerifications:
-                        type: array
-                        items:
-                          $ref: "../schemas/oceanCDRolloutVerificationTemplate.yaml"
-                      backgroundVerifications:
-                        type: array
-                        items:
-                          $ref: "../schemas/oceanCDRolloutVerificationTemplate.yaml"
+                  type: object
+                  properties:
+                    rolloutSpec:
+                      allOf:
+                        - $ref: "../schemas/oceanCDRolloutSpec.yaml"
+                        - $ref: "../schemas/oceanCDCreatedAtUpdatedAt.yaml"
+                    strategy:
+                      allOf:
+                        - $ref: "../schemas/oceanCDStrategyBase.yaml"
+                        - $ref: "../schemas/oceanCDCreatedAtUpdatedAt.yaml"
+                    phaseVerifications:
+                      type: array
+                      description: A list of phase verifications associated with the rollout
+                      items:
+                        allOf:
+                          - $ref: "../schemas/oceanCDRolloutPhaseVerification.yaml"
+                          - $ref: "../schemas/oceanCDCreatedAtUpdatedAt.yaml"
+                    backgroundVerifications:
+                      type: array
+                      description: A list of background verifications associated with the rollout
+                      items:
+                        allOf:
+                          - $ref: "../schemas/oceanCDRolloutPhaseVerification.yaml"
+                          - $ref: "../schemas/oceanCDCreatedAtUpdatedAt.yaml"
