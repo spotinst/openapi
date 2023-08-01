@@ -59793,6 +59793,9 @@
                           "virtualNodeGroupTemplate": {
                             "type": "object",
                             "title": "Ocean AKS Virtual Node Group Template",
+                            "required": [
+                              "availabilityZones"
+                            ],
                             "properties": {
                               "availabilityZones": {
                                 "type": "array",
@@ -60273,6 +60276,9 @@
                                   "2",
                                   "3"
                                 ]
+                              },
+                              "nodePoolProperties": {
+                                "$ref": "#/paths/~1ocean~1azure~1np~1virtualNodeGroup~1%7BvirtualNodeGroupId%7D/put/requestBody/content/application~1json/schema/properties/virtualNodeGroup/properties/nodePoolProperties"
                               },
                               "nodeCountLimits": {
                                 "$ref": "#/paths/~1ocean~1azure~1np~1virtualNodeGroup~1%7BvirtualNodeGroupId%7D/put/requestBody/content/application~1json/schema/properties/virtualNodeGroup/properties/nodeCountLimits"
@@ -60889,8 +60895,7 @@
                         "title": "Ocean AKS Virtual Node Group",
                         "required": [
                           "oceanId",
-                          "name",
-                          "availabilityZones"
+                          "name"
                         ],
                         "properties": {
                           "name": {
@@ -60961,10 +60966,10 @@
                                 "description": "The OS SKU of the OS type. Must correlate with the os type.\n",
                                 "enum": [
                                   "Ubuntu",
-                                  "Windows2019",
-                                  "Windows2022",
                                   "AzureLinux",
-                                  "CBLMariner"
+                                  "CBLMariner",
+                                  "Windows2019",
+                                  "Windows2022"
                                 ],
                                 "example": "Ubuntu"
                               }
@@ -61379,6 +61384,52 @@
                           "2",
                           "3"
                         ]
+                      },
+                      "nodePoolProperties": {
+                        "type": "object",
+                        "title": "Ocean AKS Node Pool Properties",
+                        "description": "The Ocean Node Pool Properties.\n",
+                        "properties": {
+                          "maxPodsPerNode": {
+                            "type": "integer",
+                            "description": "The maximum number of pods per node in the node pools.\n",
+                            "minimum": 0,
+                            "maximum": 250,
+                            "example": 30
+                          },
+                          "enableNodePublicIP": {
+                            "description": "enable node public IP.\n",
+                            "type": "boolean",
+                            "example": true
+                          },
+                          "osDiskSizeGB": {
+                            "type": "integer",
+                            "description": "The size of the OS disk in GB. \nFor Linux OS, the minimum size is 32GB and for Windows OS the minimum is 128GB.\n",
+                            "maximum": 1023,
+                            "example": 64
+                          },
+                          "osDiskType": {
+                            "type": "string",
+                            "description": "The type of the OS disk.\n",
+                            "enum": [
+                              "Managed",
+                              "Ephemeral"
+                            ],
+                            "example": "Managed"
+                          },
+                          "osSKU": {
+                            "type": "string",
+                            "description": "The OS SKU of the OS type. Must correlate with the os type.\n",
+                            "enum": [
+                              "Ubuntu",
+                              "AzureLinux",
+                              "CBLMariner",
+                              "Windows2019",
+                              "Windows2022"
+                            ],
+                            "example": "Ubuntu"
+                          }
+                        }
                       },
                       "nodeCountLimits": {
                         "type": "object",
