@@ -699,8 +699,9 @@ components:
           title: Labels
           type: object
         memory:
-          title: Memory
-          type: string
+          oneOf:
+            - $ref: '#/components/schemas/OOMRecoveryStrategy'
+            - $ref: '#/components/schemas/StaticMemoryString'
         memoryOverhead:
           title: Memoryoverhead
           type: string
@@ -1219,6 +1220,30 @@ components:
       - fieldPath
       title: ObjectFieldSelector
       type: object
+    StaticMemoryString:
+      title: StaticMemoryString
+      description: static memory
+      #example: [ '4096m', '16g' ]
+      type: string
+    OOMRecoveryStrategy:
+      description: Memory allocation strategy that automatically increments the memory when a previous app failed with a OOM
+      properties:
+        strategy:
+          type: string
+          title: oomRecovery
+          enum: [oomRecovery]
+          description: Automatically increase memory if a previous app failed with an OOM error
+        scalingFactor:
+          title: scalingFactor
+          description: Memory multiplier after an OOM failure. Optional, defaults to 2.0
+          type: number
+        maxMemory:
+          title: maxMemory
+          description: Optional, maximum allocatable memory
+          type: string
+      required:
+      - strategy
+
     PersistentVolumeClaimVolumeSource:
       properties:
         claimName:
