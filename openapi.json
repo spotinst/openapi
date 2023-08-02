@@ -71232,8 +71232,14 @@
                                   "type": "object"
                                 },
                                 "memory": {
-                                  "title": "Memory",
-                                  "type": "string"
+                                  "oneOf": [
+                                    {
+                                      "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0/components/schemas/OOMRecoveryStrategy"
+                                    },
+                                    {
+                                      "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0/components/schemas/StaticMemoryString"
+                                    }
+                                  ]
                                 },
                                 "memoryOverhead": {
                                   "title": "Memoryoverhead",
@@ -71835,6 +71841,35 @@
                               ],
                               "title": "ObjectFieldSelector",
                               "type": "object"
+                            },
+                            "StaticMemoryString": {
+                              "title": "StaticMemoryString",
+                              "description": "static memory",
+                              "type": "string"
+                            },
+                            "OOMRecoveryStrategy": {
+                              "descrtiption": "Memory allocation strategy that automatically increments the memory when a previous app failed with a OOM",
+                              "properties": {
+                                "strategy": {
+                                  "required": true,
+                                  "type": "string",
+                                  "title": "oomRecovery",
+                                  "const": "oomRecovery",
+                                  "description": "Automatically increase memory if a previous app failed with an OOM error"
+                                },
+                                "scalingFactor": {
+                                  "title": "scalingFactor",
+                                  "required": false,
+                                  "description": "Memory multiplier after an OOM failure. Optional, defaults to 2.0",
+                                  "type": "number"
+                                },
+                                "maxMemory": {
+                                  "title": "maxMemory",
+                                  "required": false,
+                                  "description": "Optional, maximum allocatable memory",
+                                  "type": "string"
+                                }
+                              }
                             },
                             "PersistentVolumeClaimVolumeSource": {
                               "properties": {
