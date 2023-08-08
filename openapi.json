@@ -28473,188 +28473,6 @@
         }
       }
     },
-    "/gcp/gce/group/gke/import": {
-      "post": {
-        "summary": "Import GKE Cluster",
-        "description": "Import an existing GKE cluster to Elastigroup.",
-        "operationId": "elastigroupGcpGkeImport",
-        "tags": [
-          "Elastigroup GCP"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
-          },
-          {
-            "in": "query",
-            "name": "clusterId",
-            "required": true,
-            "description": "The GKE Cluster identifier\n",
-            "schema": {
-              "type": "string"
-            },
-            "example": "myGKECluster"
-          },
-          {
-            "in": "query",
-            "name": "clusterLocation",
-            "required": true,
-            "description": "The location of the cluster. Enter the desired zone for zonal GKE clusters or the region for regional GKE clusters.\n",
-            "schema": {
-              "type": "string"
-            },
-            "example": "us-central1-a"
-          },
-          {
-            "in": "query",
-            "name": "nodePoolName",
-            "required": false,
-            "description": "Set the node pool to import\n",
-            "schema": {
-              "type": "string"
-            },
-            "example": "somePoolName"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "type": "object",
-                    "title": "Elastigroup GKE Import Wrapper",
-                    "required": [
-                      "group"
-                    ],
-                    "properties": {
-                      "group": {
-                        "type": "object",
-                        "title": "GCP Elastigroup",
-                        "properties": {
-                          "preemptiblePercentage": {
-                            "type": "integer",
-                            "description": "Preemptive VMs ratio in the Elastigroup",
-                            "example": 70,
-                            "default": 100
-                          },
-                          "name": {
-                            "type": "string",
-                            "example": "myGKE",
-                            "description": "Name of the Elastigroup"
-                          },
-                          "capacity": {
-                            "type": "object",
-                            "description": "Minimum, maximum and target number of vms in the Elastigroup",
-                            "properties": {
-                              "minimum": {
-                                "type": "integer",
-                                "example": 0,
-                                "description": "Minimum number of VMs to maintain in the Elastigroup"
-                              },
-                              "maximum": {
-                                "type": "integer",
-                                "example": 2,
-                                "description": "Maximum number of VMs to maintain in the Elastigroup"
-                              },
-                              "target": {
-                                "type": "integer",
-                                "example": 1,
-                                "description": "Desired number of VMs to maintain in the Elastigroup"
-                              }
-                            }
-                          },
-                          "instanceTypes": {
-                            "type": "object",
-                            "description": "Types and locations of VMs to be utilized",
-                            "properties": {
-                              "ondemand": {
-                                "type": "string",
-                                "example": "n1-highcpu-32",
-                                "description": "On-demand VM type to utilize in case such VM is launched"
-                              },
-                              "preemtible": {
-                                "type": "array",
-                                "description": "On-demand VM types to utilize in case such VM(s) is/are launched",
-                                "items": {
-                                  "type": "string",
-                                  "example": [
-                                    "n1-standard-1",
-                                    "n1-standard-2"
-                                  ]
-                                }
-                              }
-                            }
-                          },
-                          "availabilityZones": {
-                            "type": "array",
-                            "description": "Availability Zone pool to be use for this group",
-                            "items": {
-                              "type": "string",
-                              "example": [
-                                "us-central1-a",
-                                "us-central1-b"
-                              ]
-                            }
-                          }
-                        }
-                      }
-                    }
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "group": {
-                        "type": "object"
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Elastigroup Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "response": {
-                          "type": "object",
-                          "properties": {
-                            "items": {
-                              "type": "array",
-                              "items": {
-                                "$ref": "#/paths/~1gcp~1gce~1group/post/requestBody/content/application~1json/schema/allOf/0"
-                              }
-                            },
-                            "kind": {
-                              "example": "spotinst:gcp:gce:importGke"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
-      }
-    },
     "/gcp/gce/group/{groupId}/status": {
       "get": {
         "summary": "Get Elastigroup Status",
@@ -36355,7 +36173,195 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster/post/requestBody/content/application~1json/schema/allOf/0"
+                    "type": "object",
+                    "required": [
+                      "cluster"
+                    ],
+                    "properties": {
+                      "cluster": {
+                        "type": "object",
+                        "description": "The object specifying the configuration of the Ocean cluster.\n",
+                        "title": "AWS Cluster",
+                        "required": [
+                          "name",
+                          "controllerClusterId"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "readOnly": true,
+                            "description": "The Ocean cluster identifier.\n",
+                            "example": "o-abcd1234"
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "oceanName",
+                            "description": "Add a name for the Ocean cluster.\n"
+                          },
+                          "controllerClusterId": {
+                            "type": "string",
+                            "example": "ocean.k8s",
+                            "description": "Enter the reporting identifier for the Ocean Controller.\n"
+                          },
+                          "region": {
+                            "type": "string",
+                            "example": "us-east-1",
+                            "description": "Select the region for the Ocean cluster to run in.\n"
+                          },
+                          "autoScaler": {
+                            "type": "object",
+                            "title": "auto-scaler",
+                            "description": "The automatic scaling mechanism used in Ocean for Kubernetes.",
+                            "properties": {
+                              "isEnabled": {
+                                "type": "boolean",
+                                "description": "Enable the Ocean Kubernetes autoscaler.",
+                                "default": true,
+                                "example": true
+                              },
+                              "cooldown": {
+                                "type": "integer",
+                                "description": "A period of time (in seconds) that Ocean waits from the end of a scaling action until starting another scaling action.",
+                                "default": null,
+                                "example": 180
+                              },
+                              "resourceLimits": {
+                                "type": "object",
+                                "description": "Option to set upper and lower bounds on the resource usage of the cluster.",
+                                "properties": {
+                                  "maxMemoryGib": {
+                                    "type": "integer",
+                                    "description": "The maximum memory (in GiB) that can be allocated to the cluster.",
+                                    "example": 1500
+                                  },
+                                  "maxVCpu": {
+                                    "type": "integer",
+                                    "description": "The maximum CPU (in vCPU units) that can be allocated to the cluster.",
+                                    "example": 750
+                                  }
+                                }
+                              },
+                              "down": {
+                                "type": "object",
+                                "description": "Autoscaling scale down operations.",
+                                "properties": {
+                                  "maxScaleDownPercentage": {
+                                    "type": "integer",
+                                    "description": "Represents the maximum percent of your instances to scale down in a single scale-down action. Number between 1-100.",
+                                    "example": 60
+                                  }
+                                }
+                              },
+                              "headroom": {
+                                "type": "object",
+                                "description": "Spare resource capacity management enabling fast assignment of pods without waiting for new resources to launch.",
+                                "properties": {
+                                  "cpuPerUnit": {
+                                    "type": "integer",
+                                    "description": "Option to configure the number of CPUs to allocate the headroom. CPUs are denoted in millicores, where 1000 millicores = 1 vCPU.",
+                                    "example": 2000
+                                  },
+                                  "memoryPerUnit": {
+                                    "type": "integer",
+                                    "description": "Option to configure the amount of memory (MiB) to allocate the headroom.",
+                                    "example": 0
+                                  },
+                                  "gpuPerUnit": {
+                                    "type": "integer",
+                                    "description": "Amount of GPU to allocate for headroom.",
+                                    "example": 0
+                                  },
+                                  "numOfUnits": {
+                                    "type": "integer",
+                                    "description": "The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.",
+                                    "example": 4
+                                  }
+                                }
+                              },
+                              "isAutoConfig": {
+                                "type": "boolean",
+                                "description": "Use automatic headroom. When set to true, the values under cluster.autoScaler.headroom are not effective, as Ocean configures and optimizes headroom automatically.",
+                                "default": true,
+                                "example": false
+                              },
+                              "autoHeadroomPercentage": {
+                                "type": "integer",
+                                "description": "Dynamic (automatic) buffer of spare capacity, i.e., vCPU, memory, and GPU resources. Expressed as a percent of the overall cluster capacity with valid values from 0-200. Optional. Relevant when isAutoConfig=true.",
+                                "example": null
+                              },
+                              "enableAutomaticAndManualHeadroom": {
+                                "type": "boolean",
+                                "description": "When set to true, both automatic and per-VNG manual headroom to be saved concurrently and independently in the cluster. prerequisite: isAutoConfig must be true\n",
+                                "example": true
+                              },
+                              "extendedResourceDefinitions": {
+                                "type": "array",
+                                "description": "List of Ocean extended resource definitions to use in this cluster.\n",
+                                "items": {
+                                  "type": "string"
+                                },
+                                "example": [
+                                  "erd-123",
+                                  "erd-456"
+                                ]
+                              }
+                            }
+                          },
+                          "capacity": {
+                            "type": "object",
+                            "title": "Capacity Units",
+                            "description": "The overall capability of the Ocean cluster expressed as number of instances and specified with a minimum, a maximum, and a target number of running instances.",
+                            "properties": {
+                              "minimum": {
+                                "type": "integer",
+                                "example": 0,
+                                "description": "The lower limit of instances that the cluster can scale down to.\n"
+                              },
+                              "maximum": {
+                                "type": "integer",
+                                "default": 1000,
+                                "example": 1000,
+                                "description": "The upper limit of instances that the cluster can scale up to.\n"
+                              },
+                              "target": {
+                                "type": "integer",
+                                "example": 1,
+                                "description": "Number of instances to launch and maintain in the cluster.\n"
+                              }
+                            }
+                          },
+                          "strategy": {
+                            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/properties/strategy"
+                          },
+                          "scheduling": {
+                            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/properties/scheduling"
+                          },
+                          "security": {
+                            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/properties/security"
+                          },
+                          "compute": {
+                            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1import/post/responses/200/content/application~1json/schema/properties/items/properties/compute"
+                          },
+                          "logging": {
+                            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/properties/logging"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "readOnly": true,
+                            "format": "date-time",
+                            "example": "2021-03-17T08:13:08.000Z",
+                            "description": "A timestamp of the cluster creation.\n"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "readOnly": true,
+                            "format": "date-time",
+                            "example": "2021-03-17T15:06:13.000Z",
+                            "description": "A timestamp of the latest cluster update.\n"
+                          }
+                        }
+                      }
+                    }
                   }
                 ]
               }
