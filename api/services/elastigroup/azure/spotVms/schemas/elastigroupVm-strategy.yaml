@@ -69,15 +69,57 @@ properties:
           default: 1800
           minimum: 60
           maximum: 1800
-  orientation:
-    title: Group Orientation
+  availabilityVsCost:
+    title: Elastigroup Availability VS Cost
     description: |
-      Specify the prediction algorithm strategy. \n
-      [Click here](https://docs.spot.io/elastigroup/getting-started/create-an-elastigroup-for-azure?id=availability-settings) for more information about this feature.
-    type: string
-    enum:
-      - availability
-      - cost
-      - cheapest
-    default: availability
-    example: availability
+      Set the desired preference for the Spot market VM selection. (100-  Availability, 0- cost)
+    type: integer
+    example: 100
+  capacityReservation:
+    type: object
+    description: |
+      On-demand Capacity Reservation group enables you to reserve Compute capacity in an Azure region or an Availability Zone for any duration of time.
+      [CRG can only be created on the Azure end.](https://learn.microsoft.com/en-us/azure/virtual-machines/capacity-reservation-create)
+    required:
+      - shouldUtilize
+      - utilizationStrategy
+    properties:
+      shouldUtilize:
+        type: boolean
+        description: |
+          Determines whether capacity reservations should be utilized.
+        example: true
+      utilizationStrategy:
+        type: string
+        description: |
+          The priority requested for using CRG. This value will determine if CRG is used ahead of spot VMs or On-demand VMs.
+          * utilizeOverOD- If picked, we will use CRG only in case On-demand should be launched.
+          * utilizeOverSpot-  CRG will be preferred over Spot. Only after CRG is fully used, spot VMs can be used.
+        enum: [ utilizeOverSpot, utilizeOverOD ]
+        example: utilizeOverSpot
+      capacityReservationGroups:
+        type: array
+        description: |
+          List of the desired CRGs to use under the associated Azure subscription.
+          When null we will utilize any available reservation that matches the launch specification.
+        items:
+          type: object
+          required:
+            - name
+            - resourceGroupName
+          properties:
+            name:
+              type: string
+              description: |
+                The name of the CRG.
+              example: capacityReservationGroupName
+            resourceGroupName:
+              type: string
+              description: |
+                Azure resource group name
+              example: resourceGroupName
+            shouldPrioritize:
+              type: boolean
+              description: |
+                The desired CRG to utilize ahead of other CRGs in the subscription.
+              example: true
