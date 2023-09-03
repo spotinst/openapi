@@ -25817,10 +25817,79 @@
         }
       }
     },
+    "/azure/compute/statefulNode/{nodeId}/osDisk/swap": {
+      "put": {
+        "summary": "Swap OS Disk to Stateful Node",
+        "description": "Configure a new OS disk for an OS persisted paused Stateful Node.",
+        "operationId": "azureStatefulNodeSwapOSDisk",
+        "tags": [
+          "Elastigroup Azure Stateful"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1azure~1compute~1statefulNode~1%7BnodeId%7D/get/parameters/1"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "title": "Swap OS Disk to Stateful Node.",
+                    "required": [
+                      "osDiskName",
+                      "osDiskResourceGroupName"
+                    ],
+                    "properties": {
+                      "osDiskName": {
+                        "type": "string",
+                        "example": "OsDisk",
+                        "description": "Specify the name of the new OS disk.\n"
+                      },
+                      "osDiskResourceGroupName": {
+                        "type": "string",
+                        "example": "MyResourceGroup",
+                        "description": "The resource group name in which the new OS disk exists.\n"
+                      },
+                      "shouldTerminate": {
+                        "type": "boolean",
+                        "description": "Indicates whether to delete the original OS disk.\n",
+                        "default": true,
+                        "example": false
+                      },
+                      "retentionTime": {
+                        "type": "integer",
+                        "description": "Time to keep the original OS disk before deletion (hours).\n",
+                        "minimum": 0,
+                        "example": 1
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/azure/compute/statefulNode/{nodeId}/dataDisk/attach": {
       "put": {
         "summary": "Attach Data Disk to Stateful Node",
-        "description": "Create a new data disk and attche it to the stateful node.",
+        "description": "Create a new data disk and attaches it to the stateful node.",
         "operationId": "azureStatefulNodeAttachDataDisk",
         "tags": [
           "Elastigroup Azure Stateful"
