@@ -64895,6 +64895,32 @@
                                             "example": "arn:aws:iam::123456789012:role/GetMetricData"
                                           }
                                         }
+                                      },
+                                      "jenkins": {
+                                        "type": "object",
+                                        "required": [
+                                          "baseUrl",
+                                          "username",
+                                          "apiToken"
+                                        ],
+                                        "title": "Ocean CD Verification Provider Jenkins",
+                                        "properties": {
+                                          "baseUrl": {
+                                            "type": "string",
+                                            "description": "The address of the Jenkins server within the cluster.",
+                                            "example": "http://localhost:9090"
+                                          },
+                                          "username": {
+                                            "type": "string",
+                                            "description": "The Jenkins server’s access username.",
+                                            "example": "admin"
+                                          },
+                                          "apiToken": {
+                                            "type": "string",
+                                            "description": "The Jenkins server’s access apiToken.",
+                                            "example": "AbCDeeFFGG"
+                                          }
+                                        }
                                       }
                                     }
                                   },
@@ -65014,6 +65040,10 @@
                           "cloudWatch": {
                             "type": "object",
                             "$ref": "#/paths/~1ocean~1cd~1verificationProvider/post/requestBody/content/application~1json/schema/allOf/0/properties/verificationProvider/properties/cloudWatch"
+                          },
+                          "jenkins": {
+                            "type": "object",
+                            "$ref": "#/paths/~1ocean~1cd~1verificationProvider/post/requestBody/content/application~1json/schema/allOf/0/properties/verificationProvider/properties/jenkins"
                           }
                         }
                       }
@@ -65097,6 +65127,10 @@
                           "cloudWatch": {
                             "type": "object",
                             "$ref": "#/paths/~1ocean~1cd~1verificationProvider/post/requestBody/content/application~1json/schema/allOf/0/properties/verificationProvider/properties/cloudWatch"
+                          },
+                          "jenkins": {
+                            "type": "object",
+                            "$ref": "#/paths/~1ocean~1cd~1verificationProvider/post/requestBody/content/application~1json/schema/allOf/0/properties/verificationProvider/properties/jenkins"
                           }
                         }
                       }
@@ -67624,37 +67658,37 @@
                                                 "interval": {
                                                   "type": "string",
                                                   "example": "5m",
-                                                  "description": "Defines an interval string (30s, 5m, 1h) between each verification measurements. If omitted, will perform a single measurement"
+                                                  "description": "Defines an interval string (30s, 5m, 1h) between each verification measurements. If omitted, will perform a single measurement. When choosing `Jenkins` as the provider, there is no need to send this variable."
                                                 },
                                                 "initialDelay": {
                                                   "type": "string",
-                                                  "description": "How long to wait before starting this metric measurements",
+                                                  "description": "How long to wait before starting this metric measurements. When choosing `Jenkins` as the provider, there is no need to send this variable.",
                                                   "example": "1m"
                                                 },
                                                 "count": {
                                                   "type": "integer",
-                                                  "description": "The number of times to run the measurement. If both interval and count are omitted, the effective count is 1. If only interval is specified, metric runs indefinitely. If count > 1, interval must be specified",
+                                                  "description": "The number of times to run the measurement. If both interval and count are omitted, the effective count is 1. If only interval is specified, metric runs indefinitely. If count > 1, interval must be specified. When choosing `Jenkins` as the provider, there is no need to send this variable.",
                                                   "example": 10
                                                 },
                                                 "successCondition": {
                                                   "type": "string",
-                                                  "description": "An expression which determines if a measurement is considered successful. The keyword `result` is a variable reference to the value of measurement. Results can be both structured data or primitive. If successCondition is set, then failureCondition is not allowed",
+                                                  "description": "An expression which determines if a measurement is considered successful. The keyword `result` is a variable reference to the value of measurement. Results can be both structured data or primitive. If successCondition is set, then failureCondition is not allowed. When choosing `Jenkins` as the provider, there is no need to send this variable.",
                                                   "example": "result[0] <= 0.95"
                                                 },
                                                 "failureCondition": {
                                                   "type": "string",
-                                                  "description": "An expression which determines if a measurement is considered failed. If failureCondition is set, then successCondition is not allowed",
+                                                  "description": "An expression which determines if a measurement is considered failed. If failureCondition is set, then successCondition is not allowed. When choosing `Jenkins` as the provider, there is no need to send this variable.",
                                                   "example": "result[0] >= 1.2"
                                                 },
                                                 "failureLimit": {
                                                   "type": "integer",
                                                   "example": 2,
-                                                  "description": "The maximum number of times the measurement is allowed to fail, before the entire metric is considered failed. Default is 0"
+                                                  "description": "The maximum number of times the measurement is allowed to fail, before the entire metric is considered failed. Default is 0. When choosing `Jenkins` as the provider, there is no need to send this variable."
                                                 },
                                                 "consecutiveErrorLimit": {
                                                   "type": "integer",
                                                   "example": 4,
-                                                  "description": "The maximum number of times the measurement is allowed to error in succession, before the metric is considered error. Default is 4"
+                                                  "description": "The maximum number of times the measurement is allowed to error in succession, before the metric is considered error. Default is 4. When choosing `Jenkins` as the provider, there is no need to send this variable."
                                                 },
                                                 "provider": {
                                                   "type": "object",
@@ -68007,6 +68041,62 @@
                                                                 }
                                                               }
                                                             }
+                                                          }
+                                                        }
+                                                      }
+                                                    },
+                                                    "jenkins": {
+                                                      "type": "object",
+                                                      "required": [
+                                                        "pipelineName",
+                                                        "timeout",
+                                                        "interval"
+                                                      ],
+                                                      "title": "Ocean CD Verification Jenkins Metric",
+                                                      "properties": {
+                                                        "pipelineName": {
+                                                          "type": "string",
+                                                          "description": "The Jenkins pipeline name",
+                                                          "example": "pipelineName"
+                                                        },
+                                                        "tlsVerification": {
+                                                          "type": "boolean",
+                                                          "example": true,
+                                                          "description": "Host TLS verification"
+                                                        },
+                                                        "timeout": {
+                                                          "type": "string",
+                                                          "description": "The total jenkins timeout",
+                                                          "example": "120s/2m"
+                                                        },
+                                                        "interval": {
+                                                          "type": "string",
+                                                          "description": "The interval time to poll status",
+                                                          "example": "5s"
+                                                        },
+                                                        "parameters": {
+                                                          "type": "array",
+                                                          "description": "List of parameters",
+                                                          "items": {
+                                                            "type": "object",
+                                                            "title": "Ocean CD Verification argument",
+                                                            "description": "Represents Verification Parameters to inject to verification templates when running\n",
+                                                            "properties": {
+                                                              "key": {
+                                                                "type": "string",
+                                                                "description": "Key of an argument",
+                                                                "example": "app"
+                                                              },
+                                                              "value": {
+                                                                "type": "string",
+                                                                "description": "Value of an argument",
+                                                                "example": "my-application"
+                                                              }
+                                                            },
+                                                            "required": [
+                                                              "key",
+                                                              "value"
+                                                            ]
                                                           }
                                                         }
                                                       }
