@@ -700,8 +700,9 @@ components:
           type: object
         memory:
           oneOf:
-            - $ref: '#/components/schemas/OOMRecoveryStrategy'
             - $ref: '#/components/schemas/StaticMemoryString'
+            - $ref: '#/components/schemas/OOMRecoveryStrategy'
+            - $ref: '#/components/schemas/MemoryAutotuningStrategy'
         memoryOverhead:
           title: Memoryoverhead
           type: string
@@ -1226,7 +1227,7 @@ components:
       #example: [ '4096m', '16g' ]
       type: string
     OOMRecoveryStrategy:
-      description: Memory allocation strategy that automatically increments the memory when a previous app failed with a OOM
+      description: Memory allocation strategy that automatically increments the memory when a previous app failed with an OOM
       properties:
         strategy:
           type: string
@@ -1241,6 +1242,35 @@ components:
           title: maxMemory
           description: Optional, maximum allocatable memory
           type: string
+      required:
+      - strategy
+    MemoryAutotuningStrategy:
+      description: Memory allocation strategy that automatically increments the
+        memory when a previous app failed with an OOM, and decreases it based on
+        past applications' memory usage
+      properties:
+        strategy:
+          type: string
+          title: autotuning
+          enum: [autotuning]
+          description: Automatically increase memory if a previous app failed with an OOM error, and decrease it based on
+           past applications' memory usage
+        scalingFactor:
+          title: scalingFactor
+          description: Memory multiplier after an OOM failure. Optional, defaults to 2.0
+          type: number
+        maxMemory:
+          title: maxMemory
+          description: Optional, maximum allocatable memory
+          type: string
+        historySize:
+          title: historySize
+          description: Number of past apps to take into account to compute the recommended memory, defaults to 6
+          type: integer
+        marginRatio:
+          title: marginRatio
+          description: Additional safety margin on top of the recommended memory, defaults to 0.1
+          type: number
       required:
       - strategy
 
