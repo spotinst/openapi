@@ -70042,7 +70042,7 @@
                                     "description": "The description of an Ocean Spark cluster\n",
                                     "properties": {
                                       "id": {
-                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/1/schema"
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1sparkCoreHours/get/parameters/1/schema/items"
                                       },
                                       "controllerClusterId": {
                                         "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
@@ -70118,7 +70118,7 @@
             "name": "clusterId",
             "required": true,
             "schema": {
-              "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/1/schema"
+              "$ref": "#/paths/~1ocean~1spark~1cluster~1sparkCoreHours/get/parameters/1/schema/items"
             }
           }
         ],
@@ -70211,6 +70211,97 @@
         "responses": {
           "200": {
             "description": "Ok"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/spark/cluster/sparkCoreHours": {
+      "summary": "Ocean Spark",
+      "get": {
+        "summary": "Cluster Spark Core Hours",
+        "description": "Gets the number of core hours applications have consumed.\n",
+        "operationId": "OceanSparkClusterSparkCoreHours",
+        "tags": [
+          "Ocean Spark"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/0"
+          },
+          {
+            "name": "clusterId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "example": "osc-20fac3f1",
+                "description": "A unique identifier for the Ocean Spark cluster\n"
+              }
+            }
+          },
+          {
+            "in": "query",
+            "name": "period",
+            "required": false,
+            "example": "2021-11",
+            "description": "The month to query from.\n",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Number of spark core hours consumed by cluster",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "response": {
+                          "type": "object",
+                          "description": "response body\n",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "required": [
+                                  "id",
+                                  "coreHours"
+                                ],
+                                "description": "Object that holds a pair of Ocean Spark Cluster ID and core hours that this cluster has consumed.\n",
+                                "properties": {
+                                  "id": {
+                                    "$ref": "#/paths/~1ocean~1spark~1cluster~1sparkCoreHours/get/parameters/1/schema/items"
+                                  },
+                                  "coreHours": {
+                                    "type": "number",
+                                    "description": "Number of core hours that the cluster has consumed.\n",
+                                    "example": 99
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -70454,7 +70545,7 @@
                                 "description": "Summary of a cluster's usage statistics.\n",
                                 "properties": {
                                   "id": {
-                                    "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/1/schema"
+                                    "$ref": "#/paths/~1ocean~1spark~1cluster~1sparkCoreHours/get/parameters/1/schema/items"
                                   },
                                   "metrics": {
                                     "type": "object",
@@ -70572,9 +70663,7 @@
             "required": false,
             "description": "Optionally filter on the Ocean Spark cluster ID\n",
             "schema": {
-              "type": "string",
-              "example": "osc-20fac3f1",
-              "description": "A unique identifier for the Ocean Spark cluster\n"
+              "$ref": "#/paths/~1ocean~1spark~1cluster~1sparkCoreHours/get/parameters/1/schema/items"
             }
           },
           {
@@ -70832,7 +70921,7 @@
                                                   "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/5/schema"
                                                 },
                                                 "clusterId": {
-                                                  "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/1/schema"
+                                                  "$ref": "#/paths/~1ocean~1spark~1cluster~1sparkCoreHours/get/parameters/1/schema/items"
                                                 },
                                                 "controllerClusterId": {
                                                   "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
@@ -74535,7 +74624,7 @@
                                         "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/5/schema"
                                       },
                                       "clusterId": {
-                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/1/schema"
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1sparkCoreHours/get/parameters/1/schema/items"
                                       },
                                       "controllerClusterId": {
                                         "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
@@ -74745,7 +74834,7 @@
                                         "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/5/schema"
                                       },
                                       "clusterId": {
-                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/1/schema"
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1sparkCoreHours/get/parameters/1/schema/items"
                                       },
                                       "controllerClusterId": {
                                         "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
@@ -74935,7 +75024,7 @@
                                         "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/5/schema"
                                       },
                                       "clusterId": {
-                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/1/schema"
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1sparkCoreHours/get/parameters/1/schema/items"
                                       },
                                       "controllerClusterId": {
                                         "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
@@ -75298,7 +75387,7 @@
                                         "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1configTemplate/post/requestBody/content/application~1json/schema/properties/displayName"
                                       },
                                       "clusterId": {
-                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/1/schema"
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1sparkCoreHours/get/parameters/1/schema/items"
                                       },
                                       "controllerClusterId": {
                                         "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
@@ -75596,7 +75685,7 @@
                                               "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
                                             },
                                             "clusterId": {
-                                              "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/1/schema"
+                                              "$ref": "#/paths/~1ocean~1spark~1cluster~1sparkCoreHours/get/parameters/1/schema/items"
                                             },
                                             "organizationId": {
                                               "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/organizationId"
@@ -75746,7 +75835,7 @@
                                     "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
                                   },
                                   "clusterId": {
-                                    "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/1/schema"
+                                    "$ref": "#/paths/~1ocean~1spark~1cluster~1sparkCoreHours/get/parameters/1/schema/items"
                                   },
                                   "createdAt": {
                                     "type": "string",
@@ -75799,7 +75888,7 @@
                                             "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/5/schema"
                                           },
                                           "clusterId": {
-                                            "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/1/schema"
+                                            "$ref": "#/paths/~1ocean~1spark~1cluster~1sparkCoreHours/get/parameters/1/schema/items"
                                           },
                                           "controllerClusterId": {
                                             "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
@@ -75968,7 +76057,7 @@
                                     "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
                                   },
                                   "clusterId": {
-                                    "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/1/schema"
+                                    "$ref": "#/paths/~1ocean~1spark~1cluster~1sparkCoreHours/get/parameters/1/schema/items"
                                   },
                                   "createdAt": {
                                     "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/createdAt"
@@ -76101,7 +76190,7 @@
                                         "$ref": "#/paths/~1ocean~1spark~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/allOf/0/properties/oceanClusterId"
                                       },
                                       "oceanSparkClusterId": {
-                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/1/schema"
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1sparkCoreHours/get/parameters/1/schema/items"
                                       },
                                       "vngId": {
                                         "type": "string",
