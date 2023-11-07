@@ -1,0 +1,98 @@
+type: object
+properties:
+  managedInstance:
+    type: object
+    required:
+      - name
+      - region
+    properties:
+      name:
+        type: string
+        example: mi-test
+        description: |
+          Stateful Node name
+      description:
+        type: string
+        example: This is my Stateful Node
+        description: |
+          Describe your Stateful Node resource
+      region:
+        type: string
+        example: us-east-1
+        description: |
+          The AWS region your resource will be created in.
+      strategy:
+        $ref: ./mi-strategy.yaml
+      compute:
+        $ref: ./mi-compute.yaml
+      integrations:
+        $ref: ./mi-integrations.yaml
+      scheduling:
+        $ref: ./mi-scheduling.yaml
+      persistence:
+        type: object
+        description: >
+          Persistence settings. Should omit at least one of the persist options
+          below.
+        properties:
+          blockDevicesMode:
+            type: string
+            example: reattach
+            description: |
+              Determine the way we attach the data volumes to the data devices.
+            enum:
+              - reattach
+              - onLaunch
+            default: onLaunch
+          persistRootDevice:
+            type: boolean
+            example: true
+            description: |
+              Should the instance maintain its root device volumes
+          persistBlockDevices:
+            type: boolean
+            example: true
+            description: |
+              Should the instance maintain its Data volumes
+          persistPrivateIp:
+            type: boolean
+            example: true
+            description: |
+              Should the instance maintain its private IP
+      healthCheck:
+        type: object
+        properties:
+          type:
+            type: string
+            example: EC2
+            description: |
+              The service to use for the health check.
+            enum:
+              - EC2
+              - ELB
+              - TARGET_GROUP
+              - MULTAI_TARGET_SET
+            default: EC2
+          autoHealing:
+            type: boolean
+            example: true
+            description: >
+              Enable the auto healing which auto replaces the instance in case
+              the health check fails
+            default: true
+          gracePeriod:
+            type: integer
+            example: 120
+            description: >
+              The amount of time, in seconds, after the instance has launched to
+              starts and check its health.
+            default: 120
+          unhealthyDuration:
+            type: integer
+            example: 120
+            description: >
+              The amount of time, in seconds, an existing instance should remain
+              active after becoming unhealthy.\
+
+              After the set time out the instance will be replaced
+            default: 120

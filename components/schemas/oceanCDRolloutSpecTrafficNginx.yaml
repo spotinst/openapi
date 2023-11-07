@@ -1,0 +1,37 @@
+type: object
+title: Ocean CD Rollout Spec Traffic Nginx
+description: |
+  Holds Nginx Ingress specific configuration to route traffic
+properties:
+  annotationPrefix:
+    type: string
+    example: customingress.nginx.ingress.kubernetes.io
+    description: >-
+      Has to match the configured annotation prefix on the Nginx ingress
+      controller
+  stableIngress:
+    type: string
+    example: rollouts-demo-ingress-nginx
+    description: >-
+      Refers to the name of an `Ingress` resource in the same namespace as the
+      `SpotDeployment`
+  additionalIngressAnnotations:
+    type: object
+    description: >-
+      Provides additional features to add to the canary ingress (such as routing
+      by header, cookie, etc). You can add these Kubernetes annotations to
+      specific Ingress objects to customize their behavior. Above are found
+      examples of accepted k8s keys. For the full list of supported keys, you
+      may reach the following documentation -
+      https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#canary
+    properties:
+      canary-by-header:
+        type: string
+        example: X-Canary
+        description: Allows customizing the header value instead of using hardcoded values
+      key1:
+        type: string
+        example: value1
+        description: Any of supported annotations
+required:
+  - stableIngress

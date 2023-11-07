@@ -1,0 +1,84 @@
+summary: Ocean for AWS
+post:
+  summary: Initiate Roll
+  description: >
+    Roll an entire Ocean cluster or roll subsets of the cluster by specifying
+    launchSpecIds or instanceIds. Performing this request will start the roll
+    immediately and run it in defined batches.
+
+    Note that the first response for a successful request will indicate the
+    start of a roll. In order to check the status of a roll, you can use the GET
+    Roll API.
+  operationId: oceanAwsRollInit
+  tags:
+    - Ocean AWS
+  parameters:
+    - $ref: ../components/parameters/accountId.yaml
+    - $ref: ../components/parameters/oceanId.yaml
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          oneOf:
+            - type: object
+              title: Roll
+              properties:
+                roll:
+                  allOf:
+                    - $ref: ../components/schemas/roll-batchSizePercentage-2.yaml
+                    - $ref: ../components/schemas/roll-comment-2.yaml
+                    - $ref: ../components/schemas/roll-respectPdb.yaml
+                    - $ref: >-
+                        ../components/schemas/roll-batchMinHealthyPercentage.yaml
+            - type: object
+              title: Roll with instance ids
+              properties:
+                roll:
+                  allOf:
+                    - $ref: ../components/schemas/roll-batchSizePercentage-2.yaml
+                    - $ref: ../components/schemas/roll-comment-2.yaml
+                    - $ref: ../components/schemas/roll-respectPdb.yaml
+                    - $ref: >-
+                        ../components/schemas/roll-batchMinHealthyPercentage.yaml
+                    - $ref: ../components/schemas/roll-instanceIds-2.yaml
+            - type: object
+              title: Roll with launch specification ids
+              properties:
+                roll:
+                  allOf:
+                    - $ref: ../components/schemas/roll-batchSizePercentage-2.yaml
+                    - $ref: ../components/schemas/roll-comment-2.yaml
+                    - $ref: ../components/schemas/roll-respectPdb.yaml
+                    - $ref: >-
+                        ../components/schemas/roll-batchMinHealthyPercentage.yaml
+                    - $ref: ../components/schemas/roll-launchSpecIds-2.yaml
+                    - $ref: >-
+                        ../components/schemas/roll-disableLaunchSpecAutoScaling.yaml
+  responses:
+    '200':
+      $ref: ../components/responses/initiate-clusterRoll.yaml
+    '400':
+      description: Bad Request
+get:
+  summary: List Rolls
+  description: |
+    Get status for all rolls of an Ocean cluster.
+  operationId: oceanAwsRollList
+  tags:
+    - Ocean AWS
+  parameters:
+    - $ref: ../components/parameters/accountId.yaml
+    - in: path
+      name: oceanClusterId
+      schema:
+        type: string
+      required: true
+      example: o-1abcd124
+      description: |
+        The identifier of the Ocean cluster
+  responses:
+    '200':
+      $ref: ../components/responses/clusterRollGetAllResponse.yaml
+    '400':
+      description: Bad Request

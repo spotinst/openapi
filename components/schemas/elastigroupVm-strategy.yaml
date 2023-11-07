@@ -1,0 +1,151 @@
+type: object
+title: Elastigroup Strategy
+description: |
+  Strategy for Elastigroup.
+properties:
+  spotPercentage:
+    type: integer
+    example: 50
+    default: 100
+    description: |
+      Percentage of Spot-VMs to maintain.\
+      Required if odCount isn't specified.
+  onDemandCount:
+    type: integer
+    description: |
+      Percentage of Spot-VMs to maintain.\
+      Required if spotPercentage isn't specified.
+    writeOnly: true
+  drainingTimeout:
+    type: integer
+    example: 30
+    default: 120
+    description: >
+      Time (in seconds) to allow the VM be drained from incoming TCP connections
+      and detached from MLB before terminating it during a scale down operation.
+  fallbackToOd:
+    type: boolean
+    description: >
+      In case of no spots available, Elastigroup will launch an On-demand
+      instance instead
+    example: true
+  revertToSpot:
+    description: |
+      Hold settings for strategy correction - replacing On-Demand for Spot VMs
+    type: object
+    properties:
+      performAt:
+        type: string
+        description: |
+          Settings for maintenance strategy.
+        enum:
+          - timeWindow
+          - never
+          - always
+        example: timeWindow
+        default: always
+  optimizationWindows:
+    type: array
+    items:
+      type: string
+    description: >
+      valid format: "ddd:hh:mm-ddd:hh:mm (day:hour(0-23):minute(0-59))", not
+      empty if revertToSpot.performAt = timeWindow
+    example:
+      - Mon:03:00-Wed:02:30
+  signals:
+    type: array
+    description: |
+      The signals defined for this group.
+    items:
+      type: object
+      properties:
+        type:
+          type: string
+          description: |
+            The type of the signal defined for the group.
+          enum:
+            - vmReady
+            - vmReadyToShutdown
+          example: vmReady
+        timeout:
+          type: integer
+          description: >
+            The timeout in seconds to hold the vm until a signal is sent.\
+
+            If no signal is sent the vm will be replaced (vmReady) or we will
+            terminate the vm (vmReadyToShutdown) after the timeout.
+          example: 180
+          default: 1800
+          minimum: 60
+          maximum: 1800
+  availabilityVsCost:
+    title: Elastigroup Availability VS Cost
+    description: >
+      Set the desired preference for the Spot market VM selection. (100- 
+      Availability, 0- cost)
+    type: integer
+    example: 100
+  capacityReservation:
+    type: object
+    description: >
+      On-demand Capacity Reservation group enables you to reserve Compute
+      capacity in an Azure region or an Availability Zone for any duration of
+      time.
+
+      [CRG can only be created on the Azure
+      end.](https://learn.microsoft.com/en-us/azure/virtual-machines/capacity-reservation-create)
+    required:
+      - shouldUtilize
+      - utilizationStrategy
+    properties:
+      shouldUtilize:
+        type: boolean
+        description: |
+          Determines whether capacity reservations should be utilized.
+        example: true
+      utilizationStrategy:
+        type: string
+        description: >
+          The priority requested for using CRG. This value will determine if CRG
+          is used ahead of spot VMs or On-demand VMs.
+
+          * utilizeOverOD- If picked, we will use CRG only in case On-demand
+          should be launched.
+
+          * utilizeOverSpot-  CRG will be preferred over Spot. Only after CRG is
+          fully used, spot VMs can be used.
+        enum:
+          - utilizeOverSpot
+          - utilizeOverOD
+        example: utilizeOverSpot
+      capacityReservationGroups:
+        type: array
+        description: >
+          List of the desired CRGs to use under the associated Azure
+          subscription.
+
+          When null we will utilize any available reservation that matches the
+          launch specification.
+        items:
+          type: object
+          required:
+            - name
+            - resourceGroupName
+          properties:
+            name:
+              type: string
+              description: |
+                The name of the CRG.
+              example: capacityReservationGroupName
+            resourceGroupName:
+              type: string
+              description: |
+                Azure resource group name
+              example: resourceGroupName
+            shouldPrioritize:
+              type: boolean
+              description: >
+                The desired CRG to utilize ahead of other CRGs in the
+                subscription.
+              example: true

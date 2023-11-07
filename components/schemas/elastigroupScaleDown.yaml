@@ -1,0 +1,246 @@
+type: object
+title: scale down config
+properties:
+  policyName:
+    type: string
+    description: |
+      The policy name.
+    example: my-down-policy
+  metricName:
+    type: string
+    description: |
+      The name of the metric.
+    default: CPUUtilization
+    example: CPUUtilization
+  statistic:
+    type: string
+    description: |
+      The metric statistics to return.
+    enum:
+      - average
+      - sum
+      - sampleCount
+      - maximum
+      - minimum
+      - percentile
+    example: average
+  extendedStatistic:
+    type: string
+    description: |
+      Percentile statistic. Valid values: p0.1 - p100.
+    example: p1.5
+  unit:
+    type: string
+    description: |
+      The unit for the alarm's associated metric.
+    enum:
+      - seconds
+      - microseconds
+      - milliseconds
+      - bytes
+      - kilobytes
+      - megabytes
+      - gigabytes
+      - terabytes
+      - bits
+      - kilobits
+      - megabits
+      - gigabits
+      - terabits
+      - percent
+      - count
+      - bytes/second
+      - kilobytes/second
+      - megabytes/second
+      - gigabytes/second
+      - terabytes/second
+      - bits/second
+      - kilobits/second
+      - megabits/second
+      - gigabits/second
+      - terabits/second
+      - count/second
+      - none
+    example: percent
+  threshold:
+    type: integer
+    description: |
+      The value against which the specified statistic is compared.
+    example: 90
+  action:
+    type: object
+    description: >
+      The action to take when scale up is needed.
+
+      A mandatory field, that should be filled with one of the following:
+
+      "adjustment", "percentageAdjustment", "setMaxTarget", "setMinTarget",
+      "updateCapacity".
+    properties:
+      type:
+        type: string
+        description: |
+          The type of the action to take when scale up is needed.
+        enum:
+          - adjustment
+          - updateCapacity setMinTarget
+          - percentageAdjustment
+        example: updateCapacity
+      adjustment:
+        type: integer
+        description: >
+          The number / percentage associated with the specified adjustment type.
+
+          Required if using `adjustment` or `percentageAdjustment` as action
+          type.
+        example: 1
+      minTargetCapacity:
+        type: integer
+        description: |
+          The minimum target capacity.
+          Required if using `setMinTarget` as action type.
+        example: 1
+      target:
+        type: integer
+        description: >
+          The desired number of instances. Required if using `updateCapacity` as
+          action type and neither `minimum` nor `maximum` are defined.
+        example: 1
+      minimum:
+        type: integer
+        description: >
+          The lower limit number of instances that you can scale down to.
+          Optional, required if using `updateCapacity` as action type and
+          neither minimum nor maximum are defined.
+        example: 0
+      maximum:
+        type: integer
+        description: >
+          The upper limit number of instances that you can scale up to.
+          Optional, required if using `updateCapacity` as action type and
+          neither minimum nor maximum are defined.
+        example: 5
+  stepAdjustments:
+    type: array
+    description: |
+      The list of steps to define actions to take based on different thresholds.
+      When set, policy-level threshold and action cannot be specified.
+      If specified, at least one step should be defined.
+    items:
+      type: object
+      properties:
+        action:
+          type: object
+          description: >
+            The action to take when scale down according to step's threshold is
+            needed.
+
+            A mandatory field, that should be filled with one of the following:
+
+            "adjustment", "percentageAdjustment", "setMaxTarget",
+            "updateCapacity".
+          properties:
+            type:
+              type: string
+              description: |
+                The type of the action to take when scale down is needed.
+              enum:
+                - adjustment
+                - updateCapacity
+                - setMaxTarget
+                - percentageAdjustment
+              example: percentageAdjustment
+            adjustment:
+              type: integer
+              description: >
+                The number / percentage associated with the specified adjustment
+                type.
+
+                Required if using `adjustment` or `percentageAdjustment` as
+                action type
+              example: 40
+            maxTargetCapacity:
+              type: integer
+              description: |
+                The desired target capacity of.
+                Required if using `setMaxTarget` as action type
+              example: 1
+            target:
+              type: integer
+              description: >
+                The desired number of instances. Required if using
+                `updateCapacity` as action type and neither `minimum` nor
+                `maximum` are defined.
+              example: 2
+            minimum:
+              type: integer
+              description: >
+                The lower limit number of instances that you can scale down to.
+                Optional, required if using `updateCapacity` as action type and
+                neither `target` nor `maximum` are defined
+              example: 1
+            maximum:
+              type: integer
+              description: >
+                The upper limit number of instances that you can scale up to.
+                Optional, required if using `updateCapacity` as action type and
+                neither `target` nor `minimum` are defined
+              example: 5
+        threshold:
+          type: integer
+          description: |
+            The value against which the specified statistic is compared in order
+            to determine if a step should be applied.
+          example: 10
+  namespace:
+    type: string
+    description: |
+      The namespace for the alarm's associated metric.
+    default: AWS/EC2
+  dimensions:
+    type: array
+    description: |
+      The dimensions for the alarm's associated metric.
+      When name is "instanceId", no value is needed.
+    items:
+      type: object
+      properties:
+        name:
+          type: string
+          example: InstanceId
+        value:
+          type: string
+  period:
+    type: integer
+    description: |
+      The period in seconds over which the statistic is applied.
+    example: 300
+  evaluationPeriods:
+    type: integer
+    description: >
+      The number of periods over which data is compared to the specified
+      threshold.
+    example: 1
+  cooldown:
+    type: integer
+    description: >
+      The amount of time, in seconds, after a scaling activity completes and
+      before any further trigger-related scaling activities can start.
+    example: 300
+  operator:
+    type: string
+    description: >
+      The operator to use in order to determine if the scaling policy is
+      applicable.
+    enum:
+      - gt
+      - gte
+      - lt
+      - lte
+    example: gte
+  isEnabled:
+    type: boolean
+    description: |
+      Specifies whether the scaling policy described in this block is enabled.
+    default: true
+    example: true

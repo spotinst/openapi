@@ -1,0 +1,66 @@
+description: Ocean CD Rollout Resource Response
+content:
+  application/json:
+    schema:
+      allOf:
+        - $ref: ../schemas/responseWrapper.yaml
+        - type: object
+          properties:
+            response:
+              type: object
+              description: response body
+              properties:
+                items:
+                  items:
+                    properties:
+                      events:
+                        type: array
+                        description: A list of events associated with the rollout
+                        items:
+                          $ref: ../schemas/oceanCDRolloutEvent.yaml
+                      replicaSets:
+                        type: object
+                        description: A list of ReplicaSets associated with the rollout
+                        $ref: ../schemas/oceanCDRolloutReplicaSetResource.yaml
+                      pods:
+                        type: array
+                        description: A list of Pods associated with the rollout
+                        items:
+                          $ref: ../schemas/oceanCDRolloutPodResource.yaml
+                      services:
+                        type: array
+                        description: A list of services associated with the rollout
+                        items:
+                          $ref: ../schemas/oceanCDRolloutService.yaml
+                      spotDeployment:
+                        type: object
+                        description: >-
+                          Describes the SpotDeployment associated with the
+                          rollout
+                        properties:
+                          oldVersion:
+                            type: string
+                            description: >-
+                              The image version of the previous SpotDeployment
+                              revision
+                            example: nginx:1.10
+                          newVersion:
+                            type: string
+                            description: >-
+                              The image version of the desired SpotDeployment
+                              revision
+                            example: nginx:1.11
+                          oldManifest:
+                            type: string
+                            description: >-
+                              The string JSON representation of the desired
+                              SpotDeployment's revision
+                            example: >-
+                              {"kind":"SpotDeployment","apiVersion":"spot.io/v1beta1","metadata"...
+                          newManifest:
+                            type: string
+                            description: >-
+                              The string JSON representation of the previous
+                              SpotDeployment's revision
+                            example: >-
+                              {"kind":"SpotDeployment","apiVersion":"spot.io/v1beta1","metadata"...

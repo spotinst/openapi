@@ -1,0 +1,64 @@
+type: object
+properties:
+  cluster:
+    type: object
+    description: The specification of the Ocean cluster.
+    properties:
+      name:
+        type: string
+        example: test
+        description: |
+          Add a name for the Ocean cluster.
+      controllerClusterId:
+        type: string
+        example: test-123124
+        description: |
+          Enter the Ocean cluster identifier.
+      gke:
+        type: object
+        required:
+          - clusterName
+          - masterLocation
+        description: |
+          Use existing GKE cluster.
+        properties:
+          clusterName:
+            type: string
+            description: |
+              Required for the cluster.gke object.
+            example: test-cluster
+          masterLocation:
+            type: string
+            description: |
+              Required for the cluster.gke object.
+            example: us-central1-a
+      autoScaler:
+        $ref: ./ocean-autoScaler.yaml
+      capacity:
+        $ref: ./ocean-capacity-2.yaml
+      compute:
+        $ref: ./ocean-compute-3.yaml
+      strategy:
+        type: object
+        title: Ocean Strategy
+        description: |
+          The Ocean virtual node group strategy object.
+        properties:
+          drainingTimeout:
+            type: integer
+            default: 120
+            example: 120
+            description: |
+              The draining timeout (in seconds) before terminating the instance.
+          provisioningModel:
+            type: string
+            default: SPOT
+            description: |
+              Define the provisioning model of the launched instances
+            enum:
+              - SPOT
+              - PREEMPTIBLE
+  customLaunchSpecs:
+    type: array
+    items:
+      $ref: ./oceanClusterLaunchSpecImport.yaml

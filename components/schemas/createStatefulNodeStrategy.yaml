@@ -1,0 +1,178 @@
+type: object
+title: Stateful Node Strategy
+description: >
+  The strategy to launch the underlying VM and Spot’s behavior for the Stateful
+  Node.
+required:
+  - fallbackToOd
+properties:
+  preferredLifecycle:
+    type: string
+    enum:
+      - od
+      - spot
+    description: |
+      The preferred life cycle to launch the VM.
+    example: od
+    default: spot
+  signals:
+    type: array
+    description: |
+      Signals that VMs are expected to send to the platform.
+    items:
+      type: object
+      required:
+        - type
+        - timeout
+      properties:
+        type:
+          type: string
+          description: |
+            The defined type of signal.
+          enum:
+            - vmReady
+            - vmReadyToShutdown
+          example: vmReady
+        timeout:
+          type: integer
+          description: >
+            The timeout in seconds to hold the vm until a signal is sent.
+
+            * If no signal is sent the vm will be replaced (vmReady) or we will
+            terminate the VM (vmReadyToShutdown) after the timeout.
+          default: 1800
+          minimum: 1
+          example: 180
+  fallbackToOd:
+    type: boolean
+    description: >
+      In case of no spots available, Stateful Node will launch an On-demand
+      instance instead.
+    example: true
+  drainingTimeout:
+    type: integer
+    description: >
+      Time (in seconds) to allow the VM be drained from incoming TCP connections
+      and detached from LB before terminating it.
+    default: 120
+    minimum: 1
+    example: 30
+  revertToSpot:
+    description: |
+      Hold settings for strategy correction - replacing On-Demand for Spot VMs
+    type: object
+    required:
+      - performAt
+    properties:
+      performAt:
+        type: string
+        enum:
+          - timeWindow
+          - never
+          - always
+        description: |
+          Defines the time in which to perform revert to spot.
+          default: always
+        example: timeWindow
+  optimizationWindows:
+    type: array
+    items:
+      type: string
+    description: >
+      Defines the windows of which to revert to spot.
+
+      * <a style=color:red>Requires the following format: "ddd:hh:mm-ddd:hh:mm
+      (day:hour(0-23):minute(0-59))".</a>
+
+      * <a style=color:red>Must be not empty if revertToSpot.performAt =
+      timeWindow.</a>
+    example:
+      - Mon:03:00-Wed:02:30
+  odWindows:
+    type: array
+    items:
+      type: string
+    description: >
+      * Define the time windows in which the underlying VM will be set as an
+      on-demand lifecycle type.
+
+      * During the entire time window, the rest of the strategy processes will
+      be paused.
+
+      * Switching between on-demand and Spot VM types at the enter/exit of the
+      time window will trigger the recycling of the stateful node.
+
+      * <a style=color:red>Requires the following format: "ddd:hh:mm-ddd:hh:mm
+      (day:hour(0-23):minute(0-59))".</a>
+    example:
+      - Sun:23:00-Mon:02:30
+  capacityReservation:
+    type: object
+    description: >
+      On-demand Capacity Reservation group enables you to reserve Compute
+      capacity in an Azure region or an Availability Zone for any duration of
+      time.
+
+      [CRG can only be created on the Azure
+      end.](https://learn.microsoft.com/en-us/azure/virtual-machines/capacity-reservation-create)
+    required:
+      - shouldUtilize
+      - utilizationStrategy
+    properties:
+      shouldUtilize:
+        type: boolean
+        description: |
+          Determines whether capacity reservations should be utilized.
+        example: true
+      utilizationStrategy:
+        type: string
+        description: >
+          The priority requested for using CRG. This value will determine if CRG
+          is used ahead of spot VMs or On-demand VMs.
+
+          * utilizeOverOD- If picked, we will use CRG only in case On demand
+          should be launched.
+
+          * utilizeOverSpot-  CRG will be preferred over Spot. Only after CRG is
+          fully used, spot VMs can be used.
+        enum:
+          - utilizeOverSpot
+          - utilizeOverOD
+        example: utilizeOverSpot
+      capacityReservationGroups:
+        type: array
+        description: >
+          List of the desired CRGs to use under the associated Azure
+          subscription.
+
+          When null we will utilize any available reservation that matches the
+          launch specification.
+        items:
+          type: object
+          required:
+            - name
+            - resourceGroupName
+          properties:
+            name:
+              type: string
+              description: |
+                The name of the CRG.
+              example: capacityReservationGroupName
+            resourceGroupName:
+              type: string
+              description: |
+                Azure resource group name
+              example: resourceGroupName
+            shouldPrioritize:
+              type: boolean
+              description: >
+                The desired CRG to utilize ahead of other CRGs in the
+                subscription.
+              example: true
+  availabilityVsCost:
+    title: Elastigroup Availability VS Cost
+    description: >
+      Set the desired preference for the Spot market VM selection. (100- 
+      Availability, 0- cost)
+    type: integer
+    example: 100

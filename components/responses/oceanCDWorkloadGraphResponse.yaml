@@ -1,0 +1,57 @@
+description: Ocean CD Workload Graph Response
+content:
+  application/json:
+    schema:
+      allOf:
+        - $ref: ../schemas/responseWrapper.yaml
+        - type: object
+          properties:
+            response:
+              type: object
+              description: response body
+              properties:
+                items:
+                  type: array
+                  items:
+                    allOf:
+                      - type: object
+                        properties:
+                          rolloutId:
+                            type: string
+                            description: The identifier of the Ocean CD rollout
+                            example: rol-123456
+                          name:
+                            type: string
+                            description: The workload name
+                            example: prod-app
+                          namespace:
+                            type: string
+                            description: >-
+                              The Kubernetes namespace within which the workload
+                              exists
+                            example: oceancd
+                          clusterId:
+                            type: string
+                            description: >-
+                              The identifier name of Ocean CD cluster within
+                              which the workload exists
+                            example: prod-cluster
+                          status:
+                            $ref: ../schemas/oceanCDRolloutStatus.yaml
+                          failureReasonType:
+                            type: string
+                            description: The failure reason type
+                            enum:
+                              - phaseVerification
+                              - backgroundVerification
+                              - kubernetes
+                              - manualRollback
+                            example: kubernetes
+                          startTime:
+                            type: string
+                            description: The time when the rollout was started
+                            example: '2018-11-05T12:55:50.000Z'
+                          endTime:
+                            type: string
+                            description: The time when the rollout was ended
+                            example: '2018-11-05T12:58:15.000Z'

@@ -1,0 +1,38 @@
+post:
+  summary: Get Ecs Cluster Aggregated Detailed Costs
+  description: >
+    Provides Ecs cluster resource usage and costs over a time interval which can
+    be grouped and/or filtered by AWS tags,\
+
+    for example - application name (webapp, backend), environment (production,
+    staging), version etc.\
+
+    The response will contain a breakdown of the cluster resource costs($) in
+    terms of compute (CPU, memory), storage (block, file, rootVolume).
+
+    The response will group the cluster usage costs based on the preselected
+    default of Ecs Group Type which is composed of Service, Headroom, Custom
+    Object,
+
+    Idle and Standalone, or user selected AWS tags.\
+
+    Within the default grouping, costs are broken down for the Service group,
+    and for tag grouping the costs will be broken up by tag value.
+  operationId: oceanECSClusterAggregatedDetailedCosts
+  tags:
+    - Ocean ECS
+  parameters:
+    - $ref: ../components/parameters/oceanId.yaml
+    - $ref: ../components/parameters/accountId.yaml
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          allOf:
+            - $ref: ../components/schemas/clusterDetailedCostsRequest.yaml
+  responses:
+    '200':
+      $ref: ../components/responses/clusterDetailedCostsResponse.yaml
+    '400':
+      description: Bad Request

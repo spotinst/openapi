@@ -1,0 +1,110 @@
+description: Group's Deployments Status Response
+content:
+  application/json:
+    schema:
+      allOf:
+        - allOf:
+            - type: object
+              properties:
+                request:
+                  type: object
+                  description: |
+                    Original request properties
+                  properties:
+                    id:
+                      type: string
+                      example: 46642c7d-bc29-417d-8ce4-79626f00c63c
+                      description: |
+                        Unique ID associated with this request
+                    url:
+                      type: string
+                      example: >-
+                        /aws/ec2/group/sig-12345/roll?limit=5&sort=createdAt%3ADESC
+                      description: |
+                        The URL that was used for the request
+                    method:
+                      type: string
+                      example: GET
+                      description: |
+                        The HTTP **METHOD** used for the request
+                    timestamp:
+                      type: string
+                      example: '2016-01-21T17:12:51.451Z'
+                      description: |
+                        When the request was received by Spot
+                response:
+                  type: object
+                  description: >
+                    Response package that includes, status, type and any
+                    relevant data.
+                  properties:
+                    status:
+                      type: object
+                      properties:
+                        code:
+                          type: integer
+                          example: 200
+                          description: |
+                            HTTP status code assigned to this response
+                        message:
+                          type: string
+                          example: OK
+                          description: |
+                            HTTP status message for the respective status code
+            - type: object
+              properties:
+                response:
+                  type: object
+                  properties:
+                    kind:
+                      type: string
+                      example: spotinst:aws:ec2:group:roll
+                      description: |
+                        The data type of each item in the response
+                    items:
+                      type: array
+                      description: |
+                        Array of data objects
+                      items:
+                        anyOf:
+                          - $ref: ../schemas/elastigroup-deployment-status.yaml
+                          - $ref: >-
+                              ../schemas/elastigroup-deployment-status-example2.yaml
+                          - $ref: >-
+                              ../schemas/elastigroup-deployment-status-example3.yaml
+                          - $ref: >-
+                              ../schemas/elastigroup-deployment-status-example4.yaml
+                      example:
+                        - id: sbgd-781c6212
+                          status: starting
+                          progress:
+                            unit: percent
+                            value: 0
+                          createdAt: 2018-03-27T19:50:12.000+0000
+                          updatedAt: 2018-03-27T19:50:16.000+0000
+                        - id: sbgd-3ee19606
+                          status: stopped
+                          progress:
+                            unit: percent
+                            value: 0
+                          createdAt: 2018-03-27T19:35:41.000+0000
+                          updatedAt: 2018-03-27T19:39:18.000+0000
+                        - id: sbgd-cc4c44e2
+                          status: finished
+                          progress:
+                            unit: percent
+                            value: 100
+                          createdAt: 2018-03-26T19:22:45.000+0000
+                          updatedAt: 2018-03-26T19:26:17.000+0000
+                        - id: sbgd-3f127ed0
+                          status: starting
+                          progress:
+                            unit: percent
+                            value: 0
+                          createdAt: 2018-03-27T19:46:22.000+0000
+                          updatedAt: 2018-03-27T19:46:35.000+0000
+                    count:
+                      type: integer
+                      example: 1
+                      description: |
+                        Size of the data object array

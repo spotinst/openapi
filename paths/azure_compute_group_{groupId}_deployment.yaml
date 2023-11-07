@@ -1,0 +1,56 @@
+post:
+  summary: Start Deployment
+  description: >
+    Deploy the Elastigroup. This triggers a Blue/Green deployment that replaces
+    the existing VMs in the Elastigroup.
+  operationId: elastigroupAzureSpotVmsCreateDeployment
+  tags:
+    - Elastigroup Azure Spot VMs
+  parameters:
+    - $ref: ../components/parameters/accountId.yaml
+    - $ref: ../components/parameters/groupId.yaml
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          allOf:
+            - type: object
+              properties:
+                deployment:
+                  $ref: ../components/schemas/groupVmDeployment.yaml
+  responses:
+    '200':
+      $ref: ../components/responses/groupVmDeployment.yaml
+    '400':
+      description: Bad Request
+get:
+  summary: Get All Deployments
+  description: >
+    Get a list of all the deployments of a specific Elastigroup and the status
+    of each one.
+  operationId: elastigroupAzureSpotVmsListGroupDeployment
+  tags:
+    - Elastigroup Azure Spot VMs
+  parameters:
+    - $ref: ../components/parameters/accountId.yaml
+    - $ref: ../components/parameters/groupId.yaml
+    - in: query
+      name: LIMIT
+      example: 14
+      description: |
+        Limits the number of deployments returned. Default: 5
+      schema:
+        type: integer
+    - in: query
+      name: SORT
+      example: createdAt:DESC
+      description: |
+        Field by which to sort the results. Default: createdAt:DESC
+      schema:
+        type: string
+  responses:
+    '200':
+      $ref: ../components/responses/groupVmDeployment.yaml
+    '400':
+      description: Bad Request

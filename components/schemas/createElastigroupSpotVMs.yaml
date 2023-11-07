@@ -1,0 +1,1713 @@
+type: object
+title: Create Elastigroup Azure Spot VMs Body
+required:
+  - group
+  - name
+  - region
+  - capacity
+  - strategy
+  - compute
+properties:
+  group:
+    type: object
+    required:
+      - name
+      - region
+      - capacity
+      - resourceGroupName
+      - strategy
+      - compute
+    title: Azure Elastigroup
+    description: Azure Elastigroup Configuration
+    properties:
+      id:
+        type: string
+        example: sig-123456789
+        readOnly: true
+        description: |
+          Azure Elastigroup ID
+      name:
+        type: string
+        example: spotinst-group
+        description: |
+          Azure Elastigroup Name
+      description:
+        type: string
+        example: This is my example elastigroup
+        description: |
+          Describe your Azure Elastigroup
+      region:
+        type: string
+        example: eastus
+        description: |
+          Valid Azure region the Elastigroup is managed in
+      resourceGroupName:
+        type: string
+        example: spotinst-azure
+        description: |
+          The Azure resource group to associate the Elastigroup with
+      capacity:
+        type: object
+        description: Capacity of Elastigroup
+        required:
+          - target
+          - minimum
+          - maximum
+        properties:
+          target:
+            type: integer
+            example: 8
+            description: Current scale the Elastigroup will conform to
+          minimum:
+            type: integer
+            example: 2
+            description: |
+              The Elastigroup will not set a target below this value
+          maximum:
+            type: integer
+            example: 10
+            description: |
+              The Elastigroup will not set a target greater than this value
+      scaling:
+        type: object
+        description: >-
+          Scaling Policies for Elastigroup. Set as many policies as needed to
+          maximize the Elastigroup’s efficiency.
+        title: Azure Scaling
+        properties:
+          up:
+            type: object
+            title: Scale Up Policies
+            description: Provide the ability to accommodate increased workloads.
+            required:
+              - policyName
+              - metricName
+              - statistic
+              - threshold
+              - period
+              - evaluationPeriods
+              - cooldown
+              - action
+              - operator
+              - namespace
+            properties:
+              policyName:
+                title: Policy Name
+                description: Name of scaling policy
+                type: string
+                example: cpuScale
+              metricName:
+                title: Metric Name
+                description: Metric to monitor by Azure metric display name
+                type: string
+                example: Percentage CPU
+              statistic:
+                title: Statistics
+                description: Statistic by which to evaluate the selected metric.
+                type: string
+                example: average
+                enum:
+                  - average
+                  - sampleCount
+                  - sum
+                  - minimum
+                  - maximum
+              unit:
+                title: Unit
+                description: >-
+                  Unit to measure to evaluate the selected metric:  Valid
+                  Values:
+
+                  + Count
+
+                  + Bytes
+
+                  + Percent
+
+                  + CountPerSecond
+
+                  + Milliseconds
+
+                  + BytesPerSecond
+
+                  + Seconds
+                type: string
+                example: Count
+              threshold:
+                title: Threshold
+                description: The value at which the scaling action is triggered.
+                type: number
+                format: float
+                example: 0.75
+              period:
+                title: Period
+                description: >-
+                  Amount of time (seconds) for which the threshold must be met
+                  in order to trigger the scaling action.
+                type: integer
+                example: 60
+              evaluationPeriods:
+                title: Evaluation Periods
+                description: >-
+                  Amount of time (seconds) for which the threshold must be met
+                  in order to trigger the scaling action.
+                type: integer
+                example: 3
+              cooldown:
+                title: Cooldown
+                description: >-
+                  Time (seconds) to wait after a scaling action before resuming
+                  monitoring.
+                type: integer
+                example: 300
+              namespace:
+                title: namespace
+                description: >-
+                  Select one of the next namespaces presented in Azure
+                  configurator -
+                  https://docs.microsoft.com/en-us/azure/templates/
+                type: string
+                example: Microsoft.Network/applicationGateways
+                default: Microsoft.Compute
+              operator:
+                title: Operator
+                description: >-
+                  The operator used to evaluate the threshold against the
+                  current metric value.
+
+                  + gt (Greater Than)
+
+                  + gte (Greater Than or Equal)
+
+                  + lt (Less Than)
+
+                  + lte (Less Than or Equal) 
+                type: string
+                example: gte
+                enum:
+                  - gt
+                  - gte
+                  - lt
+                  - lte
+              dimenstions:
+                title: Dimenstions
+                description: >-
+                  Required if scaling.up.namespace is different from
+                  'Microsoft.Compute'. 2 dimensions are required, example:
+                  “dimensions”:  [  {  “key” : “resourceGroupName”,  “value” :
+                  “testResourceGroup”  }  {  “key” : “resourceName”,  “value” :
+                  “testApplicationGateway”  }  ]
+                type: array
+                items:
+                  type: object
+                  properties:
+                    key:
+                      title: Key
+                      description: >-
+                        Azure resource group for the scaling.down.dimensions.
+                        Required if using namespace different from
+                        "Microsoft.Compute".
+                      type: string
+                      example: resourceGroupName
+                    value:
+                      title: Value
+                      description: >-
+                        Azure resource the scaling.down.dimensions. Required if
+                        using namespace different from "Microsoft.Compute".
+                      type: string
+                      example: TestAppGateway
+              action:
+                title: Action
+                description: Scaling action to take when the policy is triggered.
+                type: object
+                required:
+                  - type
+                properties:
+                  type:
+                    title: Type
+                    description: >-
+                      Type of scaling action to take when the scaling policy is
+                      triggered. </br> Valid Values:
+
+                      + adjustment
+
+                      + setMinTarget<
+
+                      + updateCapacity
+
+                      + percentageAdjustment
+                    type: string
+                    example: adjustment
+                  adjustment:
+                    title: Adjustment
+                    description: >-
+                      Value to which the action type will be adjusted. Required
+                      if using the next action types:
+
+                      + numeric
+
+                      + percentageAdjustment
+                    type: string
+                    example: '2'
+                  target:
+                    title: Target
+                    description: >-
+                      Value to update the group target capacity to. Also you
+                      must indicate “minimum” and “maximum” amounts. Required if
+                      selected as action type:
+
+                      + updateCapacity
+                    type: integer
+                    example: 23
+                  minimum:
+                    title: Target
+                    description: >-
+                      Value to update the group minimum capacity to. Also you
+                      must indicate “target” and “maximum” amounts. Required if
+                      selected as action type:
+
+                      + updateCapacity
+                    type: integer
+                    example: 20
+                  maximum:
+                    title: Target
+                    description: >-
+                      Value to update the group mimimum capacity to. Also you
+                      must indicate “target” and “minimum” amounts. Required if
+                      selected as action type: + updateCapacity
+                    type: integer
+                    example: 25
+          down:
+            type: object
+            title: Scale Down Policies
+            description: Provide the ability to scale down to maximize cost efficiency.
+            required:
+              - policyName
+              - metricName
+              - statistic
+              - threshold
+              - period
+              - evaluationPeriods
+              - cooldown
+              - action
+              - operator
+              - namespace
+            properties:
+              policyName:
+                title: Policy Name
+                description: Name of scaling policy
+                type: string
+                example: cpuScale
+              metricName:
+                title: Metric Name
+                description: Metric to monitor by Azure metric display name
+                type: string
+                example: Percentage CPU
+              statistic:
+                title: Statistics
+                description: Statistic by which to evaluate the selected metric.
+                type: string
+                example: average
+                enum:
+                  - average
+                  - sampleCount
+                  - sum
+                  - minimum
+                  - maximum
+              unit:
+                title: Unit
+                description: >-
+                  Unit to measure to evaluate the selected metric:  Valid
+                  Values:
+
+                  + Count
+
+                  + Bytes
+
+                  + Percent<
+
+                  + CountPerSecond
+
+                  + Milliseconds
+
+                  + BytesPerSecond
+
+                  + Seconds
+                type: string
+                example: Count
+              threshold:
+                title: Threshold
+                description: The value at which the scaling action is triggered.
+                type: number
+                format: float
+                example: 0.75
+              period:
+                title: Period
+                description: >-
+                  Amount of time (seconds) for which the threshold must be met
+                  in order to trigger the scaling action.
+                type: integer
+                example: 60
+              evaluationPeriods:
+                title: Evaluation Periods
+                description: >-
+                  Number of consecutive periods in which the threshold must be
+                  met in order to trigger the scaling action.
+                type: integer
+                example: 3
+              cooldown:
+                title: Cooldown
+                description: >-
+                  Time (seconds) to wait after a scaling action before resuming
+                  monitoring.
+                type: integer
+                example: 300
+              namespace:
+                title: Namespace
+                description: >-
+                  Select one of the next namespaces presented in Azure
+                  configurator -
+                  https://docs.microsoft.com/en-us/azure/templates/
+                type: string
+                example: Microsoft.Network/applicationGateways
+              operator:
+                title: Operator
+                description: >-
+                  The operator used to evaluate the threshold against the
+                  current metric value.
+
+                  + gt (Greater Than)
+
+                  + gte (Greater Than or Equal)
+
+                  + lt (Less Than)
+
+                  + lte (Less Than or Equal) 
+                type: string
+                default: lte
+                example: gte
+                enum:
+                  - gt
+                  - gte
+                  - lt
+                  - lte
+              dimenstions:
+                title: Dimenstions
+                description: >-
+                  Required if scaling.up.namespace is different from
+                  'Microsoft.Compute'. 2 dimensions are required, example:
+                  “dimensions”:  [  {  “key” : “resourceGroupName”,  “value” :
+                  “testResourceGroup”  }  {  “key” : “resourceName”,  “value” :
+                  “testApplicationGateway”  }  ]
+                type: array
+                items:
+                  type: object
+                  properties:
+                    key:
+                      title: Key
+                      description: >-
+                        Azure resource group for the scaling.down.dimensions.
+                        Required if using namespace different from
+                        "Microsoft.Compute".
+                      type: string
+                      example: resourceGroupName
+                    value:
+                      title: Value
+                      description: >-
+                        Azure resource the scaling.down.dimensions. Required if
+                        using namespace different from "Microsoft.Compute".
+                      type: string
+                      example: TestAppGateway
+              action:
+                title: Action
+                description: Scaling action to take when the policy is triggered.
+                type: object
+                required:
+                  - type
+                  - adjustment
+                  - target
+                  - minimum
+                  - maximum
+                properties:
+                  type:
+                    title: Type
+                    description: >-
+                      Type of scaling action to take when the scaling policy is
+                      triggered. </br> Valid Values:
+
+                      + adjustment
+
+                      + setMaxTarget
+
+                      + updateCapacity
+
+                      + percentageAdjustment
+                    type: string
+                    example: adjustment
+                  target:
+                    type: integer
+                    title: Target
+                    description: >-
+                      Desired number of instances. Also you must indicate
+                      “minimum” and “maximum” amounts. Required if selected as
+                      action type:
+
+                      + updateCapacity
+                    example: 1
+                  minimum:
+                    type: integer
+                    title: Minimum
+                    description: >-
+                      Lower limit of instances that you can scale down to. Also
+                      you must indicate “target” and “maximum” amounts. Required
+                      if selected as action type:
+
+                      + updateCapacity
+                    example: 1
+                  maximum:
+                    type: integer
+                    title: Maximum
+                    description: >-
+                      Upper limit of instances that you can scale down to. Also
+                      you must indicate “minimum” and “target” amounts. Required
+                      if selected as action type:
+
+                      + updateCapacity
+                    example: 1
+                  adjustment:
+                    title: Adjustment
+                    description: >-
+                      Value to which the action type will be adjusted. Required
+                      if using the next action types:
+
+                      + numeric
+
+                      + percentageAdjustment
+                    type: string
+                    example: '2'
+      strategy:
+        type: object
+        title: Scaling Strategy
+        properties:
+          spotPercentage:
+            title: Spot Percentage
+            description: >-
+              Percentage of Spot-VMs to maintain.  <a style=color:red>Required
+              if odCount isn't specified.</a>
+            type: integer
+            default: 100
+            example: 100
+          onDemandCount:
+            title: On Demand Count
+            type: integer
+            description: >-
+              Number of On-Demand VMs to maintain.  <a style=color:red>Required
+              if spotPercentage isn't specified.</a>
+            example: 3
+          drainingTimeout:
+            title: Draining Timeout
+            type: integer
+            description: >-
+              Time (seconds) to allow the VM be drained from incoming TCP
+              connections and detached from MLB before terminating it during a
+              scale down operation.
+            default: 120
+          revertToSpot:
+            title: Revert To Spot
+            type: object
+            description: >-
+              Hold settings for strategy correction - replacing On-Demand for
+              Spot VMs
+            properties:
+              performAt:
+                title: Perform At
+                type: string
+                description: |-
+                  Settings for maintenance strategy - possible values:
+                  + timeWindow
+                  + never
+                  + always
+                default: always
+          optimizationWindows:
+            title: Optimization Windows
+            description: |-
+              Valid format:
+              + ddd:hh:mm-ddd:hh:mm (day:hour(0-23):minute(0-59))
+              + not empty if revertToSpot.performAt = timeWindow
+            type: array
+            items:
+              type: string
+          signals:
+            title: Signals
+            description: The signals defined for this group.
+            type: array
+            items:
+              type: object
+              properties:
+                timeout:
+                  title: Timeout
+                  description: >-
+                    The timeout in seconds to hold the vm until a signal is
+                    sent. If no signal is sent the vm will be replaced (vmReady)
+                    or we will terminate the vm (vmReadyToShutdown) after the
+                    timeout. (Maximum is 1800 seconds, Minimum is 60 seconds)
+                  default: 30
+                  type: integer
+                  example: 50
+                type:
+                  title: Type
+                  description: >-
+                    The type of the signal defined for the group. Valid Values:
+                    vmReady, vmReadyToShutdown
+                  type: string
+                  example: vmReady
+          availabilityVsCost:
+            title: Elastigroup Availability VS Cost
+            description: >
+              Set the desired preference for the Spot market VM selection.
+              (100-  Availability, 0- cost)
+            type: integer
+            example: 100
+          capacityReservation:
+            type: object
+            description: >
+              On-demand Capacity Reservation group enables you to reserve
+              Compute capacity in an Azure region or an Availability Zone for
+              any duration of time.
+
+              [CRG can only be created on the Azure
+              end.](https://learn.microsoft.com/en-us/azure/virtual-machines/capacity-reservation-create)
+            required:
+              - shouldUtilize
+              - utilizationStrategy
+            properties:
+              shouldUtilize:
+                type: boolean
+                description: |
+                  Determines whether capacity reservations should be utilized.
+                example: true
+              utilizationStrategy:
+                type: string
+                description: >
+                  The priority requested for using CRG. This value will
+                  determine if CRG is used ahead of spot VMs or On-demand VMs.
+
+                  * utilizeOverOD- If picked, we will use CRG only in case
+                  On-demand should be launched.
+
+                  * utilizeOverSpot- CRG will be preferred over Spot. Only after
+                  CRG is fully used, spot VMs can be used.
+                enum:
+                  - utilizeOverSpot
+                  - utilizeOverOD
+                example: utilizeOverSpot
+              capacityReservationGroups:
+                type: array
+                description: >
+                  List of the desired CRGs to use under the associated Azure
+                  subscription.
+
+                  When null we will utilize any available reservation that
+                  matches the launch specification.
+                items:
+                  type: object
+                  required:
+                    - name
+                    - resourceGroupName
+                  properties:
+                    name:
+                      type: string
+                      description: |
+                        The name of the CRG.
+                      example: capacityReservationGroupName
+                    resourceGroupName:
+                      type: string
+                      description: |
+                        Azure resource group name
+                      example: resourceGroupName
+                    shouldPrioritize:
+                      type: boolean
+                      description: >
+                        The desired CRG to utilize ahead of other CRGs in the
+                        subscription.
+                      example: true
+      health:
+        title: Health
+        description: |
+          Set health check and auto-healing of unhealthy VMs.
+        type: object
+        properties:
+          autoHealing:
+            title: Auto Healing
+            description: |
+              Enable auto-healing of unhealthy VMs.
+            type: boolean
+            example: false
+          healthCheckTypes:
+            title: Health Check Types
+            description: |
+              Health check types to use in order to validate VM health.
+            type: string
+            example: vmState
+          gracePeriod:
+            title: Grace Period
+            description: >
+              The amount of time (in seconds) after a new VM has launched before
+              terminating the old VM.
+            type: integer
+            example: 300
+          unhealthyDuration:
+            title: Unhealthy Duration
+            description: >
+              Amount of time (in seconds) for the VM to remain unhealthy before
+              a replacement is triggered.
+            type: integer
+            example: 360
+      compute:
+        title: Compute
+        description: Elastigroup's Compute Configurtion
+        type: object
+        required:
+          - vmSizes
+          - os
+          - launchSpecification
+        properties:
+          vmSizes:
+            title: VM Sizes
+            description: Sizes of On-Demand and Low-Priority VMs.
+            type: object
+            required:
+              - odSizes
+              - spotSizes
+            properties:
+              odSizes:
+                title: OD Sizes
+                type: array
+                description: >-
+                  Array of string (s) with Available On-Demand sizes (pls chose
+                  items that correspond to your location or zone)
+                  https://docs.microsoft.com/uk-ua/azure/virtual-machines/sizes:
+                items:
+                  type: string
+                  example: standard_b1s
+              spotSizes:
+                title: Spot Sizes
+                description: >-
+                  Available Spot-VM sizes. Find the list in Azure
+                  https://docs.microsoft.com/en-us/azure/virtual-machines/spot-vms?toc=/azure/virtual-machines/linux/toc.json&bc=/azure/virtual-machines/linux/breadcrumb/toc.json
+                type: array
+                items:
+                  type: string
+                  example: standard_a1_v2
+              preferredSpotSizes:
+                type: array
+                description: >
+                  Prioritize Spot VM sizes when launching Spot VMs for the
+                  group.
+
+                  <a style=color:red>Must be a sublist of
+                  compute.vmSizes.spotSizes. </a>
+                items:
+                  type: string
+                  example: standard_a2_v2
+          os:
+            type: string
+            example: Linux
+            enum:
+              - Linux
+              - Windows
+          launchSpecification:
+            title: Launch Specification
+            description: Launch Specification Configuration
+            type: object
+            required:
+              - image
+              - network
+              - subnetName
+            properties:
+              image:
+                title: Image
+                description: >-
+                  Image of VM. An image is a template for creating new VMs.
+                  Choose from Azure image catalogue (marketplace) or use a
+                  custom image or chosen from shared gallery image.
+                type: object
+                properties:
+                  marketplace:
+                    title: Marketplace
+                    type: object
+                    description: >-
+                      Select an image from Azure's Marketplace image catalogue.
+                      Cannot be used with `custom` or `gallery`. <a
+                      style=color:red;>Required if custom or gallery image are
+                      not specified.</a>
+                    properties:
+                      publisher:
+                        title: Publisher
+                        description: >-
+                          Image publisher.  <a style=color:red;>Required if
+                          marketplace image is specified.</a>
+                        type: string
+                        example: OpenLogic
+                      offer:
+                        title: Offer
+                        description: >-
+                          Name of image to use.  <a style=color:red;>Required if
+                          marketplace image is specified.</a>
+                        type: string
+                        example: CentOS
+                      sku:
+                        title: Stock Keeping Unit
+                        description: >-
+                          Image's Stock Keeping Unit, which is the specific
+                          version of the image.  <a style=color:red;>Required if
+                          marketplace image is specified.</a>
+                        type: string
+                        example: '7.3'
+                      version:
+                        title: Version
+                        description: >-
+                          Image's version. if version not provided we use
+                          'latest'
+                        type: string
+                        example: 7.3-1611
+                        default: latest
+                  custom:
+                    title: Custom
+                    type: object
+                    description: >-
+                      Custom image to launch Elastigroup with. Cannot be used
+                      with `marketplace` or `gallery`. <a
+                      style=color:red;>Required if marketplace or gallery image
+                      are not specified.</a>
+                    properties:
+                      resourceGroupName:
+                        title: Resource Group Name
+                        description: >-
+                          Name of Resource Group for custom image.  <a
+                          style=color:red;>Required if custom image is
+                          specified.</a>
+                        type: string
+                        example: spotinst-azure
+                      name:
+                        title: Image Name
+                        description: >-
+                          Name of the custom image.  <a
+                          style=color:red;>Required if custom image is
+                          specified.</a>
+                        type: string
+                        example: custom-image-name
+                  gallery:
+                    title: Gallery
+                    type: object
+                    description: >-
+                      Gallery image to launch Elastigroup with. Cannot be used
+                      with `marketplace` or `custom`. <a
+                      style=color:red;>Required if marketplace or custom image
+                      are not specified.</a>
+                    properties:
+                      resourceGroupName:
+                        title: Resource Group Name
+                        description: >-
+                          Name of Resource Group for custom image.  <a
+                          style=color:red;>Required if gallery image is
+                          specified.</a>
+                        type: string
+                        example: spotinst-azure
+                      galleryName:
+                        title: Gallery Name
+                        description: >-
+                          Name of the gallery.  <a style=color:red;>Required if
+                          gallery image is specified.</a>
+                        type: string
+                        example: gallery-name
+                      imageName:
+                        title: Image Name
+                        description: >-
+                          Name of the gallery image.  <a
+                          style=color:red;>Required if gallery image is
+                          specified.</a>
+                        type: string
+                        example: gallery-image-name
+                      version:
+                        title: Version
+                        description: >-
+                          Image's version. Can be in the format x.x.x or
+                          'latest'. <a style=color:red;>Required if gallery
+                          image is specified.</a>
+                        type: string
+                        example: 0.0.1
+                      spotAccountId:
+                        title: Spot Account ID
+                        description: >-
+                          The Spot account ID that connected to the Azure
+                          subscription to which the gallery belongs. Relevant
+                          only in case of cross-subscription shared galleries.
+                          [Read
+                          more](https://docs.spot.io/elastigroup/features-azure/shared-image-galleries)
+                          about cross-subscription shared galleries in
+                          Elastigroup.
+                        type: string
+                        example: act-123456789
+              loadBalancersConfig:
+                title: Load Balancer Configuration
+                description: Configure a Load Balancer
+                type: object
+                properties:
+                  loadBalancers:
+                    title: Load Balancers
+                    description: >-
+                      Add a load balancer. For Azure Gateway, each Backend Pool
+                      is a separate load balancer.
+                    type: array
+                    items:
+                      anyOf:
+                        - type: object
+                          title: MULTAI_TARGET_SET
+                          properties:
+                            type:
+                              title: Type
+                              description: |-
+                                The type of load balancer.  Valid Values:
+                                + MULTAI_TARGET_SET
+                                + APPLICATION_GATEWAY
+                              type: string
+                              example: MULTAI_TARGET_SET
+                              enum:
+                                - MULTAI_TARGET_SET
+                            balancerId:
+                              type: string
+                              example: lb-1ee2e3q
+                            targetSetId:
+                              type: string
+                              example: ts-3eq
+                            autoWeight:
+                              type: boolean
+                              example: true
+                        - type: object
+                          title: APPLICATION_GATEWAY
+                          properties:
+                            type:
+                              title: Type
+                              description: |-
+                                The type of load balancer.  Valid Values:
+                                + MULTAI_TARGET_SET
+                                + APPLICATION_GATEWAY
+                              type: string
+                              example: APPLICATION_GATEWAY
+                              enum:
+                                - APPLICATION_GATEWAY
+                            resourceGroupName:
+                              title: Resource Group Name
+                              description: The Resource Group name of the Load Balancer.
+                              type: string
+                              example: azureResourceGroup
+                            applicationGatewayName:
+                              type: string
+                              example: appGateway
+                            backendPoolName:
+                              type: string
+                              example: backendpool490822
+              managedServiceIdentities:
+                title: Managed Service Identities
+                description: >-
+                  Add a user-assigned managed identity to the VMs in the
+                  cluster.
+                type: array
+                items:
+                  type: object
+                  properties:
+                    resourceGroupName:
+                      title: Resource Group Name
+                      description: >-
+                        The Resource Group that the user-assigned managed
+                        identity resides in.
+                      type: string
+                      example: Resourse Group 1
+                    name:
+                      title: Name
+                      description: Name of the managed identity
+                      type: string
+                      example: Test
+              shutdownScript:
+                title: Shutdown Script
+                description: >-
+                  Shutdown script for the group. Value should be passed as a
+                  string encoded at Base64 only
+                type: string
+                example: IyEvYmluL2Jhc2gKZWNobyAidGVzdCI=
+              tags:
+                title: Tags
+                description: Key-Value pairs for VMs in the Elastigroup.
+                type: array
+                items:
+                  type: object
+                  properties:
+                    tagKey:
+                      title: Tag Key
+                      description: Tag Key for Vms in Elastigroup.
+                      type: string
+                      example: env
+                    tagValue:
+                      title: Tag Value
+                      description: Tag Value for VMs in Elastigroup.
+                      type: string
+                      example: staging
+              network:
+                title: Network
+                description: Define the Virtual Network and Subnet for your Elastigroup.
+                type: object
+                required:
+                  - resourceGroupName
+                  - virtualNetworkName
+                  - networkInterfaces
+                properties:
+                  resourceGroupName:
+                    title: Resource Group Name
+                    description: Vnet Resource Group Name
+                    type: string
+                    example: subnetResourceGroup
+                  virtualNetworkName:
+                    title: Virtual Network Name
+                    description: Virtual Network
+                    type: string
+                    example: vname
+                  networkInterfaces:
+                    title: Virtual Network Name
+                    description: Virtual Network
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - isPrimary
+                        - subnetName
+                      properties:
+                        isPrimary:
+                          title: Is Primary Criteria
+                          description: >-
+                            Defines whether the network interface is primary or
+                            not.
+                          type: boolean
+                          example: true
+                        subnetName:
+                          title: Subnet Name
+                          description: Subnet name
+                          type: string
+                          example: testSubnet
+                        assignPublicIp:
+                          title: Assign Public IP
+                          description: Assign public IP
+                          type: boolean
+                          example: true
+                        publicIpSku:
+                          title: Public Ip SKU
+                          description: >-
+                            Required if assignPublicIp=true
+                            values=[STANDARD/BASIC]
+                          type: string
+                          example: STANDARD
+                        securityGroup:
+                          title: Security Group
+                          description: Security Group
+                          type: object
+                          properties:
+                            name:
+                              title: Name
+                              description: >-
+                                Requires valid security group name. Required if
+                                security group is specified.
+                              type: string
+                              example: test
+                            resourceGroupName:
+                              title: Resource Group Name
+                              description: >-
+                                Requires valid resource group name. Required if
+                                security group is specified.
+                              type: string
+                              example: test
+                        publicIps:
+                          description: >-
+                            Defined a pool of Public Ips (from Azure), that will
+                            be associated to the network interface. We will
+                            associate one public ip per instance until the pool
+                            is exhausted, in which case, we will create a new
+                            one.
+                          type: array
+                          items:
+                            type: object
+                            required:
+                              - resourceGroupName
+                              - name
+                            properties:
+                              resourceGroupName:
+                                description: The resource group of the public ip.
+                                type: string
+                                example: resourceGroup
+                              name:
+                                description: The name of the public ip.
+                                type: string
+                                example: name
+                        enableIPForwarding:
+                          title: Enable IP Forwarding
+                          description: Enable IP Forwarding
+                          type: boolean
+                          example: true
+                        additionalIpConfigurations:
+                          title: Additional IP Configurations
+                          description: Additional configuration of network interface
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                title: Name
+                                description: >-
+                                  Required if additionalConfiguration has been
+                                  specified.
+                                type: string
+                                example: test
+                              privateIpAddressVersion:
+                                title: Private IP Address Version
+                                description: |-
+                                  Possible values:
+                                  + IPv4
+                                  + IPv6
+                                default: IPv4
+                        privateIpAddresses:
+                          type: array
+                          description: >-
+                            A list with unique items that every item is a valid
+                            IP
+                          items:
+                            type: string
+                            example:
+                              - 172.232.5.3
+                              - 172.23.5.4
+                              - 172.23.5.7
+                              - 172.23.5.8
+                              - 172.23.5.9
+                              - 172.23.5.10
+                        applicationSecurityGroups:
+                          description: >-
+                            List of Application Security Groups that will be
+                            associated to the primary ip configration of the
+                            network interface.
+                          type: array
+                          items:
+                            type: object
+                            required:
+                              - resourceGroupName
+                              - name
+                            properties:
+                              resourceGroupName:
+                                description: >-
+                                  The resource group of the Application Security
+                                  Group.
+                                type: string
+                                example: AsgResourceGroup
+                              name:
+                                description: The name of the Application Security group
+                                type: string
+                                example: AsgName
+              extensions:
+                title: Extensions
+                description: List of objects for Azure extensions
+                type: array
+                items:
+                  type: object
+                  required:
+                    - autoUpgradeMinorVersion
+                    - name
+                    - publisher
+                    - type
+                  properties:
+                    autoUpgradeMinorVersion:
+                      title: Auto Upgrade Minor Version
+                      description: >-
+                        Required on compute.launchSpecification.extensions
+                        object
+                      type: boolean
+                      example: true
+                    name:
+                      title: name
+                      description: >-
+                        Required on compute.launchSpecification.extensions
+                        object
+                      type: string
+                      example: k8s-agentpool1-38611891-vmss-computeAksLinuxBilling
+                    protectedSettings:
+                      title: Protected Settings
+                      description: Object for protected settings
+                      type: object
+                    publicSettings:
+                      title: Public Settings
+                      description: Public Settings
+                      type: object
+                    publisher:
+                      title: Publisher
+                      description: >-
+                        Required on compute.launchSpecification.extensions
+                        object
+                      type: string
+                      example: Microsoft.AKS
+                    type:
+                      title: Type
+                      description: >-
+                        Required on compute.launchSpecification.extensions
+                        object
+                      type: string
+                      example: Compute.AKS-Engine.Linux.Billing
+                    apiVersion:
+                      title: API Version
+                      description: >-
+                        The API version of the extension. Required if extension
+                        specified.
+                      type: string
+                      example: 1
+                    minorVersionAutoUpgrade:
+                      title: minorVersionAutoUpgrade
+                      description: >-
+                        Enable minor version upgrades of the extension. Required
+                        if extension specified.
+                      type: boolean
+                      example: true
+              dataDisks:
+                title: Data Disks
+                description: List of data disks to be attached to the vms in the group.
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      title: Type
+                      description: >-
+                        The type of the data disk. Required if dataDisks is
+                        specified. Possible values:
+
+                        + Standard_LRS
+
+                        + Premium_LRS
+
+                        + StandardSSD_LRS
+                      type: string
+                      example: Standard_LRS
+                    lun:
+                      title: Lun
+                      description: >-
+                        The lun of the data disk, Required if dataDisks is
+                        specified.
+                      type: integer
+                      example: 6
+                    sizeGB:
+                      title: Size GB
+                      description: >-
+                        The size of the data disk in GB, Required if dataDisks
+                        is specified. Minimum value: 1 Maximum value: 1023
+                      type: integer
+                      example: 10
+              osDisk:
+                title: OS Disk
+                description: Specify OS disk specification other than default.
+                type: object
+                properties:
+                  type:
+                    title: Type
+                    description: >-
+                      The type of the OS disk. Required if dataDisks is
+                      specified. Possible values:
+
+                      + Standard_LRS
+
+                      + Premium_LRS
+
+                      + StandardSSD_LRS
+                    type: string
+                    example: Standard_LRS
+                  size:
+                    title: Size
+                    description: >-
+                      The size of the OS disk in GB, Required if dataDisks is
+                      specified. Minimum value: 1 Maximum value: 1023
+                    type: integer
+                    example: 6
+              vmNamePrefix:
+                type: string
+                description: >
+                  Set a VM name prefix to be used for all launched VMs and the
+                  VM resources.
+
+                  * The prefix value should comply with the following
+                  limitations: 
+                    *  A maximal length of 25 characters.
+                    * The prefix can’t contain spaces, control characters, or these characters: ~ ! @ # $ % ^ & * ( ) = + _ [ ] { } | ; : . ' " , < > / ?
+                    *  A Windows VM prefix can't include a period or end with a hyphen.
+                    * A Linux VM prefix can't end with a period or hyphen.
+                example: prefix
+              customData:
+                title: Custom Data
+                description: >-
+                  This value will hold the YML in base64 and will be added to
+                  the scaleSets
+                type: string
+                example: IyEvYmluL2Jhc2gKZWNobyAidGVzdCI=
+              userData:
+                type: string
+                description: >
+                  Define a set of scripts or other metadata that's inserted to
+                  an Azure virtual machine at provision time. (Base64 encoded)
+                example: IyEvYmluL2Jhc2gKZWNobyAidGVzdCI
+              login:
+                title: Login
+                description: >-
+                  Set admin access for accessing your VMs. <a
+                  style=color:red;>Required if custom, marketplace or
+                  generalized gallery image are specified. If specialized image
+                  is set, Login should not be defined</a>
+                type: object
+                required:
+                  - userName
+                properties:
+                  userName:
+                    title: User Name
+                    description: >-
+                      User name for admin access to VMs. + for windows:
+                      compute.launchSpecification.login.password + for linux:
+                      compute.launchSpecification.login.sshPublicKey
+                    type: string
+                    example: spotinst
+                  sshPublicKey:
+                    title: SSH Public Key
+                    description: >-
+                      SSH for admin access to Linux VMs.  <a style =
+                      color:red>Required for Linux.  Can not exist
+                      simultaneously with 'password'</a>
+                    type: string
+                  password:
+                    title: Password
+                    description: >-
+                      Password for admin access to Windows VMs.  <a style =
+                      color:red>Required for Windows. Can not exist
+                      simultaneously with 'sshPublicKey'</a>
+                    type: string
+              bootDiagnostics:
+                type: object
+                description: >-
+                  Will enable boot diagnostics in Azure when a new VM is
+                  launched
+                required:
+                  - isEnabled
+                  - type
+                properties:
+                  isEnabled:
+                    type: boolean
+                    description: >-
+                      Allows you to enable and disable the configuration of boot
+                      diagnostics at launch
+                  type:
+                    type: string
+                    description: Defines the type of storage on VM launch  in Azure.
+                    enum:
+                      - managed
+                      - unmanaged
+                  storageUri:
+                    type: string
+                    description: >-
+                      The storage URI that is used if type is unmanaged. The
+                      storage URI must follow the blob storage URI format
+                      ("https://<blobstoragename>.blob.core.windows.net/").
+                      StorageUri is required if the type is unmanaged.
+                      StorageUri must be ‘null’ in case the boot diagnostics
+                      type is managed
+                example:
+                  isEnabled: true
+                  type: unmanaged
+                  storageUri: https://example.blob.core.windows.net/
+              secrets:
+                title: secrets
+                type: array
+                description: |
+                  Set of certificates that should be installed the VM
+                items:
+                  type: object
+                  required:
+                    - sourceVault
+                    - vaultCertificates
+                  properties:
+                    sourceVault:
+                      type: object
+                      description: >
+                        The key vault reference, contains the required
+                        certificates
+                      required:
+                        - resourceGroupName
+                        - name
+                      properties:
+                        resourceGroupName:
+                          type: string
+                          description: |
+                            The resource group name of the key vault
+                        name:
+                          type: string
+                          description: |
+                            The name of the key vault
+                    vaultCertificates:
+                      type: array
+                      description: |
+                        The required certificate references
+                      items:
+                        type: object
+                        required:
+                          - certificateUrl
+                          - certificateStore
+                        properties:
+                          certificateUrl:
+                            type: string
+                            description: |
+                              The URL of the certificate under the key vault
+                          certificateStore:
+                            type: string
+                            description: >
+                              The certificate store directory the VM. The
+                              directory is created in the LocalMachine account.
+
+                              * This field is required only when using windows
+                              OS type
+
+                              * This field must be ‘null’ when the OS type is
+                              Linux
+              security:
+                type: object
+                description: >
+                  Specifies the Security related profile settings for the
+                  virtual machine.
+                properties:
+                  securityType:
+                    type: string
+                    description: >
+                      Security type refers to the different security features of
+                      a virtual machine.
+
+                      Security features like Trusted launch virtual machines
+                      help to improve the security of Azure generation 2 virtual
+                      machines.
+                    enum:
+                      - Standard
+                      - TrustedLaunch
+                    example: TrustedLaunch
+                  secureBootEnabled:
+                    type: boolean
+                    description: >
+                      Specifies whether secure boot should be enabled on the
+                      virtual machine.
+                    example: true
+                  vTpmEnabled:
+                    type: boolean
+                    description: >
+                      Specifies whether vTPM should be enabled on the virtual
+                      machine.
+                    example: true
+              proximityPlacementGroups:
+                type: array
+                description: >-
+                  Defines the proximity placement group in which the VM will be
+                  launched.
+                items:
+                  type: object
+                  required:
+                    - name
+                    - resourceGroupName
+                  properties:
+                    name:
+                      type: string
+                      description: The name of the proximity placement group.
+                      example: testPPG
+                    resourceGroupName:
+                      type: string
+                      description: >-
+                        The resource group name of the proximity placement
+                        group.
+                      example: testResourceGroup
+          zones:
+            type: array
+            description: >-
+              List of Azure Availability Zones in the defined region; If not
+              defined, Virtual machines will be launched regionally.
+            items:
+              enum:
+                - '1'
+                - '2'
+                - '3'
+              type: string
+              example: '1'
+          preferredZones:
+            type: array
+            description: >
+              The AZs to prioritize when launching VMs. If no markets are
+              available in the Preferred AZs, VMs are launched in the
+              non-preferred AZs.
+
+              <a style=color:red>Must be a sublist of compute.zones.</a>
+            items:
+              enum:
+                - '1'
+                - '2'
+                - '3'
+              type: string
+              example: '1'
+      scheduling:
+        description: |
+          Define cron-based scheduled tasks.
+        properties:
+          tasks:
+            type: array
+            description: >
+              A list of scheduling tasks.
+
+              Note: The type of each task defines the behavior of the cron
+              execution.
+            items:
+              anyOf:
+                - type: object
+                  title: Scaling Scheduled Task
+                  description: >
+                    This is a scheduled task that will allow to change the
+                    group's capacty. If the target
+
+                    is changed, then VMs will either be scaled up or down.
+
+                    Note: At least one of the following must be configured:
+                    [scaleTargetCapacity, scaleMaxCapacity, scaleMinCapacity]
+                  required:
+                    - type
+                    - isEnabled
+                    - cronExpression
+                  properties:
+                    isEnabled:
+                      type: string
+                      description: |
+                        A list of scheduling tasks.
+                    cronExpression:
+                      type: string
+                      description: >
+                        A valid cron expression.
+
+                        The cron is running in UTC time zone and is in Unix cron
+                        format of Cron Expression Validator Script.
+                      example: 0 1 * * *
+                    type:
+                      type: string
+                      enum:
+                        - scale
+                      description: |
+                        Define cron-based scheduled tasks.
+                    scaleTargetCapacity:
+                      type: integer
+                      description: >
+                        This will set the defined target group capacity when the
+                        scheduling task is triggered.
+                      minimum: 0
+                    scaleMaxCapacity:
+                      type: integer
+                      description: >
+                        This will set the defined maximum group capacity when
+                        the scheduling task is triggered.
+                      minimum: 0
+                    scaleMinCapacity:
+                      type: integer
+                      description: >
+                        This will set the defined maximum group capacity when
+                        the scheduling task is triggered.
+                      minimum: 0
+                - type: object
+                  title: Scale Up Scheduled Task
+                  description: >
+                    This is a scheduled task that will allow to add VMs to the
+                    group's target capacity by a specific count.
+                  required:
+                    - adjustment
+                    - type
+                    - isEnabled
+                    - cronExpression
+                  properties:
+                    isEnabled:
+                      type: string
+                      description: |
+                        A list of scheduling tasks.
+                    cronExpression:
+                      type: string
+                      description: >
+                        A valid cron expression.
+
+                        The cron is running in UTC time zone and is in Unix cron
+                        format of Cron Expression Validator Script.
+                      example: 0 1 * * *
+                    type:
+                      type: string
+                      enum:
+                        - scaleUp
+                      description: |
+                        Defines the type of the scheduled task.
+                    adjustment:
+                      type: integer
+                      description: >
+                        This will increase the target capacity by the defined
+                        amount when the scheduling task is triggered.
+                      minimum: 1
+                      example: 1
+                - type: object
+                  title: Scale Down Scheduled Task
+                  description: >
+                    This is a scheduled task that will allow to remove VMs from
+                    the group's target capacity by a specific count.
+                  required:
+                    - adjustment
+                    - type
+                    - isEnabled
+                    - cronExpression
+                  properties:
+                    isEnabled:
+                      type: string
+                      description: |
+                        A list of scheduling tasks.
+                    cronExpression:
+                      type: string
+                      description: >
+                        A valid cron expression.
+
+                        The cron is running in UTC time zone and is in Unix cron
+                        format of Cron Expression Validator Script.
+                      example: 0 1 * * *
+                    type:
+                      type: string
+                      enum:
+                        - scaleDown
+                      description: |
+                        Defines the type of the scheduled task.
+                    adjustment:
+                      type: integer
+                      description: >
+                        This will decrease the target capacity by the defined
+                        amount when the scheduling task is triggered.
+                      minimum: 1
+                      example: 1
+                - type: object
+                  title: Scale Up Percentage Scheduled Task
+                  description: >
+                    This is a scheduled task that will allow to add VMs to the
+                    group's target capacity by a percentage of the group's
+                    current target.
+                  required:
+                    - type
+                    - isEnabled
+                    - cronExpression
+                    - adjustmentPercentage
+                  properties:
+                    isEnabled:
+                      type: string
+                      description: |
+                        A list of scheduling tasks.
+                    cronExpression:
+                      type: string
+                      description: >
+                        A valid cron expression.
+
+                        The cron is running in UTC time zone and is in Unix cron
+                        format of Cron Expression Validator Script.
+                      example: 0 1 * * *
+                    type:
+                      type: string
+                      enum:
+                        - scaleUpPercentage
+                      description: |
+                        Defines the type of the scheduled task.
+                    adjustmentPercentage:
+                      type: integer
+                      description: >
+                        This will increase the target capacity by the defined
+                        percentage value when the scheduling task is triggered.
+
+                        This will set the target capacity by the defined
+                        percentage of the current target when the scheduling
+                        task triggers.
+                      minimum: 1
+                      maximum: 100
+                - type: object
+                  title: Scale Down Percentage Scheduled Task
+                  description: >
+                    This is a scheduled task that will allow to remove VMs from
+                    the group's target capacity by a percentage of the group's
+                    current target.
+                  required:
+                    - adjustmentPercentage
+                    - type
+                    - isEnabled
+                    - cronExpression
+                  properties:
+                    isEnabled:
+                      type: string
+                      description: |
+                        A list of scheduling tasks.
+                    cronExpression:
+                      type: string
+                      description: >
+                        A valid cron expression.
+
+                        The cron is running in UTC time zone and is in Unix cron
+                        format of Cron Expression Validator Script.
+                      example: 0 1 * * *
+                    type:
+                      type: string
+                      enum:
+                        - percentageScaleDown
+                      description: |
+                        Defines the type of the scheduled task.
+                    adjustmentPercentage:
+                      type: integer
+                      description: >
+                        This will decrease the target capacity by the defined
+                        percentage value when the scheduling task is triggered.
+                      minimum: 1
+                      maximum: 100
+                - type: object
+                  title: Deployment Scheduled Task
+                  description: >
+                    This is a scheduled task that will allow the deployment of
+                    an Elastigroup.
+                  required:
+                    - batchSizePercentage
+                    - gracePeriod
+                    - type
+                    - isEnabled
+                    - cronExpression
+                  properties:
+                    isEnabled:
+                      type: string
+                      description: |
+                        A list of scheduling tasks.
+                    cronExpression:
+                      type: string
+                      description: >
+                        A valid cron expression.
+
+                        The cron is running in UTC time zone and is in Unix cron
+                        format of Cron Expression Validator Script.
+                      example: 0 1 * * *
+                    type:
+                      type: string
+                      enum:
+                        - deployment
+                      description: |
+                        Defines the type of the scheduled task.
+                    batchSizePercentage:
+                      type: integer
+                      description: >
+                        Indicates the timeout (in seconds) to wait until the VM
+                        becomes healthy, based on the healthCheckType.
+                      minimum: 1
+                      maximum: 100
+                    gracePeriod:
+                      type: integer
+                      description: >
+                        Indicates (in seconds) the timeout to wait until
+                        instance become healthy based on the healthCheckType.
+                      minimum: 1

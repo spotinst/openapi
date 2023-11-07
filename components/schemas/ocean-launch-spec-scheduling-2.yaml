@@ -1,0 +1,48 @@
+type: object
+description: |
+  An object used to define scheduled tasks such as a manual headroom update.
+title: Ocean Scheduling
+properties:
+  tasks:
+    type: array
+    items:
+      type: object
+      title: Task Definition
+      required:
+        - isEnabled
+        - cronExpression
+        - taskType
+      properties:
+        isEnabled:
+          type: boolean
+          example: true
+          description: >
+            Describes whether the task is enabled. When True, the task runs.
+            When False, it does not run. Required for
+            launchSpec.scheduling.tasks. In case automatic headroom is
+            configured, please make sure to set
+            autoScaler.enableAutomaticAndManualHeadroom on Ocean level to true
+            in order to make sure that the manual headroom would be affective.
+        cronExpression:
+          type: string
+          example: 0 1 * * *
+          description: >
+            A valid cron expression. For example : " * * * * * ". The cron job
+            runs in UTC time and is in Unix cron format. (See the Cron
+            Expression Validator Script.)
+        taskType:
+          type: string
+          example: manualHeadroomUpdate
+          enum:
+            - manualHeadroomUpdate
+          description: >
+            The activity that you are scheduling. Valid values:
+            "manualHeadroomUpdate". Required for launchSpec.scheduling.tasks.
+        config:
+          description: >-
+            The config of this scheduled task. Depends on the value of
+            `taskType`.
+          oneOf:
+            - $ref: ./manualHeadroomScheduledTaskCreate-2.yaml
+  shutdownHours:
+    $ref: ./ocean-launchSpec-shutdownHours.yaml

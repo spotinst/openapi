@@ -1,0 +1,99 @@
+type: object
+properties:
+  id:
+    type: string
+    readOnly: true
+    example: sbgd-f331fb8e
+  groupId:
+    type: string
+    readOnly: true
+    example: sig-a7aa60cd
+  status:
+    type: string
+    readOnly: true
+    example: deploymentStart
+  currentBatch:
+    type: integer
+    readOnly: true
+    example: 1
+  numOfBatches:
+    type: integer
+    readOnly: true
+    example: 2
+  progress:
+    type: object
+    readOnly: true
+    properties:
+      unit:
+        type: string
+        example: percentage
+      value:
+        type: integer
+        example: 10
+  updatedAt:
+    type: string
+    readOnly: true
+    example: '2020-06-22T11:15:06.614Z'
+  createdAt:
+    type: string
+    readOnly: true
+    example: '2020-06-22T11:15:06.614Z'
+  batchSizePercentage:
+    type: integer
+    example: 50
+    writeOnly: true
+    description: >
+      Indicates (in percentage) the batch size of the deployment (meaning, how
+      many nodes to replace in each batch).\
+
+      Cannot be null.
+    default: 25
+    minimum: 1
+    maximum: 100
+  gracePeriod:
+    type: integer
+    example: 300
+    writeOnly: true
+    description: |
+      Indicates (in seconds) the timeout to wait until the node becomes healthy.
+    default: 600
+    minimum: 300
+  batchMinHealthyPercentage:
+    type: integer
+    example: 100
+    writeOnly: true
+    description: >
+      Indicates the threshold of minimum healthy virtual machines in a single
+      batch.\
+
+      If the amount of healthy virtual machines in a single batch is under the
+      threshold, the deployment will fail.\
+
+      The value of the parameter should represent the number in percentage (%)
+      of the batch.
+    default: 50
+    minimum: 1
+    maximum: 100
+  drainingTimeout:
+    type: integer
+    example: 120
+    writeOnly: true
+    description: |
+      Indicates (in seconds) the timeout to drain the instances. Can be null.\
+      Default - The Elastigroups draining time out or 120.
+    minimum: 0
+  healthCheckTypes:
+    type: array
+    description: >
+      Define a health check type. Can be null.\
+
+      If no value is set, the deployment will use the group's auto-healing
+      health check.
+    writeOnly: true
+    items:
+      type: string
+      enum:
+        - vmState
+        - applicationGateway
+      example:
+        - vmState

@@ -1,0 +1,43 @@
+post:
+  summary: Instance Standby
+  description: >-
+    Instance Standby enables you to put an instance in Standby state , update or
+    troubleshoot the instance, and then return the instance to service.
+    Instances that are on standby are still part of the Elastigroup, but they
+    don't get application traffic.
+
+    Whenever instance is standby state -
+
+    It will be de-registered from all the ELBs / ALBs in the Elastigroup It
+    won't be affected from Scale down activities in the Elastigroup The instance
+    health won't be checked, and it won't be replaced When the instance exits
+    the Standby state -
+
+    The instance will be register back to all the ELBs / ALBs that are defined
+    in the Elastigroup It will be considered and affected from all the
+    Elastigroup activities (helth checks, scaling, etc.)
+  operationId: elastigroupAwsInstanceStandBy
+  tags:
+    - Elastigroup AWS
+  parameters:
+    - in: path
+      name: instanceId
+      example: i-123456
+      description: |
+        The instance ID you want to put in standby state
+      schema:
+        type: string
+      required: true
+    - in: query
+      name: accountId
+      example: act-123abc
+      description: |
+        ID of the account associated with your token
+      schema:
+        type: string
+      required: false
+  responses:
+    '200':
+      $ref: ../components/responses/instance-standby.yaml
+    '400':
+      description: Bad Request

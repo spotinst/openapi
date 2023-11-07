@@ -1,0 +1,45 @@
+get:
+  summary: Get User
+  description: |
+    Get user's account mapping
+  operationId: OrganizationsAndAccountsGetUser
+  tags:
+    - Organizations
+  parameters:
+    - in: query
+      name: userEmail
+      example: test@spot.io
+      description: |
+        Target user email address
+      schema:
+        type: string
+      required: true
+  responses:
+    '200':
+      $ref: ../components/responses/getUser.yaml
+    '400':
+      description: Bad Request
+post:
+  summary: Assign Users to Accounts
+  description: >
+    Assign users to accounts in bulk. Only accounts under the creator's own
+    organization are allowed. Creator's organization ID is taken from the
+    personal token attached to the API call.
+  operationId: OrganizationsAndAccountsAssignUsersToAccounts
+  tags:
+    - Accounts
+  parameters:
+    - $ref: ../components/parameters/accountId.yaml
+  requestBody:
+    required: false
+    content:
+      application/json:
+        schema:
+          oneOf:
+            - $ref: ../components/schemas/assignUsersToAccounts-example1.yaml
+            - $ref: ../components/schemas/assignUsersToAccounts-example4.yaml
+  responses:
+    '200':
+      $ref: ../components/responses/assignUsersToAccounts.yaml
+    '400':
+      description: Bad Request

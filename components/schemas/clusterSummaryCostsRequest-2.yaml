@@ -1,0 +1,106 @@
+type: object
+required:
+  - endTime
+  - startTime
+properties:
+  startTime:
+    type: string
+    example: '2023-07-20T11:35:01.745Z'
+    description: >
+      Beginning date value using either the date format
+      "yyyy-MM-dd'T'HH:mm:ss'Z'" or ms "1494751821472".
+  endTime:
+    type: string
+    example: '2023-07-22T11:30:01.745Z'
+    description: >
+      End date value using either the date format "yyyy-MM-dd'T'HH:mm:ss'Z'" or
+      ms "1494751821472".
+  groupBy:
+    type: string
+    description: |
+      The parameter we want to group the costs by.
+    default: namespace
+    example: namespace.label.env
+    enum:
+      - namespace
+      - namespace.label.${labelKey}
+      - resource.label.${labelKey}
+      - resource.annotation.${annotationKey}
+      - namespace.annotation.${annotationKey}
+  filter:
+    type: object
+    description: Describe how to filter the costs. Optional field.
+    required:
+      - scope
+      - conditions
+    properties:
+      scope:
+        type: string
+        enum:
+          - namespace
+          - resource
+      conditions:
+        type: object
+        required:
+          - anyMatch
+        properties:
+          anyMatch:
+            type: array
+            description: |
+              Array of conditions set that OR operator is applied between them.
+            items:
+              type: object
+              required:
+                - allMatch
+              properties:
+                allMatch:
+                  type: array
+                  description: >
+                    Array of conditions that AND operator is applied between
+                    them.\
+
+                    For example, (label env equals prod) AND (label app exists)
+                  items:
+                    type: object
+                    description: The basic expression of a condition
+                    required:
+                      - type
+                      - key
+                      - operator
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                          - label
+                          - annotation
+                      key:
+                        type: string
+                        description: |
+                          May be any string, but shouldn't be empty.
+                        example: env
+                      operator:
+                        type: string
+                        enum:
+                          - equals
+                          - notEquals
+                          - exists
+                          - notExists
+                      value:
+                        type: string
+                        description: >
+                          Required whenever the operator is "equals" or
+                          "notEquals".
+                        example: prod
+            example:
+              - allMatch:
+                  - type: label
+                    key: env
+                    operator: equals
+                    value: prod
+                  - type: label
+                    key: app
+                    operator: exists
+              - allMatch:
+                  - type: annotation
+                    key: meta.data
+                    operator: exists

@@ -1,0 +1,103 @@
+type: object
+title: Elastigroup/Stateful Node event
+required:
+  - subscription
+properties:
+  subscription:
+    type: object
+    required:
+      - resourceId
+      - protocol
+      - endpoint
+      - eventType
+    description: |
+      Object defining the subscription parameters
+    properties:
+      resourceId:
+        type: string
+        example: sig-1234abcd
+        description: |
+          Spot Resource ID (Elastigroup ID, Ocean ID or Stateful Node ID)
+      protocol:
+        type: string
+        enum:
+          - aws-sns
+          - email
+          - email-json
+          - web
+        example: email
+        description: |
+          The protocol to send the notification.
+
+          The following values are deprecated: http https
+          You can use the generic web protocol instead.
+          aws-sns is only supported with AWS provider
+      endpoint:
+        type: string
+        example: YOUR@EMAIL.COM
+        description: >
+          The endpoint the notification will be sent to. url in case of
+          http/https/web, email address in case of email/email-json and
+          sns-topic-arn in case of aws-sns.
+
+          For example: YOUR@EMAIL.COM or https://YOUR_ENDPOINT.COM or
+          SNS_TOPIC_ARN
+      eventType:
+        enum:
+          - AWS_EC2_INSTANCE_TERMINATE
+          - AWS_EC2_INSTANCE_TERMINATED
+          - AWS_EC2_INSTANCE_LAUNCH
+          - AWS_EC2_INSTANCE_READY_SIGNAL_TIMEOUT
+          - SIGNAL_TIMEOUT_SHUTDOWN_SCRIPT
+          - AWS_EC2_CANT_SPIN_OD
+          - AWS_EC2_INSTANCE_UNHEALTHY_IN_ELB
+          - GROUP_ROLL_FAILED
+          - GROUP_ROLL_FINISHED
+          - CANT_SCALE_UP_GROUP_MAX_CAPACITY
+          - GROUP_UPDATED
+          - AWS_EMR_PROVISION_TIMEOUT
+          - GROUP_BEANSTALK_INIT_READY
+          - AZURE_VM_TERMINATED
+          - AZURE_VM_TERMINATE
+          - AWS_EC2_MANAGED_INSTANCE_PAUSING
+          - AWS_EC2_MANAGED_INSTANCE_RESUMING
+          - AWS_EC2_MANAGED_INSTANCE_RECYCLING
+          - AWS_EC2_MANAGED_INSTANCE_DELETING
+        type: string
+        example: AWS_EC2_INSTANCE_TERMINATE
+        description: |
+          The event to send the notification when triggered.
+      eventFormat:
+        type: object
+        description: |
+          The format of the notification content (JSON Format: Key + Value).
+          The keys can be renamed.
+        properties:
+          event:
+            type: string
+            enum:
+              - '%event%'
+            description: Allow to get name of event that happened
+            example: '%event%'
+          resourceId:
+            type: string
+            enum:
+              - '%resource-id%'
+            description: Allow to get ID of resource where event happened
+            example: '%resource-id%'
+          resourceName:
+            type: string
+            enum:
+              - '%resource-name%'
+            description: Allow to get the name of resource (related to ID)
+            example: '%resource-name%'
+          instanceId:
+            type: string
+            enum:
+              - '%instance-id%'
+            description: Allow to get the instance ID which related to the event
+            example: '%instance-id%'
+          myCustomKey:
+            type: string
+            description: Allow to use custom text in messages
+            example: My content is set here

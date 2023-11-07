@@ -1,0 +1,105 @@
+type: object
+title: Compute Object
+description: describes the compute resources for the MR scaler
+properties:
+  ebsRootVolumeSize:
+    type: integer
+    description: The EBS root volume size in GB
+    example: 4
+  availabilityZones:
+    type: array
+    description: Array of availability zone objects
+    items:
+      $ref: ./availabilityZone.yaml
+  bootstrapActions:
+    $ref: ./bootstrapActions.yaml
+  steps:
+    $ref: ./steps.yaml
+  instanceGroups:
+    type: array
+    description: Array of instance groups for this MR scaler
+    items:
+      $ref: ./instanceGroup.yaml
+  instanceWeights:
+    type: array
+    description: An array of custom-weight settings
+    items:
+      $ref: ./instanceWeight.yaml
+  emrManagedMasterSecurityGroup:
+    type: string
+    description: EMR Managed Security group that will be set to the master instance group
+    example: sg-123456789
+  emrManagedSlaveSecurityGroup:
+    type: string
+    description: EMR Managed Security group that will be set to the slave instance group
+    example: sg-123456789
+  additionalMasterSecurityGroups:
+    type: array
+    description: A list of additional Amazon EC2 security group IDs for the master node.
+    items:
+      type: string
+    example:
+      - sg-123456789
+  additionalSlaveSecurityGroups:
+    type: array
+    description: >-
+      A list of additional Amazon EC2 security group IDs for the core and task
+      nodes.
+    items:
+      type: string
+    example:
+      - sg-123456789
+  serviceAccessSecurityGroup:
+    type: string
+    description: >
+      The identifier of the Amazon EC2 security group for the Amazon EMR service
+      to access clusters in VPC private subnets
+    example: EMR_DefaultRole
+  customAmiId:
+    type: string
+    description: >-
+      The ID of a custom Amazon EBS-backed Linux AMI if the cluster uses a
+      custom AMI.
+    example: ami-123456789
+  repoUpgradeOnBoot:
+    type: string
+    description: >
+      **Applies only when CustomAmiID is used**. Specifies the type of updates
+      that are applied from the Amazon Linux AMI package repositories when an
+      instance boots using the AMI.
+    enum:
+      - SECURITY
+      - NONE
+    example: SECURITY
+  tags:
+    type: array
+    description: |
+      array of key:value pairs of tags
+    items:
+      type: object
+      properties:
+        tagKey:
+          type: string
+          description: The tag's key
+          example: Creator
+        tagValue:
+          type: string
+          description: The tag's value
+          example: someUser
+  ec2KeyName:
+    type: string
+    description: >
+      The name of an Amazon EC2 key-pair that can be used to `SSH` to the master
+      node.
+    example: myEC2KeyName
+  applications:
+    type: array
+    description: >
+      A case-insensitive array of applications for Amazon EMR to install and
+      configure when launching the cluster.
+    items:
+      $ref: ./application.yaml
+  configurations:
+    oneOf:
+      - $ref: ./jsonConfiguration.yaml
+      - $ref: ./configurations.yaml

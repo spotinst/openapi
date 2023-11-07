@@ -1,0 +1,71 @@
+type: array
+items:
+  type: object
+  properties:
+    id:
+      type: string
+      description: policy id
+    name:
+      type: string
+      description: policy name
+    description:
+      type: string
+      description: policy description
+    type:
+      type: string
+      enum:
+        - ACCOUNT
+        - ORGANIZATION
+      description: policy type
+    policyContent:
+      type: object
+      properties:
+        statements:
+          type: array
+          description: policy statements
+          items:
+            type: object
+            properties:
+              effect:
+                type: string
+                description: ALLOW / DENY
+              actions:
+                type: array
+                description: actions that the policy covers (can be with regex expressions)
+                items:
+                  type: string
+              resources:
+                type: array
+                description: >-
+                  resources that the policy covers (can be with regex
+                  expressions)
+                items:
+                  type: string
+example:
+  - id: pol-a1b2c3d4
+    name: Developers
+    description: A policy that contains permissions for developers
+    type: ORGANIZATION
+    policyContent:
+      statements:
+        - effect: ALLOW
+          actions:
+            - elastigroup:createGroup
+            - elastigroup:updateGroup
+          resources:
+            - '*'
+    createdAt: 2021-12-19T13:44:13.000+0000
+    updatedAt: 2022-01-02T22:04:29.000+0000
+  - id: pol-87654321
+    name: DevOps
+    description: A policy that contains permissions for DevOps
+    type: ACCOUNT
+    policyContent:
+      statements:
+        - effect: ALLOW
+          actions:
+            - setup:updatePolicy
+          resources:
+            - '*'
+    createdAt: 2021-12-19T13:44:13.000+0000
+    updatedAt: 2022-01-02T22:04:29.000+0000

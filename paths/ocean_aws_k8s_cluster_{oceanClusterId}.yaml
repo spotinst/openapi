@@ -1,0 +1,61 @@
+delete:
+  summary: Delete Cluster
+  description: |
+    Delete an existing Ocean cluster.
+  operationId: OceanAWSClusterDelete
+  tags:
+    - Ocean AWS
+  parameters:
+    - $ref: ../components/parameters/accountId.yaml
+    - $ref: ../components/parameters/oceanId.yaml
+  responses:
+    '200':
+      $ref: ../components/responses/oceanDelete.yaml
+    '400':
+      description: Bad Request
+get:
+  summary: Get Cluster
+  description: |
+    Get the configuration of an existing Ocean cluster.
+  operationId: OceanAWSClusterGet
+  tags:
+    - Ocean AWS
+  parameters:
+    - $ref: ../components/parameters/accountId.yaml
+    - $ref: ../components/parameters/oceanId.yaml
+  responses:
+    '200':
+      $ref: ../components/responses/oceanGet.yaml
+    '400':
+      description: Bad Request
+put:
+  summary: Update Cluster
+  description: >
+    All Ocean parameters are updatable, except for region and identifier. This
+    API supports partial updates, so specific fields can be updated separately.
+  operationId: OceanAWSClusterUpdate
+  tags:
+    - Ocean AWS
+  parameters:
+    - $ref: ../components/parameters/oceanId.yaml
+    - $ref: ../components/parameters/accountId.yaml
+    - in: query
+      name: autoApplyTags
+      example: 'true'
+      description: |
+        Option to update instance tags on the fly without rolling the cluster.
+      schema:
+        type: string
+        default: 'false'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          allOf:
+            - $ref: ../components/schemas/oceanClusterUpdateWrapper.yaml
+  responses:
+    '200':
+      $ref: ../components/responses/oceanUpdate.yaml
+    '400':
+      description: Bad Request

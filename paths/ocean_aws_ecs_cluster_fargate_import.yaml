@@ -1,0 +1,56 @@
+post:
+  summary: Import Fargate To New Ocean Cluster
+  description: >
+    This API copies the configuration from a Fargate service into the
+    corresponding fields of an Ocean object.
+
+    (This process is commonly referred to as importing.)
+
+    The API returns an Ocean object that is suitable for use in the [Create
+    API](https://docs.spot.io/api/#operation/oceanEcsCreate/) to create a new
+    Ocean cluster based on your Fargate configuration.
+
+    If you are migrating a Fargate service that has tags, you must run the Opt
+    In procedure on your Amazon account or IAM role.
+
+    This is required in order to obtain the necessary Amazon Resource Name (ARN)
+    and resource identifier format for your ECS tasks, container instances, and
+    services.
+
+    For more information about the required ARN and the Opt In procedure, see
+    the following pages:
+
+
+    * [Amazon Resource Names (ARNs) and
+    identifiers](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-account-settings.html#ecs-resource-ids)
+
+    * [Migrating your Amazon ECS deployment to the new ARN and resource
+    identifier
+    format](https://aws.amazon.com/blogs/compute/migrating-your-amazon-ecs-deployment-to-the-new-arn-and-resource-id-format-2/)
+
+
+    The API requires one of the following permissions to be defined in Spot -
+
+
+    * Permission: Account Editor (See [User
+    Roles](https://docs.spot.io/administration/users/)) or
+
+    * Action: ocean:importOceanFromFargate (See [Access
+    Policies](https://docs.spot.io/administration/access-policies/))
+  operationId: oceanEcsFargateImportToNew
+  tags:
+    - Ocean ECS
+  parameters:
+    - $ref: ../components/parameters/accountId.yaml
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          allOf:
+            - $ref: ../components/schemas/fargate-to-new.yaml
+  responses:
+    '200':
+      $ref: ../components/responses/fargate-import-response.yaml
+    '400':
+      description: Bad Request

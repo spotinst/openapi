@@ -1,0 +1,99 @@
+type: object
+required:
+  - cluster
+properties:
+  cluster:
+    type: object
+    description: The specification of the Ocean cluster.
+    required:
+      - name
+      - compute
+    properties:
+      name:
+        type: string
+        example: test
+        description: |
+          Add a name for the Ocean cluster.
+      controllerClusterId:
+        type: string
+        example: test-123124
+        description: |
+          Enter the Ocean cluster identifier.
+      capacity:
+        $ref: ./ocean-capacity-2.yaml
+      instanceTypes:
+        type: object
+        description: >-
+          The type of instances that may or may not be a part of the Ocean
+          cluster.
+        properties:
+          whitelist:
+            type: array
+            description: >
+              Instance types allowed in the Ocean cluster. Cannot be configured
+              if a deny list is configured.
+            items:
+              type: string
+            example:
+              - n1-standard-2
+          blacklist:
+            type: array
+            description: >
+              Instance types to avoid launching in the Ocean cluster. Cannot be
+              configured if a permit list is configured.
+            items:
+              type: string
+            example:
+              - n2d-highcpu-96
+      autoScaler:
+        $ref: ./ocean-autoScaler.yaml
+      availabilityZones:
+        type: array
+        description: >
+          An array holding availability zones, this configures the availability
+          zones the Ocean may launch instances in per VNG. Can be null.
+        items:
+          type: string
+        example:
+          - us-central1-a
+          - us-central1-b
+      backendServices:
+        type: array
+        items:
+          type: object
+          required:
+            - backendServiceName
+          properties:
+            backendServiceName:
+              type: string
+              example: bserv-2
+            locationType:
+              type: string
+              enum:
+                - regional
+                - global
+              example: regional
+            scheme:
+              type: string
+              description: |
+                Required if locationType is set to "regional".
+              enum:
+                - EXTERNAL
+                - INTERNAL
+              example: EXTERNAL
+            namedPorts:
+              type: object
+              required:
+                - name
+                - ports
+              properties:
+                name:
+                  type: string
+                  example: https
+                ports:
+                  type: array
+                  items:
+                    type: integer
+                  example:
+                    - 443
+                    - 8443
