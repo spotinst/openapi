@@ -61770,6 +61770,100 @@
         }
       }
     },
+    "/ocean/azure/np/cluster/{oceanClusterId}/migration/discovery": {
+      "get": {
+        "summary": "Get Migration Discovery",
+        "description": "Get information about nodes which can be migrated into Ocean.\n",
+        "operationId": "oceanAksV2GetMigrationDiscovery",
+        "tags": [
+          "Ocean AKS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          },
+          {
+            "in": "query",
+            "name": "shouldFetchPods",
+            "example": "true",
+            "description": "Should fetch data about running pods for each node.\n",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Migration Discovery Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "ocean/azure/np/cluster/o-abcd1234/migration/discovery"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "title": "Workload migration discovery details",
+                                "description": "Information about available nodes which can be migrated to the Ocean cluster",
+                                "type": "object",
+                                "properties": {
+                                  "nodeName": {
+                                    "type": "string",
+                                    "description": "The node name.",
+                                    "example": "aks-mynodepool-18735776-vmss000001"
+                                  },
+                                  "nodePoolName": {
+                                    "type": "string",
+                                    "description": "The NodePool Name.",
+                                    "example": "mynodepool"
+                                  },
+                                  "runningPods": {
+                                    "type": "integer",
+                                    "description": "The number of running pods on the node (appears if shouldFetchPods was true).",
+                                    "example": "6"
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:azure:k8s:np:nodePoolUnmanaged"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/ocean/azure/np/virtualNodeGroup/{virtualNodeGroupId}": {
       "get": {
         "summary": "Get Virtual Node Group",
