@@ -62693,6 +62693,698 @@
         }
       }
     },
+    "/ocean/azure/np/cluster/{oceanClusterId}/roll": {
+      "summary": "Ocean for AKS",
+      "post": {
+        "summary": "Initiate Roll",
+        "description": "Roll an entire Ocean cluster or roll subsets of the cluster by specifying vngIds, nodePoolNames or nodeNames. Performing this request will start the roll immediately and run it in defined batches. Note that the first response for a successful request will indicate the start of a roll. In order to check the status of a roll, you can use the GET Roll API.\n",
+        "operationId": "oceanAksRollInit",
+        "tags": [
+          "Ocean AKS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "title": "Roll",
+                    "allOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "batchSizePercentage": {
+                            "type": "integer",
+                            "description": "Value as a percent to set the size of a batch in a roll. Valid values are 0-100. In case of null as value, the default value in the backend will be 20%.\n",
+                            "example": 25
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "comment": {
+                            "type": "string",
+                            "description": "Add a comment description for the roll. The comment is limited to 256 chars and optional.\n",
+                            "example": "This is why I deployed my cluster."
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "respectPdb": {
+                            "type": "boolean",
+                            "description": "During the roll, if the parameter is set to true we honor PDB during the nodes replacement.\n",
+                            "example": false,
+                            "default": true
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "respectRestrictScaleDown": {
+                            "type": "boolean",
+                            "description": "During the roll, if the parameter is set to true we honor Restrict Scale Down label during the nodes replacement.\n",
+                            "example": true,
+                            "default": false
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "batchMinHealthyPercentage": {
+                            "type": "integer",
+                            "description": "Indicates the threshold of minimum healthy nodes in single batch. If the amount of healthy nodes in single batch is under the threshold, the roll will fail. If exists, the parameter value will be in range of 1-100. In case of null as value, the default value in the backend will be 50%. Value of param should represent the number in percentage (%) of the batch.\n",
+                            "example": 100,
+                            "default": 50
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "title": "Roll with node names",
+                    "allOf": [
+                      {
+                        "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/allOf/0"
+                      },
+                      {
+                        "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/allOf/1"
+                      },
+                      {
+                        "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/allOf/2"
+                      },
+                      {
+                        "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/allOf/3"
+                      },
+                      {
+                        "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/allOf/4"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "nodeNames": {
+                            "type": "array",
+                            "description": "List of node names to be rolled. Each identifier is a string. nodeNames can be null, and cannot be used together with nodePoolNames and vngIds.\n",
+                            "items": {
+                              "type": "string",
+                              "example": [
+                                "aks-omnpbc2ebdb1-15563275-vmss00000g",
+                                "aks-omnpe9429a2f-26725402-vmss000015"
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "title": "Roll with node pool names",
+                    "allOf": [
+                      {
+                        "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/allOf/0"
+                      },
+                      {
+                        "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/allOf/1"
+                      },
+                      {
+                        "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/allOf/2"
+                      },
+                      {
+                        "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/allOf/3"
+                      },
+                      {
+                        "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/allOf/4"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "nodePoolNames": {
+                            "type": "array",
+                            "description": "List of node pools to be rolled. Each node pool name is a string. nodePoolNames can be null, and cannot be used together with nodeNames and vngIds.\n",
+                            "items": {
+                              "type": "string",
+                              "example": [
+                                "omnp35f6cccb",
+                                "omnp55bd559b"
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "title": "Roll with virtual node group ids",
+                    "allOf": [
+                      {
+                        "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/allOf/0"
+                      },
+                      {
+                        "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/allOf/1"
+                      },
+                      {
+                        "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/allOf/2"
+                      },
+                      {
+                        "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/allOf/3"
+                      },
+                      {
+                        "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1roll/post/requestBody/content/application~1json/schema/oneOf/0/allOf/4"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "vngIds": {
+                            "type": "array",
+                            "description": "List of virtual node group identifiers to be rolled. Each identifier is a string. vngIds can be null, and cannot be used together with nodeNames and nodePoolNames.\n",
+                            "items": {
+                              "type": "string",
+                              "example": [
+                                "vng-69dc457b",
+                                "vng-175947a4"
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ocean AKS Create Cluster Roll Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/azure/np/cluster/o-12345abc/roll"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "allOf": [
+                                  {
+                                    "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1roll/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items"
+                                  },
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "status": {
+                                        "example": "IN_PROGRESS"
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "progress": {
+                                        "example": {
+                                          "detailedStatus": {
+                                            "rollNodes": [
+                                              {
+                                                "nodeName": "aks-omnpbc2ebdb1-15563275-vmss00000q",
+                                                "status": "IN_PROGRESS"
+                                              },
+                                              {
+                                                "nodeName": "aks-omnpbc2ebdb1-15563275-vmss000008",
+                                                "status": "TO_BE_REPLACED"
+                                              },
+                                              {
+                                                "nodeName": "aks-omnpbc2ebdb1-15563275-vmss00000r",
+                                                "status": "TO_BE_REPLACED"
+                                              },
+                                              {
+                                                "nodeName": "aks-omnpe9429a2f-26725402-vmss00000z",
+                                                "status": "IN_PROGRESS"
+                                              },
+                                              {
+                                                "nodeName": "aks-omnp0c85c2c2-26833420-vmss000001",
+                                                "status": "IN_PROGRESS"
+                                              },
+                                              {
+                                                "nodeName": "aks-omnp0c85c2c2-26833420-vmss000003",
+                                                "status": "TO_BE_REPLACED"
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:azure:np:roll"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "get": {
+        "summary": "List Rolls",
+        "description": "Get status for all rolls of an Ocean cluster.\n",
+        "operationId": "oceanAksRollList",
+        "tags": [
+          "Ocean AKS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean AKS Get Cluster Roll Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/azure/np/cluster/o-12345abc/roll"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string",
+                                    "description": "The identifier of the cluster roll.\n",
+                                    "example": "scr-12345abc"
+                                  },
+                                  "oceanId": {
+                                    "type": "string",
+                                    "description": "The identifier of the ocean cluster being rolled.\n",
+                                    "example": "o-12e31234"
+                                  },
+                                  "scope": {
+                                    "type": "string",
+                                    "enum": [
+                                      "Cluster",
+                                      "Vng",
+                                      "Node Pool",
+                                      "Node"
+                                    ],
+                                    "example": "Cluster"
+                                  },
+                                  "status": {
+                                    "type": "string",
+                                    "description": "The status of the roll.\n",
+                                    "enum": [
+                                      "IN_PROGRESS",
+                                      "COMPLETED",
+                                      "PARTLY_COMPLETED",
+                                      "FAILED",
+                                      "STOPPED"
+                                    ],
+                                    "example": "COMPLETED"
+                                  },
+                                  "currentBatch": {
+                                    "type": "integer",
+                                    "description": "The current batch being handled by the roll.\n",
+                                    "example": 1
+                                  },
+                                  "numOfBatches": {
+                                    "type": "integer",
+                                    "description": "The total number of batches in the roll.\n",
+                                    "example": 2
+                                  },
+                                  "comment": {
+                                    "type": "string",
+                                    "example": "This is why I deployed my cluster."
+                                  },
+                                  "progress": {
+                                    "type": "object",
+                                    "properties": {
+                                      "progressPercentage": {
+                                        "type": "integer",
+                                        "example": 0
+                                      },
+                                      "detailedStatus": {
+                                        "type": "object",
+                                        "description": "An object containing detailed information about the progress of the roll.\n",
+                                        "properties": {
+                                          "rollNodes": {
+                                            "type": "array",
+                                            "description": "An array of objects containing detailed information about each node handled by the roll.\n",
+                                            "items": {
+                                              "type": "object",
+                                              "properties": {
+                                                "nodeName": {
+                                                  "type": "string"
+                                                },
+                                                "status": {
+                                                  "description": "The status of the node according to the roll.\n",
+                                                  "type": "string",
+                                                  "enum": [
+                                                    "REPLACED",
+                                                    "TO_BE_REPLACED",
+                                                    "COULD_NOT_BE_REPLACED",
+                                                    "NOT_REPLACED_DUE_TO_PDB",
+                                                    "DID_NOT_REPLACE",
+                                                    "IN_PROGRESS"
+                                                  ]
+                                                }
+                                              }
+                                            },
+                                            "example": [
+                                              {
+                                                "nodeName": "aks-omnpbc2ebdb1-15563275-vmss00000q",
+                                                "status": "REPLACED"
+                                              },
+                                              {
+                                                "nodeName": "aks-omnpbc2ebdb1-15563275-vmss000008",
+                                                "status": "TO_BE_REPLACED"
+                                              },
+                                              {
+                                                "nodeName": "aks-omnpbc2ebdb1-15563275-vmss00000r",
+                                                "status": "COULD_NOT_BE_REPLACED"
+                                              },
+                                              {
+                                                "nodeName": "aks-omnpe9429a2f-26725402-vmss00000z",
+                                                "status": "NOT_REPLACED_DUE_TO_PDB"
+                                              },
+                                              {
+                                                "nodeName": "aks-omnp0c85c2c2-26833420-vmss000001",
+                                                "status": "IN_PROGRESS"
+                                              },
+                                              {
+                                                "nodeName": "aks-omnp0c85c2c2-26833420-vmss000003",
+                                                "status": "DID_NOT_REPLACE"
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "respectPdb": {
+                                    "type": "boolean",
+                                    "example": true
+                                  },
+                                  "respectRestrictScaleDown": {
+                                    "type": "boolean",
+                                    "example": false
+                                  },
+                                  "batchMinHealthyPercentage": {
+                                    "type": "integer",
+                                    "example": 70
+                                  },
+                                  "createdAt": {
+                                    "type": "string",
+                                    "description": "The creation timestamp of the roll.\n",
+                                    "example": "2019-03-24T15:46:09.000Z"
+                                  },
+                                  "updatedAt": {
+                                    "type": "string",
+                                    "description": "The latest update timestamp of the roll.\n",
+                                    "example": "2019-03-24T15:46:09.000Z"
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:azure:np:roll"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/azure/np/cluster/{oceanClusterId}/roll/{rollId}": {
+      "summary": "Ocean for AKS",
+      "get": {
+        "summary": "Get Roll",
+        "description": "Get status for a roll of an Ocean cluster.\n",
+        "operationId": "oceanAksGetSingleRoll",
+        "tags": [
+          "Ocean AKS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          },
+          {
+            "in": "path",
+            "name": "rollId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "acr-12345abc",
+            "description": "Ocean cluster roll identifier.\n"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean AKS Get Roll Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/azure/np/cluster/o-12345abc/roll/scr-12345abc"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1roll/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:azure:np:roll"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/azure/np/cluster/{oceanClusterId}/roll/{rollId}/stop": {
+      "summary": "Ocean for AKS",
+      "put": {
+        "summary": "Stop Roll",
+        "description": "Stop a roll of an Ocean cluster.\n\n*Performing the request will stop the next batch in a roll.*\n",
+        "operationId": "oceanAksRollStop",
+        "tags": [
+          "Ocean AKS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1roll~1%7BrollId%7D/get/parameters/2"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean AKS STOP Cluster Roll Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/azure/np/cluster/o-12345abc/roll/scr-12345abc/stop"
+                            },
+                            "method": {
+                              "example": "PUT"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "allOf": [
+                                  {
+                                    "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1roll/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items"
+                                  },
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "status": {
+                                        "example": "STOPPED"
+                                      },
+                                      "progress": {
+                                        "example": {
+                                          "detailedStatus": {
+                                            "progressPercentage": 50,
+                                            "rollNodes": [
+                                              {
+                                                "nodeName": "aks-omnpbc2ebdb1-15563275-vmss00000q",
+                                                "status": "REPLACED"
+                                              },
+                                              {
+                                                "nodeName": "aks-omnpbc2ebdb1-15563275-vmss000008",
+                                                "status": "DID_NOT_REPLACE"
+                                              },
+                                              {
+                                                "nodeName": "aks-omnpbc2ebdb1-15563275-vmss00000r",
+                                                "status": "DID_NOT_REPLACE"
+                                              },
+                                              {
+                                                "nodeName": "aks-omnpe9429a2f-26725402-vmss00000z",
+                                                "status": "REPLACED"
+                                              },
+                                              {
+                                                "nodeName": "aks-omnp0c85c2c2-26833420-vmss000001",
+                                                "status": "REPLACED"
+                                              },
+                                              {
+                                                "nodeName": "aks-omnp0c85c2c2-26833420-vmss000003",
+                                                "status": "DID_NOT_REPLACE"
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:azure:np:roll"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/ocean/azure/k8s/cluster/{oceanClusterId}/aggregatedCosts": {
       "post": {
         "summary": "Get Cluster Aggregated Detailed Costs",
