@@ -1,5 +1,10 @@
 type: object
 title: target scaling config
+required:
+  - policyName
+  - namespace
+  - metricName
+  - target
 properties:
   source:
     title: Source
@@ -12,7 +17,7 @@ properties:
     type: string
     description: |
       The policy name
-    example: "my-up-policy"
+    example: "my-target-scaling-policy"
   metricName:
     type: string
     description: |
@@ -36,13 +41,53 @@ properties:
     description: |
       The namespace for the alarm's associated metric.
     default: "AWS/EC2"
+  dimensions:
+    type: array
+    description: |
+      The dimensions for the alarm's associated metric.
+      When name is "instanceId", no value is needed.
+    items:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: "InstanceId"
+        value:
+          type: string
+  period:
+    type: integer
+    description: |
+      The period in seconds over which the statistic is applied.
+    example: 300
+  evaluationPeriods:
+    type: integer
+    description: |
+      The number of periods over which data is compared to the specified threshold.
+    example: 1
+  cooldown:
+    type: integer
+    description: |
+      The amount of time, in seconds, after a scaling activity completes before any further trigger-related scaling activities can start.
+    example: 300
   target:
     type: integer
     description: |
       The target value for the group.
     example: 1
-  cooldown:
-    type: integer
+  maxCapacityPerScale:
+    type: string
+  predictive:
+    type: object
     description: |
-      The amount of time, in seconds, after a scaling activity completes and before any further trigger-related scaling activities can start.
-    example: 300
+      Enable predictive autoscaling.
+    required:
+      - mode
+    properties:
+      mode:
+        description: |
+          Predictive autoscaling mode.
+        enum: [ FORECAST_AND_SCALE, FORECAST_ONLY ]
+        type: string
+        example: "FORECAST_AND_SCALE"

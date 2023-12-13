@@ -6,6 +6,17 @@ properties:
     description: |
       The policy name.
     example: "my-down-policy"
+  namespace:
+    type: string
+    description: |
+      The namespace for the alarm's associated metric.
+    default: "AWS/EC2"
+  source:
+    type: string
+    description: |
+      The metric source.
+    enum: [ spectrum, cloudWatch ]
+    example: "spectrum"
   metricName:
     type: string
     description: |
@@ -34,46 +45,10 @@ properties:
     description: |
       The value against which the specified statistic is compared.
     example: 90
-  action:
-    type: object
+  adjustment:
+    type: integer
     description: |
-      The action to take when scale up is needed.
-      A mandatory field, that should be filled with one of the following:
-      "adjustment", "percentageAdjustment", "setMaxTarget", "setMinTarget", "updateCapacity".
-    properties:
-      type:
-        type: string
-        description: |
-          The type of the action to take when scale up is needed.
-        enum: [ adjustment , updateCapacity setMinTarget , percentageAdjustment ]
-        example: "updateCapacity"
-      adjustment:
-        type: integer
-        description: |
-          The number / percentage associated with the specified adjustment type.
-          Required if using `adjustment` or `percentageAdjustment` as action type.
-        example: 1
-      minTargetCapacity:
-        type: integer
-        description: |
-          The minimum target capacity.
-          Required if using `setMinTarget` as action type.
-        example: 1
-      target:
-        type: integer
-        description: |
-          The desired number of instances. Required if using `updateCapacity` as action type and neither `minimum` nor `maximum` are defined.
-        example: 1
-      minimum:
-        type: integer
-        description: |
-          The lower limit number of instances that you can scale down to. Optional, required if using `updateCapacity` as action type and neither minimum nor maximum are defined.
-        example: 0
-      maximum:
-        type: integer
-        description: |
-          The upper limit number of instances that you can scale up to. Optional, required if using `updateCapacity` as action type and neither minimum nor maximum are defined.
-        example: 5
+      The number associated with the specified adjustment type.
   stepAdjustments:
     type: array
     description: |
@@ -82,9 +57,13 @@ properties:
       If specified, at least one step should be defined.
     items:
       type: object
+      required: 
+        -  threshold
       properties:
         action:
           type: object
+          required: 
+            -  type
           description: |
             The action to take when scale down according to step's threshold is needed.
             A mandatory field, that should be filled with one of the following:
@@ -129,11 +108,52 @@ properties:
             The value against which the specified statistic is compared in order
             to determine if a step should be applied.
           example: 10
-  namespace:
-    type: string
+  action:
+    type: object
+    required:
+      - type
     description: |
-      The namespace for the alarm's associated metric.
-    default: "AWS/EC2"
+      The action to take when scale up is needed.
+      A mandatory field, that should be filled with one of the following:
+      "adjustment", "percentageAdjustment", "setMaxTarget", "setMinTarget", "updateCapacity".
+    properties:
+      type:
+        type: string
+        description: |
+          The type of the action to take when scale up is needed.
+        enum: [ adjustment , updateCapacity setMinTarget , percentageAdjustment ]
+        example: "updateCapacity"
+      adjustment:
+        type: integer
+        description: |
+          The number / percentage associated with the specified adjustment type.
+          Required if using `adjustment` or `percentageAdjustment` as action type.
+        example: 1
+      maxTargetCapacity:
+        type: integer
+        description: |
+          The maximum target capacity.
+          Required if using `setMaxTarget` as action type.
+        example: 1
+      target:
+        type: integer
+        description: |
+          The desired number of instances. Required if using `updateCapacity` as action type and neither `minimum` nor `maximum` are defined.
+        example: 1
+      minimum:
+        type: integer
+        description: |
+          The lower limit number of instances that you can scale down to. Optional, required if using `updateCapacity` as action type and neither minimum nor maximum are defined.
+        example: 0
+      maximum:
+        type: integer
+        description: |
+          The upper limit number of instances that you can scale up to. Optional, required if using `updateCapacity` as action type and neither minimum nor maximum are defined.
+        example: 5
+  maxTargetCapacity:
+    type: integer
+    description: |
+      The maximum target capacity.
   dimensions:
     type: array
     description: |
@@ -141,6 +161,8 @@ properties:
       When name is "instanceId", no value is needed.
     items:
       type: object
+      required:
+        - name
       properties:
         name:
           type: string
