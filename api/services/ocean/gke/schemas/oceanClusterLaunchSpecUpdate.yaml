@@ -21,19 +21,19 @@ properties:
         example: "https://www.googleapis.com/compute/v1/projects/gke-node-images/global/images/container-v1-3-v20160517"
         description: >
           Set image URL. Can be null.
-      rootVolumeSize:
+      rootVolumeSizeInGb:
         type: integer
         description: Set root volume size (in GB).
         example: 8
       metadata:
         type: array
-        required:
-          - key
-          - value
         description: >
           Add metadata to the cluster.
         items:
           type: object
+          required:
+            - key
+            - value
           properties:
             key:
               type: string
@@ -74,6 +74,10 @@ properties:
         description: Add taints to virtual node group.
         items:
           type: object
+          required:
+            - key
+            - value
+            - effect
           properties:
             key:
               type: string
@@ -83,6 +87,7 @@ properties:
               description: Set taint value.
             effect:
               type: string
+              enum: [ NoSchedule, PreferNoSchedule, NoExecute ]
               description: Set taint effect.
         example:
           - key: taintKey
@@ -93,6 +98,9 @@ properties:
         description: 'An array of labels to add to the virtual node group. Only custom user labels are allowed, and not Kubernetes built-in labels or Spot internal labels.'
         items:
           type: object
+          required:
+            - key
+            - value
           properties:
             key:
               type: string
@@ -121,36 +129,40 @@ properties:
       autoScale:
         type: object
         properties:
-          headroom:
-            type: object
+          headrooms:
+            type: array
             description: >
               Set custom headroom per virtual node group. Provide a list of launchSpec.autoScale.headroom objects.
-            properties:
-              cpuPerUnit:
-                type: integer
-                description: >
-                  Configure the number of CPUs to allocate the headroom.
-                  CPUs are denoted in millicores, where 1000 millicores = 1 vCPU.
-                example: 1000
-              memoryPerUnit:
-                type: integer
-                description: >
-                  Configure the amount of memory (MiB) to allocate the headroom.
-                example: 2048
-              gpuPerUnit:
-                type: integer
-                description: >
-                  The amount of GPU allocate per headroom unit.
-                example: 0
-              numOfUnits:
-                type: integer
-                description: >
-                  The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.
-                example: 3
+            items:
+              type: object
+              required:
+                - numOfUnits
+              properties:
+                cpuPerUnit:
+                  type: integer
+                  description: >
+                    Configure the number of CPUs to allocate the headroom.
+                    CPUs are denoted in millicores, where 1000 millicores = 1 vCPU.
+                  example: 1000
+                memoryPerUnit:
+                  type: integer
+                  description: >
+                    Configure the amount of memory (MiB) to allocate the headroom.
+                  example: 2048
+                gpuPerUnit:
+                  type: integer
+                  description: >
+                    The amount of GPU to allocate per headroom unit.
+                  example: 0
+                numOfUnits:
+                  type: integer
+                  description: >
+                    The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.
+                  example: 3
           autoHeadroomPercentage:
             type: integer
             description: >
-              Number between 0-200 to control the headroom % of the specific Virtual Node Group. Effective when cluster.autoScaler.isAutoConfig=true is set on the Ocean cluster.
+              Number between 0-200 to control the headroom % of the specific Virtual Node Group. Effective when cluster.autoScaler.isAutoConfig=true is set on the Ocean cluster
             example: 20
       resourceLimits:
         type: object
