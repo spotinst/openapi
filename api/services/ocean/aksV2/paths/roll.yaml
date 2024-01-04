@@ -1,0 +1,78 @@
+summary: Ocean for AKS
+post:
+  summary: "Initiate Roll"
+  description: >
+    Roll an entire Ocean cluster or roll subsets of the cluster by specifying vngIds, nodePoolNames or nodeNames.
+    Performing this request will start the roll immediately and run it in defined batches.
+    Note that the first response for a successful request will indicate the start of a roll. In order to check the status of a roll, you can use the GET Roll API.
+  operationId: "oceanAksRollInit"
+  tags:
+    - "Ocean AKS"
+  parameters:
+    - $ref: "../../../../commons/parameters/accountId.yaml"
+    - $ref: "../../commons/parameters/oceanId.yaml"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          oneOf:
+            - type: object
+              title: 'Roll'
+              allOf:
+                - $ref: "../schemas/roll/roll-batchSizePercentage.yaml"
+                - $ref: "../schemas/roll/roll-comment.yaml"
+                - $ref: "../schemas/roll/roll-respectPdb.yaml"
+                - $ref: "../schemas/roll/roll-respectRestrictScaleDown.yaml"
+                - $ref: "../schemas/roll/roll-batchMinHealthyPercentage.yaml"
+            - type: object
+              title: 'Roll with node names'
+              allOf:
+                - $ref: "../schemas/roll/roll-batchSizePercentage.yaml"
+                - $ref: "../schemas/roll/roll-comment.yaml"
+                - $ref: "../schemas/roll/roll-respectPdb.yaml"
+                - $ref: "../schemas/roll/roll-respectRestrictScaleDown.yaml"
+                - $ref: "../schemas/roll/roll-batchMinHealthyPercentage.yaml"
+                - $ref: "../schemas/roll/roll-nodeNames.yaml"
+            - type: object
+              title: 'Roll with node pool names'
+              allOf:
+                - $ref: "../schemas/roll/roll-batchSizePercentage.yaml"
+                - $ref: "../schemas/roll/roll-comment.yaml"
+                - $ref: "../schemas/roll/roll-respectPdb.yaml"
+                - $ref: "../schemas/roll/roll-respectRestrictScaleDown.yaml"
+                - $ref: "../schemas/roll/roll-batchMinHealthyPercentage.yaml"
+                - $ref: "../schemas/roll/roll-nodePoolNames.yaml"
+            - type: object
+              title: 'Roll with virtual node group ids'
+              allOf:
+                - $ref: "../schemas/roll/roll-batchSizePercentage.yaml"
+                - $ref: "../schemas/roll/roll-comment.yaml"
+                - $ref: "../schemas/roll/roll-respectPdb.yaml"
+                - $ref: "../schemas/roll/roll-respectRestrictScaleDown.yaml"
+                - $ref: "../schemas/roll/roll-batchMinHealthyPercentage.yaml"
+                - $ref: "../schemas/roll/roll-vngIds.yaml"
+  responses:
+    200:
+      $ref: "../responses/rollCreateResponse.yaml"
+    400:
+      description: "Bad Request"
+
+get:
+  summary: "List Rolls"
+  description: >
+    Get status for all rolls of an Ocean cluster.
+  operationId: "oceanAksRollList"
+  tags:
+    - "Ocean AKS"
+  parameters:
+    - $ref: "../../../../commons/parameters/accountId.yaml"
+    - $ref: "../../commons/parameters/oceanId.yaml"
+  responses:
+    200:
+      $ref: "../responses/rollListResponse.yaml"
+    400:
+      description: "Bad Request"
+
+
+
