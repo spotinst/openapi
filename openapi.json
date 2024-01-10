@@ -36146,7 +36146,6 @@
                                   "title": "Task Definition",
                                   "required": [
                                     "isEnabled",
-                                    "cronExpression",
                                     "taskType"
                                   ],
                                   "properties": {
@@ -36158,18 +36157,20 @@
                                     "cronExpression": {
                                       "type": "string",
                                       "example": "0 1 * * *",
-                                      "description": "A valid cron expression. For example : \" * * * * * \". The cron job runs in UTC time and is in Unix cron format. (See the Cron Expression Validator Script.) Only one of ‘frequency' or ‘cronExpression' can be used at a time.\n"
+                                      "description": "A valid cron expression. For example : \" * * * * * \". The cron job runs in UTC time and is in Unix cron format. (See the Cron Expression Validator Script.) Required field for taskType \"clusterRoll\", optional field for taskType \"amiAutoUpdate\".\n"
                                     },
                                     "taskType": {
                                       "type": "string",
                                       "example": "clusterRoll",
                                       "enum": [
-                                        "clusterRoll"
+                                        "clusterRoll",
+                                        "amiAutoUpdate"
                                       ],
-                                      "description": "The activity that you are scheduling. Valid values: \"clusterRoll\". Required for cluster.scheduling.tasks.\n"
+                                      "description": "The activity that you are scheduling. Valid values: \"clusterRoll\", \"amiAutoUpdate\". Required for cluster.scheduling.tasks.\n"
                                     },
                                     "parameters": {
                                       "type": "object",
+                                      "description": "This field will be compatible to the task type field. \nIf taskType is defined as \"clusterRoll\", use cluster roll object in parameters.\n",
                                       "properties": {
                                         "clusterRoll": {
                                           "type": "object",
@@ -36199,6 +36200,60 @@
                                               "description": "During the roll, if the parameter is set to true we honor PDB during the instance replacement.\n",
                                               "example": true,
                                               "default": false
+                                            }
+                                          }
+                                        },
+                                        "amiAutoUpdate": {
+                                          "type": "object",
+                                          "properties": {
+                                            "patch": {
+                                              "type": "boolean",
+                                              "description": "When set to 'true', the auto-update process will update the VNGs’ images with the latest security patches. either \"patch\" or \"minorVersion\" must be true.\n",
+                                              "example": "true",
+                                              "default": false
+                                            },
+                                            "minorVersion": {
+                                              "type": "boolean",
+                                              "example": "true",
+                                              "default": false,
+                                              "description": "When set to 'true', the auto-update process will update the VNGs’ AMI with the AMI to match the Kubernetes control plane version. either \"patch\" or \"minorVersion\" must be true.\n"
+                                            },
+                                            "applyRoll": {
+                                              "type": "boolean",
+                                              "example": "true",
+                                              "default": false,
+                                              "description": "This parameter is optional. When the AMI is updated according to the configuration set, a cluster roll can be triggered.\n"
+                                            },
+                                            "clusterRoll": {
+                                              "type": "object",
+                                              "properties": {
+                                                "batchSizePercentage": {
+                                                  "type": "integer",
+                                                  "minimum": 0,
+                                                  "maximum": 100,
+                                                  "example": 20,
+                                                  "description": "Value as a percent to set the size of a batch in a roll. Valid values are 0-100.\n"
+                                                },
+                                                "comment": {
+                                                  "type": "string",
+                                                  "example": "This is why I deployed my cluster.",
+                                                  "description": "Add a comment description for the roll. The comment is limited to 256 chars\n"
+                                                },
+                                                "batchMinHealthyPercentage": {
+                                                  "type": "integer",
+                                                  "minimum": 1,
+                                                  "maximum": 100,
+                                                  "default": 50,
+                                                  "example": 100,
+                                                  "description": "Indicates the threshold of minimum healthy instances in single batch. If the amount of healthy instances in single batch is under the threshold, the cluster roll will fail. If exists, the parameter value will be in range of 1-100. In case of null as value, the default value in the backend will be 50%. Value of param should represent the number in percentage (%) of the batch.\n"
+                                                },
+                                                "respectPdb": {
+                                                  "type": "boolean",
+                                                  "description": "During the roll, if the parameter is set to true we honor PDB during the instance replacement.\n",
+                                                  "example": true,
+                                                  "default": false
+                                                }
+                                              }
                                             }
                                           }
                                         }
@@ -41137,6 +41192,230 @@
                             },
                             "kind": {
                               "example": "ocean:k8s:cluster:aggregatedCosts:summary"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/aws/k8s/cluster/{oceanClusterId}/amiAutoUpdate": {
+      "put": {
+        "summary": "Initiate EKS AMI Auto Update",
+        "description": "Update the Ocean EKS cluster's VNGs with the latest image or the image matching the control plane's version after upgrading, by specifying ‘patch' or 'minorVersion’.\nPerforming this request will update the VNGs with new AMI if available, and run a cluster roll if set.\nIf the response is successful, the old and new AMIs will be included in the response along with the updated VNGs.\nIf a cluster roll is set in the request, the first response for a successful request will indicate the start of a roll.\nIn order to check the status of the roll, you can use the GET Roll API.\n",
+        "operationId": "oceanAwsAmiAutoUpdate",
+        "tags": [
+          "Ocean AWS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          },
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "description": "The object specifying the request to trigger an AMI auto update operation\n",
+                    "title": "AMI Auto Update",
+                    "properties": {
+                      "patch": {
+                        "type": "boolean",
+                        "description": "When set to 'true', the auto-update process will update the VNGs’ images with the latest security patches. Either \"patch\" or \"minorVersion\" must be true.\n",
+                        "example": "true",
+                        "default": false
+                      },
+                      "minorVersion": {
+                        "type": "boolean",
+                        "example": "true",
+                        "default": false,
+                        "description": "When set to 'true', the auto-update process will update the VNGs’ AMI with the AMI to match the Kubernetes control plane version. Either \"patch\" or \"minorVersion\" must be true.\n"
+                      },
+                      "applyRoll": {
+                        "type": "boolean",
+                        "example": "true",
+                        "default": false,
+                        "description": "This parameter is optional. When the AMI is updated according to the configuration set, a cluster roll can be triggered.\n"
+                      },
+                      "clusterRoll": {
+                        "type": "object",
+                        "description": "Cluster roll configuration.",
+                        "properties": {
+                          "batchSizePercentage": {
+                            "type": "integer",
+                            "description": "Value as a percent to set the size of a batch in a roll. Valid values are 0-100.",
+                            "example": 20
+                          },
+                          "batchMinHealthyPercentage": {
+                            "type": "integer",
+                            "description": "Indicates the threshold of minimum healthy instances in single batch. If the amount of healthy instances in single batch is under the threshold, the cluster roll will fail. If exists, the parameter value will be in range of 1-100. In case of null as value, the default value in the backend will be 50%. Value of param should represent the number in percentage (%) of the batch.",
+                            "example": 100,
+                            "minimum": 1,
+                            "maximum": 100,
+                            "default": 50
+                          },
+                          "comment": {
+                            "type": "string",
+                            "description": "Add a brief description for the roll. The comment is limited to 256 chars.\n",
+                            "example": "This is why I rolled my cluster."
+                          },
+                          "respectPdb": {
+                            "type": "boolean",
+                            "description": "During the roll, if the parameter is set to true we honor PDB during the instance replacement.\n",
+                            "example": true,
+                            "default": false
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "EKS AMI Auto Update Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/aws/eks/cluster/o-abcd1234/amiAutoUpdate"
+                            },
+                            "method": {
+                              "example": "PUT"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "description": "Response indicating AMI updated for each cluster's Virtual Node Groups\n",
+                                "title": "AMI Auto Update Response",
+                                "properties": {
+                                  "oceanId": {
+                                    "type": "string",
+                                    "readOnly": true,
+                                    "example": "o-134abcd",
+                                    "description": "Ocean cluster identifier.\n"
+                                  },
+                                  "status": {
+                                    "type": "string",
+                                    "description": "Ami update result.\n",
+                                    "enum": [
+                                      "Success",
+                                      "Failed"
+                                    ]
+                                  },
+                                  "data": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "description": "Launch spec AMI auto update details\n",
+                                      "properties": {
+                                        "vngId": {
+                                          "type": "string",
+                                          "readOnly": true,
+                                          "example": "default",
+                                          "description": "The Virtual Node Group Identifier.\n"
+                                        },
+                                        "vngName": {
+                                          "type": "string",
+                                          "readOnly": true,
+                                          "example": "default",
+                                          "description": "The Virtual Node Group name.\n"
+                                        },
+                                        "status": {
+                                          "type": "string",
+                                          "readOnly": true,
+                                          "example": "UPDATE_SUCCEEDED",
+                                          "description": "The AMI update result.\n",
+                                          "enum": [
+                                            "NO_UPDATE_REQUIRED",
+                                            "UPDATE_SUCCEEDED",
+                                            "UPDATE_REQUIRED_BUT_FAILED",
+                                            "FAILED"
+                                          ]
+                                        },
+                                        "updateType": {
+                                          "type": "string",
+                                          "readOnly": true,
+                                          "example": "MINOR",
+                                          "description": "Virtual Node Group's AMI update type.\n",
+                                          "enum": [
+                                            "MINOR",
+                                            "PATCH"
+                                          ]
+                                        },
+                                        "oldAmiId": {
+                                          "type": "string",
+                                          "readOnly": true,
+                                          "example": "ami-00cd348996bfd7ba8",
+                                          "description": "The ID of the old AMI that was replaced.\n"
+                                        },
+                                        "newAmiId": {
+                                          "type": "string",
+                                          "readOnly": true,
+                                          "example": "ami-019e5b81636e5a350",
+                                          "description": "The ID of the new AMI that is being used for the VNG.\n"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "rollId": {
+                                    "type": "string",
+                                    "readOnly": true,
+                                    "example": "scr-752331b9",
+                                    "description": "The ID of the triggered cluster roll.\n"
+                                  },
+                                  "createdAt": {
+                                    "type": "string",
+                                    "readOnly": true,
+                                    "example": "2024-01-02T09:57:09.211Z",
+                                    "description": "The AMI update method was triggered at this time.\n"
+                                  },
+                                  "updatedAt": {
+                                    "type": "string",
+                                    "readOnly": true,
+                                    "example": "2024-01-02T09:57:09.211Z",
+                                    "description": "The AMI update method was triggered at this time.    \n  \n"
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "ocean:k8s:cluster:amiAutoUpdate:summary"
                             }
                           }
                         }
