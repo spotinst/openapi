@@ -1,0 +1,26 @@
+put:
+  summary: "Initiate EKS AMI Auto Update"
+  description: |
+    Update the Ocean EKS cluster's VNGs with the latest image or the image matching the control plane's version after upgrading, by specifying ‘patch' or 'minorVersion’.
+    Performing this request will update the VNGs with new AMI if available, and run a cluster roll if set.
+    If the response is successful, the old and new AMIs will be included in the response along with the updated VNGs.
+    If a cluster roll is set in the request, the first response for a successful request will indicate the start of a roll.
+    In order to check the status of the roll, you can use the GET Roll API.
+  operationId: "oceanAwsAmiAutoUpdate"
+  tags:
+    - "Ocean AWS"
+  parameters:
+  - $ref: "../../commons/parameters/oceanClusterId.yaml"
+  - $ref: "../../../../commons/parameters/accountId.yaml"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          allOf:
+            - $ref: "../schemas/amiAutoUpdate.yaml"
+  responses:
+    200:
+      $ref: "../responses/amiAutoUpdate.yaml"
+    400:
+      description: "Bad Request"
