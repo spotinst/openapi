@@ -41259,7 +41259,7 @@
         }
       }
     },
-    "/ocean/aws/k8s/cluster/{oceanClusterId}/amiAutoUpdate": {
+    "/ocean/aws/eks/cluster/{oceanClusterId}/amiAutoUpdate": {
       "put": {
         "summary": "Initiate EKS AMI Auto Update",
         "description": "Update the Ocean EKS cluster's VNGs with the latest image or the image matching the control plane's version after upgrading, by specifying ‘patch' or 'minorVersion’.\nPerforming this request will update the VNGs with new AMI if available, and run a cluster roll if set.\nIf the response is successful, the old and new AMIs will be included in the response along with the updated VNGs.\nIf a cluster roll is set in the request, the first response for a successful request will indicate the start of a roll.\nIn order to check the status of the roll, you can use the GET Roll API.\n",
@@ -41286,51 +41286,56 @@
                     "description": "The object specifying the request to trigger an AMI auto update operation\n",
                     "title": "AMI Auto Update",
                     "properties": {
-                      "patch": {
-                        "type": "boolean",
-                        "description": "When set to 'true', the auto-update process will update the VNGs’ images with the latest security patches. Either \"patch\" or \"minorVersion\" must be true.\n",
-                        "example": "true",
-                        "default": false
-                      },
-                      "minorVersion": {
-                        "type": "boolean",
-                        "example": "true",
-                        "default": false,
-                        "description": "When set to 'true', the auto-update process will update the VNGs’ AMI with the AMI to match the Kubernetes control plane version. Either \"patch\" or \"minorVersion\" must be true.\n"
-                      },
-                      "applyRoll": {
-                        "type": "boolean",
-                        "example": "true",
-                        "default": false,
-                        "description": "This parameter is optional. When the AMI is updated according to the configuration set, a cluster roll can be triggered.\n"
-                      },
-                      "clusterRoll": {
+                      "amiAutoUpdate": {
                         "type": "object",
-                        "description": "Cluster roll configuration.",
                         "properties": {
-                          "batchSizePercentage": {
-                            "type": "integer",
-                            "description": "Value as a percent to set the size of a batch in a roll. Valid values are 0-100.",
-                            "example": 20
-                          },
-                          "batchMinHealthyPercentage": {
-                            "type": "integer",
-                            "description": "Indicates the threshold of minimum healthy instances in single batch. If the amount of healthy instances in single batch is under the threshold, the cluster roll will fail. If exists, the parameter value will be in range of 1-100. In case of null as value, the default value in the backend will be 50%. Value of param should represent the number in percentage (%) of the batch.",
-                            "example": 100,
-                            "minimum": 1,
-                            "maximum": 100,
-                            "default": 50
-                          },
-                          "comment": {
-                            "type": "string",
-                            "description": "Add a brief description for the roll. The comment is limited to 256 chars.\n",
-                            "example": "This is why I rolled my cluster."
-                          },
-                          "respectPdb": {
+                          "patch": {
                             "type": "boolean",
-                            "description": "During the roll, if the parameter is set to true we honor PDB during the instance replacement.\n",
-                            "example": true,
+                            "description": "When set to 'true', the auto-update process will update the VNGs’ images with the latest security patches. Either \"patch\" or \"minorVersion\" must be true.\n",
+                            "example": "true",
                             "default": false
+                          },
+                          "minorVersion": {
+                            "type": "boolean",
+                            "example": "true",
+                            "default": false,
+                            "description": "When set to 'true', the auto-update process will update the VNGs’ AMI with the AMI to match the Kubernetes control plane version. Either \"patch\" or \"minorVersion\" must be true.\n"
+                          },
+                          "applyRoll": {
+                            "type": "boolean",
+                            "example": "true",
+                            "default": false,
+                            "description": "This parameter is optional. When the AMI is updated according to the configuration set, a cluster roll can be triggered.\n"
+                          },
+                          "clusterRoll": {
+                            "type": "object",
+                            "description": "Cluster roll configuration.",
+                            "properties": {
+                              "batchSizePercentage": {
+                                "type": "integer",
+                                "description": "Value as a percent to set the size of a batch in a roll. Valid values are 0-100.",
+                                "example": 20
+                              },
+                              "batchMinHealthyPercentage": {
+                                "type": "integer",
+                                "description": "Indicates the threshold of minimum healthy instances in single batch. If the amount of healthy instances in single batch is under the threshold, the cluster roll will fail. If exists, the parameter value will be in range of 1-100. In case of null as value, the default value in the backend will be 50%. Value of param should represent the number in percentage (%) of the batch.",
+                                "example": 100,
+                                "minimum": 1,
+                                "maximum": 100,
+                                "default": 50
+                              },
+                              "comment": {
+                                "type": "string",
+                                "description": "Add a brief description for the roll. The comment is limited to 256 chars.\n",
+                                "example": "This is why I rolled my cluster."
+                              },
+                              "respectPdb": {
+                                "type": "boolean",
+                                "description": "During the roll, if the parameter is set to true we honor PDB during the instance replacement.\n",
+                                "example": true,
+                                "default": false
+                              }
+                            }
                           }
                         }
                       }
