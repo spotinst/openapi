@@ -31192,7 +31192,7 @@
           },
           {
             "in": "query",
-            "name": "LIMIT",
+            "name": "limit",
             "description": "Maximum number of lines to extract in a response.\n",
             "schema": {
               "type": "integer",
@@ -31204,7 +31204,7 @@
           },
           {
             "in": "query",
-            "name": "SEVERITY",
+            "name": "severity",
             "description": "Severity of log entries to extract.\n",
             "schema": {
               "type": "string",
@@ -31212,6 +31212,7 @@
                 "ALL",
                 "INFO",
                 "DEBUG",
+                "ERROR",
                 "WARN"
               ],
               "default": "ALL"
@@ -35969,7 +35970,8 @@
                         "required": [
                           "name",
                           "region",
-                          "controllerClusterId"
+                          "controllerClusterId",
+                          "compute"
                         ],
                         "properties": {
                           "id": {
@@ -36679,10 +36681,6 @@
                         "type": "object",
                         "description": "The object specifying the configuration of the Ocean cluster.\n",
                         "title": "AWS Cluster",
-                        "required": [
-                          "name",
-                          "controllerClusterId"
-                        ],
                         "properties": {
                           "id": {
                             "type": "string",
@@ -37175,7 +37173,7 @@
                   {
                     "type": "object",
                     "properties": {
-                      "launchSpec": {
+                      "cluster": {
                         "type": "object",
                         "description": "The object specifying the configuration of the VNG.\n",
                         "properties": {
@@ -38517,6 +38515,11 @@
                                           },
                                           "dynamicIops": {
                                             "type": "object",
+                                            "required": [
+                                              "baseSize",
+                                              "resource",
+                                              "sizePerResourceUnit"
+                                            ],
                                             "description": "Set dynamic IOPS properties. When using this object, you cannot use the 'iops' object. You must use one or the other.\n",
                                             "properties": {
                                               "baseSize": {
@@ -38528,7 +38531,7 @@
                                                 "type": "string",
                                                 "enum": [
                                                   "CPU",
-                                                  "MEMORY"
+                                                  "memory"
                                                 ],
                                                 "description": "",
                                                 "example": "CPU"
@@ -38561,7 +38564,8 @@
                                             "type": "object",
                                             "required": [
                                               "baseSize",
-                                              "resource"
+                                              "resource",
+                                              "sizePerResourceUnit"
                                             ],
                                             "description": "Set dynamic volume size properties. When using this object, you cannot use volumeSize. You must use one or the other.\n",
                                             "properties": {
@@ -38572,6 +38576,9 @@
                                               },
                                               "resource": {
                                                 "type": "string",
+                                                "enum": [
+                                                  "CPU"
+                                                ],
                                                 "example": "CPU"
                                               },
                                               "sizePerResourceUnit": {
@@ -39281,9 +39288,15 @@
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "roll"
+                ],
                 "properties": {
                   "roll": {
                     "type": "object",
+                    "required": [
+                      "status"
+                    ],
                     "description": "Object that specifies the parameters required to initiate a roll (also called a deployment).\n",
                     "properties": {
                       "status": {
@@ -39672,6 +39685,9 @@
                 "allOf": [
                   {
                     "type": "object",
+                    "required": [
+                      "instancesToDetach"
+                    ],
                     "properties": {
                       "instancesToDetach": {
                         "type": "array",
@@ -41635,12 +41651,12 @@
           {
             "in": "query",
             "name": "oceanId",
+            "example": "o-12345abc",
+            "description": "Identifier of the Ocean cluster.\n",
             "schema": {
               "type": "string"
             },
-            "required": true,
-            "example": "o-12345abc",
-            "description": "Identifier of the Ocean cluster.\n"
+            "required": false
           }
         ],
         "responses": {
@@ -41964,6 +41980,9 @@
                         "properties": {
                           "tagSelector": {
                             "type": "object",
+                            "required": [
+                              "tagKey"
+                            ],
                             "description": "Key-value object, which defines an Elastic IP from the customer pool. Can be null.\n",
                             "properties": {
                               "tagKey": {
@@ -42121,7 +42140,8 @@
                                   "type": "object",
                                   "required": [
                                     "baseSize",
-                                    "resource"
+                                    "resource",
+                                    "sizePerResourceUnit"
                                   ],
                                   "description": "Set dynamic volume size properties. When using this object, you cannot use volumeSize.\\\nYou must use one or the other.\n",
                                   "properties": {
@@ -42792,7 +42812,7 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/get/parameters/1"
           },
           {
             "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1autoScalingGroup~1import/post/parameters/1"
@@ -42858,8 +42878,7 @@
                                   "enum": [
                                     "NoSchedule",
                                     "PreferNoSchedule",
-                                    "NoExecute",
-                                    "PreferNoExecute"
+                                    "NoExecute"
                                   ]
                                 }
                               }
@@ -43016,14 +43035,7 @@
             "required": false
           },
           {
-            "in": "query",
-            "name": "oceanId",
-            "example": "o-12345abc",
-            "description": "Identifier of the Ocean cluster.\n",
-            "schema": {
-              "type": "string"
-            },
-            "required": false
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec/get/parameters/1"
           }
         ],
         "requestBody": {
@@ -55157,7 +55169,14 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec/get/parameters/1"
+            "in": "query",
+            "name": "oceanId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "o-12345abc",
+            "description": "Identifier of the Ocean cluster.\n"
           }
         ],
         "responses": {
@@ -55225,7 +55244,7 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/get/parameters/1"
           },
           {
             "in": "query",
@@ -59644,7 +59663,7 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/get/parameters/1"
           }
         ],
         "responses": {
@@ -62060,7 +62079,7 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/get/parameters/1"
           }
         ],
         "responses": {
@@ -62898,7 +62917,7 @@
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1aws~1k8s~1launchSpec/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec/get/parameters/1"
           },
           {
             "in": "query",
@@ -64835,6 +64854,9 @@
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "launchRequest"
+                ],
                 "properties": {
                   "launchRequest": {
                     "type": "object",
@@ -65613,7 +65635,7 @@
                           "shouldTerminateDrainedNodes",
                           "shouldEvictStandAlonePods",
                           "forcePodEvictionOnPdbFailure",
-                          "batchSize"
+                          "batchSizePercentage"
                         ],
                         "properties": {
                           "instanceIds": {
@@ -65642,7 +65664,7 @@
                             "example": true,
                             "description": "Ocean will force the Pod eviction from the instance, even if the distributed budget is not satisfied.\n"
                           },
-                          "batchSize": {
+                          "batchSizePercentage": {
                             "type": "integer",
                             "example": 50,
                             "description": "Indicates (in percentage) the batch size of the migration (meaning, how many nodes to migrate in each batch).\\\nCannot be null.\n",
@@ -65692,135 +65714,6 @@
                                     "example": "owm-6e3819ae",
                                     "description": "The migration identifier of a specific migration.\n",
                                     "type": "string"
-                                  }
-                                }
-                              }
-                            },
-                            "kind": {
-                              "example": "spotinst:ocean:aws:k8s:cluster:migration"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
-      },
-      "put": {
-        "summary": "Stop Migration",
-        "description": "Stop an ongoing Workload Migration.\n",
-        "operationId": "oceanAwsPutMigration",
-        "tags": [
-          "Ocean AWS"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
-          },
-          {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
-          },
-          {
-            "in": "query",
-            "name": "migrationId",
-            "example": "owm-6e3819ae",
-            "description": "The migration identifier of a specific migration.\n",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "type": "object",
-                    "required": [
-                      "migration"
-                    ],
-                    "properties": {
-                      "migration": {
-                        "required": [
-                          "state"
-                        ],
-                        "type": "object",
-                        "description": "Migration update configuration.\n",
-                        "properties": {
-                          "shouldTerminateDrainedNodes": {
-                            "type": "boolean",
-                            "example": true,
-                            "default": false,
-                            "description": "Ocean will terminate the old instances once the pods that reside on them are migrated, and the old instances are fully drained.\n"
-                          },
-                          "state": {
-                            "type": "string",
-                            "description": "The only allowed state to update is to \"STOPPED\". This state will stop a running migration.\n",
-                            "example": "STOPPED"
-                          }
-                        }
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Migrations Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "request": {
-                          "type": "object",
-                          "properties": {
-                            "url": {
-                              "example": "ocean/aws/k8s/cluster/o-1234567/migration/owm-abc1234"
-                            },
-                            "method": {
-                              "example": "PUT"
-                            }
-                          }
-                        },
-                        "response": {
-                          "properties": {
-                            "items": {
-                              "type": "array",
-                              "items": {
-                                "properties": {
-                                  "id": {
-                                    "example": "owm-6e3819ae",
-                                    "description": "The migration identifier of a specific migration.\n",
-                                    "type": "string"
-                                  },
-                                  "oceanId": {
-                                    "type": "string",
-                                    "description": "The identifier of the ocean cluster belong the migration.\n",
-                                    "example": "o-12e31234"
-                                  },
-                                  "state": {
-                                    "type": "string",
-                                    "description": "if update succeeded, the return value should be \"STOPPED\".\n",
-                                    "example": "STOPPED"
                                   }
                                 }
                               }
@@ -66125,6 +66018,128 @@
                                     "type": "string",
                                     "example": "2021-10-01T05:51:06.000Z",
                                     "description": "When this migration was completed.\n"
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:aws:k8s:cluster:migration"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "put": {
+        "summary": "Stop Migration",
+        "description": "Stop an ongoing Workload Migration.\n",
+        "operationId": "oceanAwsPutMigration",
+        "tags": [
+          "Ocean AWS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D~1migration~1%7BmigrationId%7D/get/parameters/2"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "migration"
+                    ],
+                    "properties": {
+                      "migration": {
+                        "required": [
+                          "state"
+                        ],
+                        "type": "object",
+                        "description": "Migration update configuration.\n",
+                        "properties": {
+                          "shouldTerminateDrainedNodes": {
+                            "type": "boolean",
+                            "example": true,
+                            "default": false,
+                            "description": "Ocean will terminate the old instances once the pods that reside on them are migrated, and the old instances are fully drained.\n"
+                          },
+                          "state": {
+                            "type": "string",
+                            "description": "The only allowed state to update is to \"STOPPED\". This state will stop a running migration.\n",
+                            "example": "STOPPED"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Migrations Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "ocean/aws/k8s/cluster/o-1234567/migration/owm-abc1234"
+                            },
+                            "method": {
+                              "example": "PUT"
+                            }
+                          }
+                        },
+                        "response": {
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "properties": {
+                                  "id": {
+                                    "example": "owm-6e3819ae",
+                                    "description": "The migration identifier of a specific migration.\n",
+                                    "type": "string"
+                                  },
+                                  "oceanId": {
+                                    "type": "string",
+                                    "description": "The identifier of the ocean cluster belong the migration.\n",
+                                    "example": "o-12e31234"
+                                  },
+                                  "state": {
+                                    "type": "string",
+                                    "description": "if update succeeded, the return value should be \"STOPPED\".\n",
+                                    "example": "STOPPED"
                                   }
                                 }
                               }
