@@ -32439,6 +32439,99 @@
         }
       }
     },
+    "/ocean/aws/ecs/cluster/{oceanClusterId}/detachInstances": {
+      "put": {
+        "summary": "Detach Instances",
+        "description": "Detach instances from your Ocean cluster.\n",
+        "operationId": "oceanEcsDetachInstance",
+        "tags": [
+          "Ocean ECS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "instancesToDetach"
+                    ],
+                    "properties": {
+                      "instancesToDetach": {
+                        "type": "array",
+                        "description": "Array of instance identifiers to be detached.\n",
+                        "items": {
+                          "type": "string"
+                        },
+                        "example": [
+                          "i-0003a99ffb566f039",
+                          "i-0567a99ffb566f765"
+                        ]
+                      },
+                      "shouldTerminateInstances": {
+                        "type": "boolean",
+                        "description": "Determines whether the detached EC2 instances should be terminated or not.\n",
+                        "example": true
+                      },
+                      "shouldDecrementTargetCapacity": {
+                        "type": "boolean",
+                        "description": "Determines whether the Ocean cluster's target capacity should be decremented.\n",
+                        "example": false
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Detach Instances Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/aws/ecs/cluster/o-abcd1234/detachInstances"
+                            },
+                            "method": {
+                              "example": "PUT"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/ocean/aws/ecs/launchSpec": {
       "post": {
         "summary": "Create VNG",
@@ -39684,33 +39777,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "type": "object",
-                    "required": [
-                      "instancesToDetach"
-                    ],
-                    "properties": {
-                      "instancesToDetach": {
-                        "type": "array",
-                        "description": "Array of instance identifiers to be detached.\n",
-                        "items": {
-                          "type": "string"
-                        },
-                        "example": [
-                          "i-0003a99ffb566f039",
-                          "i-0567a99ffb566f765"
-                        ]
-                      },
-                      "shouldTerminateInstances": {
-                        "type": "boolean",
-                        "description": "Determines whether the detached EC2 instances should be terminated or not.\n",
-                        "example": true
-                      },
-                      "shouldDecrementTargetCapacity": {
-                        "type": "boolean",
-                        "description": "Determines whether the Ocean cluster's target capacity should be decremented.\n",
-                        "example": false
-                      }
-                    }
+                    "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D~1detachInstances/put/requestBody/content/application~1json/schema/allOf/0"
                   }
                 ]
               }
