@@ -30203,7 +30203,7 @@
                             "items": {
                               "type": "array",
                               "items": {
-                                "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster/post/requestBody/content/application~1json/schema/allOf/0"
+                                "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D/put/requestBody/content/application~1json/schema/allOf/0"
                               }
                             },
                             "kind": {
@@ -30250,6 +30250,11 @@
                       "cluster": {
                         "type": "object",
                         "title": "ECS Ocean",
+                        "required": [
+                          "name",
+                          "clusterName",
+                          "region"
+                        ],
                         "properties": {
                           "id": {
                             "type": "string",
@@ -30271,9 +30276,6 @@
                             "type": "object",
                             "title": "Ocean Autoscaler",
                             "description": "The Ocean ECS Autoscaler.\n",
-                            "required": [
-                              "isEnabled"
-                            ],
                             "properties": {
                               "isEnabled": {
                                 "type": "boolean",
@@ -30284,19 +30286,6 @@
                                 "type": "integer",
                                 "description": "Cooldown period between scaling actions. Value should be cooldown period in seconds, greater than 180.\n",
                                 "example": 300
-                              },
-                              "attributes": {
-                                "type": "object",
-                                "properties": {
-                                  "key": {
-                                    "type": "string",
-                                    "example": "the_key"
-                                  },
-                                  "value": {
-                                    "type": "string",
-                                    "example": "the_value"
-                                  }
-                                }
                               },
                               "resourceLimits": {
                                 "type": "object",
@@ -30420,12 +30409,6 @@
                             "type": "object",
                             "title": "Ocean Strategy",
                             "description": "Strategy Configuration of the Ocean cluster.\n",
-                            "required": [
-                              "utilizeReservedInstances",
-                              "fallbackToOd",
-                              "spotPercentage",
-                              "drainingTimeout"
-                            ],
                             "properties": {
                               "utilizeReservedInstances": {
                                 "type": "boolean",
@@ -30526,8 +30509,7 @@
                                 "description": "The default specification for container instances in the cluster. Used as a template for custom Virtual Node Groups to inherit values which are not explicitly defined in them, and as a default VNG when no other VNGs exist or match the workload’s requirements.\n",
                                 "required": [
                                   "imageId",
-                                  "securityGroupIds",
-                                  "iamInstanceProfile"
+                                  "securityGroupIds"
                                 ],
                                 "properties": {
                                   "associatePublicIpAddress": {
@@ -30622,7 +30604,8 @@
                                               "type": "object",
                                               "required": [
                                                 "baseSize",
-                                                "resource"
+                                                "resource",
+                                                "sizePerResourceUnit"
                                               ],
                                               "description": "Set dynamic volume size properties. When using this object, you cannot use volumeSize. You must use one or the other.\n",
                                               "properties": {
@@ -30648,7 +30631,37 @@
                                     }
                                   },
                                   "instanceMetadataOptions": {
-                                    "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BEcsClusterName%7D~1import/post/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/cluster/properties/compute/properties/launchSpecification/properties/instanceMetadataOptions"
+                                    "type": "object",
+                                    "title": "instanceMetadataOptions",
+                                    "required": [
+                                      "httpTokens"
+                                    ],
+                                    "description": "Ocean instance metadata options object for [IMDSv2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html).\n",
+                                    "properties": {
+                                      "httpTokens": {
+                                        "type": "string",
+                                        "description": "Determines if a signed token is required or not.\n",
+                                        "enum": [
+                                          "optional",
+                                          "required"
+                                        ],
+                                        "example": "optional"
+                                      },
+                                      "httpPutResponseHopLimit": {
+                                        "type": "integer",
+                                        "description": "An integer from 1 through 64.\nThe desired HTTP PUT response hop limit for instance metadata requests.\nThe larger the number, the further the instance metadata requests can travel.\n",
+                                        "example": 12
+                                      },
+                                      "httpEndpoint": {
+                                        "type": "string",
+                                        "description": "Enables or disables the HTTP metadata endpoint on your instances.\n",
+                                        "enum": [
+                                          "disabled",
+                                          "enabled"
+                                        ],
+                                        "example": "disabled"
+                                      }
+                                    }
                                   },
                                   "userData": {
                                     "type": "string",
@@ -30660,10 +30673,39 @@
                                     "type": "boolean",
                                     "description": "The configuration specified on the Ocean object will function only as a template for virtual node groups.\n",
                                     "default": false
+                                  },
+                                  "monitoring": {
+                                    "type": "boolean",
+                                    "description": "Enable detailed monitoring for cluster.",
+                                    "example": false
+                                  },
+                                  "ebsOptimized": {
+                                    "type": "boolean",
+                                    "description": "Enable EBS optimization for the cluster. A flag will enable optimized capacity for high bandwidth connectivity to the EB service for non EBS optimized instance types. For instances that are EBS optimized, this flag will be ignored.",
+                                    "example": false
+                                  },
+                                  "tags": {
+                                    "type": "array",
+                                    "description": "List of kay-value pairs of tags.\n",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "tagKey": {
+                                          "type": "string",
+                                          "description": "Set the tag key.\n",
+                                          "example": "Creator"
+                                        },
+                                        "tagValue": {
+                                          "type": "string",
+                                          "description": "Set the tag value.\n",
+                                          "example": "John Doe"
+                                        }
+                                      }
+                                    }
                                   }
                                 }
                               },
-                              "optimizeImage": {
+                              "optimizeImages": {
                                 "type": "object",
                                 "properties": {
                                   "shouldOptimizeEcsAmi": {
@@ -30895,7 +30937,71 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster/post/requestBody/content/application~1json/schema/allOf/0"
+                    "type": "object",
+                    "required": [
+                      "cluster"
+                    ],
+                    "properties": {
+                      "cluster": {
+                        "type": "object",
+                        "title": "ECS Ocean",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "o-12345abc",
+                            "readOnly": true,
+                            "description": "Ocean cluster identifier.\n"
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "Ocean::my-elastigroup-name",
+                            "description": "Add a name for the Ocean cluster.\n"
+                          },
+                          "clusterName": {
+                            "type": "string",
+                            "example": "my-ECS-cluster-name",
+                            "description": "ECS cluster name.\n"
+                          },
+                          "autoScaler": {
+                            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/properties/autoScaler"
+                          },
+                          "region": {
+                            "type": "string",
+                            "example": "us-east-1",
+                            "description": "Select the region for the Ocean cluster to run in.\n"
+                          },
+                          "capacity": {
+                            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/properties/capacity"
+                          },
+                          "strategy": {
+                            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/properties/strategy"
+                          },
+                          "compute": {
+                            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/properties/compute"
+                          },
+                          "scheduling": {
+                            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/properties/scheduling"
+                          },
+                          "logging": {
+                            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/properties/logging"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "readOnly": true,
+                            "format": "date-time",
+                            "example": "2019-06-03T08:13:08.000Z",
+                            "description": "A timestamp of the Ocean creation.\n"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "readOnly": true,
+                            "format": "date-time",
+                            "example": "2019-06-10T15:06:13.000Z",
+                            "description": "A timestamp of the latest Ocean update.\n"
+                          }
+                        }
+                      }
+                    }
                   }
                 ]
               }
@@ -31109,37 +31215,7 @@
                                                 }
                                               },
                                               "instanceMetadataOptions": {
-                                                "type": "object",
-                                                "title": "instanceMetadataOptions",
-                                                "required": [
-                                                  "httpTokens"
-                                                ],
-                                                "description": "Ocean instance metadata options object for [IMDSv2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html).\n",
-                                                "properties": {
-                                                  "httpTokens": {
-                                                    "type": "string",
-                                                    "description": "Determines if a signed token is required or not.\n",
-                                                    "enum": [
-                                                      "optional",
-                                                      "required"
-                                                    ],
-                                                    "example": "optional"
-                                                  },
-                                                  "httpPutResponseHopLimit": {
-                                                    "type": "integer",
-                                                    "description": "An integer from 1 through 64.\nThe desired HTTP PUT response hop limit for instance metadata requests.\nThe larger the number, the further the instance metadata requests can travel.\n",
-                                                    "example": 12
-                                                  },
-                                                  "httpEndpoint": {
-                                                    "type": "string",
-                                                    "description": "Enables or disables the HTTP metadata endpoint on your instances.\n",
-                                                    "enum": [
-                                                      "disabled",
-                                                      "enabled"
-                                                    ],
-                                                    "example": "disabled"
-                                                  }
-                                                }
+                                                "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/properties/compute/properties/launchSpecification/properties/instanceMetadataOptions"
                                               }
                                             }
                                           }
@@ -32198,13 +32274,22 @@
                   {
                     "type": "object",
                     "properties": {
-                      "status": {
-                        "type": "string",
+                      "roll": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
                         "description": "Sets the status of the roll.\n",
-                        "example": "STOPPED",
-                        "enum": [
-                          "STOPPED"
-                        ]
+                        "properties": {
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "STOPPED"
+                            ],
+                            "description": "Set status of a roll. Valid values: \"STOPPED\"\n",
+                            "example": "STOPPED"
+                          }
+                        }
                       }
                     }
                   }
@@ -32696,6 +32781,9 @@
                                 "type": "array",
                                 "items": {
                                   "type": "object",
+                                  "required": [
+                                    "numOfUnits"
+                                  ],
                                   "properties": {
                                     "cpuPerUnit": {
                                       "description": "Configure the number of CPUs to allocate the headroom. CPUs are denoted in millicores, where 1000 millicores = 1 vCPU.\n",
@@ -32793,7 +32881,8 @@
                                       "type": "object",
                                       "required": [
                                         "baseSize",
-                                        "resource"
+                                        "resource",
+                                        "sizePerResourceUnit"
                                       ],
                                       "description": "Set dynamic volume size properties. When using this object, you cannot use volumeSize. You must use one or the other.\n",
                                       "properties": {
@@ -33023,6 +33112,15 @@
         "parameters": [
           {
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "in": "query",
+            "name": "oceanId",
+            "schema": {
+              "type": "string"
+            },
+            "example": "o-12345abc",
+            "description": "Identifier of the Ocean cluster.\n"
           }
         ],
         "responses": {
@@ -65051,6 +65149,9 @@
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "launchRequest"
+                ],
                 "properties": {
                   "launchRequest": {
                     "type": "object",
