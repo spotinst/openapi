@@ -10,10 +10,6 @@ properties:
     description: >
       The identifier of the ocean cluster.
     example: o-12e31234
-  scope:
-    type: string
-    enum: [Cluster, Vng, Node Pool, Node]
-    example: Cluster
   status:
     type: string
     description: >
@@ -42,35 +38,105 @@ properties:
       detailedStatus:
         type: object
         description: >
-          An object containing detailed information about the progress of the roll.
+          An object containing detailed information about the progress of the migration.
         properties:
-          rollNodes:
+          oldNodes:
             type: array
             description: >
-              An array of objects containing detailed information about each node handled by the roll.
+              An array of objects containing detailed information about old nodes that are being replaced.
             items:
               type: object
               properties:
                 nodeName:
                   type: string
+                nodePoolName:
+                  type: string
                 status:
                   description: >
-                    The status of the node according to the roll.
+                    The status of the node according to the migration.
                   type: string
                   enum: [REPLACED, TO_BE_REPLACED, COULD_NOT_BE_REPLACED, NOT_REPLACED_DUE_TO_PDB, DID_NOT_REPLACE, IN_PROGRESS]
+                podDetails:
+                  type: array
+                  description: >
+                    An array of objects of all pods currently running on the node that is being replaced.
+                  items:
+                    type: object
+                    properties:
+                      podName:
+                        type: string
+                runningPods:
+                  type: integer
             example:
               - nodeName: aks-omnpbc2ebdb1-15563275-vmss00000q
+                nodePoolName: omnpbc2ebdb1
                 status: REPLACED
+                "podDetails":
+                  - "podName": "pod-example-name1"
+                runningPods: 1
               - nodeName: aks-omnpbc2ebdb1-15563275-vmss000008
+                nodePoolName: omnpbc2ebdb1
                 status: TO_BE_REPLACED
+                "podDetails":
+                  - "podName": "pod-example-name2"
+                  - "podName": "pod-example-name3"
+                runningPods: 2
               - nodeName: aks-omnpbc2ebdb1-15563275-vmss00000r
+                nodePoolName: omnpbc2ebdb1
                 status: COULD_NOT_BE_REPLACED
+                "podDetails":
+                  - "podName": "pod-example-name4"
+                  - "podName": "pod-example-name5"
+                runningPods: 2
               - nodeName: aks-omnpe9429a2f-26725402-vmss00000z
+                nodePoolName: omnpe9429a2f
                 status: NOT_REPLACED_DUE_TO_PDB
+                "podDetails":
+                  - "podName": "pod-example-name6"
+                runningPods: 1
               - nodeName: aks-omnp0c85c2c2-26833420-vmss000001
+                nodePoolName: omnp0c85c2c2
                 status: IN_PROGRESS
+                "podDetails":
+                  - "podName": "pod-example-name7"
+                runningPods: 1
               - nodeName: aks-omnp0c85c2c2-26833420-vmss000003
+                nodePoolName: omnp0c85c2c2
                 status: DID_NOT_REPLACE
+                "podDetails":
+                  - "podName": "pod-example-name8"
+                runningPods: 1
+          scaleNodePools:
+            type: array
+            description: >
+              An array of objects containing detailed information about all node pools that were scaled during the migration process.
+            items:
+              type: object
+              properties:
+                nodePoolName:
+                  type: string
+                newNodes:
+                  type: integer
+                vngId:
+                  type: string
+                vngName:
+                  type: string
+                status:
+                  description: >
+                    The status of the node pool scaling according to the migration.
+                  type: string
+                  enum: [SCALING, COMPLETED, FAILED]
+            example:
+              - "nodePoolName": omnp12340
+                "newNodes": 2
+                "vngId": vng-1234
+                "vngName": vng2
+                "status": Scaling
+              - "nodePoolName": omnp12345
+                "newNodes": 10
+                "vngId": vng-1234
+                "vngName": vng2
+                "status": Completed
   respectPdb:
     type: boolean
     example: true
@@ -83,10 +149,20 @@ properties:
   createdAt:
     type: string
     description: >
-      The creation timestamp of the roll.
+      The creation timestamp of the migration.
     example: 2019-03-24T15:46:09.000Z
-  updatedAt:
+  erredAt:
     type: string
     description: >
-      The latest update timestamp of the roll.
+      The timestamp of the migration error.
+    example: 2019-03-24T15:46:09.000Z
+  stoppedAt:
+    type: string
+    description: >
+      The stopping timestamp of the migration.
+    example: 2019-03-24T15:46:09.000Z
+  completedAt:
+    type: string
+    description: >
+      The completion timestamp of the migration.
     example: 2019-03-24T15:46:09.000Z
