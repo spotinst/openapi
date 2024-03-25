@@ -62575,100 +62575,6 @@
         }
       }
     },
-    "/ocean/azure/np/cluster/{oceanClusterId}/migration/discovery": {
-      "get": {
-        "summary": "Get Migration Discovery",
-        "description": "Get information about nodes which can be migrated into Ocean.\n",
-        "operationId": "oceanAksV2GetMigrationDiscovery",
-        "tags": [
-          "Ocean AKS"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
-          },
-          {
-            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
-          },
-          {
-            "in": "query",
-            "name": "shouldFetchPods",
-            "example": "true",
-            "description": "Should fetch data about running pods for each node.\n",
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Migration Discovery Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "request": {
-                          "type": "object",
-                          "properties": {
-                            "url": {
-                              "example": "ocean/azure/np/cluster/o-abcd1234/migration/discovery"
-                            },
-                            "method": {
-                              "example": "GET"
-                            }
-                          }
-                        },
-                        "response": {
-                          "properties": {
-                            "items": {
-                              "type": "array",
-                              "items": {
-                                "title": "Workload migration discovery details",
-                                "description": "Information about available nodes which can be migrated to the Ocean cluster",
-                                "type": "object",
-                                "properties": {
-                                  "nodeName": {
-                                    "type": "string",
-                                    "description": "The node name.",
-                                    "example": "aks-mynodepool-18735776-vmss000001"
-                                  },
-                                  "nodePoolName": {
-                                    "type": "string",
-                                    "description": "The NodePool Name.",
-                                    "example": "mynodepool"
-                                  },
-                                  "runningPods": {
-                                    "type": "integer",
-                                    "description": "The number of running pods on the node (appears if shouldFetchPods was true).",
-                                    "example": "6"
-                                  }
-                                }
-                              }
-                            },
-                            "kind": {
-                              "example": "spotinst:ocean:azure:k8s:np:nodePoolUnmanaged"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
-      }
-    },
     "/ocean/azure/np/virtualNodeGroup/{virtualNodeGroupId}": {
       "get": {
         "summary": "Get Virtual Node Group",
@@ -64215,6 +64121,847 @@
                             },
                             "kind": {
                               "example": "spotinst:ocean:azure:np:roll"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/azure/np/cluster/{oceanClusterId}/migration/discovery": {
+      "get": {
+        "summary": "Get Migration Discovery",
+        "description": "Get information about nodes which can be migrated into Ocean.\n",
+        "operationId": "oceanAksV2GetMigrationDiscovery",
+        "tags": [
+          "Ocean AKS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1ecs~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          },
+          {
+            "in": "query",
+            "name": "shouldFetchPods",
+            "example": "true",
+            "description": "Should fetch data about running pods for each node.\n",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Migration Discovery Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "ocean/azure/np/cluster/o-abcd1234/migration/discovery"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "title": "Workload migration discovery details",
+                                "description": "Information about available nodes which can be migrated to the Ocean cluster",
+                                "type": "object",
+                                "properties": {
+                                  "nodeName": {
+                                    "type": "string",
+                                    "description": "The node name.",
+                                    "example": "aks-mynodepool-18735776-vmss000001"
+                                  },
+                                  "nodePoolName": {
+                                    "type": "string",
+                                    "description": "The NodePool Name.",
+                                    "example": "mynodepool"
+                                  },
+                                  "runningPods": {
+                                    "type": "integer",
+                                    "description": "The number of running pods on the node (appears if shouldFetchPods was true).",
+                                    "example": "6"
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:azure:k8s:np:nodePoolUnmanaged"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/azure/np/cluster/{oceanClusterId}/migration": {
+      "summary": "Ocean for AKS",
+      "post": {
+        "summary": "Create Migration",
+        "description": "Migrate to ocean workloads that run on unmanaged nodes by specifying nodePoolNames or nodeNames. Performing this request will start the migration immediately and run it in defined batches. Note that the first response for a successful request will indicate the start of a migration. In order to check the status of a migration, you can use the GET migration API.\n",
+        "operationId": "oceanAksCreateMigration",
+        "tags": [
+          "Ocean AKS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "title": "Migration with node names",
+                    "allOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "batchSizePercentage": {
+                            "type": "integer",
+                            "description": "Value as a percent to set the size of a batch in a migration. Valid values are 0-100. In case of null as value, the default value in the backend will be 20%.\n",
+                            "minimum": 1,
+                            "maximum": 100,
+                            "example": 25
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "comment": {
+                            "type": "string",
+                            "description": "Add a comment description for the migration. The comment is limited to 256 chars and optional.\n",
+                            "example": "This is why I deployed my cluster."
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "respectPdb": {
+                            "type": "boolean",
+                            "description": "During the migration, if the parameter is set to true we honor PDB during the nodes replacement.\n",
+                            "example": false,
+                            "default": true
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "respectRestrictScaleDown": {
+                            "type": "boolean",
+                            "description": "During the migration, if the parameter is set to true we honor Restrict Scale Down label during the nodes replacement.\n",
+                            "example": true,
+                            "default": false
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "shouldTerminateNodes": {
+                            "type": "boolean",
+                            "description": "If the parameter is set to true we will terminate the node after the migration has finished successfully. If the parameter is set to false we will leave the nodes.    example: true\n",
+                            "default": true
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "shouldEvictStandalonePods": {
+                            "type": "boolean",
+                            "description": "If the parameter is set to true we will evict all standalone pods during the migration.\n",
+                            "example": true,
+                            "default": true
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "batchMinHealthyPercentage": {
+                            "type": "integer",
+                            "description": "Indicates the threshold of minimum healthy nodes in single batch. If the amount of healthy nodes in single batch is under the threshold, the migration will fail. If exists, the parameter value will be in range of 1-100. In case of null as value, the default value in the backend will be 50%. Value of param should represent the number in percentage (%) of the batch.\n",
+                            "minimum": 1,
+                            "maximum": 100,
+                            "example": 100,
+                            "default": 50
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "nodeNames": {
+                            "type": "array",
+                            "description": "List of node names to be migrated. Each identifier is a string. nodeNames can be null, and cannot be used together with nodePoolNames.\n",
+                            "items": {
+                              "type": "string",
+                              "example": [
+                                "aks-omnpbc2ebdb1-15563275-vmss00000g",
+                                "aks-omnpe9429a2f-26725402-vmss000015"
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "title": "Migration with node pool names",
+                    "allOf": [
+                      {
+                        "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1migration/post/requestBody/content/application~1json/schema/oneOf/0/allOf/0"
+                      },
+                      {
+                        "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1migration/post/requestBody/content/application~1json/schema/oneOf/0/allOf/1"
+                      },
+                      {
+                        "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1migration/post/requestBody/content/application~1json/schema/oneOf/0/allOf/2"
+                      },
+                      {
+                        "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1migration/post/requestBody/content/application~1json/schema/oneOf/0/allOf/3"
+                      },
+                      {
+                        "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1migration/post/requestBody/content/application~1json/schema/oneOf/0/allOf/4"
+                      },
+                      {
+                        "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1migration/post/requestBody/content/application~1json/schema/oneOf/0/allOf/5"
+                      },
+                      {
+                        "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1migration/post/requestBody/content/application~1json/schema/oneOf/0/allOf/6"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "nodePoolNames": {
+                            "type": "array",
+                            "description": "List of node pools to be migrated. Each node pool name is a string. nodePoolNames can be null, and cannot be used together with nodeNames.\n",
+                            "items": {
+                              "type": "string",
+                              "example": [
+                                "omnp35f6cccb",
+                                "omnp55bd559b"
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ocean AKS Create Migration Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/azure/np/cluster/o-12345abc/migration"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "allOf": [
+                                  {
+                                    "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1migration/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items"
+                                  }
+                                ]
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:ocean:azure:np:migration"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "get": {
+        "summary": "List Migrations",
+        "description": "Get status for all migrations of an Ocean cluster.\n",
+        "operationId": "oceanAksMigrationsList",
+        "tags": [
+          "Ocean AKS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean AKS Get Migration Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/azure/np/cluster/o-12345abc/migration"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string",
+                                    "description": "The identifier of the migration.\n",
+                                    "example": "scr-12345abc"
+                                  },
+                                  "oceanId": {
+                                    "type": "string",
+                                    "description": "The identifier of the ocean cluster.\n",
+                                    "example": "o-12e31234"
+                                  },
+                                  "status": {
+                                    "type": "string",
+                                    "description": "The status of the migration.\n",
+                                    "enum": [
+                                      "IN_PROGRESS",
+                                      "COMPLETED",
+                                      "PARTLY_COMPLETED",
+                                      "FAILED",
+                                      "STOPPED"
+                                    ],
+                                    "example": "COMPLETED"
+                                  },
+                                  "currentBatch": {
+                                    "type": "integer",
+                                    "description": "The current batch being handled by the migration.\n",
+                                    "example": 1
+                                  },
+                                  "numOfBatches": {
+                                    "type": "integer",
+                                    "description": "The total number of batches in the migration.\n",
+                                    "example": 2
+                                  },
+                                  "comment": {
+                                    "type": "string",
+                                    "example": "migration comment."
+                                  },
+                                  "migrationProgress": {
+                                    "type": "object",
+                                    "properties": {
+                                      "progressPercentage": {
+                                        "type": "number",
+                                        "example": 0
+                                      },
+                                      "detailedStatus": {
+                                        "type": "object",
+                                        "description": "An object containing detailed information about the progress of the migration.\n",
+                                        "properties": {
+                                          "oldNodes": {
+                                            "type": "array",
+                                            "description": "An array of objects containing detailed information about old nodes that are being replaced.\n",
+                                            "items": {
+                                              "type": "object",
+                                              "properties": {
+                                                "nodeName": {
+                                                  "type": "string"
+                                                },
+                                                "nodePoolName": {
+                                                  "type": "string"
+                                                },
+                                                "vngId": {
+                                                  "type": "string"
+                                                },
+                                                "vngName": {
+                                                  "type": "string"
+                                                },
+                                                "status": {
+                                                  "description": "The status of the node according to the migration.\n",
+                                                  "type": "string",
+                                                  "enum": [
+                                                    "REPLACED",
+                                                    "TO_BE_REPLACED",
+                                                    "COULD_NOT_BE_REPLACED",
+                                                    "NOT_REPLACED_DUE_TO_PDB",
+                                                    "DID_NOT_REPLACE",
+                                                    "IN_PROGRESS"
+                                                  ]
+                                                },
+                                                "podDetails": {
+                                                  "type": "array",
+                                                  "description": "An array of objects of all pods currently running on the node that is being replaced.\n",
+                                                  "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                      "podName": {
+                                                        "type": "string"
+                                                      }
+                                                    }
+                                                  }
+                                                },
+                                                "runningPods": {
+                                                  "type": "integer"
+                                                }
+                                              }
+                                            },
+                                            "example": [
+                                              {
+                                                "nodeName": "aks-omnpbc2ebdb1-15563275-vmss00000q",
+                                                "nodePoolName": "omnpbc2ebdb1",
+                                                "status": "REPLACED",
+                                                "podDetails": [
+                                                  {
+                                                    "podName": "pod-example-name1"
+                                                  }
+                                                ],
+                                                "runningPods": 1
+                                              },
+                                              {
+                                                "nodeName": "aks-omnpbc2ebdb1-15563275-vmss000008",
+                                                "nodePoolName": "omnpbc2ebdb1",
+                                                "status": "TO_BE_REPLACED",
+                                                "podDetails": [
+                                                  {
+                                                    "podName": "pod-example-name2"
+                                                  },
+                                                  {
+                                                    "podName": "pod-example-name3"
+                                                  }
+                                                ],
+                                                "runningPods": 2
+                                              },
+                                              {
+                                                "nodeName": "aks-omnpbc2ebdb1-15563275-vmss00000r",
+                                                "nodePoolName": "omnpbc2ebdb1",
+                                                "status": "COULD_NOT_BE_REPLACED",
+                                                "podDetails": [
+                                                  {
+                                                    "podName": "pod-example-name4"
+                                                  },
+                                                  {
+                                                    "podName": "pod-example-name5"
+                                                  }
+                                                ],
+                                                "runningPods": 2
+                                              },
+                                              {
+                                                "nodeName": "aks-omnpe9429a2f-26725402-vmss00000z",
+                                                "nodePoolName": "omnpe9429a2f",
+                                                "status": "NOT_REPLACED_DUE_TO_PDB",
+                                                "podDetails": [
+                                                  {
+                                                    "podName": "pod-example-name6"
+                                                  }
+                                                ],
+                                                "runningPods": 1
+                                              },
+                                              {
+                                                "nodeName": "aks-omnp0c85c2c2-26833420-vmss000001",
+                                                "nodePoolName": "omnp0c85c2c2",
+                                                "status": "IN_PROGRESS",
+                                                "podDetails": [
+                                                  {
+                                                    "podName": "pod-example-name7"
+                                                  }
+                                                ],
+                                                "runningPods": 1
+                                              },
+                                              {
+                                                "nodeName": "aks-omnp0c85c2c2-26833420-vmss000003",
+                                                "nodePoolName": "omnp0c85c2c2",
+                                                "status": "DID_NOT_REPLACE",
+                                                "podDetails": [
+                                                  {
+                                                    "podName": "pod-example-name8"
+                                                  }
+                                                ],
+                                                "runningPods": 1
+                                              }
+                                            ]
+                                          },
+                                          "scaleNodePools": {
+                                            "type": "array",
+                                            "description": "An array of objects containing detailed information about all node pools that were scaled during the migration process.\n",
+                                            "items": {
+                                              "type": "object",
+                                              "properties": {
+                                                "nodePoolName": {
+                                                  "type": "string"
+                                                },
+                                                "newNodes": {
+                                                  "type": "integer"
+                                                },
+                                                "vngId": {
+                                                  "type": "string"
+                                                },
+                                                "vngName": {
+                                                  "type": "string"
+                                                },
+                                                "status": {
+                                                  "description": "The status of the node pool's scaling operation according to the migration.\n",
+                                                  "type": "string",
+                                                  "enum": [
+                                                    "SCALING",
+                                                    "COMPLETED",
+                                                    "FAILED",
+                                                    "PARTIAL_SUCCESS"
+                                                  ]
+                                                }
+                                              }
+                                            },
+                                            "example": [
+                                              {
+                                                "nodePoolName": "omnp12340",
+                                                "newNodes": 2,
+                                                "vngId": "vng-1234",
+                                                "vngName": "vng2",
+                                                "status": "Scaling"
+                                              },
+                                              {
+                                                "nodePoolName": "omnp12345",
+                                                "newNodes": 10,
+                                                "vngId": "vng-1234",
+                                                "vngName": "vng2",
+                                                "status": "Completed"
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "respectPdb": {
+                                    "type": "boolean",
+                                    "example": true
+                                  },
+                                  "respectRestrictScaleDown": {
+                                    "type": "boolean",
+                                    "example": false
+                                  },
+                                  "shouldTerminateNodes": {
+                                    "type": "boolean",
+                                    "example": true
+                                  },
+                                  "shouldEvictStandalonePods": {
+                                    "type": "boolean",
+                                    "example": false
+                                  },
+                                  "batchMinHealthyPercentage": {
+                                    "type": "integer",
+                                    "example": 70
+                                  },
+                                  "createdAt": {
+                                    "type": "string",
+                                    "description": "The creation timestamp of the migration.\n",
+                                    "example": "2019-03-24T15:46:09.000Z"
+                                  },
+                                  "erredAt": {
+                                    "type": "string",
+                                    "description": "The timestamp of the migration error.\n",
+                                    "example": "2019-03-24T15:46:09.000Z"
+                                  },
+                                  "stoppedAt": {
+                                    "type": "string",
+                                    "description": "The stopping timestamp of the migration.\n",
+                                    "example": "2019-03-24T15:46:09.000Z"
+                                  },
+                                  "completedAt": {
+                                    "type": "string",
+                                    "description": "The completion timestamp of the migration.\n",
+                                    "example": "2019-03-24T15:46:09.000Z"
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:azure:ocean:workloadMigration"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/azure/np/cluster/{oceanClusterId}/migration/{migrationId}": {
+      "summary": "Ocean for AKS",
+      "get": {
+        "summary": "Get Migration",
+        "description": "Get status for a migration of an Ocean cluster.\n",
+        "operationId": "oceanAksGetMigration",
+        "tags": [
+          "Ocean AKS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          },
+          {
+            "in": "path",
+            "name": "migrationId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "scr-12345abc",
+            "description": "Ocean cluster workload migration identifier.\n"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean AKS Get Migration Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/azure/np/cluster/o-12345abc/migration/scr-12345abc"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1migration/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items"
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:azure:ocean:workloadMigration"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/azure/np/cluster/{oceanClusterId}/migration/{migrationId}/stop": {
+      "summary": "Ocean for AKS",
+      "put": {
+        "summary": "Stop Migration",
+        "description": "Stop a migration of an Ocean cluster.\n\n*Performing the request will stop the next batch in a migration.*\n",
+        "operationId": "oceanAksMigrationStop",
+        "tags": [
+          "Ocean AKS"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1migration~1%7BmigrationId%7D/get/parameters/2"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean AKS Stop Migration Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/azure/np/cluster/o-12345abc/migration/scr-12345abc"
+                            },
+                            "method": {
+                              "example": "PUT"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "allOf": [
+                                  {
+                                    "$ref": "#/paths/~1ocean~1azure~1np~1cluster~1%7BoceanClusterId%7D~1migration/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items"
+                                  },
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "status": {
+                                        "example": "STOPPED"
+                                      },
+                                      "progress": {
+                                        "example": {
+                                          "detailedStatus": {
+                                            "progressPercentage": 50,
+                                            "oldNodes": [
+                                              {
+                                                "nodeName": "aks-omnpbc2ebdb1-15563275-vmss00000q",
+                                                "status": "REPLACED"
+                                              },
+                                              {
+                                                "nodeName": "aks-omnpbc2ebdb1-15563275-vmss000008",
+                                                "status": "DID_NOT_REPLACE"
+                                              },
+                                              {
+                                                "nodeName": "aks-omnpbc2ebdb1-15563275-vmss00000r",
+                                                "status": "DID_NOT_REPLACE"
+                                              },
+                                              {
+                                                "nodeName": "aks-omnpe9429a2f-26725402-vmss00000z",
+                                                "status": "REPLACED"
+                                              },
+                                              {
+                                                "nodeName": "aks-omnp0c85c2c2-26833420-vmss000001",
+                                                "status": "REPLACED"
+                                              },
+                                              {
+                                                "nodeName": "aks-omnp0c85c2c2-26833420-vmss000003",
+                                                "status": "DID_NOT_REPLACE"
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "kind": {
+                              "example": "spotinst:azure:ocean:workloadMigration"
                             }
                           }
                         }
