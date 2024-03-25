@@ -6,7 +6,7 @@ properties:
     type: string
     example: "specialty.nodes.spotk8s.com"
     description: |
-      Set launch specification name.
+      Set Virtual Node Group name.
   imageId:
     type: string
     example: "ami-ID"
@@ -52,7 +52,7 @@ properties:
   instanceTypes:
     type: array
     description: |
-      A list of instance types allowed to be provisioned for pods pending for the launch specification.\
+      A list of instance types allowed to be provisioned for pods pending for the Virtual Node Group.\
       The list overrides the list defined for the Ocean cluster. Can be null.
     items:
       type: string
@@ -106,7 +106,7 @@ properties:
   taints:
     type: array
     description: |
-      Add taints to Launch Spec.
+      Add taints to Virtual Node Group.
     items:
       type: object
       properties:
@@ -129,14 +129,14 @@ properties:
   subnetIds:
     type: array
     description: |
-      Set subnets in launchSpec. Each element in the array is a subnet identifier.
+      Set subnets in Virtual Node Group. Each element in the array is a subnet identifier.
     items:
       type: string
     example: ["subnet-123", "subnet-456"]
   elasticIpPool:
     type: object
     description: |
-      Assign an Elastic IP to the instances launched by the launch spec. Can be null.
+      Assign an Elastic IP to the instances launched by the Virtual Node Group. Can be null.
     properties:
       tagSelector:
         type: object
@@ -148,7 +148,7 @@ properties:
           tagKey:
             type: string
             description: |
-              Elastic IP tag key. The launch spec will consider all elastic IPs tagged with this tag as a part of the elastic IP pool to use.
+              Elastic IP tag key. The Virtual Node Group will consider all elastic IPs tagged with this tag as a part of the elastic IP pool to use.
             example: color
           tagValue:
             type: string
@@ -304,18 +304,28 @@ properties:
                     Additional size per resource unit (in GB).\
                     For example: if baseSize=50, and sizePerResourceUnit=20, and an instance with 2 CPU is launched, its disk size will be 90 GB.
                   example: 20
+  ephemeralStorage:
+    type: object
+    properties:
+      deviceName:
+        type: string
+        description: |
+          Specify an alternative device name from which ephemeral storage calculations should be derived.
+          This parameter is used when the ephemeral storage should not utilize the root device.
+          Provide the device name configured in the VNG's BDM or AMI's BDM that differs from the default root device.
+        example: "/dev/xvdb"
   resourceLimits:
     type: object
     properties:
       maxInstanceCount:
         description: |
-          Option to set a maximum number of instances per launch specification.\
+          Option to set a maximum number of instances per Virtual Node Group.\
           Can be null. If set, value must be greater than or equal to 0.
         type: integer
         example: 5
       minInstanceCount:
         description: |
-          Option to set a minimum number of instances per launch specification.\
+          Option to set a minimum number of instances per Virtual Node Group.\
           Can be null. If set, value must be greater than or equal to 0.
         type: integer
         example: 2
