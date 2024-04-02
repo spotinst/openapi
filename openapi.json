@@ -73510,6 +73510,24 @@
           },
           {
             "in": "query",
+            "name": "appType",
+            "required": false,
+            "description": "Optionally filter on the type of the Spark application\n",
+            "schema": {
+              "description": "The type of Spark application",
+              "example": "notebook",
+              "type": "string",
+              "enum": [
+                "batch",
+                "notebook",
+                "spark-connect",
+                "hive-thrift-server",
+                "spark-connect-and-hive-thrift-server"
+              ]
+            }
+          },
+          {
+            "in": "query",
             "name": "state",
             "required": false,
             "description": "Optionally filter on the state of the Spark application\n",
@@ -73695,10 +73713,10 @@
                                         "example": []
                                       },
                                       "after": {
-                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/12/schema"
+                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/13/schema"
                                       },
                                       "before": {
-                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/13/schema"
+                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/14/schema"
                                       }
                                     }
                                   },
@@ -73743,7 +73761,7 @@
                                                   "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/organizationId"
                                                 },
                                                 "userId": {
-                                                  "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/5/schema"
+                                                  "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/6/schema"
                                                 },
                                                 "clusterId": {
                                                   "$ref": "#/paths/~1ocean~1spark~1cluster~1sparkCoreHours/get/parameters/1/schema/items"
@@ -73752,10 +73770,13 @@
                                                   "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
                                                 },
                                                 "appState": {
-                                                  "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/4/schema"
+                                                  "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/5/schema"
                                                 },
                                                 "submissionSource": {
                                                   "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/submissionSource"
+                                                },
+                                                "appType": {
+                                                  "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/4/schema"
                                                 },
                                                 "job": {
                                                   "type": "object",
@@ -73860,7 +73881,7 @@
             "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/4"
           },
           {
-            "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/11"
+            "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/5"
           },
           {
             "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/12"
@@ -73873,6 +73894,9 @@
           },
           {
             "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/15"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/16"
           }
         ],
         "responses": {
@@ -74573,6 +74597,9 @@
                                   "description": "The number of cores allocated to the Spark application. It is 0 if the application is completed.\n",
                                   "example": 1
                                 },
+                                "dnsConfig": {
+                                  "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0/components/schemas/PodDNSConfig"
+                                },
                                 "env": {
                                   "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0/components/schemas/Env"
                                 },
@@ -74757,6 +74784,9 @@
                                 },
                                 "cores": {
                                   "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0/components/schemas/DriverSpec/properties/cores"
+                                },
+                                "dnsConfig": {
+                                  "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0/components/schemas/PodDNSConfig"
                                 },
                                 "env": {
                                   "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0/components/schemas/Env"
@@ -75606,6 +75636,51 @@
                               },
                               "title": "PodAntiAffinity",
                               "type": "object"
+                            },
+                            "PodDNSConfigOption": {
+                              "title": "PodDNSConfigOption",
+                              "type": "object",
+                              "properties": {
+                                "name": {
+                                  "title": "Name",
+                                  "description": "Required.",
+                                  "type": "string"
+                                },
+                                "value": {
+                                  "title": "Value",
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "PodDNSConfig": {
+                              "title": "PodDNSConfig",
+                              "type": "object",
+                              "properties": {
+                                "nameservers": {
+                                  "title": "Nameservers",
+                                  "description": "A list of DNS name server IP addresses. This will be appended to the base nameservers generated from DNSPolicy. Duplicated nameservers will be removed.",
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                },
+                                "options": {
+                                  "title": "Options",
+                                  "description": "A list of DNS resolver options. This will be merged with the base options generated from DNSPolicy. Duplicated entries will be removed. Resolution options given in Options will override those that appear in the base DNSPolicy.",
+                                  "type": "array",
+                                  "items": {
+                                    "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/configOverrides/allOf/0/components/schemas/PodDNSConfigOption"
+                                  }
+                                },
+                                "searches": {
+                                  "title": "Searches",
+                                  "description": "A list of DNS search domains for host-name lookup. This will be appended to the base search paths generated from DNSPolicy. Duplicated search paths will be removed.",
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                }
+                              }
                             },
                             "PodSecurityContext": {
                               "properties": {
@@ -77446,7 +77521,7 @@
                                         "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/organizationId"
                                       },
                                       "userId": {
-                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/5/schema"
+                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/6/schema"
                                       },
                                       "clusterId": {
                                         "$ref": "#/paths/~1ocean~1spark~1cluster~1sparkCoreHours/get/parameters/1/schema/items"
@@ -77455,10 +77530,13 @@
                                         "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
                                       },
                                       "appState": {
-                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/4/schema"
+                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/5/schema"
                                       },
                                       "submissionSource": {
                                         "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/submissionSource"
+                                      },
+                                      "appType": {
+                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/4/schema"
                                       },
                                       "job": {
                                         "type": "object",
@@ -77656,7 +77734,7 @@
                                         "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/organizationId"
                                       },
                                       "userId": {
-                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/5/schema"
+                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/6/schema"
                                       },
                                       "clusterId": {
                                         "$ref": "#/paths/~1ocean~1spark~1cluster~1sparkCoreHours/get/parameters/1/schema/items"
@@ -77665,7 +77743,7 @@
                                         "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
                                       },
                                       "appState": {
-                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/4/schema"
+                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/5/schema"
                                       },
                                       "submissionSource": {
                                         "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/submissionSource"
@@ -77846,7 +77924,7 @@
                                         "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/organizationId"
                                       },
                                       "userId": {
-                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/5/schema"
+                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/6/schema"
                                       },
                                       "clusterId": {
                                         "$ref": "#/paths/~1ocean~1spark~1cluster~1sparkCoreHours/get/parameters/1/schema/items"
@@ -77855,10 +77933,13 @@
                                         "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
                                       },
                                       "appState": {
-                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/4/schema"
+                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/5/schema"
                                       },
                                       "submissionSource": {
                                         "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/submissionSource"
+                                      },
+                                      "appType": {
+                                        "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/4/schema"
                                       },
                                       "startedAt": {
                                         "type": "string",
@@ -78710,7 +78791,7 @@
                                             "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1job~1%7BjobId%7D/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/organizationId"
                                           },
                                           "userId": {
-                                            "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/5/schema"
+                                            "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/6/schema"
                                           },
                                           "clusterId": {
                                             "$ref": "#/paths/~1ocean~1spark~1cluster~1sparkCoreHours/get/parameters/1/schema/items"
@@ -78719,10 +78800,13 @@
                                             "$ref": "#/paths/~1ocean~1spark~1cluster/get/parameters/4/schema"
                                           },
                                           "appState": {
-                                            "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/4/schema"
+                                            "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/5/schema"
                                           },
                                           "submissionSource": {
                                             "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1app/post/requestBody/content/application~1json/schema/properties/submissionSource"
+                                          },
+                                          "appType": {
+                                            "$ref": "#/paths/~1ocean~1spark~1app/get/parameters/4/schema"
                                           },
                                           "startedAt": {
                                             "type": "string",
