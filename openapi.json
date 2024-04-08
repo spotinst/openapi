@@ -61102,6 +61102,88 @@
                                     "description": "Flag to enable or disable the shutdown hours mechanism. When False, the mechanism is deactivated, and the cluster remains in its current state.\n"
                                   }
                                 }
+                              },
+                              "tasks": {
+                                "type": "array",
+                                "description": "A list of scheduling tasks to preform on the cluster at a specific cron time.\n",
+                                "items": {
+                                  "type": "object",
+                                  "required": [
+                                    "isEnabled",
+                                    "cronExpression",
+                                    "taskType"
+                                  ],
+                                  "properties": {
+                                    "isEnabled": {
+                                      "type": "boolean",
+                                      "description": "Flag to enable or disable the scheduling task.\n"
+                                    },
+                                    "cronExpression": {
+                                      "type": "string",
+                                      "description": "A valid cron expression. The cron is running in UTC time zone and is in Unix cron format of Cron Expression Validator Script.\n",
+                                      "example": "0 1 * * *"
+                                    },
+                                    "taskType": {
+                                      "type": "string",
+                                      "description": "The type of the scheduling task.\n",
+                                      "enum": [
+                                        "clusterRoll"
+                                      ],
+                                      "example": "clusterRoll"
+                                    },
+                                    "parameters": {
+                                      "type": "object",
+                                      "description": "The parameters of the scheduling task. Each task type will have properties relevant only to it.\n",
+                                      "properties": {
+                                        "clusterRoll": {
+                                          "type": "object",
+                                          "description": "The parameters of the cluster roll scheduling task.\n",
+                                          "properties": {
+                                            "batchSizePercentage": {
+                                              "type": "integer",
+                                              "minimum": 1,
+                                              "maximum": 100,
+                                              "description": "The percentage of the cluster that will be rolled at each batch.\n",
+                                              "example": 20
+                                            },
+                                            "comment": {
+                                              "type": "string",
+                                              "description": "A comment to be added to the cluster roll.\n",
+                                              "example": "Scheduled cluster roll"
+                                            },
+                                            "respectPdb": {
+                                              "type": "boolean",
+                                              "description": "During the roll, if the parameter is set to true we honor PDB during the instance replacement.\n",
+                                              "example": true
+                                            },
+                                            "respectRestrictScaleDown": {
+                                              "type": "boolean",
+                                              "description": "During the roll, if the parameter is set to true we honor Restrict Scale Down label during the nodes replacement.\n",
+                                              "example": true
+                                            },
+                                            "batchMinHealthyPercentage": {
+                                              "type": "integer",
+                                              "minimum": 1,
+                                              "maximum": 100,
+                                              "description": "The minimum percentage of the scaled nodes that should be healthy at each batch.\n",
+                                              "example": 80
+                                            },
+                                            "vngIds": {
+                                              "type": "array",
+                                              "description": "List of Virtual Node Group IDs to be rolled.\n",
+                                              "items": {
+                                                "type": "string"
+                                              },
+                                              "example": [
+                                                "vng-123456"
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
                               }
                             }
                           },
@@ -63837,6 +63919,15 @@
                                     "type": "string",
                                     "description": "The identifier of the ocean cluster being rolled.\n",
                                     "example": "o-12e31234"
+                                  },
+                                  "type": {
+                                    "type": "string",
+                                    "description": "The type of the trigger for the cluster roll\n",
+                                    "enum": [
+                                      "scheduled",
+                                      "manual"
+                                    ],
+                                    "example": "manual"
                                   },
                                   "scope": {
                                     "type": "string",
