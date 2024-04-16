@@ -79390,6 +79390,297 @@
         }
       }
     },
+    "/ocean/spark/cluster/{clusterId}/workspace": {
+      "summary": "Ocean Spark",
+      "post": {
+        "summary": "Create Workspace",
+        "description": "Create Ocean Spark Workspace\n",
+        "operationId": "OceanSparkWorkspaceCreate",
+        "tags": [
+          "Ocean Spark"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D/get/parameters/1"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "description": "The object specifying the configuration of the Ocean Spark workspace.\n",
+                    "title": "Ocean Spark Workspace",
+                    "allOf": [
+                      {
+                        "type": "object",
+                        "description": "The description of an Ocean Spark workspace\n"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The name of the workspace.",
+                        "example": "cosmos"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1workspace/get/responses/200"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "get": {
+        "summary": "List Workspaces",
+        "description": "List the Ocean Spark workspaces in the specified cluster.\n",
+        "operationId": "OceanSparkWorkspaceList",
+        "tags": [
+          "Ocean Spark"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D/get/parameters/1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of Ocean Spark workspace (can be a single workspace)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "response": {
+                          "type": "object",
+                          "description": "response body\n",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "description": "The object specifying the Ocean Spark workspace.\n",
+                                "title": "Ocean Spark Workspace",
+                                "required": [
+                                  "id",
+                                  "name",
+                                  "ownerUserId",
+                                  "state",
+                                  "createdAt",
+                                  "url"
+                                ],
+                                "allOf": [
+                                  {
+                                    "type": "object",
+                                    "description": "The description of an Ocean Spark workspace\n",
+                                    "properties": {
+                                      "id": {
+                                        "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1workspace~1%7BworkspaceId%7D/get/parameters/2/schema"
+                                      },
+                                      "name": {
+                                        "type": "string",
+                                        "example": "cosmos",
+                                        "description": "The name of the Ocean Spark workspace\n"
+                                      },
+                                      "ownerUserId": {
+                                        "type": "string",
+                                        "description": "The owner user id of the Ocean Spark workspace\n",
+                                        "example": "163018"
+                                      },
+                                      "state": {
+                                        "description": "The current state of the Ocean Spark workspace.\n* `WORKSPACE_STATE_RUNNING`: The workspace is RUNNING.\n* `WORKSPACE_STATE_STARTING`: The workspace is STARTING.\n* `WORKSPACE_STATE_STOPPING`: The workspace is STOPPING.\n* `WORKSPACE_STATE_STOPPED`: The workspace has STOPPED.\n* `WORKSPACE_STATE_UNSPECIFIED`: The workspace status API has an unexpected, internal error.\n",
+                                        "example": "WORKSPACE_STATE_RUNNING",
+                                        "enum": [
+                                          "WORKSPACE_STATE_RUNNING",
+                                          "WORKSPACE_STATE_STARTING",
+                                          "WORKSPACE_STATE_STOPPING",
+                                          "WORKSPACE_STATE_STOPPED",
+                                          "WORKSPACE_STATE_UNSPECIFIED"
+                                        ]
+                                      },
+                                      "createdAt": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "description": "The creation date of the Ocean Spark workspace",
+                                        "example": "2021-11-20T13:29:30.000Z"
+                                      },
+                                      "url": {
+                                        "type": "string",
+                                        "description": "The URL of the Ocean Spark workspace\n",
+                                        "example": "/api/ocean/spark/cluster/osc-93f1ae79/workspace/wksp-163018-b1ff5921/proxy"
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "$ref": "#/paths/~1aws~1emr~1mrScaler/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/allOf/1"
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/spark/cluster/{clusterId}/workspace/{workspaceId}": {
+      "summary": "Ocean Spark",
+      "get": {
+        "summary": "Get Workspace",
+        "description": "Describe an Ocean Spark workspace.\n",
+        "operationId": "OceanSparkWorkspaceGet",
+        "tags": [
+          "Ocean Spark"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D/get/parameters/1"
+          },
+          {
+            "in": "path",
+            "name": "workspaceId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "wksp-170654-1bc9c7a0",
+              "description": "A unique identifier for the Ocean Spark workspace\n"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1workspace/get/responses/200"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Workspace",
+        "description": "Delete an Ocean Spark workspace.\n",
+        "operationId": "OceanSparkWorkspaceDelete",
+        "tags": [
+          "Ocean Spark"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D/get/parameters/1"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1workspace~1%7BworkspaceId%7D/get/parameters/2"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/spark/cluster/{clusterId}/workspace/{workspaceId}/start": {
+      "summary": "Ocean Spark",
+      "put": {
+        "summary": "Start Workspace",
+        "description": "Start an Ocean Spark workspace.\n",
+        "operationId": "OceanSparkWorkspaceStart",
+        "tags": [
+          "Ocean Spark"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D/get/parameters/1"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1workspace~1%7BworkspaceId%7D/get/parameters/2"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1workspace/get/responses/200"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/spark/cluster/{clusterId}/workspace/{workspaceId}/stop": {
+      "summary": "Ocean Spark",
+      "put": {
+        "summary": "Stop Workspace",
+        "description": "Stop an Ocean Spark workspace.\n",
+        "operationId": "OceanSparkWorkspaceStop",
+        "tags": [
+          "Ocean Spark"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D/get/parameters/1"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1workspace~1%7BworkspaceId%7D/get/parameters/2"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/paths/~1ocean~1spark~1cluster~1%7BclusterId%7D~1workspace/get/responses/200"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/insights/savings": {
       "get": {
         "summary": "Get Organization Savings",
