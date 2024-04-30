@@ -1,0 +1,41 @@
+delete:
+  description: if no version is specified, delete all versions of the workflow
+  operationId: delete_workflow_instance
+  parameters:
+  - $ref: "../parameters/workflow_name.yaml"
+  - $ref: "../parameters/workspace_id.yaml"
+  - $ref: "../parameters/version.yaml"
+  responses:
+    '200':
+      content: {}
+      description: Success
+  summary: delete a selected version of a selected workflow;
+  tags:
+  - workflows
+parameters: []
+put:
+  description: "We always create a new workflow off of the latest version in SSM.\n\nAPI
+    request sample body:{\n    \"Content\": {\n        \"assumeRole\": \"{{AutomationAssumeRole}}\",\n
+    \       \"description\":\"...\"\n        ...\n    },\n    \"Tags\": [\"tag1\",
+    tag2, ..]\n}"
+  operationId: put_workflow_instance
+  parameters:
+  - $ref: "../parameters/workflow_name.yaml"
+  - $ref: "../parameters/workspace_id.yaml"
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: "../../schemas/UpdateWorkflowInput.yaml"
+    required: true
+  responses:
+    '200':
+      content:
+        application/json:
+          schema:
+            $ref: "../../schemas/WorkflowModel.yaml"
+      description: Success
+  summary: Update a selected workflow by creating a new version
+  tags:
+  - workflows
+  x-codegen-request-body-name: payload
