@@ -522,6 +522,8 @@ components:
           type: string
         cores:
           $ref: "cores.yaml"
+        dnsConfig:
+          $ref: '#/components/schemas/PodDNSConfig'
         env:
           $ref: '#/components/schemas/Env'
         envSecretKeyRefs:
@@ -659,6 +661,8 @@ components:
           type: string
         cores:
           $ref: "cores.yaml"
+        dnsConfig:
+          $ref: '#/components/schemas/PodDNSConfig'
         env:
           $ref: '#/components/schemas/Env'
         envSecretKeyRefs:
@@ -1391,6 +1395,45 @@ components:
           type: array
       title: PodAntiAffinity
       type: object
+    PodDNSConfigOption:
+      title: PodDNSConfigOption
+      type: object
+      properties:
+        name:
+          title: Name
+          description: Required.
+          type: string
+        value:
+          title: Value
+          type: string
+    PodDNSConfig:
+      title: PodDNSConfig
+      type: object
+      properties:
+        nameservers:
+          title: Nameservers
+          description: A list of DNS name server IP addresses. This will be appended to
+            the base nameservers generated from DNSPolicy. Duplicated nameservers will
+            be removed.
+          type: array
+          items:
+            type: string
+        options:
+          title: Options
+          description: A list of DNS resolver options. This will be merged with the base
+            options generated from DNSPolicy. Duplicated entries will be removed. Resolution
+            options given in Options will override those that appear in the base DNSPolicy.
+          type: array
+          items:
+            "$ref": "#/components/schemas/PodDNSConfigOption"
+        searches:
+          title: Searches
+          description: A list of DNS search domains for host-name lookup. This will be
+            appended to the base search paths generated from DNSPolicy. Duplicated search
+            paths will be removed.
+          type: array
+          items:
+            type: string
     PodSecurityContext:
       properties:
         fsGroup:
