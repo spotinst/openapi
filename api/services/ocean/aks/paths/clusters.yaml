@@ -5,27 +5,45 @@ post:
   description: |
     Creates an Ocean entity according to a given specification.
 
-    Prerequisite:
+    <p>Notes:<br></p>
 
-    Kubenet-based AKS clusters only: The permissions needed in the Azure managed service identity (MSI) for Ocean to use when provisioning new nodes should be adjusted. Run the displayed script on a workstation with an Owner permissions token for the Azure environment. [Learn more](https://docs.spot.io/ocean/getting-started/aks?id=additional-steps-for-kubenet-based-clusters).
+    It is recommended to import all necessary information from the existing AKS cluster using the Ocean [AKS Cluster Import](https://docs.spot.io/api/#operation/oceanAKSClusterImport) API call and use its output to create a fully configured Ocean cluster.
 
-    Notes:
+    <p>The Ocean Controller is used to monitor the cluster resources and report back to Ocean SaaS. <b>A properly functioning controller is mandatory for Ocean to operate.</b><br>
+    The controller can be installed on the cluster using Kubectl or Helm.<br>
+    To install the Controller using Kubectl, run the following script on a machine with kubectl command line tool installed and configured:</p>
 
-    1. The Ocean Controller is used to monitor the cluster resources and report back to Ocean SaaS. A properly functioning controller is mandatory for Ocean to operate. To install the Controller, run the following script on a machine with kubectl command line tool installed and configured:
-
-    ```
+    ```bash
     #!/usr/bin/env bash
     curl -fsSL http://spotinst-public.s3.amazonaws.com/integrations/kubernetes/cluster-controller/scripts/init.sh | \
     SPOTINST_TOKEN=<ENTER YOUR TOKEN HERE> \
     SPOTINST_ACCOUNT=<ENTER YOUR SPOTINST ACCOUNT ID HERE> \
     SPOTINST_CLUSTER_IDENTIFIER=<ENTER YOUR CLUSTER IDENTIFIER HERE> \
+    ENABLE_OCEAN_METRIC_EXPORTER=false \
     bash
     ```
 
-    2. It is recommended to import all necessary information from the existing AKS cluster using the Ocean [AKS Cluster Import](https://docs.spot.io/api/#operation/oceanAKSClusterImport) API call and use its output to create a fully configured Ocean cluster.
+    To install the Controller using Helm 3.x:
+       * For installation using Helm 2.x additional step is needed to grant Tiller access. [View documentation](https://docs.spot.io/ocean/tutorials/spot-kubernetes-controller/install-with-helm)
+       * Please configure all chart's values using the set command line argument or a values. yaml file. [Ocean controller help chart artifact](https://artifacthub.io/packages/helm/spotinst/spotinst-kubernetes-cluster-controller).
+    
+    ```bash
+    helm repo add spotinst https://spotinst.github.io/spotinst-kubernetes-helm-charts \
+    && helm repo update
+
+    helm install ocean-controller spotinst/spotinst-kubernetes-cluster-controller \
+    --set spotinst.token=<ENTER YOUR TOKEN HERE> \
+    --set spotinst.account=<ENTER YOUR SPOTINST ACCOUNT ID HERE> \
+    --set spotinst.clusterIdentifier=<ENTER YOUR CLUSTER IDENTIFIER HERE> \
+    --set metrics-server.deployChart=false \
+    --create-namespace \
+    --namespace="spot-ocean" \
+    --set namespace="spot-ocean"
+    ```
+
   operationId: "oceanAKSClusterCreate"
   tags:
-    - "Ocean AKS (Deprecated)"
+    - "Ocean AKS"
   parameters:
     - $ref: "../../../../commons/parameters/accountId.yaml"
   requestBody:
@@ -34,7 +52,7 @@ post:
       application/json:
         schema:
           allOf:
-            - $ref:  "../schemas/ocean.yaml"
+            - $ref:  "../schemas/create/ocean.yaml"
   responses:
     200:
       $ref: "../responses/oceanClusterCreate.yaml"
@@ -47,7 +65,7 @@ get:
     List the configurations for all Ocean clusters in the specified account.
   operationId: "oceanAKSClusterList"
   tags:
-    - "Ocean AKS (Deprecated)"
+    - "Ocean AKS"
   parameters:
     - $ref: "../../../../commons/parameters/accountId.yaml"
   responses:
