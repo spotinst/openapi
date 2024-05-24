@@ -76895,6 +76895,151 @@
         ]
       }
     },
+    "/connect/schedules": {
+      "get": {
+        "description": "Returns:\n    List: list schedules",
+        "operationId": "get_schedules_list",
+        "parameters": [
+          {
+            "description": "(optional) filter related schedules to a task",
+            "in": "query",
+            "name": "task_id",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Currently selected Workspace ID",
+            "in": "query",
+            "name": "workspace_id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {},
+            "description": "Success"
+          },
+          "400": {
+            "content": {},
+            "description": "Bad Request"
+          }
+        },
+        "summary": "Scheduled workflows for a tenant",
+        "tags": [
+          "Connect Schedules"
+        ]
+      },
+      "parameters": []
+    },
+    "/connect/schedules/{workflow_name}": {
+      "delete": {
+        "description": "body: {\n    rule: String:rule-name,\n    id: String (dynamoDB id),\n}\nreturn 200 OK",
+        "operationId": "delete_workflow_schedules",
+        "parameters": [
+          {
+            "$ref": "#/paths/~1connect~1schedules~1%7Bworkflow_name%7D/get/parameters/0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {},
+            "description": "Deleted"
+          },
+          "400": {
+            "content": {},
+            "description": "Bad Request"
+          }
+        },
+        "summary": "Delete scheduled rule",
+        "tags": [
+          "Connect Schedules"
+        ]
+      },
+      "get": {
+        "operationId": "get_workflow_schedules",
+        "parameters": [
+          {
+            "description": "unique workflow name only",
+            "in": "path",
+            "name": "workflow_name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/paths/~1connect~1schedules/get/parameters/1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {},
+            "description": "Success"
+          },
+          "400": {
+            "content": {},
+            "description": "Bad Request"
+          }
+        },
+        "summary": "list schedules for a runbook",
+        "tags": [
+          "Connect Schedules"
+        ]
+      },
+      "parameters": [],
+      "post": {
+        "description": "Accept POST request to schedule runbook execution:\nbody: {\n    version: Integer,\n    expression: String,\n    task_id: (optional) int,\n    params: (optional) dict: default parameters for scheduled version\n    params examples:\n     - \"params\": {\"param-name\": \"param-value\"}\n     - \"params\": {\"param-name\": [\"param-value1\", \"param-value2\"]}\n     - \"params\": {\"param-name\": {\"dict-key\": \"dict-value\"}}\n}\nreturn: 201 created",
+        "operationId": "post_workflow_schedules",
+        "parameters": [
+          {
+            "$ref": "#/paths/~1connect~1schedules~1%7Bworkflow_name%7D/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1connect~1schedules/get/parameters/1"
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {},
+            "description": "Created"
+          },
+          "400": {
+            "content": {},
+            "description": "Bad Request"
+          }
+        },
+        "summary": "schedules/<workflow-name>",
+        "tags": [
+          "Connect Schedules"
+        ]
+      },
+      "put": {
+        "description": "body: {\n    rule: String,\n    State: [ENABLED|DISABLED]\n}\nreturn: 200 success",
+        "operationId": "put_workflow_schedules",
+        "parameters": [
+          {
+            "$ref": "#/paths/~1connect~1schedules~1%7Bworkflow_name%7D/get/parameters/0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {},
+            "description": "Success"
+          },
+          "400": {
+            "content": {},
+            "description": "Bad Request"
+          }
+        },
+        "summary": "Accept PUT request to enable/disable execution schedule (rule)",
+        "tags": [
+          "Connect Schedules"
+        ]
+      }
+    },
     "/connect/settings/apikeys": {
       "get": {
         "operationId": "get_settings_api_keys",
@@ -78534,6 +78679,57 @@
         ],
         "x-codegen-request-body-name": "payload"
       }
+    },
+    "/connect/workspaces/name/{workspace_name}": {
+      "get": {
+        "operationId": "get_workspace_instance_by_name",
+        "parameters": [
+          {
+            "description": "Workspace name",
+            "in": "path",
+            "name": "workspace_name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/paths/~1connect~1workspaces/get/parameters/0"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/paths/~1connect~1workspaces~1%7Bworkspace_id%7D/get/requestBody/content/application~1json/schema"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/paths/~1connect~1workspaces~1%7Bworkspace_id%7D/get/requestBody/content/application~1json/schema"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "content": {},
+            "description": "Bad Request"
+          }
+        },
+        "summary": "Get a specific workspace",
+        "tags": [
+          "Connect Workspaces"
+        ],
+        "x-codegen-request-body-name": "payload"
+      },
+      "parameters": []
     },
     "/connect/workspaces/{workspace_id}": {
       "delete": {
