@@ -47116,7 +47116,8 @@
                         "type": "string",
                         "description": "The vendor for the data integration. This value affects the expected `config`.",
                         "enum": [
-                          "s3"
+                          "s3",
+                          "azureBlob"
                         ]
                       },
                       "name": {
@@ -47141,6 +47142,26 @@
                               },
                               "subdir": {
                                 "description": "The subdirectory in which your files will be stored within the bucket. Adds the prefix `subdir/` to new objects' keys.\n**Can't be null or contain '/'**.\n",
+                                "type": "string",
+                                "example": "dev"
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "title": "Azure Blob",
+                            "required": [
+                              "storageAccount",
+                              "container"
+                            ],
+                            "properties": {
+                              "storageAccount": {
+                                "type": "string",
+                                "description": "The name of the storage account to use.\n",
+                                "example": "myStorageAccount"
+                              },
+                              "container": {
+                                "description": "The container in which your files will be stored within the storage account.\n",
                                 "type": "string",
                                 "example": "dev"
                               }
@@ -47224,7 +47245,8 @@
             "schema": {
               "type": "string",
               "enum": [
-                "s3"
+                "s3",
+                "azureBlob"
               ]
             }
           },
@@ -47311,7 +47333,8 @@
                                     "type": "string",
                                     "description": "The vendor for the data integration. This value affects the expected `config`.",
                                     "enum": [
-                                      "s3"
+                                      "s3",
+                                      "azureBlob"
                                     ]
                                   },
                                   "name": {
@@ -47352,6 +47375,9 @@
                                     "oneOf": [
                                       {
                                         "$ref": "#/paths/~1insights~1dataIntegration/post/requestBody/content/application~1json/schema/properties/dataIntegration/properties/config/oneOf/0"
+                                      },
+                                      {
+                                        "$ref": "#/paths/~1insights~1dataIntegration/post/requestBody/content/application~1json/schema/properties/dataIntegration/properties/config/oneOf/1"
                                       }
                                     ]
                                   }
@@ -47415,7 +47441,8 @@
                         "type": "string",
                         "description": "The vendor for the data integration. This value affects the expected `config`.\n**This value is immutable and must be the same as the existing data integration.**\n",
                         "enum": [
-                          "s3"
+                          "s3",
+                          "azureBlob"
                         ]
                       },
                       "name": {
@@ -47445,6 +47472,22 @@
                               },
                               "subdir": {
                                 "description": "The subdirectory in which your files will be stored within the bucket. Adds the prefix `subdir/` to new objects' keys.\n**Can't be null or contain '/'**.\n",
+                                "type": "string",
+                                "example": "dev"
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "title": "Azure Blob",
+                            "properties": {
+                              "storageAccount": {
+                                "type": "string",
+                                "description": "The name of the storage account to use.\n",
+                                "example": "myStorageAccount"
+                              },
+                              "container": {
+                                "description": "The container in which your files will be stored within the storage account.\n",
                                 "type": "string",
                                 "example": "dev"
                               }
@@ -58053,6 +58096,41 @@
                               }
                             }
                           },
+                          "logging": {
+                            "type": "object",
+                            "title": "Ocean AKS Logging",
+                            "description": "The Ocean AKS Logging object.",
+                            "required": [
+                              "export"
+                            ],
+                            "properties": {
+                              "export": {
+                                "type": "object",
+                                "title": "The Ocean AKS Logging Export",
+                                "description": "The Ocean AKS Logging Export object.",
+                                "required": [
+                                  "azureBlob"
+                                ],
+                                "properties": {
+                                  "azureBlob": {
+                                    "type": "object",
+                                    "title": "The Ocean AKS Logging Azure Blob Export",
+                                    "description": "Exports your cluster's logs to the storage account and container configured on the storage account [data integration](/#operation/DataIntegrationCreate) given.\nEach file contains logs of 3 minutes where each log is separated by a new line and saved as a JSON.\nThe file formats are `container`/`accountId`_`oceanId`_`oceanName`_`startTime`.log\n",
+                                    "required": [
+                                      "id"
+                                    ],
+                                    "properties": {
+                                      "id": {
+                                        "type": "string",
+                                        "description": "The identifier of The Azure Blob data integration to export the logs to.",
+                                        "example": "di-123"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
                           "health": {
                             "type": "object",
                             "title": "Ocean AKS Health",
@@ -58305,6 +58383,9 @@
                                   "scheduling": {
                                     "$ref": "#/paths/~1ocean~1azure~1np~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/properties/scheduling"
                                   },
+                                  "logging": {
+                                    "$ref": "#/paths/~1ocean~1azure~1np~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/properties/logging"
+                                  },
                                   "health": {
                                     "$ref": "#/paths/~1ocean~1azure~1np~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/properties/health"
                                   },
@@ -58528,6 +58609,9 @@
                           },
                           "scheduling": {
                             "$ref": "#/paths/~1ocean~1azure~1np~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/properties/scheduling"
+                          },
+                          "logging": {
+                            "$ref": "#/paths/~1ocean~1azure~1np~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/properties/logging"
                           },
                           "health": {
                             "$ref": "#/paths/~1ocean~1azure~1np~1cluster/post/requestBody/content/application~1json/schema/allOf/0/properties/cluster/properties/health"
