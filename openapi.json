@@ -53994,6 +53994,103 @@
         }
       }
     },
+    "/ocean/gcp/k8s/cluster/{oceanClusterId}/detachInstances": {
+      "put": {
+        "summary": "Detach Instances",
+        "description": "Detach instances from your Ocean cluster.\n",
+        "operationId": "oceanGkeDetachInstance",
+        "tags": [
+          "Ocean GKE"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1aws~1k8s~1cluster~1%7BoceanClusterId%7D/get/parameters/1"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "instancesToDetach"
+                    ],
+                    "properties": {
+                      "instancesToDetach": {
+                        "type": "array",
+                        "description": "Array of instance identifiers to be detached.\n",
+                        "items": {
+                          "type": "string"
+                        },
+                        "example": [
+                          "sin-9d317117a0df-oesg-02cff6a8",
+                          "sin-49784809d76a-oesg-02cff6a8"
+                        ]
+                      },
+                      "shouldTerminateInstances": {
+                        "type": "boolean",
+                        "description": "Determines whether the detached instances should be terminated or not. (Default true)\n",
+                        "example": true
+                      },
+                      "shouldDecrementTargetCapacity": {
+                        "type": "boolean",
+                        "description": "Determines whether the Ocean cluster's target capacity should be decremented. (Default false)\n",
+                        "example": false
+                      },
+                      "drainingTimeout": {
+                        "type": "integer",
+                        "description": "(Applies only if shouldTerminateInstances is on) The draining timeout (in seconds) before terminating the instance.\n"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ocean Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1azure~1compute~1vm~1signal/post/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/gcp/k8s/cluster/o-4c794b06/detachInstances"
+                            },
+                            "method": {
+                              "example": "PUT"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/ocean/gcp/k8s/cluster/{oceanClusterId}/log": {
       "summary": "Ocean for GKE",
       "get": {
