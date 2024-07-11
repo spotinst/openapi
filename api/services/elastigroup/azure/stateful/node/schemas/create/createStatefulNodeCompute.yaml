@@ -19,7 +19,6 @@ properties:
       Defines the VM sizes to use when launching VMs.
     required:
       - odSizes
-      - spotSizes
     properties:
       odSizes:
         type: array
@@ -32,6 +31,50 @@ properties:
         type: array
         description: |
           Defines the spot-VM sizes to use when launching VMs.
+          <a style=color:red>Required if spotSizeAttributes isn't specified.</a>
+        items:
+          type: string
+          example: "standard_a2_v2"
+      spotSizeAttributes:
+        type: object
+        description: |
+          Defines values and ranges for attributes of the spot sizes to use when launching VMs.
+           <a style=color:red>Required if spotSizes isn't specified.</a>
+        properties:
+          minCpu:
+            type: integer
+            example: 2
+            description: >
+              Minimum amount of vCPU units.
+          maxCpu:
+            type: integer
+            example: 16
+            description: >
+              Maximum amount of vCPU units.
+          minStorage:
+            type: integer
+            example: 50
+            description: >
+              Minimum amount of storage in GiB.
+          MaxStorage:
+            type: integer
+            example: 1000
+            description: >
+              Maximum amount of storage in GiB.
+          minMemory:
+            type: integer
+            example: 2
+            description: >
+              Minimum amount of memory in GiB.
+          maxMemory:
+            type: integer
+            example: 48
+            description: >
+              Maximum amount of memory in GiB.
+      excludedVmSizes:
+        type: array
+        description: |
+          Defines the VM sizes to exclude when defining spot types with spotSizeAttributes.
         items:
           type: string
           example: "standard_a2_v2"
@@ -724,6 +767,11 @@ properties:
             type: boolean
             description: |
               Specifies whether vTPM should be enabled on the virtual machine.
+            example: true
+          encryptionAtHost:
+            type: boolean
+            description: |
+              Enables the Host Encryption for the virtual machine. The Encryption at host will be disabled unless this property is set to true for the resource.
             example: true
 
       proximityPlacementGroups:
