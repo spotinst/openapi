@@ -78393,57 +78393,10 @@
           "Connect Workflows"
         ]
       },
-      "parameters": []
-    },
-    "/connect/workflows/{workflow_name}": {
-      "delete": {
-        "description": "if no version is specified, delete all versions of the workflow",
-        "operationId": "delete_workflow_instance",
-        "parameters": [
-          {
-            "$ref": "#/paths/~1connect~1workflows~1%7Bworkflow_name%7D/put/parameters/0"
-          },
-          {
-            "$ref": "#/paths/~1connect~1workflows/get/parameters/0"
-          },
-          {
-            "description": "Selected workflow version",
-            "in": "query",
-            "name": "version",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {},
-            "description": "Success"
-          },
-          "400": {
-            "content": {},
-            "description": "Bad Request"
-          }
-        },
-        "summary": "delete a selected version of a selected workflow;",
-        "tags": [
-          "Connect Workflows"
-        ]
-      },
       "parameters": [],
-      "put": {
-        "description": "We always create a new workflow off of the latest version in SSM.\n\nAPI request sample body:{\n    \"Content\": {\n        \"assumeRole\": \"{{AutomationAssumeRole}}\",\n        \"description\":\"...\"\n        ...\n    },\n    \"Tags\": [\"tag1\", tag2, ..]\n}",
-        "operationId": "put_workflow_instance",
+      "post": {
+        "operationId": "post_workflow_list",
         "parameters": [
-          {
-            "description": "Unique workflow name",
-            "in": "path",
-            "name": "workflow_name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "$ref": "#/paths/~1connect~1workflows/get/parameters/0"
           }
@@ -78610,6 +78563,27 @@
                     "description": "SSM document for the workflow",
                     "type": "object"
                   },
+                  "Name": {
+                    "description": "Unique workflow name",
+                    "type": "string"
+                  },
+                  "StepDocuments": {
+                    "description": "List of step docs used in the SSM document.",
+                    "items": {
+                      "properties": {
+                        "document_id": {
+                          "description": "Document_id from step_store.",
+                          "type": "string"
+                        },
+                        "version": {
+                          "description": "version of the document.",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
                   "Tags": {
                     "description": "list of workflow tags",
                     "items": {
@@ -78619,7 +78593,8 @@
                   }
                 },
                 "required": [
-                  "Content"
+                  "Content",
+                  "Name"
                 ],
                 "type": "object"
               }
@@ -78634,40 +78609,7 @@
                 "schema": {
                   "allOf": [
                     {
-                      "properties": {
-                        "Content": {
-                          "allOf": [
-                            {
-                              "$ref": "#/paths/~1connect~1workflows~1%7Bworkflow_name%7D/put/requestBody/content/application~1json/schema/properties/Content/allOf/0"
-                            }
-                          ],
-                          "description": "SSM document for the workflow",
-                          "type": "object"
-                        },
-                        "Name": {
-                          "description": "Unique workflow name",
-                          "type": "string"
-                        },
-                        "StepDocuments": {
-                          "description": "List of step docs used in the SSM document.",
-                          "items": {
-                            "$ref": "#/paths/~1connect~1workflows~1%7Bworkflow_name%7D~1content/get/responses/200/content/application~1json/schema/properties/StepDocuments/items"
-                          },
-                          "type": "array"
-                        },
-                        "Tags": {
-                          "description": "list of workflow tags",
-                          "items": {
-                            "type": "string"
-                          },
-                          "type": "array"
-                        }
-                      },
-                      "required": [
-                        "Content",
-                        "Name"
-                      ],
-                      "type": "object"
+                      "$ref": "#/paths/~1connect~1workflows/post/requestBody/content/application~1json/schema"
                     },
                     {
                       "properties": {
@@ -78696,6 +78638,121 @@
                       "type": "object"
                     }
                   ]
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "201": {
+            "content": {},
+            "description": "Workflow created successfully"
+          },
+          "400": {
+            "content": {},
+            "description": "Request validation error"
+          },
+          "409": {
+            "content": {},
+            "description": "Duplicate workflow"
+          }
+        },
+        "summary": "Create a new workflow in the selected workspace.",
+        "tags": [
+          "Connect Workflows"
+        ],
+        "x-codegen-request-body-name": "payload"
+      }
+    },
+    "/connect/workflows/{workflow_name}": {
+      "delete": {
+        "description": "if no version is specified, delete all versions of the workflow",
+        "operationId": "delete_workflow_instance",
+        "parameters": [
+          {
+            "$ref": "#/paths/~1connect~1workflows~1%7Bworkflow_name%7D/put/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1connect~1workflows/get/parameters/0"
+          },
+          {
+            "description": "Selected workflow version",
+            "in": "query",
+            "name": "version",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {},
+            "description": "Success"
+          },
+          "400": {
+            "content": {},
+            "description": "Bad Request"
+          }
+        },
+        "summary": "delete a selected version of a selected workflow;",
+        "tags": [
+          "Connect Workflows"
+        ]
+      },
+      "parameters": [],
+      "put": {
+        "description": "We always create a new workflow off of the latest version in SSM.\n\nAPI request sample body:{\n    \"Content\": {\n        \"assumeRole\": \"{{AutomationAssumeRole}}\",\n        \"description\":\"...\"\n        ...\n    },\n    \"Tags\": [\"tag1\", tag2, ..]\n}",
+        "operationId": "put_workflow_instance",
+        "parameters": [
+          {
+            "description": "Unique workflow name",
+            "in": "path",
+            "name": "workflow_name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/paths/~1connect~1workflows/get/parameters/0"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "Content": {
+                    "allOf": [
+                      {
+                        "$ref": "#/paths/~1connect~1workflows/post/requestBody/content/application~1json/schema/properties/Content/allOf/0"
+                      }
+                    ],
+                    "description": "SSM document for the workflow",
+                    "type": "object"
+                  },
+                  "Tags": {
+                    "description": "list of workflow tags",
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "Content"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/paths/~1connect~1workflows/post/responses/200/content/application~1json/schema"
                 }
               }
             },
@@ -78761,7 +78818,7 @@
                     "Content": {
                       "allOf": [
                         {
-                          "$ref": "#/paths/~1connect~1workflows~1%7Bworkflow_name%7D/put/requestBody/content/application~1json/schema/properties/Content/allOf/0"
+                          "$ref": "#/paths/~1connect~1workflows/post/requestBody/content/application~1json/schema/properties/Content/allOf/0"
                         }
                       ],
                       "description": "SSM document for the workflow",
@@ -78786,17 +78843,7 @@
                     "StepDocuments": {
                       "description": "List of step docs used in the SSM document.",
                       "items": {
-                        "properties": {
-                          "document_id": {
-                            "description": "Document_id from step_store.",
-                            "type": "string"
-                          },
-                          "version": {
-                            "description": "version of the document.",
-                            "type": "string"
-                          }
-                        },
-                        "type": "object"
+                        "$ref": "#/paths/~1connect~1workflows/post/requestBody/content/application~1json/schema/properties/StepDocuments/items"
                       },
                       "type": "array"
                     }
@@ -78871,7 +78918,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/paths/~1connect~1workflows~1%7Bworkflow_name%7D/put/responses/200/content/application~1json/schema"
+                  "$ref": "#/paths/~1connect~1workflows/post/responses/200/content/application~1json/schema"
                 }
               }
             },
