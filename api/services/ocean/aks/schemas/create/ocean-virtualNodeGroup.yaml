@@ -1,0 +1,94 @@
+type: object
+title: Ocean AKS Virtual Node Group
+required:
+  - oceanId
+  - name
+properties:
+  name:
+    type: string
+    example: testVng
+    description: |
+      Enter a name for the virtual node group.
+  oceanId:
+    type: string
+    example: o-134abcd
+    description: |
+      Ocean cluster identifier.
+  availabilityZones:
+    type: array
+    description: |
+      An Array holding Availability Zones, this configures the availability zones the Ocean may launch nodes in per VNG.\
+      Select zone 0 if you have a workload that requires no availability zone redundancy (AZ=null). You can select this option either alone or together with other availability zones.\
+      In case zone 0 is selected together with other availability zones, nodes of zone 0 will be scaled only for workloads that demand it.
+    items:
+      type: string
+    example: [ "0", "1", "2", "3" ]
+  nodePoolProperties:
+    $ref: "../../schemas/ocean-nodePoolProperties.yaml"
+  nodeCountLimits:
+    $ref: "../../schemas/ocean-nodeCountLimits.yaml"
+  strategy:
+    $ref: "../../schemas/ocean-strategy.yaml"
+  autoScale:
+    $ref: "../../schemas/ocean-autoScale.yaml"
+  labels:
+    type: object
+    description: |
+      key-value pairs of labels to add to the virtual node group.\
+      Only custom user labels are allowed, and not Kubernetes built-in labels or Spot internal labels.\
+      The following are not allowed:
+      * "kubernetes.azure.com/agentpool"
+      * "kubernetes.io/arch"* "kubernetes.io/os"
+      * "node.kubernetes.io/instance-type"
+      * "topology.kubernetes.io/region"
+      * "topology.kubernetes.io/zone"
+      * "kubernetes.azure.com/cluster"
+      * "kubernetes.azure.com/mode"
+      * "kubernetes.azure.com/role"
+      * "kubernetes.azure.com/scalesetpriority"
+      * "kubernetes.io/hostname"
+      * "kubernetes.azure.com/storageprofile"
+      * "kubernetes.azure.com/storagetier"
+      * "kubernetes.azure.com/instance-sku"
+      * "kubernetes.azure.com/node-image-version"
+      * "kubernetes.azure.com/subnet"
+      * "kubernetes.azure.com/vnet"
+      * "kubernetes.azure.com/ppg"
+      * "kubernetes.azure.com/encrypted-set"
+      * "kubernetes.azure.com/accelerator"
+      * "kubernetes.azure.com/fips_enabled"
+      * "kubernetes.azure.com/os-sku"
+    example:
+      key: value
+  taints:
+    type: array
+    description: |
+      Add taints to a virtual node group.
+    items:
+      type: object
+      properties:
+        key:
+          type: string
+          description: |
+            Set taint key.
+            The following are not allowed:
+            * "kubernetes.azure.com/scalesetpriority"
+        value:
+          type: string
+          description: |
+            Set taint value.
+        effect:
+          type: string
+          description: |
+            Set taint effect.
+          enum: [NoSchedule, PreferNoSchedule, NoExecute, PreferNoExecute]
+    example:
+      - key: taintKey
+        value: taintValue
+        effect: NoSchedule
+  tags:
+    type: object
+    description: |
+      A maximum of 10 unique key-value pairs for VM tags in the virtual node group.
+  vmSizes:
+    $ref: "../../schemas/ocean-vmSizes.yaml"
