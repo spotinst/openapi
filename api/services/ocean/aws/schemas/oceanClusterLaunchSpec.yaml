@@ -59,6 +59,13 @@ properties:
     example: ["c3.2xlarge", "c4.2xlarge"]
   instanceTypesFilters:
     $ref: "./oceanInstanceTypesFiltersForVng.yaml"
+  preferredOnDemandTypes:
+    type: array
+    description: |
+      When Ocean scales up instances, it takes your preferred types into consideration while maintaining a variety of machine types running for optimized distribution.
+    items:
+      type: string
+    example: [ "c3.large", "m4.xlarge" ]
   preferredSpotTypes:
     type: array
     description: |
@@ -304,6 +311,16 @@ properties:
                     Additional size per resource unit (in GB).\
                     For example: if baseSize=50, and sizePerResourceUnit=20, and an instance with 2 CPU is launched, its disk size will be 90 GB.
                   example: 20
+  ephemeralStorage:
+    type: object
+    properties:
+      deviceName:
+        type: string
+        description: |
+          Specify an alternative device name from which ephemeral storage calculations should be derived.
+          This parameter is used when the ephemeral storage should not utilize the root device.
+          Provide the device name configured in the VNG's BDM or AMI's BDM that differs from the default root device.
+        example: "/dev/xvdb"
   resourceLimits:
     type: object
     properties:
@@ -345,6 +362,14 @@ properties:
           If savings plans commitment has available capacity, Ocean will utilize them alongside RIs (if exist) to maximize cost efficiency.
         example: false
         default: false
+      drainingTimeout:
+        type: integer
+        description: |
+          The configurable amount of time that Ocean will wait for the draining process to complete before terminating an instance. 
+          If you have not defined a draining timeout, the default of 300 seconds will be used.
+        minimum: 300
+        example: 300
+        default: 300
   associatePublicIpAddress:
     type: boolean
     description: |

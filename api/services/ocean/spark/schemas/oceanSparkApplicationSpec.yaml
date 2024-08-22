@@ -74,6 +74,8 @@ properties:
     description: The priority of the Spark application.
   pythonVersion:
     $ref: '#/components/schemas/PythonVersion'
+  shuffle:
+    $ref: '#/components/schemas/Shuffle'
   sparkConf:
     additionalProperties:
       type: string
@@ -522,6 +524,8 @@ components:
           type: string
         cores:
           $ref: "cores.yaml"
+        dnsConfig:
+          $ref: '#/components/schemas/PodDNSConfig'
         env:
           $ref: '#/components/schemas/Env'
         envSecretKeyRefs:
@@ -659,6 +663,8 @@ components:
           type: string
         cores:
           $ref: "cores.yaml"
+        dnsConfig:
+          $ref: '#/components/schemas/PodDNSConfig'
         env:
           $ref: '#/components/schemas/Env'
         envSecretKeyRefs:
@@ -1391,6 +1397,45 @@ components:
           type: array
       title: PodAntiAffinity
       type: object
+    PodDNSConfigOption:
+      title: PodDNSConfigOption
+      type: object
+      properties:
+        name:
+          title: Name
+          description: Required.
+          type: string
+        value:
+          title: Value
+          type: string
+    PodDNSConfig:
+      title: PodDNSConfig
+      type: object
+      properties:
+        nameservers:
+          title: Nameservers
+          description: A list of DNS name server IP addresses. This will be appended to
+            the base nameservers generated from DNSPolicy. Duplicated nameservers will
+            be removed.
+          type: array
+          items:
+            type: string
+        options:
+          title: Options
+          description: A list of DNS resolver options. This will be merged with the base
+            options generated from DNSPolicy. Duplicated entries will be removed. Resolution
+            options given in Options will override those that appear in the base DNSPolicy.
+          type: array
+          items:
+            "$ref": "#/components/schemas/PodDNSConfigOption"
+        searches:
+          title: Searches
+          description: A list of DNS search domains for host-name lookup. This will be
+            appended to the base search paths generated from DNSPolicy. Duplicated search
+            paths will be removed.
+          type: array
+          items:
+            type: string
     PodSecurityContext:
       properties:
         fsGroup:
@@ -1901,6 +1946,37 @@ components:
       - Scala
       title: SparkApplicationType
       type: string
+    Shuffle:
+      description: External Shuffle storage configuration. This is used to configure
+        the external shuffle storage plugin in Spark allowing the shuffle data to be stored on
+        an external storage system. This is useful to handle spot kill more gracefully and allow for executor scaledown
+        when the shuffle data is stored externally.
+      properties:
+        enabled:
+          title: enabled
+          description: Is the external shuffle storage plugin enabled
+          type: boolean
+        rootDir:
+          title: rootDir
+          description: The rootDir for external shuffle storage. This can be any filesystem url supported by hadoop,
+            e.g. s3://bucket/path, gs://bucket/path, azure://bucket/path, hdfs://path and local path representing 
+            a shared drive mounted on all nodes.
+          type: string
+        dependencyInitUserId:
+          title: dependencyInitUserId
+          description: The user id for the init container with the shuffle dependencies, 
+            ideally the same as the user id of the driver/executor to ensure the shuffle 
+            dependencies are accessible from there. By default the init container is run as root.
+          type: integer
+        dependencyFsGroup:
+          title: dependencyFsGroup
+          description: The fsGroup for the podSecurityContext for the Spark driver/executors.
+            This is used to ensure the shuffle dependencies are accessible from the driver/executor.
+            This is needed if there is a mismatch between the user id of the driver/executor and the init container.
+          type: integer
+      required:
+      - enabled
+      - rootDir
     StorageOSVolumeSource:
       properties:
         fsType:

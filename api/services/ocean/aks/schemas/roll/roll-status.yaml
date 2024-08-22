@@ -1,0 +1,98 @@
+type: object
+properties:
+  id:
+    type: string
+    description: >
+      The identifier of the cluster roll.
+    example: scr-12345abc
+  oceanId:
+    type: string
+    description: >
+      The identifier of the ocean cluster being rolled.
+    example: o-12e31234
+  type:
+    type: string
+    description: >
+      The type of the trigger for the cluster roll
+    enum: [scheduled, manual]
+    example: manual
+  scope:
+    type: string
+    enum: [Cluster, Vng, Node Pool, Node]
+    example: Cluster
+  status:
+    type: string
+    description: >
+      The status of the roll.
+    enum: [IN_PROGRESS, COMPLETED, PARTLY_COMPLETED, FAILED, STOPPED]
+    example: COMPLETED
+  currentBatch:
+    type: integer
+    description: >
+      The current batch being handled by the roll.
+    example: 1
+  numOfBatches:
+    type: integer
+    description: >
+      The total number of batches in the roll.
+    example: 2
+  comment:
+    type: string
+    example: "This is why I deployed my cluster."
+  progress:
+    type: object
+    properties:
+      progressPercentage:
+        type: integer
+        example: 0
+      detailedStatus:
+        type: object
+        description: >
+          An object containing detailed information about the progress of the roll.
+        properties:
+          rollNodes:
+            type: array
+            description: >
+              An array of objects containing detailed information about each node handled by the roll.
+            items:
+              type: object
+              properties:
+                nodeName:
+                  type: string
+                status:
+                  description: >
+                    The status of the node according to the roll.
+                  type: string
+                  enum: [REPLACED, TO_BE_REPLACED, COULD_NOT_BE_REPLACED, NOT_REPLACED_DUE_TO_PDB, DID_NOT_REPLACE, IN_PROGRESS]
+            example:
+              - nodeName: aks-omnpbc2ebdb1-15563275-vmss00000q
+                status: REPLACED
+              - nodeName: aks-omnpbc2ebdb1-15563275-vmss000008
+                status: TO_BE_REPLACED
+              - nodeName: aks-omnpbc2ebdb1-15563275-vmss00000r
+                status: COULD_NOT_BE_REPLACED
+              - nodeName: aks-omnpe9429a2f-26725402-vmss00000z
+                status: NOT_REPLACED_DUE_TO_PDB
+              - nodeName: aks-omnp0c85c2c2-26833420-vmss000001
+                status: IN_PROGRESS
+              - nodeName: aks-omnp0c85c2c2-26833420-vmss000003
+                status: DID_NOT_REPLACE
+  respectPdb:
+    type: boolean
+    example: true
+  respectRestrictScaleDown:
+    type: boolean
+    example: false
+  batchMinHealthyPercentage:
+    type: integer
+    example: 70
+  createdAt:
+    type: string
+    description: >
+      The creation timestamp of the roll.
+    example: 2019-03-24T15:46:09.000Z
+  updatedAt:
+    type: string
+    description: >
+      The latest update timestamp of the roll.
+    example: 2019-03-24T15:46:09.000Z

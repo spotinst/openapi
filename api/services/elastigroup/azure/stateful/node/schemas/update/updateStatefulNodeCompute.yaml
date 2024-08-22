@@ -19,7 +19,6 @@ properties:
       Amount of time to be unhealthy before a replacement is triggered
     required:
       - odSizes
-      - spotSizes
     properties:
       odSizes:
         type: array
@@ -32,6 +31,50 @@ properties:
         type: array
         description: |
           Available Spot-VM sizes.
+          <a style=color:red>Required if spotSizeAttributes isn't specified.</a>
+        items:
+          type: string
+          example: "standard_a2_v2"
+      spotSizeAttributes:
+        type: object
+        description: |
+          Defines values and ranges for attributes of the spot sizes to use when launching VMs.
+          <a style=color:red>Required if spotSizes isn't specified.</a>
+        properties:
+          minCpu:
+            type: integer
+            example: 2
+            description: >
+              Minimum amount of vCPU units.
+          maxCpu:
+            type: integer
+            example: 16
+            description: >
+              Maximum amount of vCPU units.
+          minStorage:
+            type: integer
+            example: 50
+            description: >
+              Minimum amount of storage in GiB.
+          MaxStorage:
+            type: integer
+            example: 1000
+            description: >
+              Maximum amount of storage in GiB.
+          minMemory:
+            type: integer
+            example: 2
+            description: >
+              Minimum amount of memory in GiB.
+          maxMemory:
+            type: integer
+            example: 48
+            description: >
+              Maximum amount of memory in GiB.
+      excludedVmSizes:
+        type: array
+        description: |
+          Defines the VM sizes to exclude when defining spot types with spotSizeAttributes.
         items:
           type: string
           example: "standard_a2_v2"
@@ -176,8 +219,7 @@ properties:
           * The prefix value should comply with the following limitations: 
             *  A maximal length of 25 characters.
             * The prefix can’t contain spaces, control characters, or these characters: ~ ! @ # $ % ^ & * ( ) = + _ [ ] { } | ; : . ' " , < > / ?
-            *  A Windows VM prefix can't include a period or end with a hyphen.
-            * A Linux VM prefix can't end with a period or hyphen.
+            * The VM prefix can't end with a hyphen.
         example: "prefix"
       customData:
         type: string
@@ -503,6 +545,33 @@ properties:
               type: object
               description: |
                 Object for protected settings
+            enableAutomaticUpgrade:
+              title: enable automatic upgrade
+              description: |
+                Indicates whether the extension should be automatically upgraded by the platform if there is a newer version of the extension available.
+              type: boolean
+              example: false
+            protectedSettingsFromKeyVault:
+              title: Protected Settings from key vault
+              description: |
+                The extensions protected settings that are passed by reference, and consumed from key vault.
+              type: object
+              required:
+                - sourceVault
+                - secretUrl
+              properties:
+                sourceVault:
+                  title: sourceVault
+                  type: string
+                  description: |
+                    The relative URL of the Key Vault containing the secret.
+                  example: "/subscriptions/1234-1234-1234/resourceGroups/rg_test/providers/Microsoft.KeyVault/vaults/testKeyVault"
+                secretUrl:
+                  title: secretUrl
+                  type: string
+                  description: |
+                    The URL referencing a secret in a Key Vault.
+                  example: "https://testKeyVault.vault.azure.net/secrets/SecretTest/123456"
       dataDisks:
         type: array
         description: |
@@ -530,7 +599,7 @@ properties:
               type: string
               description: |
                 The type of the data disk
-              enum: [ Standard_LRS, Premium_LRS, StandardSSD_LRS, UltraSSD_LRS ]
+              enum: [ Standard_LRS, Premium_LRS, StandardSSD_LRS, UltraSSD_LRS, StandardSSD_ZRS, Premium_ZRS ]
               example: "Standard_LRS"
             caching:
               type: string
@@ -552,7 +621,7 @@ properties:
             type: string
             description: |
               The type of the OS disk.
-            enum: [ Standard_LRS, Premium_LRS, StandardSSD_LRS ]
+            enum: [ Standard_LRS, Premium_LRS, StandardSSD_LRS, StandardSSD_ZRS, Premium_ZRS ]
             example: "Standard_LRS"
           sizeGB:
             type: integer
@@ -655,7 +724,7 @@ properties:
             description: |
               Security type refers to the different security features of a virtual machine.
               Security features like Trusted launch virtual machines help to improve the security of Azure generation 2 virtual machines.
-            enum: [ Standard, TrustedLaunch ]
+            enum: [ Standard, TrustedLaunch, ConfidentialVM ]
             example: "TrustedLaunch"
           secureBootEnabled:
             type: boolean
@@ -667,6 +736,17 @@ properties:
             description: |
               Specifies whether vTPM should be enabled on the virtual machine.
             example: true
+          encryptionAtHost:
+            type: boolean
+            description: |
+              Enables the Host Encryption for the virtual machine. The Encryption at host will be disabled unless this property is set to true for the resource.
+            example: true
+          confidentialOsDiskEncryption:
+            type: boolean
+            description: |
+              Confidential disk encryption binds the disk encryption keys to the VM's TPM, ensuring VM-only access.
+              The security type must be "ConfidentialVM" to enable defining this preference as “true”.
+            example: false
       proximityPlacementGroups:
         type: array
         description: Defines the proximity placement group in which the VM will be launched.

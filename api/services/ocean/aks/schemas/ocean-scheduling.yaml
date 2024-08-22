@@ -1,0 +1,115 @@
+type: object
+description: >
+  An object used to specify times when the cluster will turn off. Once the shutdown time will be over, the cluster will return to its previous state.
+title: Ocean AKS Scheduling
+properties:
+  shutdownHours:
+    type: object
+    description: >
+      An object used to specify times that the nodes in the cluster will be taken down.
+    title: Shutdown Hours
+    properties:
+      timeWindows:
+        type: array
+        description: >
+          The times that the shutdown hours will apply. Required if isEnabled is true.
+        items:
+          type: string
+          example: "Sat:08:00-Sun:08:00"
+      isEnabled:
+        type: boolean
+        example: true
+        description: >
+          Flag to enable or disable the shutdown hours mechanism. When False, the mechanism is deactivated, and the cluster remains in its current state.
+  tasks:
+    type: array
+    description: >
+      A list of scheduling tasks to preform on the cluster at a specific cron time.
+    items:
+      type: object
+      required:
+        - isEnabled
+        - cronExpression
+        - taskType
+      properties:
+        isEnabled:
+          type: boolean
+          description: >
+            Flag to enable or disable the scheduling task.
+        cronExpression:
+          type: string
+          description: >
+            A valid cron expression.
+            The cron is running in UTC time zone and is in Unix cron format of Cron Expression Validator Script.
+          example: "0 1 * * *"
+        taskType:
+          type: string
+          description: >
+            The type of the scheduling task.
+          enum:
+            - clusterRoll
+          example: clusterRoll
+        parameters:
+          type: object
+          description: >
+            The parameters of the scheduling task. Each task type will have properties relevant only to it.
+          properties:
+            clusterRoll:
+              type: object
+              description: >
+                The parameters of the cluster roll scheduling task.
+              properties:
+                batchSizePercentage:
+                  type: integer
+                  minimum: 1
+                  maximum: 100
+                  description: >
+                    The percentage of the cluster that will be rolled at each batch.
+                  example: 20
+                comment:
+                  type: string
+                  description: >
+                    A comment to be added to the cluster roll.
+                  example: Scheduled cluster roll
+                respectPdb:
+                  type: boolean
+                  description: >
+                    During the roll, if the parameter is set to true we honor PDB during the instance replacement.
+                  example: true
+                respectRestrictScaleDown:
+                  type: boolean
+                  description: >
+                    During the roll, if the parameter is set to true we honor Restrict Scale Down label during the nodes replacement.
+                  example: true
+                batchMinHealthyPercentage:
+                  type: integer
+                  minimum: 1
+                  maximum: 100
+                  description: >
+                    The minimum percentage of the scaled nodes that should be healthy at each batch.
+                  example: 80
+                vngIds:
+                  type: array
+                  description: >
+                    List of Virtual Node Group IDs to be rolled. If not set or set to null, cluster roll will be applied.
+                  items:
+                    type: string
+                  example: [ "vng-123456" ]
+  suspensionHours:
+    type: object
+    description: >
+      An object used to specify times that the cluster should be exempted from Ocean's scaling-down activities to ensure uninterrupted operations during critical periods.
+    title: Suspension Hours
+    properties:
+      timeWindows:
+        type: array
+        description: >
+          The times that the suspension hours will apply. Required if isEnabled is true.
+        items:
+          type: string
+          example: "Sat:08:00-Sun:08:00"
+      isEnabled:
+        type: boolean
+        example: true
+        description: >
+          Flag to enable or disable the suspension hours mechanism. When False, the mechanism is deactivated, and the cluster remains in its current state.
