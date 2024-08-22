@@ -74,6 +74,8 @@ properties:
     description: The priority of the Spark application.
   pythonVersion:
     $ref: '#/components/schemas/PythonVersion'
+  shuffle:
+    $ref: '#/components/schemas/Shuffle'
   sparkConf:
     additionalProperties:
       type: string
@@ -1944,6 +1946,37 @@ components:
       - Scala
       title: SparkApplicationType
       type: string
+    Shuffle:
+      description: External Shuffle storage configuration. This is used to configure
+        the external shuffle storage plugin in Spark allowing the shuffle data to be stored on
+        an external storage system. This is useful to handle spot kill more gracefully and allow for executor scaledown
+        when the shuffle data is stored externally.
+      properties:
+        enabled:
+          title: enabled
+          description: Is the external shuffle storage plugin enabled
+          type: boolean
+        rootDir:
+          title: rootDir
+          description: The rootDir for external shuffle storage. This can be any filesystem url supported by hadoop,
+            e.g. s3://bucket/path, gs://bucket/path, azure://bucket/path, hdfs://path and local path representing 
+            a shared drive mounted on all nodes.
+          type: string
+        dependencyInitUserId:
+          title: dependencyInitUserId
+          description: The user id for the init container with the shuffle dependencies, 
+            ideally the same as the user id of the driver/executor to ensure the shuffle 
+            dependencies are accessible from there. By default the init container is run as root.
+          type: integer
+        dependencyFsGroup:
+          title: dependencyFsGroup
+          description: The fsGroup for the podSecurityContext for the Spark driver/executors.
+            This is used to ensure the shuffle dependencies are accessible from the driver/executor.
+            This is needed if there is a mismatch between the user id of the driver/executor and the init container.
+          type: integer
+      required:
+      - enabled
+      - rootDir
     StorageOSVolumeSource:
       properties:
         fsType:
