@@ -117,6 +117,10 @@
       }
     },
     {
+      "name": "Ocean Automatic Rightsizing",
+      "description": "New Automatic Rightsizing version.\n\nIf you wish to learn more about it reach out to our support team.\n"
+    },
+    {
       "name": "Ocean Spark",
       "description": "Ocean for Apache Spark is a managed cloud-native Spark platform that can be deployed in your cloud account.\n\nRunning on top of Ocean, Spot’s serverless infrastructure engine for containers, Ocean Spark makes it easy for your data teams to be successful with Apache Spark on Kubernetes, without dealing with the complexity of managing servers.\n",
       "externalDocs": {
@@ -198,7 +202,8 @@
         "Ocean AKS",
         "Ocean Insights",
         "Ocean CD",
-        "Ocean Spark"
+        "Ocean Spark",
+        "Ocean Automatic Rightsizing"
       ]
     },
     {
@@ -79635,6 +79640,1393 @@
           "Connect Workspaces"
         ],
         "x-codegen-request-body-name": "payload"
+      }
+    },
+    "/ocean/{oceanId}/rightSizing/rule": {
+      "post": {
+        "summary": "Create Ocean Rightsizing Rule",
+        "description": "",
+        "operationId": "oceanRightsizingRuleCreate",
+        "tags": [
+          "Ocean Automatic Rightsizing"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "title": "Ocean Rightsizing Rule",
+                    "description": "Determines the Ocean Rightsizing rule\n",
+                    "required": [
+                      "recommendationApplicationIntervals"
+                    ],
+                    "properties": {
+                      "ruleName": {
+                        "type": "string",
+                        "description": "The unique name of the rule",
+                        "example": "dev-rule"
+                      },
+                      "restartReplicas": {
+                        "type": "string",
+                        "description": "Enable to sequentially restart pod batches according to recommendations, for all pods, only more than 1 replica, or not any pod.",
+                        "enum": [
+                          "MORE_THAN_ONE_REPLICA",
+                          "ALL_MANIFEST",
+                          "NO_RESTART"
+                        ],
+                        "example": "ALL_MANIFEST"
+                      },
+                      "excludePreliminaryRecommendations": {
+                        "type": "boolean",
+                        "description": "Exclude preliminary recommendations (recommendations based on less than 4 full days of data).",
+                        "example": false
+                      },
+                      "recommendationApplicationIntervals": {
+                        "description": "Determines the Ocean Rightsizing rule recommendation application intervals",
+                        "type": "array",
+                        "example": [
+                          {
+                            "repetitionBasis": "WEEKLY",
+                            "weeklyRepetitionBasis": {
+                              "intervalDays": [
+                                "MONDAY",
+                                "WEDNESDAY"
+                              ],
+                              "intervalHours": {
+                                "startTime": "12:00",
+                                "endTime": "14:00"
+                              }
+                            }
+                          },
+                          {
+                            "repetitionBasis": "MONTHLY",
+                            "monthlyRepetitionBasis": {
+                              "intervalMonths": [
+                                2,
+                                4,
+                                6
+                              ],
+                              "weekOfTheMonth": [
+                                "FIRST",
+                                "LAST"
+                              ],
+                              "weeklyRepetitionBasis": {
+                                "intervalDays": [
+                                  "MONDAY"
+                                ],
+                                "intervalHours": {
+                                  "startTime": "03:00",
+                                  "endTime": "04:00"
+                                }
+                              }
+                            }
+                          }
+                        ],
+                        "items": {
+                          "type": "object",
+                          "title": "Ocean Rightsizing Rule Recommendation Application Interval",
+                          "description": "Determines the Ocean Rightsizing rule recommendation application interval\n",
+                          "properties": {
+                            "repetitionBasis": {
+                              "type": "string",
+                              "description": "The repetition basis",
+                              "enum": [
+                                "WEEKLY",
+                                "MONTHLY"
+                              ]
+                            },
+                            "monthlyRepetitionBasis": {
+                              "type": "object",
+                              "title": "Ocean Rightsizing Rule Monthly Repetition Basis",
+                              "description": "Determines the Ocean Rightsizing rule monthly repetition basis\n",
+                              "properties": {
+                                "intervalMonths": {
+                                  "type": "array",
+                                  "description": "Array of the months (in number), when we want to trigger the apply recommendations.\n",
+                                  "items": {
+                                    "type": "integer",
+                                    "example": 2
+                                  }
+                                },
+                                "weekOfTheMonth": {
+                                  "type": "string",
+                                  "description": "Array of the weeks in the month, when we want to trigger the apply recommendations.\n",
+                                  "enum": [
+                                    "FIRST",
+                                    "SECOND",
+                                    "THIRD",
+                                    "FOURTH",
+                                    "LAST"
+                                  ]
+                                },
+                                "weeklyRepetitionBasis": {
+                                  "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule/post/requestBody/content/application~1json/schema/allOf/0/properties/recommendationApplicationIntervals/items/properties/weeklyRepetitionBasis"
+                                }
+                              }
+                            },
+                            "weeklyRepetitionBasis": {
+                              "type": "object",
+                              "title": "Ocean Rightsizing Rule Weekly Repetition Basis",
+                              "description": "Determines the Ocean Rightsizing rule weekly repetition basis\n",
+                              "properties": {
+                                "intervalDays": {
+                                  "type": "array",
+                                  "description": "Array of the days of the week, when we want to trigger the apply recommendations.\n",
+                                  "items": {
+                                    "type": "string",
+                                    "enum": [
+                                      "SUNDAY",
+                                      "MONDAY",
+                                      "TUESDAY",
+                                      "WEDNESDAY",
+                                      "THURSDAY",
+                                      "FRIDAY",
+                                      "SATURDAY"
+                                    ],
+                                    "example": "MONDAY"
+                                  }
+                                },
+                                "intervalHours": {
+                                  "type": "object",
+                                  "properties": {
+                                    "startTime": {
+                                      "type": "string",
+                                      "example": "12:00"
+                                    },
+                                    "endTime": {
+                                      "type": "string",
+                                      "example": "14:00"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "recommendationApplicationMinThreshold": {
+                        "type": "object",
+                        "title": "Ocean Rightsizing Rule Recommendation Application Min Threshold",
+                        "description": "Determines the extent of difference between current request and recommendation to trigger a change in percentage\n",
+                        "properties": {
+                          "cpuPercentage": {
+                            "type": "number",
+                            "minimum": 0.05,
+                            "maximum": 1,
+                            "default": 0.05,
+                            "example": 0.412
+                          },
+                          "memoryPercentage": {
+                            "type": "number",
+                            "minimum": 0.05,
+                            "maximum": 1,
+                            "default": 0.05,
+                            "example": 0.36
+                          }
+                        }
+                      },
+                      "recommendationApplicationBoundaries": {
+                        "type": "object",
+                        "title": "Ocean Rightsizing Rule Recommendation Application Boundaries",
+                        "description": "Determines the Ocean Rightsizing rule recommendation application boundaries.\n",
+                        "properties": {
+                          "cpu": {
+                            "type": "object",
+                            "properties": {
+                              "min": {
+                                "type": "integer",
+                                "description": "the minimal value of cpu in vCpu",
+                                "example": 0
+                              },
+                              "max": {
+                                "type": "integer",
+                                "description": "the maximal value of cpu in vCpu",
+                                "example": 100
+                              }
+                            }
+                          },
+                          "memory": {
+                            "type": "object",
+                            "properties": {
+                              "min": {
+                                "type": "integer",
+                                "description": "the minimal value of memory in Gib",
+                                "minimum": 0,
+                                "example": 1
+                              },
+                              "max": {
+                                "type": "integer",
+                                "description": "the maximal value of memory in Gib",
+                                "minimum": 0,
+                                "example": 80
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "recommendationApplicationOverheadValues": {
+                        "type": "object",
+                        "title": "Ocean Rightsizing Rule Recommendation Application Overhead Values",
+                        "description": "Determines the Ocean Rightsizing rule recommendation application overhead values\n",
+                        "properties": {
+                          "cpuPercentage": {
+                            "type": "number",
+                            "minimum": 0.1,
+                            "maximum": 1,
+                            "default": 0.1,
+                            "example": 0.8
+                          },
+                          "memoryPercentage": {
+                            "type": "number",
+                            "minimum": 0.1,
+                            "maximum": 1,
+                            "default": 0.1,
+                            "example": 0.5
+                          }
+                        }
+                      },
+                      "recommendationApplicationHPA": {
+                        "type": "object",
+                        "title": "Ocean Rightsizing Rule Recommendation Application For HPA",
+                        "description": "HPA Rightsizing Rule Recommendation Configuration",
+                        "properties": {
+                          "allowHPARecommendations": {
+                            "type": "boolean",
+                            "description": "Determines by the rule if recommendation application is allowed for workloads with HPA definition.",
+                            "example": true
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ocean Rightsizing Rule Create Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/{oceanId}/rightSizing/rule"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items"
+                              }
+                            },
+                            "kind": {
+                              "example": "mcs:ocean:rightsizing:rule"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "get": {
+        "summary": "List Ocean Rightsizing Rules",
+        "description": "",
+        "operationId": "oceanRightsizingRulesList",
+        "tags": [
+          "Ocean Automatic Rightsizing"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "oceanId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "o-abcd1234",
+            "description": "Identifier of the Ocean cluster.\n"
+          },
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean Rightsizing Rules Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/{oceanId}/rightSizing/rule"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "description": "Rightsizing rule",
+                                "type": "object",
+                                "properties": {
+                                  "oceanId": {
+                                    "type": "string",
+                                    "example": "o-482d9d26"
+                                  },
+                                  "clusterIdentifier": {
+                                    "type": "string",
+                                    "example": "dev-cluster"
+                                  },
+                                  "ruleName": {
+                                    "type": "string",
+                                    "example": "dev-rule"
+                                  },
+                                  "restartReplicas": {
+                                    "type": "string",
+                                    "description": "Enable to sequentially restart pod batches according to recommendations, for all pods, only more than 1 replica, or not any pod.",
+                                    "enum": [
+                                      "MORE_THAN_ONE_REPLICA",
+                                      "ALL_MANIFEST",
+                                      "NO_RESTART"
+                                    ],
+                                    "example": "ALL_MANIFEST"
+                                  },
+                                  "excludePreliminaryRecommendations": {
+                                    "type": "boolean",
+                                    "description": "Exclude preliminary recommendations (recommendations based on less than 4 full days of data).",
+                                    "example": false
+                                  },
+                                  "recommendationApplicationIntervals": {
+                                    "type": "array",
+                                    "example": [
+                                      {
+                                        "repetitionBasis": "WEEKLY",
+                                        "weeklyRepetitionBasis": {
+                                          "intervalDays": [
+                                            "MONDAY",
+                                            "WEDNESDAY"
+                                          ],
+                                          "intervalHours": {
+                                            "startTime": "12:00",
+                                            "endTime": "14:00"
+                                          }
+                                        }
+                                      },
+                                      {
+                                        "repetitionBasis": "MONTHLY",
+                                        "monthlyRepetitionBasis": {
+                                          "intervalMonths": [
+                                            2,
+                                            4,
+                                            6
+                                          ],
+                                          "weekOfTheMonth": [
+                                            "FIRST",
+                                            "LAST"
+                                          ],
+                                          "weeklyRepetitionBasis": {
+                                            "intervalDays": [
+                                              "MONDAY"
+                                            ],
+                                            "intervalHours": {
+                                              "startTime": "03:00",
+                                              "endTime": "04:00"
+                                            }
+                                          }
+                                        }
+                                      }
+                                    ],
+                                    "items": {
+                                      "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule/post/requestBody/content/application~1json/schema/allOf/0/properties/recommendationApplicationIntervals/items"
+                                    }
+                                  },
+                                  "recommendationApplicationMinThreshold": {
+                                    "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule/post/requestBody/content/application~1json/schema/allOf/0/properties/recommendationApplicationMinThreshold"
+                                  },
+                                  "recommendationApplicationBoundaries": {
+                                    "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule/post/requestBody/content/application~1json/schema/allOf/0/properties/recommendationApplicationBoundaries"
+                                  },
+                                  "recommendationApplicationOverheadValues": {
+                                    "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule/post/requestBody/content/application~1json/schema/allOf/0/properties/recommendationApplicationOverheadValues"
+                                  },
+                                  "recommendationApplicationHPA": {
+                                    "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule/post/requestBody/content/application~1json/schema/allOf/0/properties/recommendationApplicationHPA"
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "mcs:ocean:rightsizing:rule"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Ocean Rightsizing Rules",
+        "description": "",
+        "operationId": "oceanRightsizingRuleDelete",
+        "tags": [
+          "Ocean Automatic Rightsizing"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "title": "Ocean Rightsizing Rule Names",
+                    "description": "Rightsizing Rule Names to delete.\n",
+                    "properties": {
+                      "ruleNames": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "example": [
+                          "dev-rule",
+                          "test-rule"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ocean Rightsizing Deleted Rule Names Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/{oceanId}/rightSizing/rule"
+                            },
+                            "method": {
+                              "example": "DELETE"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "ruleNames": {
+                                    "type": "array",
+                                    "example": [
+                                      "dev-rule",
+                                      "test-rule"
+                                    ],
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "mcs:ocean:rightsizing:rule"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/{oceanId}/rightSizing/rule/{ruleName}": {
+      "get": {
+        "summary": "Get Ocean Rightsizing Rule",
+        "description": "",
+        "operationId": "oceanRightsizingRuleGet",
+        "tags": [
+          "Ocean Automatic Rightsizing"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule/get/parameters/0"
+          },
+          {
+            "in": "path",
+            "name": "ruleName",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "dev-rule",
+            "description": "Identifier of rightsizing rule.\n"
+          },
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule/post/responses/200"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update Ocean Rightsizing Rule",
+        "description": "",
+        "operationId": "oceanRightsizingRuleUpdate",
+        "tags": [
+          "Ocean Automatic Rightsizing"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule~1%7BruleName%7D/get/parameters/1"
+          },
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "title": "Ocean Rightsizing Rule",
+                    "description": "Determines the Ocean Rightsizing rule\n",
+                    "required": [
+                      "recommendationApplicationIntervals"
+                    ],
+                    "properties": {
+                      "restartReplicas": {
+                        "type": "string",
+                        "description": "Enable to sequentially restart pod batches according to recommendations, for all pods, only more than 1 replica, or not any pod.",
+                        "enum": [
+                          "MORE_THAN_ONE_REPLICA",
+                          "ALL_MANIFEST",
+                          "NO_RESTART"
+                        ],
+                        "example": "ALL_MANIFEST"
+                      },
+                      "excludePreliminaryRecommendations": {
+                        "type": "boolean",
+                        "description": "Exclude preliminary recommendations (recommendations based on less than 4 full days of data).",
+                        "example": false
+                      },
+                      "recommendationApplicationIntervals": {
+                        "description": "Determines the Ocean Rightsizing rule recommendation application intervals",
+                        "type": "array",
+                        "example": [
+                          {
+                            "repetitionBasis": "WEEKLY",
+                            "weeklyRepetitionBasis": {
+                              "intervalDays": [
+                                "MONDAY",
+                                "WEDNESDAY"
+                              ],
+                              "intervalHours": {
+                                "startTime": "12:00",
+                                "endTime": "14:00"
+                              }
+                            }
+                          },
+                          {
+                            "repetitionBasis": "MONTHLY",
+                            "monthlyRepetitionBasis": {
+                              "intervalMonths": [
+                                2,
+                                4,
+                                6
+                              ],
+                              "weekOfTheMonth": [
+                                "FIRST",
+                                "LAST"
+                              ],
+                              "weeklyRepetitionBasis": {
+                                "intervalDays": [
+                                  "MONDAY"
+                                ],
+                                "intervalHours": {
+                                  "startTime": "03:00",
+                                  "endTime": "04:00"
+                                }
+                              }
+                            }
+                          }
+                        ],
+                        "items": {
+                          "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule/post/requestBody/content/application~1json/schema/allOf/0/properties/recommendationApplicationIntervals/items"
+                        }
+                      },
+                      "recommendationApplicationMinThreshold": {
+                        "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule/post/requestBody/content/application~1json/schema/allOf/0/properties/recommendationApplicationMinThreshold"
+                      },
+                      "recommendationApplicationBoundaries": {
+                        "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule/post/requestBody/content/application~1json/schema/allOf/0/properties/recommendationApplicationBoundaries"
+                      },
+                      "recommendationApplicationOverheadValues": {
+                        "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule/post/requestBody/content/application~1json/schema/allOf/0/properties/recommendationApplicationOverheadValues"
+                      },
+                      "recommendationApplicationHPA": {
+                        "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule/post/requestBody/content/application~1json/schema/allOf/0/properties/recommendationApplicationHPA"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ocean Rightsizing Rule Update Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/{oceanId}/rightSizing/rule/{ruleName]"
+                            },
+                            "method": {
+                              "example": "PUT"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items"
+                              }
+                            },
+                            "kind": {
+                              "example": "mcs:ocean:rightsizing:rule"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/{oceanId}/rightSizing/rule/{ruleName}/attachment": {
+      "post": {
+        "summary": "Attach Ocean Rightsizing Rule",
+        "description": "",
+        "operationId": "oceanRightsizingRuleMatchingAttachment",
+        "tags": [
+          "Ocean Automatic Rightsizing"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule~1%7BruleName%7D/get/parameters/1"
+          },
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "namespaces": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "namespaceName": {
+                              "type": "string",
+                              "description": "List of namespaces",
+                              "example": "kube-system"
+                            },
+                            "workloads": {
+                              "type": "array",
+                              "description": "List of workloads",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "name": {
+                                    "type": "string",
+                                    "description": "The name of the workload",
+                                    "example": "kube-proxy"
+                                  },
+                                  "type": {
+                                    "type": "string",
+                                    "description": "The type of the workload",
+                                    "example": "Deployment"
+                                  },
+                                  "regexName": {
+                                    "type": "string",
+                                    "description": "The regex for the workload name",
+                                    "example": "spotinst*"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "example": [
+                            {
+                              "namespacesName": "kube-system",
+                              "workloads": [
+                                {
+                                  "name": "kube-proxy",
+                                  "type": "Deployment"
+                                },
+                                {
+                                  "regexName": "spotinst*",
+                                  "type": "Deployment"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ocean Rightsizing Rule Attachment Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/{oceanId}/rightSizing/rule/{ruleName}/attachment"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "example": "mcs:ocean:rightsizing:ruleMatching"
+                            },
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "rulesMatchings": {
+                                    "type": "array",
+                                    "example": [
+                                      {
+                                        "oceanId": "o-6ea3032a",
+                                        "clusterIdentifier": "dev-cluster",
+                                        "namespace": "kube-system",
+                                        "resourceType": "Deployment",
+                                        "name": "kube-proxy",
+                                        "ruleName": "dev-rule",
+                                        "ruleMatching": "workloadName:kube-proxy"
+                                      },
+                                      {
+                                        "oceanId": "o-6ea3032a",
+                                        "clusterIdentifier": "dev-cluster",
+                                        "namespace": "kube-system",
+                                        "resourceType": "Deployment",
+                                        "name": "spotinst-controller",
+                                        "ruleName": "dev-rule",
+                                        "ruleMatching": "regexName:spotinst*"
+                                      }
+                                    ],
+                                    "items": {
+                                      "description": "Rightsizing rule matching of rule to workload",
+                                      "type": "object",
+                                      "properties": {
+                                        "oceanId": {
+                                          "type": "string"
+                                        },
+                                        "clusterIdentifier": {
+                                          "type": "string"
+                                        },
+                                        "namespace": {
+                                          "type": "string"
+                                        },
+                                        "resourceType": {
+                                          "type": "string"
+                                        },
+                                        "name": {
+                                          "type": "string"
+                                        },
+                                        "ruleName": {
+                                          "type": "string"
+                                        },
+                                        "ruleMatching": {
+                                          "type": "string"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/{oceanId}/rightSizing/rule/{ruleName}/detachment": {
+      "post": {
+        "summary": "Detach Ocean Rightsizing Rule",
+        "description": "",
+        "operationId": "oceanRightsizingRuleMatchingDetachment",
+        "tags": [
+          "Ocean Automatic Rightsizing"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule~1%7BruleName%7D/get/parameters/1"
+          },
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule~1%7BruleName%7D~1attachment/post/requestBody/content/application~1json/schema/allOf/0"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ocean Rightsizing Rule Detached Workload Names Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/{oceanId}/rightSizing/rule/{ruleName}/detachment"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "workloadNames": {
+                                    "type": "array",
+                                    "example": [
+                                      "kube-proxy",
+                                      "spotinst-controller"
+                                    ],
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "kind": {
+                              "example": "mcs:ocean:rightsizing:rule"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/ocean/{oceanId}/rightSizing/recommendations": {
+      "post": {
+        "summary": "Get Ocean Rightsizing Recommendations",
+        "description": "Get right-sizing recommendations for an Ocean cluster.\n",
+        "operationId": "oceanRightsizingRecommendations",
+        "tags": [
+          "Ocean Automatic Rightsizing"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "title": "Ocean Rightsizing Recommendations",
+                    "description": "Determines the Ocean Rightsizing recommendations\n",
+                    "required": [
+                      "clusterResources OR clusterLabels"
+                    ],
+                    "properties": {
+                      "clusterResources": {
+                        "type": "object",
+                        "title": "Ocean Rightsizing Recommendation Cluster Resources",
+                        "description": "Determines the Ocean Recommendation filtering by the combinations of namespace::workload::containers\n",
+                        "properties": {
+                          "namespaceName": {
+                            "description": "Determines the namespace to filter by with objects of it's workloads",
+                            "type": "object",
+                            "properties": {
+                              "workloadName": {
+                                "description": "Determines the workload to filter by with List of it's containers",
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "properties": {
+                                    "containerName": {
+                                      "type": "string",
+                                      "description": "container name",
+                                      "example": "workloadContainer1"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "example": {
+                          "namespaceName1": {
+                            "workloadName1": [
+                              "workloadContainer1",
+                              "workloadContainer2"
+                            ],
+                            "workloadName2": [
+                              "workloadContainer2",
+                              "workloadContainer3"
+                            ]
+                          },
+                          "namespaceName2": {
+                            "workloadName1": [
+                              "workloadContainer1",
+                              "workloadContainer2"
+                            ]
+                          }
+                        }
+                      },
+                      "clusterLabels": {
+                        "type": "object",
+                        "title": "Ocean Rightsizing Recommendation Cluster Labels",
+                        "description": "Determines the Ocean Recommendation filtering by the combinations of namespace::workloadsLabels\n",
+                        "properties": {
+                          "namespaceName": {
+                            "description": "Determines the namespace to filter by with List of it's workloads labels",
+                            "type": "array",
+                            "properties": {
+                              "containerName": {
+                                "type": "string",
+                                "description": "container name",
+                                "example": "workloadContainer1"
+                              }
+                            }
+                          }
+                        },
+                        "example": {
+                          "namespaceName1": [
+                            "workloadLabel1",
+                            "workloadLabel2",
+                            "workloadLabel3"
+                          ],
+                          "namespaceName2": [
+                            "workloadLabel1",
+                            "workloadLabel2"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ocean Rightsizing Recommendation Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/o-abcd1234/rightSizing/recommendations"
+                            },
+                            "method": {
+                              "example": "POST"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "title": "Ocean Rightsizing Recommendation",
+                                "description": "Rightsizing Resource Container Recommendation.\n",
+                                "properties": {
+                                  "namespace": {
+                                    "type": "string",
+                                    "description": "The namespace of the workload"
+                                  },
+                                  "workloadName": {
+                                    "type": "string",
+                                    "description": "The name of the workload"
+                                  },
+                                  "workloadType": {
+                                    "type": "string",
+                                    "description": "The type of the workload"
+                                  },
+                                  "requestedCPU": {
+                                    "type": "number",
+                                    "description": "The requested cpu"
+                                  },
+                                  "suggestedCPU": {
+                                    "type": "integer",
+                                    "description": "The suggested cpu"
+                                  },
+                                  "requestedMemory": {
+                                    "type": "number",
+                                    "description": "The requested memory"
+                                  },
+                                  "suggestedMemory": {
+                                    "type": "integer",
+                                    "description": "The requested memory"
+                                  },
+                                  "monthlyMaxSavings\"": {
+                                    "type": "number",
+                                    "description": "The monthly potential savings"
+                                  },
+                                  "ruleName": {
+                                    "type": "string",
+                                    "description": "The name of the attached rule"
+                                  },
+                                  "optimizationStatus": {
+                                    "type": "string",
+                                    "description": "The optimization status of the workload"
+                                  },
+                                  "reasonsForPartialOptimized": {
+                                    "type": "array",
+                                    "description": "The reasons for the partly optimized status",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "containers": {
+                                    "type": "array",
+                                    "description": "The containers of the workload",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "name": {
+                                          "type": "string",
+                                          "description": "The name of the container"
+                                        },
+                                        "requestedCPU": {
+                                          "type": "number",
+                                          "description": "The requested cpu"
+                                        },
+                                        "suggestedCPU": {
+                                          "type": "integer",
+                                          "description": "The suggested cpu"
+                                        },
+                                        "requestedMemory": {
+                                          "type": "number",
+                                          "description": "The requested memory"
+                                        },
+                                        "suggestedMemory": {
+                                          "type": "integer",
+                                          "description": "The requested memory"
+                                        },
+                                        "preliminary": {
+                                          "type": "boolean",
+                                          "description": "The recommendation is preliminary"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "example": [
+                                {
+                                  "namespace": "kube-system",
+                                  "workloadName": "redis-controller",
+                                  "workloadType": "deployment",
+                                  "requestedCPU": 50,
+                                  "suggestedCPU": 4,
+                                  "requestedMemory": 50,
+                                  "suggestedMemory": 19,
+                                  "monthlyMaxSavings\"": 17.312044994154263,
+                                  "ruleName": "attachedRule",
+                                  "optimizationStatus": "PARTLY_OPTIMIZED",
+                                  "reasonsForPartialOptimized": [
+                                    "Threshold did not allow us to apply the recommendation",
+                                    "The ranges of the rule prevent the apply of the recommendations",
+                                    "Recommendation did not perform due to preliminary exclusion"
+                                  ],
+                                  "containers": [
+                                    {
+                                      "name": "dnsmasq",
+                                      "requestedCPU": 10,
+                                      "suggestedCPU": 2,
+                                      "requestedMemory": 40,
+                                      "suggestedMemory": 15,
+                                      "preliminary": false
+                                    },
+                                    {
+                                      "name": "sidecar",
+                                      "requestedCPU": 40,
+                                      "suggestedCPU": 2,
+                                      "requestedMemory": 10,
+                                      "suggestedMemory": 4,
+                                      "preliminary": true
+                                    }
+                                  ]
+                                },
+                                {
+                                  "namespace": "sparkSpace",
+                                  "workloadName": "test-redis",
+                                  "workloadType": "deployment",
+                                  "requestedCPU": 50,
+                                  "suggestedCPU": 2,
+                                  "requestedMemory": 30,
+                                  "suggestedMemory": 20,
+                                  "monthlyMaxSavings": 28.258386736965104,
+                                  "ruleName": null,
+                                  "optimizationStatus": "NOT_OPTIMIZED",
+                                  "containers": [
+                                    {
+                                      "name": "dns-controller",
+                                      "requestedCPU": 20,
+                                      "suggestedCPU": 1,
+                                      "requestedMemory": 20,
+                                      "suggestedMemory": 15,
+                                      "preliminary": false
+                                    },
+                                    {
+                                      "name": "kubedns",
+                                      "requestedCPU": 30,
+                                      "suggestedCPU": 1,
+                                      "requestedMemory": 10,
+                                      "suggestedMemory": 5,
+                                      "preliminary": true
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            "count": {
+                              "example": 2
+                            },
+                            "kind": {
+                              "example": "mcs:ocean:rightSizing:recommendations"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
       }
     }
   }
