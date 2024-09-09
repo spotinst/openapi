@@ -77478,6 +77478,7 @@
     },
     "/connect/executions/formatted_execution/{exe_id}": {
       "get": {
+        "description": "Get details for the selected workflow execution.",
         "operationId": "get_formatted_execution_instance",
         "parameters": [
           {
@@ -77492,15 +77493,166 @@
         ],
         "responses": {
           "200": {
-            "content": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "AutomationExecutionId": {
+                      "description": "SSM doc automation execution id.",
+                      "type": "string"
+                    },
+                    "AutomationExecutionStatus": {
+                      "description": "Status of execution.",
+                      "type": "string"
+                    },
+                    "DocumentName": {
+                      "description": "Name of the workflow",
+                      "type": "string"
+                    },
+                    "DocumentVersion": {
+                      "description": "Executed version of the workflow.",
+                      "type": "integer"
+                    },
+                    "ExecutedBy": {
+                      "description": "AWS role that executed the workflow.",
+                      "type": "string"
+                    },
+                    "ExecutionEndTime": {
+                      "description": "Time at which execution ended.",
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "ExecutionStartTime": {
+                      "description": "Start time of the execution.",
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "Mode": {
+                      "type": "string"
+                    },
+                    "Outputs": {
+                      "description": "Outputs of the execution.",
+                      "properties": {},
+                      "type": "object"
+                    },
+                    "Parameters": {
+                      "description": "Runtime parameters for execution.",
+                      "properties": {},
+                      "type": "object"
+                    },
+                    "PostProcessingCompletedAt": {
+                      "description": "Time at which post processing was completed.",
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "ResolvedTargets": {
+                      "properties": {},
+                      "type": "object"
+                    },
+                    "StepExecutions": {
+                      "description": "List of steps in workflow execution.",
+                      "items": {
+                        "properties": {
+                          "Action": {
+                            "description": "Action of the step in the workflow.",
+                            "type": "string"
+                          },
+                          "ExecutionEndTime": {
+                            "description": "Time when step execution ended.",
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "ExecutionStartTime": {
+                            "description": "Time when execution started.",
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "Inputs": {
+                            "description": "Inputs for the step.",
+                            "properties": {},
+                            "type": "object"
+                          },
+                          "IsEnd": {
+                            "description": "Indicator for final step.",
+                            "type": "boolean"
+                          },
+                          "NextStep": {
+                            "description": "Name of the next step.",
+                            "type": "string"
+                          },
+                          "Outputs": {
+                            "description": "Outputs of the step.",
+                            "properties": {},
+                            "type": "object"
+                          },
+                          "OverriddenParameters": {
+                            "description": "Overridden Parameters of the step.",
+                            "properties": {},
+                            "type": "object"
+                          },
+                          "StepExecutionId": {
+                            "description": "Unique execution id of the step.",
+                            "type": "string"
+                          },
+                          "StepName": {
+                            "description": "Name of the step.",
+                            "type": "string"
+                          },
+                          "StepStatus": {
+                            "description": "Status of the step.",
+                            "type": "string"
+                          },
+                          "ValidNextSteps": {
+                            "description": "Valid next steps in the workflow.",
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "Targets": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "TaskId": {
+                      "description": "Integer id for execution task.",
+                      "type": "integer"
+                    },
+                    "TenantId": {
+                      "description": "Tenant id of the owner of the workflow.",
+                      "type": "string"
+                    },
+                    "Trigger": {
+                      "description": "User who triggered the workflow.",
+                      "type": "string"
+                    },
+                    "WorkflowDeleted": {
+                      "description": "Indicator if workflow is deleted.",
+                      "type": "boolean"
+                    },
+                    "WorkspaceId": {
+                      "description": "ID of workspace this workflow belongs to.",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
             "description": "Success"
           },
           "400": {
             "content": {},
-            "description": "Bad Request"
+            "description": "Bad request"
           }
         },
-        "summary": "get information for the selected runbook execution",
+        "summary": "Get Execution",
         "tags": [
           "Connect Executions"
         ]
@@ -77509,6 +77661,7 @@
     },
     "/connect/executions/formatted_execution/{exe_id}/download": {
       "get": {
+        "description": "Get link to download details for the selected workflow execution.",
         "operationId": "get_formatted_execution_instance_download",
         "parameters": [
           {
@@ -77517,15 +77670,27 @@
         ],
         "responses": {
           "200": {
-            "content": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "redirect_url": {
+                      "description": "Redirect url.",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
             "description": "Success"
           },
           "400": {
             "content": {},
-            "description": "Bad Request"
+            "description": "Bad request"
           }
         },
-        "summary": "get information for the selected runbook execution",
+        "summary": "Get Execution download url",
         "tags": [
           "Connect Executions"
         ]
@@ -77535,7 +77700,7 @@
     "/connect/executions/{name}": {
       "parameters": [],
       "post": {
-        "description": "Args: version=int\nBody Params:\n    json (dict): input data for the parameters",
+        "description": "Start the execution of the selected workflow.",
         "operationId": "post_workflow_execution",
         "parameters": [
           {
@@ -77565,16 +77730,28 @@
           }
         ],
         "responses": {
-          "200": {
-            "content": {},
-            "description": "Success"
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "exe_id": {
+                      "description": "Execution ID",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Created"
           },
           "400": {
             "content": {},
             "description": "Bad Request"
           }
         },
-        "summary": "start the execution of a selected workflow",
+        "summary": "Start Execution",
         "tags": [
           "Connect Executions"
         ]
@@ -77730,6 +77907,14 @@
         "operationId": "get_settings_api_keys",
         "parameters": [
           {
+            "description": "Disable redacting API keys",
+            "in": "query",
+            "name": "disable_redact",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "description": "Currently selected Workspace ID",
             "in": "query",
             "name": "workspace_id",
@@ -77760,10 +77945,10 @@
         "operationId": "delete_settings_api_key_item",
         "parameters": [
           {
-            "$ref": "#/paths/~1connect~1settings~1apikeys~1%7Bapikey_name%7D/put/parameters/0"
+            "$ref": "#/paths/~1connect~1settings~1apikeys~1%7Bapikey_name%7D/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1connect~1settings~1apikeys/get/parameters/0"
+            "$ref": "#/paths/~1connect~1settings~1apikeys/get/parameters/1"
           }
         ],
         "responses": {
@@ -77781,15 +77966,49 @@
           "Connect Settings"
         ]
       },
+      "get": {
+        "operationId": "get_settings_api_key_item",
+        "parameters": [
+          {
+            "description": "API key name",
+            "in": "path",
+            "name": "apikey_name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/paths/~1connect~1settings~1apikeys/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1connect~1settings~1apikeys/get/parameters/1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {},
+            "description": "Success"
+          },
+          "400": {
+            "content": {},
+            "description": "Bad Request"
+          }
+        },
+        "summary": "API to fetch an API Key with given name in a given workspace",
+        "tags": [
+          "Connect Settings"
+        ]
+      },
       "parameters": [],
       "post": {
         "operationId": "post_settings_api_key_item",
         "parameters": [
           {
-            "$ref": "#/paths/~1connect~1settings~1apikeys~1%7Bapikey_name%7D/put/parameters/0"
+            "$ref": "#/paths/~1connect~1settings~1apikeys~1%7Bapikey_name%7D/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1connect~1settings~1apikeys/get/parameters/0"
+            "$ref": "#/paths/~1connect~1settings~1apikeys/get/parameters/1"
           }
         ],
         "responses": {
@@ -77811,16 +78030,10 @@
         "operationId": "put_settings_api_key_item",
         "parameters": [
           {
-            "description": "API key name",
-            "in": "path",
-            "name": "apikey_name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/paths/~1connect~1settings~1apikeys~1%7Bapikey_name%7D/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1connect~1settings~1apikeys/get/parameters/0"
+            "$ref": "#/paths/~1connect~1settings~1apikeys/get/parameters/1"
           }
         ],
         "responses": {
@@ -77871,7 +78084,7 @@
         "operationId": "get_settings_connector_discovery",
         "parameters": [
           {
-            "$ref": "#/paths/~1connect~1settings~1apikeys/get/parameters/0"
+            "$ref": "#/paths/~1connect~1settings~1apikeys/get/parameters/1"
           }
         ],
         "responses": {
@@ -77897,7 +78110,7 @@
         "operationId": "post_jira_auth_settings",
         "parameters": [
           {
-            "$ref": "#/paths/~1connect~1settings~1apikeys/get/parameters/0"
+            "$ref": "#/paths/~1connect~1settings~1apikeys/get/parameters/1"
           }
         ],
         "responses": {
@@ -78028,7 +78241,7 @@
         "operationId": "post_slack_o_auth_post_install",
         "parameters": [
           {
-            "$ref": "#/paths/~1connect~1settings~1apikeys/get/parameters/0"
+            "$ref": "#/paths/~1connect~1settings~1apikeys/get/parameters/1"
           }
         ],
         "responses": {
@@ -78135,7 +78348,7 @@
         "operationId": "get_setting_items",
         "parameters": [
           {
-            "description": "Name of connector service (value=ansible|apikeys|datadog|humio|instana|jira|opsgenie|aws_health|pagerduty|prometheus|pulumi|slack|splunk|splunk_on_call|spot|squadcast|terraform|terraform_cli|twilio|zoom)",
+            "description": "Name of connector service (value=ansible|apikeys|bitbucket|datadog|git|humio|instana|jira|opsgenie|aws_health|pagerduty|prometheus|pulumi|slack|splunk|splunk_on_call|spot|squadcast|terraform|terraform_cli|twilio|zoom)",
             "in": "path",
             "name": "service",
             "required": true,
@@ -78145,6 +78358,9 @@
           },
           {
             "$ref": "#/paths/~1connect~1settings~1apikeys/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1connect~1settings~1apikeys/get/parameters/1"
           }
         ],
         "responses": {
@@ -78170,7 +78386,7 @@
             "$ref": "#/paths/~1connect~1settings~1%7Bservice%7D/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1connect~1settings~1apikeys/get/parameters/0"
+            "$ref": "#/paths/~1connect~1settings~1apikeys/get/parameters/1"
           }
         ],
         "responses": {
@@ -78201,7 +78417,7 @@
             "$ref": "#/paths/~1connect~1settings~1%7Bservice%7D~1%7Bintegration_id%7D/get/parameters/1"
           },
           {
-            "$ref": "#/paths/~1connect~1settings~1apikeys/get/parameters/0"
+            "$ref": "#/paths/~1connect~1settings~1apikeys/get/parameters/1"
           }
         ],
         "responses": {
@@ -78235,6 +78451,9 @@
           },
           {
             "$ref": "#/paths/~1connect~1settings~1apikeys/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1connect~1settings~1apikeys/get/parameters/1"
           }
         ],
         "responses": {
@@ -78264,7 +78483,7 @@
             "$ref": "#/paths/~1connect~1settings~1%7Bservice%7D~1%7Bintegration_id%7D/get/parameters/1"
           },
           {
-            "$ref": "#/paths/~1connect~1settings~1apikeys/get/parameters/0"
+            "$ref": "#/paths/~1connect~1settings~1apikeys/get/parameters/1"
           }
         ],
         "responses": {
@@ -78293,6 +78512,9 @@
           },
           {
             "$ref": "#/paths/~1connect~1settings~1apikeys/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1connect~1settings~1apikeys/get/parameters/1"
           }
         ],
         "responses": {
@@ -79497,6 +79719,28 @@
       "parameters": []
     },
     "/connect/workspaces/{workspace_id}": {
+      "delete": {
+        "operationId": "delete_workspace_instance",
+        "parameters": [
+          {
+            "$ref": "#/paths/~1connect~1workspaces~1%7Bworkspace_id%7D/get/parameters/0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {},
+            "description": "Success"
+          },
+          "400": {
+            "content": {},
+            "description": "Bad Request"
+          }
+        },
+        "summary": "Deletes the workspace identified by workspace_id",
+        "tags": [
+          "Connect Workspaces"
+        ]
+      },
       "get": {
         "operationId": "get_workspace_instance",
         "parameters": [
