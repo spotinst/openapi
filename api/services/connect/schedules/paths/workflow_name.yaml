@@ -1,63 +1,80 @@
 delete:
-  description: "body: {\n    rule: String:rule-name,\n    id: String (dynamoDB id),\n}\nreturn
-    200 OK"
+  description: Delete the selected schedule rule.
   operationId: delete_workflow_schedules
   parameters:
   - $ref: "../parameters/workflow_name.yaml"
+  - $ref: "../parameters/workspace_id.yaml"
+  - $ref: "../parameters/version.yaml"
   responses:
     '200':
       content: {}
       description: Deleted
-    '400': &id001
+    '400':
       content: {}
       description: Bad Request
-  summary: Delete scheduled rule
+  summary: Delete schedule rule
   tags:
   - Connect Schedules
 get:
+  description: List all schedules for a workflow.
   operationId: get_workflow_schedules
   parameters:
   - $ref: "../parameters/workflow_name.yaml"
   - $ref: "../parameters/workspace_id.yaml"
   responses:
     '200':
-      content: {}
+      content:
+        application/json:
+          schema:
+            $ref: "../../schemas/ScheduleList.yaml"
       description: Success
-    '400': *id001
-  summary: list schedules for a runbook
+    '400':
+      content: {}
+      description: Bad Request
+  summary: Get schedules for workflow
   tags:
   - Connect Schedules
 parameters: []
 post:
-  description: "Accept POST request to schedule runbook execution:\nbody: {\n    version:
-    Integer,\n    expression: String,\n    task_id: (optional) int,\n    params: (optional)
-    dict: default parameters for scheduled version\n    params examples:\n     - \"params\":
-    {\"param-name\": \"param-value\"}\n     - \"params\": {\"param-name\": [\"param-value1\",
-    \"param-value2\"]}\n     - \"params\": {\"param-name\": {\"dict-key\": \"dict-value\"}}\n}\nreturn:
-    201 created"
+  description: Endpoint to schedule workflow execution.
   operationId: post_workflow_schedules
   parameters:
   - $ref: "../parameters/workflow_name.yaml"
   - $ref: "../parameters/workspace_id.yaml"
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: "../../schemas/ScheduleInput.yaml"
+    required: true
   responses:
     '201':
-      content: {}
+      content:
+        application/json:
+          schema:
+            $ref: "../../schemas/ScheduleRule.yaml"
       description: Created
-    '400': *id001
-  summary: schedules/<workflow-name>
+    '400':
+      content: {}
+      description: Bad Request
+  summary: Create schedule
   tags:
   - Connect Schedules
+  x-codegen-request-body-name: payload
 put:
-  description: "body: {\n    rule: String,\n    State: [ENABLED|DISABLED]\n}\nreturn:
-    200 success"
+  description: Accept request to enable/disable execution schedule rule.
   operationId: put_workflow_schedules
   parameters:
   - $ref: "../parameters/workflow_name.yaml"
+  - $ref: "../parameters/workspace_id.yaml"
+  - $ref: "../parameters/version.yaml"
   responses:
     '200':
       content: {}
       description: Success
-    '400': *id001
-  summary: Accept PUT request to enable/disable execution schedule (rule)
+    '400':
+      content: {}
+      description: Bad Request
+  summary: Update schedule
   tags:
   - Connect Schedules
