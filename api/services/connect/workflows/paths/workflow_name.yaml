@@ -1,5 +1,7 @@
 delete:
-  description: if no version is specified, delete all versions of the workflow
+  description: 'Delete a selected version of the selected workflow.
+
+    If no version is specified, delete all versions of the workflow.'
   operationId: delete_workflow_instance
   parameters:
   - $ref: "../parameters/workflow_name.yaml"
@@ -7,20 +9,22 @@ delete:
   - $ref: "../parameters/version.yaml"
   responses:
     '200':
-      content: {}
+      content:
+        application/json:
+          schema:
+            $ref: "../../schemas/WorkflowDelete.yaml"
       description: Success
-    '400': &id001
+    '400':
       content: {}
       description: Bad Request
-  summary: delete a selected version of a selected workflow;
+  summary: Delete Workflow
   tags:
   - Connect Workflows
 parameters: []
 put:
-  description: "We always create a new workflow off of the latest version in SSM.\n\nAPI
-    request sample body:{\n    \"Content\": {\n        \"assumeRole\": \"{{AutomationAssumeRole}}\",\n
-    \       \"description\":\"...\"\n        ...\n    },\n    \"Tags\": [\"tag1\",
-    tag2, ..]\n}"
+  description: 'Update a selected workflow by creating a new version.
+
+    New workflow is created off of the latest version in SSM.'
   operationId: put_workflow_instance
   parameters:
   - $ref: "../parameters/workflow_name.yaml"
@@ -36,10 +40,12 @@ put:
       content:
         application/json:
           schema:
-            $ref: "../../schemas/WorkflowModel.yaml"
+            $ref: "../../schemas/WorkflowItem.yaml"
       description: Success
-    '400': *id001
-  summary: Update a selected workflow by creating a new version
+    '400':
+      content: {}
+      description: Bad Request
+  summary: Update Workflow
   tags:
   - Connect Workflows
   x-codegen-request-body-name: payload
