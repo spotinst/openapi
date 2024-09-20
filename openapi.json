@@ -77759,7 +77759,7 @@
     },
     "/connect/schedules": {
       "get": {
-        "description": "Returns:\n    List: list schedules",
+        "description": "List all scheduled workflows of the selected workspace.",
         "operationId": "get_schedules_list",
         "parameters": [
           {
@@ -77771,7 +77771,7 @@
             }
           },
           {
-            "description": "Currently selected Workspace ID",
+            "description": "currently selected Workspace ID",
             "in": "query",
             "name": "workspace_id",
             "schema": {
@@ -77781,7 +77781,56 @@
         ],
         "responses": {
           "200": {
-            "content": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "items": {
+                      "description": "List of workflow schedules.",
+                      "items": {
+                        "properties": {
+                          "created_at": {
+                            "description": "Time when the schedule was created.",
+                            "type": "string"
+                          },
+                          "created_by": {
+                            "description": "Tenant ID for the user who created the schedule.",
+                            "type": "integer"
+                          },
+                          "created_by_username": {
+                            "description": "Name of the user who created the schedule.",
+                            "type": "string"
+                          },
+                          "enabled": {
+                            "description": "Status of the schedule (true for active and false for inactive).",
+                            "type": "boolean"
+                          },
+                          "rule": {
+                            "description": "Rule ID of the schedule",
+                            "type": "string"
+                          },
+                          "schedule_expression": {
+                            "description": "CRON expression for the schedule.",
+                            "type": "string"
+                          },
+                          "task_id": {
+                            "description": "Task ID for the schedule.",
+                            "type": "integer"
+                          },
+                          "workflow": {
+                            "description": "Name of the workflow.",
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
             "description": "Success"
           },
           "400": {
@@ -77789,7 +77838,7 @@
             "description": "Bad Request"
           }
         },
-        "summary": "Scheduled workflows for a tenant",
+        "summary": "List Scheduled Workflows",
         "tags": [
           "Connect Schedules"
         ]
@@ -77798,11 +77847,17 @@
     },
     "/connect/schedules/{workflow_name}": {
       "delete": {
-        "description": "body: {\n    rule: String:rule-name,\n    id: String (dynamoDB id),\n}\nreturn 200 OK",
+        "description": "Delete a selected execution schedule of the selected workflow.",
         "operationId": "delete_workflow_schedules",
         "parameters": [
           {
             "$ref": "#/paths/~1connect~1schedules~1%7Bworkflow_name%7D/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1connect~1schedules/get/parameters/1"
+          },
+          {
+            "$ref": "#/paths/~1connect~1schedules~1%7Bworkflow_name%7D/put/parameters/2"
           }
         ],
         "responses": {
@@ -77815,12 +77870,13 @@
             "description": "Bad Request"
           }
         },
-        "summary": "Delete scheduled rule",
+        "summary": "Delete Schedule",
         "tags": [
           "Connect Schedules"
         ]
       },
       "get": {
+        "description": "List all execution schedules for the selected workflow.",
         "operationId": "get_workflow_schedules",
         "parameters": [
           {
@@ -77838,7 +77894,13 @@
         ],
         "responses": {
           "200": {
-            "content": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/paths/~1connect~1schedules/get/responses/200/content/application~1json/schema"
+                }
+              }
+            },
             "description": "Success"
           },
           "400": {
@@ -77846,14 +77908,14 @@
             "description": "Bad Request"
           }
         },
-        "summary": "list schedules for a runbook",
+        "summary": "List Schedules for Workflow",
         "tags": [
           "Connect Schedules"
         ]
       },
       "parameters": [],
       "post": {
-        "description": "Accept POST request to schedule runbook execution:\nbody: {\n    version: Integer,\n    expression: String,\n    task_id: (optional) int,\n    params: (optional) dict: default parameters for scheduled version\n    params examples:\n     - \"params\": {\"param-name\": \"param-value\"}\n     - \"params\": {\"param-name\": [\"param-value1\", \"param-value2\"]}\n     - \"params\": {\"param-name\": {\"dict-key\": \"dict-value\"}}\n}\nreturn: 201 created",
+        "description": "Create a new execution schedule for the selected workflow.",
         "operationId": "post_workflow_schedules",
         "parameters": [
           {
@@ -77863,9 +77925,50 @@
             "$ref": "#/paths/~1connect~1schedules/get/parameters/1"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "expression": {
+                    "description": "CRON expression of the schedule.",
+                    "type": "string"
+                  },
+                  "params": {
+                    "description": "Runtime parameters for the workflow.",
+                    "properties": {},
+                    "type": "object"
+                  },
+                  "version": {
+                    "description": "Version of the workflow.",
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "expression",
+                  "version"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "201": {
-            "content": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "rule_name": {
+                      "description": "Rule ID of the schedule.",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
             "description": "Created"
           },
           "400": {
@@ -77873,17 +77976,29 @@
             "description": "Bad Request"
           }
         },
-        "summary": "schedules/<workflow-name>",
+        "summary": "Create Schedule",
         "tags": [
           "Connect Schedules"
-        ]
+        ],
+        "x-codegen-request-body-name": "payload"
       },
       "put": {
-        "description": "body: {\n    rule: String,\n    State: [ENABLED|DISABLED]\n}\nreturn: 200 success",
+        "description": "Enable/disable the status of the selected execution schedule.",
         "operationId": "put_workflow_schedules",
         "parameters": [
           {
             "$ref": "#/paths/~1connect~1schedules~1%7Bworkflow_name%7D/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1connect~1schedules/get/parameters/1"
+          },
+          {
+            "description": "version of workflow in schedule",
+            "in": "query",
+            "name": "version",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -77896,7 +78011,7 @@
             "description": "Bad Request"
           }
         },
-        "summary": "Accept PUT request to enable/disable execution schedule (rule)",
+        "summary": "Update Schedule Status",
         "tags": [
           "Connect Schedules"
         ]
