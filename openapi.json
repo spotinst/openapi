@@ -79821,6 +79821,7 @@
     },
     "/connect/workspaces": {
       "get": {
+        "description": "List all workspaces the user is authorized to view.",
         "operationId": "get_workspace_list",
         "parameters": [
           {
@@ -79838,10 +79839,40 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/paths/~1connect~1workspaces/post/responses/200/content/application~1json/schema"
-                  },
-                  "type": "array"
+                  "allOf": [
+                    {
+                      "allOf": [
+                        {
+                          "$ref": "#/paths/~1connect~1workspaces/post/requestBody/content/application~1json/schema/allOf/0"
+                        },
+                        {
+                          "properties": {
+                            "workspace_id": {
+                              "description": "Unique workspace ID",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      ]
+                    },
+                    {
+                      "properties": {
+                        "permissions": {
+                          "description": "List of permissions for that workspace",
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "workspace_id": {
+                          "description": "Unique workspace ID",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
                 }
               }
             },
@@ -79852,13 +79883,14 @@
             "description": "Bad Request"
           }
         },
-        "summary": "Return a list of Workspaces the user is authorized to view",
+        "summary": "List Workspaces",
         "tags": [
           "Connect Workspaces"
         ]
       },
       "parameters": [],
       "post": {
+        "description": "Create a new workspace.",
         "operationId": "post_workspace_list",
         "parameters": [
           {
@@ -79873,19 +79905,19 @@
                   {
                     "properties": {
                       "description": {
-                        "description": ".",
+                        "description": "Description of workspace",
                         "type": "string"
                       },
                       "name": {
-                        "description": ".",
+                        "description": "Name of workspace",
                         "type": "string"
                       },
                       "owner": {
-                        "description": ".",
+                        "description": "Owner of workspace",
                         "type": "string"
                       },
                       "type": {
-                        "description": ".",
+                        "description": "Type of workspace",
                         "type": "string"
                       }
                     },
@@ -79894,21 +79926,27 @@
                   {
                     "properties": {
                       "entities": {
+                        "description": "List of entities",
                         "items": {
                           "properties": {
                             "id": {
+                              "description": "Spot ID of the user",
                               "type": "string"
                             },
                             "isGroup": {
+                              "description": "If the user is present in any group",
                               "type": "boolean"
                             },
                             "isOwner": {
+                              "description": "If the user is owner of that workspace",
                               "type": "boolean"
                             },
                             "name": {
+                              "description": "Name of user",
                               "type": "string"
                             },
                             "permissions": {
+                              "description": "List of permissions for that workspace",
                               "items": {
                                 "type": "string"
                               },
@@ -79933,45 +79971,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "allOf": [
-                        {
-                          "$ref": "#/paths/~1connect~1workspaces/post/requestBody/content/application~1json/schema/allOf/0"
-                        },
-                        {
-                          "properties": {
-                            "workspace_id": {
-                              "description": ".",
-                              "type": "string"
-                            }
-                          },
-                          "type": "object"
-                        }
-                      ]
-                    },
-                    {
-                      "properties": {
-                        "permissions": {
-                          "items": {
-                            "type": "string"
-                          },
-                          "type": "array"
-                        },
-                        "workspace_id": {
-                          "type": "string"
-                        }
-                      },
-                      "type": "object"
-                    }
-                  ]
+                  "$ref": "#/paths/~1connect~1workspaces/get/responses/200/content/application~1json/schema"
                 }
               }
             },
-            "description": "Success"
-          },
-          "201": {
-            "content": {},
             "description": "Workspace created successfully"
           },
           "400": {
@@ -79983,7 +79986,7 @@
             "description": "Workspace name already exists"
           }
         },
-        "summary": "Create a new workspace entry",
+        "summary": "Create Workspace",
         "tags": [
           "Connect Workspaces"
         ],
@@ -79993,6 +79996,7 @@
     "/connect/workspaces/name/available": {
       "parameters": [],
       "post": {
+        "description": "Check if Workspace name is available for use.",
         "operationId": "post_workspace_name_availability_check",
         "parameters": [
           {
@@ -80030,9 +80034,11 @@
                     {
                       "properties": {
                         "available": {
+                          "description": "Check if workspace name is available for use",
                           "type": "boolean"
                         },
                         "message": {
+                          "description": "Response message on availability check",
                           "type": "string"
                         }
                       },
@@ -80049,7 +80055,7 @@
             "description": "Request validation error"
           }
         },
-        "summary": "Check for workspace name is available for use",
+        "summary": "Workspace Availability",
         "tags": [
           "Connect Workspaces"
         ],
@@ -80058,6 +80064,7 @@
     },
     "/connect/workspaces/name/{workspace_name}": {
       "get": {
+        "description": "Get details of a specific workspace using workspace name.",
         "operationId": "get_workspace_instance_by_name",
         "parameters": [
           {
@@ -80073,22 +80080,25 @@
             "$ref": "#/paths/~1connect~1workspaces/get/parameters/0"
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/paths/~1connect~1workspaces~1%7Bworkspace_id%7D/get/requestBody/content/application~1json/schema"
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/paths/~1connect~1workspaces~1%7Bworkspace_id%7D/get/requestBody/content/application~1json/schema"
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1connect~1workspaces/post/requestBody/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "properties": {
+                        "workspace_id": {
+                          "description": "cws-XXXXXXX",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  ]
                 }
               }
             },
@@ -80099,16 +80109,16 @@
             "description": "Bad Request"
           }
         },
-        "summary": "Get a specific workspace",
+        "summary": "Get Workspace by Name",
         "tags": [
           "Connect Workspaces"
-        ],
-        "x-codegen-request-body-name": "payload"
+        ]
       },
       "parameters": []
     },
     "/connect/workspaces/{workspace_id}": {
       "delete": {
+        "description": "Delete a workspace specified by workspace_id",
         "operationId": "delete_workspace_instance",
         "parameters": [
           {
@@ -80118,19 +80128,20 @@
         "responses": {
           "200": {
             "content": {},
-            "description": "Success"
+            "description": "Deleted"
           },
           "400": {
             "content": {},
             "description": "Bad Request"
           }
         },
-        "summary": "Deletes the workspace identified by workspace_id",
+        "summary": "Delete Workspace",
         "tags": [
           "Connect Workspaces"
         ]
       },
       "get": {
+        "description": "Get details of a workspace specified by workspace_id.",
         "operationId": "get_workspace_instance",
         "parameters": [
           {
@@ -80146,35 +80157,12 @@
             "$ref": "#/paths/~1connect~1workspaces/get/parameters/0"
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/paths/~1connect~1workspaces/post/requestBody/content/application~1json/schema/allOf/0"
-                  },
-                  {
-                    "properties": {
-                      "workspace_id": {
-                        "description": "cws-XXXXXXX",
-                        "type": "string"
-                      }
-                    },
-                    "type": "object"
-                  }
-                ]
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
           "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/paths/~1connect~1workspaces~1%7Bworkspace_id%7D/get/requestBody/content/application~1json/schema"
+                  "$ref": "#/paths/~1connect~1workspaces/get/responses/200/content/application~1json/schema"
                 }
               }
             },
@@ -80185,15 +80173,14 @@
             "description": "Bad Request"
           }
         },
-        "summary": "Get a specific workspace",
+        "summary": "Get Workspace by ID",
         "tags": [
           "Connect Workspaces"
-        ],
-        "x-codegen-request-body-name": "payload"
+        ]
       },
       "parameters": [],
       "put": {
-        "description": "Client must pass all required values, including any that are unchanged.\nrequired fields: workspace_id, name",
+        "description": "Update a workspace specified by workspace_id.",
         "operationId": "put_workspace_instance",
         "parameters": [
           {
@@ -80218,7 +80205,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/paths/~1connect~1workspaces/post/responses/200/content/application~1json/schema"
+                  "$ref": "#/paths/~1connect~1workspaces/get/responses/200/content/application~1json/schema"
                 }
               }
             },
@@ -80229,7 +80216,7 @@
             "description": "Bad Request"
           }
         },
-        "summary": "Update the given workspace",
+        "summary": "Update Workspace",
         "tags": [
           "Connect Workspaces"
         ],
@@ -80239,7 +80226,7 @@
     "/connect/workspaces/{workspace_id}/move-order": {
       "parameters": [],
       "post": {
-        "description": "updateWorkflow\n    updateIntegration\n    updateSchedule\n    updateExecution\n    Payload:\n    {\n        \"workspace_id\": \"development\",\n        \"workflow_name\": \"test\",\n        \"instances\": [\"instance1_id\"]\n    }",
+        "description": "It moves a workflow and all integrations it uses\nin new workspace. Following things are needed -\nPermissions the user needs in both workspaces:\n    updateWorkflow\n    updateIntegration\n    updateSchedule\n    updateExecution",
         "operationId": "post_move_order_view",
         "parameters": [
           {
@@ -80251,16 +80238,16 @@
             "application/json": {
               "schema": {
                 "properties": {
-                  "instances": {
-                    "items": {
-                      "type": "string"
-                    },
-                    "type": "array"
+                  "move_all_integrations": {
+                    "description": "If we need to move all integrations used in that workflow",
+                    "type": "boolean"
                   },
-                  "workflow_id": {
+                  "workflow_name": {
+                    "description": "Name of the workflow to move to the new workspace",
                     "type": "string"
                   },
                   "workspace_id": {
+                    "description": "Workspace ID to move the workflow into",
                     "type": "string"
                   }
                 },
@@ -80280,7 +80267,7 @@
             "description": "Bad Request"
           }
         },
-        "summary": "Permissions the user needs in both workspaces:",
+        "summary": "Move Workflow and its Integrations to Another Workpace",
         "tags": [
           "Connect Workspaces"
         ],
