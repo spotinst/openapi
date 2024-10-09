@@ -1,0 +1,27 @@
+name: Common Spot Verification Workflow
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  pr_jira_structure_verification:
+    runs-on: default-scale-set
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checking Out Jira Lint Action
+        uses: actions/checkout@v4
+        with:
+          repository: spotinst/action-jira-linter
+
+      - uses: ./
+        name: Validating Jira Link and Status
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          jira-token: ${{ secrets.JIRA_TOKEN }}
+          jira-base-url: https://spotinst.atlassian.net
+          pr-threshold: 1000
+          validate-issue-status: true
+          allowed-issue-statuses: |
+            APPROVED FOR PUBLISHING
