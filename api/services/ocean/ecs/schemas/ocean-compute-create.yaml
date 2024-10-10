@@ -1,0 +1,56 @@
+type: object
+title: Ocean Compute
+required:
+  - subnetIds
+  - launchSpecification
+properties:
+  subnetIds:
+    type: array
+    description: >
+      A comma-separated list of subnet identifiers for the Ocean cluster. Subnet identifiers should be configured with auto-assign public IP.
+    items:
+      type: string
+      example: "subnet-1234abcd"
+  instanceTypes:
+    type: object
+    description: The type of instances that may or may not be a part of the Ocean cluster.
+    properties:
+      filters:
+        $ref: "./oceanInstanceTypesFilters.yaml"
+      whitelist:
+        type: array
+        description: >
+          Instance types allowed in the Ocean cluster.
+          Cannot be configured if a deny list is configured.
+        items:
+          type: string
+        example: [ "c4.xlarge", "c4.2xlarge", "c4.4xlarge", "c4.8xlarge" ]
+      blacklist:
+        type: array
+        description: >
+          Instance types to avoid launching in the Ocean cluster.
+          Cannot be configured if a permit list is configured.
+        items:
+          type: string
+        example: [ "r5.large", "r5.xlarge" ]
+  launchSpecification:
+    $ref: "./ocean-launch-spec-compute-create.yaml"
+  optimizeImages:
+    type: object
+    required:
+      - shouldOptimizeEcsAmi
+    properties:
+      shouldOptimizeEcsAmi:
+        type: boolean
+        example: "true"
+      performAt:
+        type: string
+        example: "never"
+        description: >
+          Must be one of the following values: never, always, timeWindow. If performAt = timeWindow, the time window array should contain at least one time window.
+      timeWindows:
+        type: array
+        description: >
+          Restrict to time window regex.
+        items:
+          example: "['Sun:02:00-Sun:12:00', 'Wed:01:01-Fri:02:03']"
