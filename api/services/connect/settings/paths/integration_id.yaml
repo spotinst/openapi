@@ -1,5 +1,6 @@
 delete:
-  description: "1) For connectors storing secrets in the tenant secrets db, remove
+  description: "Endpoint handling two use cases for removing connector integration
+    or resource:\n1) For connectors storing secrets in the tenant secrets db, remove
     the dynamic\n   secret keys added during connector integration\n2) For target
     account oriented resources stored in the Target Settings DB,\n   remove the resource
     associated with one 'alias' account or all accounts"
@@ -10,16 +11,31 @@ delete:
   - $ref: "../parameters/workspace_id.yaml"
   responses:
     '200':
-      content: {}
+      content:
+        application/json:
+          schema:
+            $ref: "../../schemas/Base_ResponseMessage.yaml"
       description: Success
-    '400': &id001
+    '400':
       content: {}
       description: Bad Request
-  summary: 'Endpoint handling two use cases for removing connector integration or
-    resource:'
+  summary: Delete Integration/Resource
   tags:
   - Connect Settings
 get:
+  description: 'Get the details of the selected integration/resource instance.
+
+
+    Note: The JSON response will contain credentials specific to the selected service
+    and integration,
+
+    unlike the response model which shows all possible fields for all services. The
+    model is provided
+
+    to illustrate the complete set of fields that may be present in the response,
+    depending on which
+
+    service and integration is selected.'
   operationId: get_setting_item
   parameters:
   - $ref: "../parameters/service.yaml"
@@ -28,10 +44,15 @@ get:
   - $ref: "../parameters/workspace_id.yaml"
   responses:
     '200':
-      content: {}
+      content:
+        application/json:
+          schema:
+            $ref: "../../schemas/Base_AllIntegrations.yaml"
       description: Success
-    '400': *id001
-  summary: Get the details of an individual integration/resource instance
+    '400':
+      content: {}
+      description: Bad Request
+  summary: Get Integration/Resource
   tags:
   - Connect Settings
 parameters: []
@@ -57,27 +78,70 @@ patch:
   parameters:
   - $ref: "../parameters/service.yaml"
   - $ref: "../parameters/integration_id.yaml"
-  - $ref: "../parameters/workspace_id.yaml"
+  requestBody:
+    content:
+      application/json: {}
+    description: Workspace ID of the workspace to move integration/resource to.
+    required: false
   responses:
     '200':
-      content: {}
+      content:
+        application/json:
+          schema:
+            $ref: "../../schemas/Base_ResponseMessage.yaml"
       description: Success
-    '400': *id001
-  summary: Update secret for a given service
+    '201':
+      content: {}
+      description: Created
+    '400':
+      content: {}
+      description: Bad Request
+  summary: Set Default/Move Integration/Resource
   tags:
   - Connect Settings
+  x-codegen-request-body-name: workspace_id
 put:
+  description: "Update the Integration/Resource secrets for a given service and given
+    integration instance.\n\nNote: The displayed request and response models show
+    the structure for each service. \nWhen calling this endpoint, only the credentials
+    for the specific service being updated \nshould be provided in the payload under
+    the 'credentials' key. The response will contain \nthe newly updated integration
+    information for that service.\n\nFor example, to update a Slack integration:\n\nRequest:\n{\n
+    \   \"credentials\": {\n        \"alias\": \"updated-slack-integration\",\n        \"bot_token\":
+    \"xoxb-updated-token\",\n        \"signing_secret\": \"updated-secret\"\n    }\n}\n\nResponse
+    will contain the updated Slack integration details."
   operationId: put_setting_item
   parameters:
   - $ref: "../parameters/service.yaml"
   - $ref: "../parameters/integration_id.yaml"
   - $ref: "../parameters/disable_redact.yaml"
   - $ref: "../parameters/workspace_id.yaml"
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: "../../schemas/AllInputModels.yaml"
+    required: true
   responses:
     '200':
-      content: {}
+      content:
+        application/json:
+          schema:
+            $ref: "../../schemas/Base_AllIntegrations.yaml"
       description: Success
-    '400': *id001
-  summary: Update secret for a given service and given integration instance
+    '400':
+      content: {}
+      description: Bad Request
+    '404':
+      content: {}
+      description: Not Found
+    '422':
+      content: {}
+      description: Unprocessable Entity
+    '500':
+      content: {}
+      description: Internal Server Error
+  summary: Update Integration/Resource
   tags:
   - Connect Settings
+  x-codegen-request-body-name: payload
