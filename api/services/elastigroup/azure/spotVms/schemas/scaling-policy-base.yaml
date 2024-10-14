@@ -1,5 +1,11 @@
 type: object
 properties:
+  isEnabled:
+    type: boolean
+    example: "true"
+    description: |
+      Specifies whether the scaling policy is enabled.
+    default: true
   policyName:
     type: string
     description: |
@@ -15,12 +21,12 @@ properties:
     description: |
       Statistic by which to evaluate the selected metric.
     example: "average"
-    enum: [average, total, minimum, maximum, count]
+    enum: [ average, total, minimum, maximum, count ]
   unit:
     type: string
     description: |
       Unit to measure to evaluate the selected metric
-    enum: [percent, seconds, microseconds, milliseconds, bytes, kilobytes, megabytes, gigabytes, terabytes, bits, kilobits, megabits, gigabits, terabits, count, bytes/second, kilobytes/second, megabytes/second, gigabytes/second, terabytes/second, bits/second, kilobits/second, megabits/second, gigabits/second, terabits/second, count/second, none]
+    enum: [ percent, seconds, microseconds, milliseconds, bytes, kilobytes, megabytes, gigabytes, terabytes, bits, kilobits, megabits, gigabits, terabits, count, bytes/second, kilobytes/second, megabytes/second, gigabytes/second, terabytes/second, bits/second, kilobits/second, megabits/second, gigabits/second, terabits/second, count/second, none ]
   threshold:
     type: number
     format: float
@@ -106,7 +112,7 @@ properties:
     type: integer
     description: |
       Amount of time (seconds) for which the threshold must be met in order to trigger the scaling action.
-    enum: [60, 300, 900, 1800, 3600, 7200]
+    enum: [ 60, 300, 900, 1800, 3600, 7200 ]
     example: 60
   evaluationPeriods:
     type: integer
@@ -121,34 +127,6 @@ properties:
       multiple of 60.
     minimum: 0
     example: 300
-  dimensions:
-    type: array
-    description: |
-      Required if scaling.up.namespace is different from "Microsoft.Compute".\
-      2 dimensions are required.
-    items:
-      allOf:
-        - type: object
-          properties:
-            name:
-              type: string
-              example: "resourceName"
-            value:
-              type: string
-              example: "testApplicationGateway"
-        - type: object
-          properties:
-            name:
-              type: string
-              example: "resourceGroupName"
-            value:
-              type: string
-              example: "testResourceGroup"
-    example:
-      - name: "resourceName"
-        value: "testApplicationGateway"
-      - name: "resourceGroupName"
-        value: "testResourceGroup"
   operator:
     type: string
     description: |
@@ -164,39 +142,3 @@ properties:
       - gte
       - lt
       - lte
-  action:
-    type: object
-    description: |
-      Scaling action to take when the policy is triggered.
-    properties:
-      type:
-        type: string
-        description: |
-          Type of scaling action to take when the scaling policy is triggered.
-        enum: [adjustment, updateCapacity]
-        example: adjustment
-      adjustment:
-        type: string
-        description: |
-          Value to which the action type will be adjusted.\
-          Required if using "adjustment" action type.
-        example: "2"
-      target:
-        type: integer
-        description: |
-          Value to update the group target capacity to.\
-          Required if using “updateCapacity” as action type\
-          and “minimum” and “maximum” are undefined.
-      minimum:
-        type: integer
-        description: |
-          Value to update the group mimimum capacity to.\
-          Required if using “updateCapacity” as action type\
-          and “target” and“maximum” are undefined.
-      maximum:
-        type: integer
-        description: |
-          Value to update the group mimimum capacity to.\
-          Required if using “updateCapacity” as action type\
-          and “target” and “minimum” are undefined.
-
