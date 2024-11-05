@@ -4,6 +4,7 @@ description: |
 required:
   - oceanId
   - sourceImage
+  - metadata
 properties:
   oceanId:
     type: string
@@ -25,7 +26,7 @@ properties:
     example: 265168459660-compute@developer.gserviceaccount.com
     description: >
       The account used by applications running on the VM to call GCP APIs.
-  rootVolumeSize:
+  rootVolumeSizeInGb:
     type: integer
     description: Set root volume size (in GB).
     example: 8
@@ -36,13 +37,13 @@ properties:
     enum: [pd-standard, pd-ssd, pd-balanced]
   metadata:
     type: array
-    required:
-      - key
-      - value
     description: >
       Add metadata to the cluster.
     items:
       type: object
+      required:
+        - key
+        - value
       properties:
         key:
           type: string
@@ -87,6 +88,10 @@ properties:
     description: Add taints to the virtual node group.
     items:
       type: object
+      required:
+        - key
+        - value
+        - effect
       properties:
         key:
           type: string
@@ -106,6 +111,9 @@ properties:
     description: 'An array of labels to add to the virtual node group. Only custom user labels are allowed, and not Kubernetes built-in labels or Spot internal labels.'
     items:
       type: object
+      required:
+        - key
+        - value
       properties:
         key:
           type: string
@@ -142,6 +150,8 @@ properties:
           Set custom headroom per virtual node group. Provide a list of launchSpec.autoScale.headroom objects.
         items:
           type: object
+          required:
+            - numOfUnits
           properties:
             cpuPerUnit:
               type: integer
@@ -231,6 +241,8 @@ properties:
         Settings for network interfaces
       items:
         type: object
+        required:
+          - network
         properties:
           network:
             type: string
@@ -265,12 +277,12 @@ properties:
                     example: "ONE_TO_ONE_NAT"
           aliasIpRanges:
             type: array
-            required:
-              - ipCidrRange
-              - subnetworkRangeName
             description:
               use the imported node pool’s associated aliasIpRange to assign secondary IP addresses to the nodes. Cannot be changed after VNG creation.
             items:
+              required:
+                - ipCidrRange
+                - subnetworkRangeName
               properties:
                 ipCidrRange:
                   type: string
