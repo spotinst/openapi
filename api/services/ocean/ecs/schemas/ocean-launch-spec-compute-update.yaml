@@ -1,0 +1,73 @@
+type: object
+description: >
+  The default specification for container instances in the cluster. Used as a template for custom Virtual Node Groups to inherit values which are not explicitly defined in them, and as a default VNG when no other VNGs exist or match the workload’s requirements.
+properties:
+  associatePublicIpAddress:
+    type: boolean
+    description: Configure public IP address allocation.
+    default: false
+    example: false
+  associateIpv6Address:
+    type: boolean
+    description: Configure IPv6 address allocation.
+    default: false
+    example: false
+  imageId:
+    type: string
+    example: "ami-123456789abcdefgh"
+  securityGroupIds:
+    type: array
+    description: >
+      One or more security group identifiers.
+    items:
+      type: string
+      example: "sg-abcdefgh123456789"
+  iamInstanceProfile:
+    type: object
+    description: >
+      The instance profile iamRole.
+    properties:
+      arn:
+        type: string
+        description: >
+          The iamRole ARN.
+        example: "my-arn"
+  blockDeviceMappings:
+    $ref: "../schemas/ocean-blockDeviceMappings.yaml"
+  instanceMetadataOptions:
+    $ref: "./oceanInstanceMetadataOptions.yaml"
+  userData:
+    type: string
+    format: byte
+    description: The base 64 encoded MIME user data to make available to the instances.
+    example: Q29udGVudC1UeXBlOiBtdWx0aXBhcnQvbWl4ZWQ7IGJvdW5kYXJ5PSI9PT09PT09PT09PT09PT01MTg5MDY1Mzc3MjIyODk4NDA3PT0iCk1JTUUtVmVyc2lvbjogMS4wCgotLT09PT09PT09PT09PT09PTUxODkwNjUzNzcyMjI4OTg0MDc9PQp
+  useAsTemplateOnly:
+    type: boolean
+    description: |
+      The configuration specified on the Ocean object will function only as a template for virtual node groups.
+    default: false
+  monitoring:
+    type: boolean
+    description: Enable detailed monitoring for cluster.
+    example: false
+  ebsOptimized:
+    type: boolean
+    description: Enable EBS optimization for the cluster. A flag will enable optimized capacity for high bandwidth connectivity to the EB service for non EBS optimized instance types. For instances that are EBS optimized, this flag will be ignored.
+    example: false
+  tags:
+    type: array
+    description: |
+      List of kay-value pairs of tags.
+    items:
+      type: object
+      properties:
+        tagKey:
+          type: string
+          description: |
+            Set the tag key.
+          example: "Creator"
+        tagValue:
+          type: string
+          description: |
+            Set the tag value.
+          example: "John Doe"

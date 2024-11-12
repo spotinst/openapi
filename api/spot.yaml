@@ -108,6 +108,12 @@ tags:
       description: Ocean CD
       url: https://docs.spot.io/ocean-cd/
 
+  - name: Ocean Automatic Rightsizing
+    description: |
+      New Automatic Rightsizing version available for EKS and AKS only.
+      
+      If you wish to learn more about it reach out to our support team.
+
   - name: Ocean Spark
     description: |
       Ocean for Apache Spark is a managed cloud-native Spark platform that can be deployed in your cloud account.
@@ -189,6 +195,7 @@ x-tagGroups:
       - Ocean Insights
       - Ocean CD
       - Ocean Spark
+      - Ocean Automatic Rightsizing
   - name: Elastigroup
     tags:
       - Elastigroup AWS
@@ -449,7 +456,7 @@ paths:
     $ref: services/ocean/ecs/paths/detachInstances.yaml
   /ocean/aws/ecs/launchSpec:
     $ref: services/ocean/ecs/paths/cluster-launchSpecs.yaml
-  /ocean/aws/ecs/launchSpec/{oceanLaunchSpecId}:
+  /ocean/aws/ecs/launchSpec/{launchSpecId}:
     $ref: services/ocean/ecs/paths/cluster-launchSpec.yaml
   /ocean/aws/ecs/cluster/{oceanClusterId}/fargateMigration:
     $ref: services/ocean/ecs/paths/fargate-import-to-exist.yaml
@@ -521,11 +528,11 @@ paths:
     $ref: services/ocean/aws/paths/amiAutoUpdate.yaml
   /ocean/aws/k8s/launchSpec:
     $ref: services/ocean/aws/paths/clusters-launchSpec.yaml
-  /ocean/aws/k8s/launchSpec/{oceanLaunchSpecId}:
+  /ocean/aws/k8s/launchSpec/{launchSpecId}:
     $ref: services/ocean/aws/paths/cluster-launchSpec.yaml
-  /ocean/aws/k8s/launchSpec/{oceanLaunchSpecId}/instanceTypeFiltersSimulation:
+  /ocean/aws/k8s/launchSpec/{launchSpecId}/instanceTypeFiltersSimulation:
       $ref: services/ocean/aws/paths/instanceTypeFiltersSimulationForVng.yaml
-  /ocean/aws/k8s/launchSpec/{oceanLaunchSpecId}/allowedInstanceTypesByFilters:
+  /ocean/aws/k8s/launchSpec/{launchSpecId}/allowedInstanceTypesByFilters:
     $ref: services/ocean/aws/paths/allowedInstanceTypesByFilters.yaml
   /ocean/aws/k8s/launchSpec/autoScalingGroup/import:
     $ref: services/ocean/aws/paths/importASG-launchSpec.yaml
@@ -626,7 +633,7 @@ paths:
   /gcp/setup/credentials/validation:
     $ref: services/administration/general/paths/validateCloudCredentialsForGCP.yaml
   /azure/setup/credentials:
-    $ref: services/administration/general/paths/setCloudCredentialsForAzure.yaml
+    $ref: services/administration/general/paths/cloudCredentialsForAzure.yaml
   /azure/setup/credentials/validation:
     $ref: services/administration/general/paths/validateCloudCredentialsForAzure.yaml
   /ocean/gcp/k8s/cluster:
@@ -639,22 +646,24 @@ paths:
     $ref: services/ocean/gke/paths/detachInstances.yaml
   /ocean/gcp/k8s/cluster/{oceanClusterId}/log:
     $ref: services/ocean/gke/paths/clusterFetchElastilog.yaml
-  /ocean/gcp/k8s/cluster/{oceanClusterId}/rightSizing/suggestion:
+  /ocean/gcp/k8s/cluster/{oceanId}/rightSizing/suggestion:
     $ref: services/ocean/gke/paths/rightSizing.yaml
   /ocean/gcp/k8s/cluster/{oceanClusterId}/aggregatedCosts:
     $ref: services/ocean/gke/paths/cluster-aggregated-costs.yaml
   /ocean/gcp/k8s/cluster/{oceanClusterId}/aggregatedCosts/summary:
     $ref: services/ocean/gke/paths/cluster-aggregated-costs-summary.yaml
+  /ocean/gcp/k8s/cluster/{oceanClusterId}/instanceTypeFiltersSimulation:
+    $ref: services/ocean/gke/paths/instanceTypeFiltersSimulation.yaml
   #    $ref: services/ocean/gke/paths/rightSizingLegacy.yaml - deprecated
   /ocean/gcp/k8s/launchSpec:
     $ref: services/ocean/gke/paths/clusters-launchSpec.yaml
   /ocean/gcp/k8s/launchSpec/import:
     $ref: services/ocean/gke/paths/clusters-launchSpec-import.yaml
-  /ocean/gcp/k8s/launchSpec/{oceanLaunchSpecId}:
+  /ocean/gcp/k8s/launchSpec/{launchSpecId}:
     $ref: services/ocean/gke/paths/cluster-launchSpec.yaml
-  /ocean/gcp/k8s/cluster/{oceanClusterId}/roll:
+  /ocean/gcp/k8s/cluster/{oceanId}/roll:
     $ref: services/ocean/gke/paths/clusters-roll.yaml
-  /ocean/gcp/k8s/cluster/{oceanClusterId}/roll/{ROLL_ID}:
+  /ocean/gcp/k8s/cluster/{oceanId}/roll/{rollId}:
     $ref: services/ocean/gke/paths/cluster-roll.yaml
   /ocean/gcp/k8s/cluster/{oceanClusterId}/nodes:
     $ref: services/ocean/gke/paths/cluster-nodes.yaml
@@ -662,7 +671,7 @@ paths:
     $ref: services/ocean/gke/paths/upgradeElastigroupToOcean.yaml
   /ocean/gcp/k8s/cluster/gke/import:
     $ref: services/ocean/gke/paths/clusters-import.yaml
-  /ocean/gcp/k8s/launchSpec/{oceanLaunchSpecId}/launchNodes:
+  /ocean/gcp/k8s/launchSpec/{launchSpecId}/launchNodes:
     $ref: services/ocean/gke/paths/cluster-launchSpec-launchNodes.yaml
   /ocean/azure/np/cluster:
       $ref: services/ocean/aks/paths/clusters.yaml
@@ -700,13 +709,15 @@ paths:
     $ref: services/ocean/aks/paths/rightSizing.yaml
   /ocean/azure/np/cluster/{oceanClusterId}/log:
     $ref: services/ocean/aks/paths/clusterFetchElastilog.yaml
+  /ocean/azure/np/cluster/{oceanClusterId}/autoUpgrade:
+    $ref: services/ocean/aks/paths/initiateAutoUpgrade.yaml
   /ocean/azure/k8s/cluster/{oceanClusterId}/aggregatedCosts:
     $ref: services/ocean/aks/paths/cluster-aggregated-costs.yaml
   /ocean/azure/k8s/cluster/{oceanClusterId}/aggregatedCosts/summary:
     $ref: services/ocean/aks/paths/cluster-aggregated-costs-summary.yaml
-  /ocean/aws/k8s/launchSpec/{oceanLaunchSpecId}/launchNodes:
+  /ocean/aws/k8s/launchSpec/{launchSpecId}/launchNodes:
     $ref: services/ocean/aws/paths/cluster-launchSpec-launchNodes.yaml
-  /ocean/aws/ecs/launchSpec/{oceanLaunchSpecId}/launchContainerInstances:
+  /ocean/aws/ecs/launchSpec/{launchSpecId}/launchContainerInstances:
     $ref: services/ocean/ecs/paths/cluster-launchSpec-launchContainerInstances.yaml
   /ocean/k8s/extendedResourceDefinition:
     $ref: services/ocean/commons/paths/extendedResourceDefinitions.yaml
@@ -904,3 +915,13 @@ paths:
     $ref: services/connect/workspaces/paths/workspace_id.yaml
   /connect/workspaces/{workspace_id}/move-order:
     $ref: services/connect/workspaces/paths/move-order.yaml
+  /ocean/{oceanId}/rightSizing/rule:
+    $ref: services/ocean/rightsizing/paths/oceanRightsizingRule.yaml
+  /ocean/{oceanId}/rightSizing/rule/{ruleName}:
+    $ref: services/ocean/rightsizing/paths/oceanRightsizingRuleByName.yaml
+  /ocean/{oceanId}/rightSizing/rule/{ruleName}/attachment:
+    $ref: services/ocean/rightsizing/paths/oceanRightsizingRuleAttachment.yaml
+  /ocean/{oceanId}/rightSizing/rule/{ruleName}/detachment:
+    $ref: services/ocean/rightsizing/paths/oceanRightsizingRuleDetachment.yaml
+  /ocean/{oceanId}/rightSizing/recommendations:
+    $ref: services/ocean/rightsizing/paths/oceanRightsizingRecommendations.yaml
