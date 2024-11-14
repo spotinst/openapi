@@ -12,12 +12,86 @@ allOf:
       operator:
         type: string
         example: "lte"
+      dimensions:
+        type: array
+        description: |
+          Required if scaling.down.namespace is different from "Microsoft.Compute".\
+          2 dimensions are required.
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+              description: |
+                Azure resource group for the scaling.down.dimensions. Required if using namespace different from "Microsoft.Compute".
+              example: "resourceName"
+            value:
+              type: string
+              description: |
+                Azure resource for the scaling.down.dimensions. Required if using namespace different from "Microsoft.Compute".
+              example: "testApplicationGateway"
+        example:
+          - name: "resourceName"
+            value: "testApplicationGateway"
+          - name: "resourceGroupName"
+            value: "testResourceGroup"
       action:
         type: object
-        properties:
-          type:
-            type: string
-            example: adjustment
-            enum:
-              - adjustment
-              - updateCapacity
+        description: |
+          The action to take when scale down is needed.
+        oneOf:
+          - type: object
+            title: updateCapacity
+            properties:
+              type:
+                type: string
+                description: |
+                  Type of scaling action to take when the scaling policy is triggered.
+                example: "updateCapacity"
+                enum:
+                  - adjustment
+                  - updateCapacity
+              target:
+                type: integer
+                title: Target
+                description: |
+                  The desired amount of instances. Must be defined along with the ‘minimum’ and ‘maximum’ amounts.
+                  Required if selection as action type is:
+                   + updateCapacity
+                example: 1
+              minimum:
+                type: integer
+                title: Minimum
+                description: |
+                  The lower limit of instances that you can scale down to. Must be defined along with the ‘maximum’ and ‘target’ amounts.
+                  Required if selection as action type is:
+                  + updateCapacity
+                example: 1
+              maximum:
+                type: integer
+                title: Maximum
+                description: |
+                  The upper limit of instances that you can scale down to. Must be defined along with the ‘minimum’ and ‘target’ amounts.
+                  Required if selection as action type is:
+                  + updateCapacity
+                example: 1
+          - type: object
+            title: adjustment
+            properties:
+              type:
+                type: string
+                description: |
+                  Type of scaling action to take when the scaling policy is triggered.
+                example: "adjustment"
+                enum:
+                  - adjustment
+                  - updateCapacity
+              adjustment:
+                title: Adjustment
+                description: |
+                  Value to which the action type will be adjusted. Required if using the next action types:
+                  + adjustment
+                type: string
+                example: "2"
+
+

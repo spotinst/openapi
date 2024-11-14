@@ -84,12 +84,27 @@ properties:
               - statistic
               - threshold
               - period
+              - isEnabled
               - evaluationPeriods
               - cooldown
               - action
               - operator
               - namespace
             properties:
+              isEnabled:
+                type: boolean
+                example: "true"
+                description: |
+                  Specifies whether the scaling policy is enabled.
+                default: true
+              source:
+                type: string
+                description: |
+                  The metric source.
+                example: "azureMonitor"
+                enum:
+                  - azureMonitor
+                  - spotMetrics
               policyName:
                 title: Policy Name
                 description: Name of scaling policy
@@ -176,74 +191,84 @@ properties:
                   - gte
                   - lt
                   - lte
-              dimenstions:
-                title: Dimenstions
-                description: "Required if scaling.up.namespace is different from 'Microsoft.Compute'. 2 dimensions are required, example:
-                “dimensions”:  [  {  “key” : “resourceGroupName”,  “value” : “testResourceGroup”  }  {  “key” : “resourceName”,  “value” : “testApplicationGateway”  }  ]"
+              action:
+                type: object
+                description: |
+                  The action to take when scale down is needed.
+                oneOf:
+                  - type: object
+                    title: updateCapacity
+                    properties:
+                      type:
+                        type: string
+                        description: |
+                          Type of scaling action to take when the scaling policy is triggered.
+                        example: "updateCapacity"
+                        enum:
+                          - adjustment
+                          - updateCapacity
+                      target:
+                        type: integer
+                        title: Target
+                        description: |
+                          Desired number of instances. Also you must indicate “minimum” and “maximum” amounts. Required if selected as action type:
+                           + updateCapacity
+                        example: 1
+                      minimum:
+                        type: integer
+                        title: Minimum
+                        description: |
+                          Lower limit of instances that you can scale up to. Also you must indicate “target” and “maximum” amounts. Required if selected as action type:
+                          + updateCapacity
+                        example: 1
+                      maximum:
+                        type: integer
+                        title: Maximum
+                        description: |
+                          Upper limit of instances that you can scale up to. Also you must indicate “minimum” and “target” amounts. Required if selected as action type:
+                          + updateCapacity
+                        example: 1
+                  - type: object
+                    title: adjustment
+                    properties:
+                      type:
+                        type: string
+                        description: |
+                          Type of scaling action to take when the scaling policy is triggered.
+                        example: "adjustment"
+                        enum:
+                          - adjustment
+                          - updateCapacity
+                      adjustment:
+                        title: Adjustment
+                        description: |
+                          Value to which the action type will be adjusted. Required if using the next action types:
+                          + adjustment
+                        type: string
+                        example: "2"
+              dimensions:
                 type: array
+                description: |
+                  Required if scaling.down.namespace is different from "Microsoft.Compute".\
+                  2 dimensions are required.
                 items:
                   type: object
                   properties:
-                    key:
-                      title: Key
-                      description: Azure resource group for the scaling.down.dimensions. Required if using namespace different from "Microsoft.Compute".
+                    name:
                       type: string
-                      example: resourceGroupName
+                      description: |
+                        Azure resource group for the scaling.up.dimensions. Required if using namespace different from "Microsoft.Compute".
+                      example: "resourceName"
                     value:
-                      title: Value
-                      description: Azure resource the scaling.down.dimensions. Required if using namespace different from "Microsoft.Compute".
                       type: string
-                      example: TestAppGateway
-              action:
-                title: Action
-                description: Scaling action to take when the policy is triggered.
-                type: object
-                required:
-                  - type
-                properties:
-                  type:
-                    title: Type
-                    description: "Type of scaling action to take when the scaling policy is triggered. </br> Valid Values:
-
-                    + adjustment
-
-                    + setMinTarget<
-
-                    + updateCapacity
-
-                    + percentageAdjustment"
-                    type: string
-                    example: adjustment
-                  adjustment:
-                    title: Adjustment
-                    description: "Value to which the action type will be adjusted. Required if using the next action types:
-
-                    + numeric
-
-                    + percentageAdjustment"
-                    type: string
-                    example: "2"
-                  target:
-                    title: Target
-                    description: "Value to update the group target capacity to. Also you must indicate “minimum” and “maximum” amounts. Required if selected as action type:
-
-                      + updateCapacity"
-                    type: integer
-                    example: 23
-                  minimum:
-                    title: Target
-                    description: "Value to update the group minimum capacity to. Also you must indicate “target” and “maximum” amounts. Required if selected as action type:
-
-                        + updateCapacity"
-                    type: integer
-                    example: 20
-                  maximum:
-                    title: Target
-                    description: "Value to update the group mimimum capacity to. Also you must indicate “target” and “minimum” amounts. Required if selected as action type:
-                          + updateCapacity"
-                    type: integer
-                    example: 25
-
+                      description: |
+                        Azure resource for the scaling.up.dimensions. Required if using namespace different from "Microsoft.Compute".
+                      example: "testApplicationGateway"
+                example:
+                  - name: "resourceName"
+                    value: "testApplicationGateway"
+                  - name: "resourceGroupName"
+                    value: "testResourceGroup"
           down:
             type: object
             title: Scale Down Policies
@@ -255,11 +280,26 @@ properties:
               - threshold
               - period
               - evaluationPeriods
+              - isEnabled
               - cooldown
               - action
               - operator
               - namespace
             properties:
+              isEnabled:
+                type: boolean
+                example: "true"
+                description: |
+                  Specifies whether the scaling policy is enabled.
+                default: true
+              source:
+                type: string
+                description: |
+                  The metric source.
+                example: "azureMonitor"
+                enum:
+                  - azureMonitor
+                  - spotMetrics
               policyName:
                 title: Policy Name
                 description: Name of scaling policy
@@ -346,78 +386,87 @@ properties:
                   - gte
                   - lt
                   - lte
-              dimenstions:
-                title: Dimenstions
-                description: "Required if scaling.up.namespace is different from 'Microsoft.Compute'. 2 dimensions are required, example:
-                                “dimensions”:  [  {  “key” : “resourceGroupName”,  “value” : “testResourceGroup”  }  {  “key” : “resourceName”,  “value” : “testApplicationGateway”  }  ]"
+              action:
+                type: object
+                description: |
+                  The action to take when scale down is needed.
+                oneOf:
+                  - type: object
+                    title: updateCapacity
+                    properties:
+                      type:
+                        type: string
+                        description: |
+                          Type of scaling action to take when the scaling policy is triggered.
+                        example: "updateCapacity"
+                        enum:
+                          - adjustment
+                          - updateCapacity
+                      target:
+                        type: integer
+                        title: Target
+                        description: |
+                          The desired amount of instances. Must be defined along with the ‘minimum’ and ‘maximum’ amounts.
+                          Required if selection as action type is:
+                           + updateCapacity
+                        example: 1
+                      minimum:
+                        type: integer
+                        title: Minimum
+                        description: |
+                          The lower limit of instances that you can scale down to. Must be defined along with the ‘maximum’ and ‘target’ amounts.
+                          Required if selection as action type is:
+                          + updateCapacity
+                        example: 1
+                      maximum:
+                        type: integer
+                        title: Maximum
+                        description: |
+                          The upper limit of instances that you can scale down to. Must be defined along with the ‘minimum’ and ‘target’ amounts.
+                          Required if selection as action type is:
+                          + updateCapacity
+                        example: 1
+                  - type: object
+                    title: adjustment
+                    properties:
+                      type:
+                        type: string
+                        description: |
+                          Type of scaling action to take when the scaling policy is triggered.
+                        example: "adjustment"
+                        enum:
+                          - adjustment
+                          - updateCapacity
+                      adjustment:
+                        title: Adjustment
+                        description: |
+                          Value to which the action type will be adjusted. Required if using the next action types:
+                          + adjustment
+                        type: string
+                        example: "2"
+              dimensions:
                 type: array
+                description: |
+                  Required if scaling.up.namespace is different from "Microsoft.Compute".\
+                  2 dimensions are required.
                 items:
                   type: object
                   properties:
-                    key:
-                      title: Key
-                      description: Azure resource group for the scaling.down.dimensions. Required if using namespace different from "Microsoft.Compute".
+                    name:
                       type: string
-                      example: resourceGroupName
+                      description: |
+                        Azure resource group for the scaling.down.dimensions. Required if using namespace different from "Microsoft.Compute".
+                      example: "resourceName"
                     value:
-                      title: Value
-                      description: Azure resource the scaling.down.dimensions. Required if using namespace different from "Microsoft.Compute".
                       type: string
-                      example: TestAppGateway
-              action:
-                title: Action
-                description: Scaling action to take when the policy is triggered.
-                type: object
-                required:
-                  - type
-                  - adjustment
-                  - target
-                  - minimum
-                  - maximum
-                properties:
-                  type:
-                    title: Type
-                    description: "Type of scaling action to take when the scaling policy is triggered. </br> Valid Values:
-
-                    + adjustment
-
-                    + setMaxTarget
-
-                    + updateCapacity
-
-                    + percentageAdjustment"
-                    type: string
-                    example: adjustment
-                  target:
-                    type: integer
-                    title: Target
-                    description: "Desired number of instances. Also you must indicate “minimum” and “maximum” amounts. Required if selected as action type:
-
-                    + updateCapacity"
-                    example: 1
-                  minimum:
-                    type: integer
-                    title: Minimum
-                    description: "Lower limit of instances that you can scale down to. Also you must indicate “target” and “maximum” amounts. Required if selected as action type:
-
-                    + updateCapacity"
-                    example: 1
-                  maximum:
-                    type: integer
-                    title: Maximum
-                    description: "Upper limit of instances that you can scale down to. Also you must indicate “minimum” and “target” amounts. Required if selected as action type:
-
-                      + updateCapacity"
-                    example: 1
-                  adjustment:
-                    title: Adjustment
-                    description: "Value to which the action type will be adjusted. Required if using the next action types:
-
-                      + numeric
-
-                      + percentageAdjustment"
-                    type: string
-                    example: "2"
+                      description: |
+                        Azure resource for the scaling.down.dimensions. Required if using namespace different from "Microsoft.Compute".
+                      example: "testApplicationGateway"
+                example:
+                  - name: "resourceName"
+                    value: "testApplicationGateway"
+                  - name: "resourceGroupName"
+                    value: "testResourceGroup"
       strategy:
         type: object
         title: Scaling Strategy
@@ -537,6 +586,12 @@ properties:
                       description: |
                         The desired CRG to utilize ahead of other CRGs in the subscription.
                       example: true
+          fallbackToOd:
+            type: boolean
+            default: true
+            example: true
+            description: |
+              When set to `true` Elastigroup will launch On Demand instances if no spot market is available
       health:
         title: Health
         description: |
