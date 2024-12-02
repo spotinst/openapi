@@ -1,12 +1,16 @@
 name: pr-jira-validation
 
 on:
-  workflow_dispatch:
-    inputs:
-      branch_name:
-        description: "Name of the branch to test !"
-        required: true
-        default: "DOC-2064-test-shimi-3"
+  pull_request:
+    branches:
+      - master
+
+#  workflow_dispatch:
+#    inputs:
+#      branch_name:
+#        description: "Name of the branch to test !"
+#        required: true
+#        default: "DOC-2064-test-shimi-3"
 
 jobs:
   validate:
@@ -17,19 +21,25 @@ jobs:
 
       - name: Get source branch
         id: get_source_branch
-        #run: echo "branch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
-        run: echo "branch=${{ inputs.branch_name }}" >> $GITHUB_ENV
+        run: echo "branch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
+        #run: echo "branch=${{ inputs.branch_name }}" >> $GITHUB_ENV
+        #
 
       - name: Get branch creation event
         id: get_branch_creation_event
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
+          echo "repo - ${{  github.repository }}"
           BRANCH_CREATION_EVENT=$(gh api -H "Accept: application/vnd.github.v3+json" /repos/${{ github.repository }}/events | jq -c '[.[] | select(.type == "CreateEvent" and .payload.ref == "${{ env.branch }}" and .payload.ref_type == "branch")] | .[0]')
+          echo "branch_creation_event - $BRANCH_CREATION_EVENT"
           echo "branch_creation_event=$BRANCH_CREATION_EVENT" >> $GITHUB_ENV
 
       - name: Validate branch creator
         id: validate_branch_creator
         run: |
           ACTOR_LOGIN=$(echo '${{ env.branch_creation_event }}' | jq -r '.actor.login')
+          echo "ACTOR_LOGIN - $ACTOR_LOGIN"
           if [ "$ACTOR_LOGIN" != "jira[bot]" ]; then
             echo "Branch was not created by jira[bot]."
             exit 1
