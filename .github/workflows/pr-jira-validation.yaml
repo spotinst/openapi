@@ -1,0 +1,71 @@
+name: Validate Pull Request
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch_name:
+        description: "Name of the branch to test !"
+        required: true
+        default: "DOC-2064-test-shimi-3"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Get source branch
+        id: get_source_branch
+        #run: echo "branch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
+        run: echo "branch=${{ inputs.branch_name }}" >> $GITHUB_ENV
+
+      - name: Get branch creation event
+        id: get_branch_creation_event
+        run: |
+          BRANCH_CREATION_EVENT=$(gh api -H "Accept: application/vnd.github.v3+json" /repos/${{ github.repository }}/events | jq -c '[.[] | select(.type == "CreateEvent" and .payload.ref == "${{ env.branch }}" and .payload.ref_type == "branch")] | .[0]')
+          echo "branch_creation_event=$BRANCH_CREATION_EVENT" >> $GITHUB_ENV
+
+      - name: Validate branch creator
+        id: validate_branch_creator
+        run: |
+          ACTOR_LOGIN=$(echo '${{ env.branch_creation_event }}' | jq -r '.actor.login')
+          if [ "$ACTOR_LOGIN" != "jira[bot]" ]; then
+            echo "Branch was not created by jira[bot]."
+            exit 1
+          fi
+
+      - name: Validate PR body for Jira ticket link
+        id: validate_pr_body
+        run: |
+          PR_BODY=$(jq -r '.pull_request.body' < $GITHUB_EVENT_PATH)
+          if ! echo "$PR_BODY" | grep -q "https://spotinst.atlassian.net/browse/Documentation-"; then
+            echo "PR body does not contain a Jira ticket link."
+            exit 1
+          fi
+
+      - name: Extract Jira ticket ID
+        id: extract_jira_ticket
+        run: |
+          PR_BODY=$(jq -r '.pull_request.body' < $GITHUB_EVENT_PATH)
+          JIRA_TICKET=$(echo "$PR_BODY" | grep -o "Documentation-[0-9]*" | head -n 1)
+          if [ -z "$JIRA_TICKET" ]; then
+            echo "No Jira ticket found in the PR body."
+            exit 1
+          fi
+          echo "jira_ticket=$JIRA_TICKET" >> $GITHUB_ENV
+
+      - name: Verify Jira ticket status
+        id: verify_jira_ticket
+        env:
+          JIRA_USER: ${{ secrets.JIRA_USER }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+        run: |
+          JIRA_TICKET=${{ env.jira_ticket }}
+          JIRA_API_URL="https://spotinst.atlassian.net/rest/api/2/issue/$JIRA_TICKET"
+          JIRA_STATUS=$(curl -s -u $JIRA_USER:$JIRA_API_TOKEN $JIRA_API_URL | jq -r '.fields.status.name')
+          if [ "$JIRA_STATUS" != "APPROVED FOR PUBLISHING" ]; then
+            echo "Jira ticket $JIRA_TICKET is not in 'APPROVED FOR PUBLISHING' status."
+            exit 1
+          fi
+          echo "All validations passed."
