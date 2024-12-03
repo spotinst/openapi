@@ -50,8 +50,8 @@ jobs:
         run: |
           PR_BODY=$(jq -r '.pull_request.body' < $GITHUB_EVENT_PATH)
           echo "PR-body - $PR_BODY"
-          if ! echo "$PR_BODY" | grep -q "https://spotinst.atlassian.net/browse/DOC-"; then
-            echo "PR body does not contain a Jira ticket link."
+          if ! echo "$PR_BODY" | grep -q -e "https://spotinst.atlassian.net/browse/DOC-" -e "https://spotinst.atlassian.net/browse/AUT-"; then
+            echo "PR body does not contain a valid Jira ticket link (DOC or AUT)."
             exit 1
           fi
 
@@ -59,9 +59,9 @@ jobs:
         id: extract_jira_ticket
         run: |
           PR_BODY=$(jq -r '.pull_request.body' < $GITHUB_EVENT_PATH)
-          JIRA_TICKET=$(echo "$PR_BODY" | grep -o "DOC-[0-9]*" | head -n 1)
+          JIRA_TICKET=$(echo "$PR_BODY" | grep -o -e "DOC-[0-9]*" -e "AUT-[0-9]*" | head -n 1)
           if [ -z "$JIRA_TICKET" ]; then
-            echo "No Jira ticket found in the PR body."
+            echo "No DOC or AUT Jira ticket found in the PR body."
             exit 1
           fi
           echo "jira_ticket=$JIRA_TICKET" >> $GITHUB_ENV
@@ -76,8 +76,8 @@ jobs:
           JIRA_API_URL="https://spotinst.atlassian.net/rest/api/2/issue/$JIRA_TICKET"
           JIRA_STATUS=$(curl -s -u $JIRA_USER:$JIRA_API_TOKEN $JIRA_API_URL | jq -r '.fields.status.name')
           echo "JIRA_STATUS - $JIRA_STATUS"
-          if [ "$JIRA_STATUS" != "Approved for Publishing" ]; then
-            echo "Jira ticket $JIRA_TICKET is not in 'Approved for Publishing' status."
+          if [ "$JIRA_STATUS" != "Approved for Publishing" ] && [[ "$JIRA_TICKET" != *DOC* ]]; then
+            echo "Jira ticket $JIRA_TICKET is not in 'Approved for Publishing' status and does not contain 'DOC'."
             exit 1
           fi
           echo "All validations passed."
