@@ -31,7 +31,7 @@ jobs:
         id: get_branch_creation_event
         run: |
           echo "repo - ${{  github.repository }}"
-          BRANCH_CREATION_EVENT=$(gh api -H "Accept: application/vnd.github.v3+json" /repos/${{ github.repository }}/events | jq -c '[.[] | select(.type == "CreateEvent" and .payload.ref == "${{ env.branch }}" and .payload.ref_type == "branch")] | .[0]')
+          BRANCH_CREATION_EVENT=$(gh api -H "Accept: application/vnd.github.v3+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/${{ github.repository }}/activity | jq -c '[.[] | select(.type == "CreateEvent" and .payload.ref == "refs/heads/${{ env.branch }}")] | .[0]')
           echo "branch_creation_event - $BRANCH_CREATION_EVENT"
           echo "branch_creation_event=$BRANCH_CREATION_EVENT" >> $GITHUB_ENV
 
