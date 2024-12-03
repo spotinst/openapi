@@ -16,7 +16,7 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     env:
-        GH_TOKEN: ${{ github.token }}
+      GH_TOKEN: ${{ github.token }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -31,7 +31,7 @@ jobs:
         id: get_branch_creation_event
         run: |
           echo "repo - ${{  github.repository }}"
-          BRANCH_CREATION_EVENT=$(gh api -H "Accept: application/vnd.github.v3+json" /repos/${{ github.repository }}/events | jq -c '[.[] | select(.type == "CreateEvent" and .payload.ref == "${{ env.branch }}" and .payload.ref_type == "branch")] | .[0]')
+          BRANCH_CREATION_EVENT=$(gh api -H "Accept:application/vnd.github.v3+json" /repos/${{ github.repository }}/events | jq -c '[.[] | select(.type == "CreateEvent" and .payload.ref == "${{ env.branch }}" and .payload.ref_type == "branch")] | .[0]')
           echo "branch_creation_event - $BRANCH_CREATION_EVENT"
           echo "branch_creation_event=$BRANCH_CREATION_EVENT" >> $GITHUB_ENV
 
