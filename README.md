@@ -12,7 +12,7 @@ Spot OpenAPI Specification is a static site built using [OpenAPI][openapi] defin
 - [Contributing](#contributing)
 - [License](#license)
 
-## Requirements
+## Requirements o
 
 - [Nvm][nvm]
 - [Node.js][nodejs]
