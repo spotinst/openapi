@@ -19,61 +19,40 @@ post:
     content:
       application/json:
         schema:
-          type: object
-          properties:
-            roll:
-              type: object
-              description: >
-                Settings for roll operation
+          oneOf:
+            - type: object
+              title: 'Roll'
               properties:
-                batchSizePercentage:
-                  type: integer
-                  description: >
-                    Value in % to set the size of the batches in the roll. Valid values are 0-100
-                  example: 20
-                comment:
-                  description: >
-                    Add a breif description or comment about the roll. The comment should be limited to 256 chars.
-                  type: string
-                  example: "This is why I deployed my cluster."
-                respectPdb:
-                  type: boolean
-                  example: true
-                  default: false
-                  description: >
-                    During the roll, if the parameter is set to true we honor PDB during the instance replacement.
-                batchMinHealthyPercentage:
-                  type: integer
-                  description: >
-                    Indicates the threshold of minimum healthy instances in single batch. If the amount of healthy instances in single batch is under the threshold, the cluster roll will fail. If exists, the parameter value will be in range of 1-100. In case of null as value, the default value in the backend will be 50%. Value of param should represent the number in percentage (%) of the batch.
-                  example: 100
-                  default: 50
-                launchSpecIds:
-                  type: array
-                  description: >
-                    List of virtual node group identifiers to be rolled.
-                    Each identifier is a string. Can be null.
-                    Cannot be used together with instanceName.
-                  items:
-                    type: string
-                    example:
-                      - ols-76694a7d
-                      - ols-56694a76
-                instanceNames:
-                  type: array
-                  description: >
-                    List of instance names to be rolled.
-                    Each name is a string.
-                    instanceNames can be null.
-                    Cannot be used together with launchSpecIds.
-                  items:
-                    type: string
-                    example:
-                      - i-0003a99ffb566f039
-                      - i-0567a99ffb566f765
+                roll:
+                  allOf:
+                    - $ref: "../schemas/roll/roll-batchSizePercentage.yaml"
+                    - $ref: "../schemas/roll/roll-comment.yaml"
+                    - $ref: "../schemas/roll/roll-respectPdb.yaml"
+                    - $ref: "../schemas/roll/roll-batchMinHealthyPercentage.yaml"
+            - type: object
+              title: 'Roll with instance ids'
+              properties:
+                roll:
+                  allOf:
+                    - $ref: "../schemas/roll/roll-batchSizePercentage.yaml"
+                    - $ref: "../schemas/roll/roll-comment.yaml"
+                    - $ref: "../schemas/roll/roll-respectPdb.yaml"
+                    - $ref: "../schemas/roll/roll-batchMinHealthyPercentage.yaml"
+                    - $ref: "../schemas/roll/roll-instanceIds.yaml"
+            - type: object
+              title: 'Roll with Virtual Node Group ids'
+              properties:
+                roll:
+                  allOf:
+                    - $ref: "../schemas/roll/roll-batchSizePercentage.yaml"
+                    - $ref: "../schemas/roll/roll-comment.yaml"
+                    - $ref: "../schemas/roll/roll-respectPdb.yaml"
+                    - $ref: "../schemas/roll/roll-batchMinHealthyPercentage.yaml"
+                    - $ref: "../schemas/roll/roll-launchSpecIds.yaml"
+                    - $ref: "../schemas/roll/roll-disableLaunchSpecAutoScaling.yaml"
   responses:
     200:
-      $ref: "../responses/initiate-clusterRoll.yaml"
+      $ref: "../responses/roll/initiate-clusterRoll.yaml"
     400:
       description: "Bad Request"
 
@@ -89,6 +68,6 @@ get:
     - $ref: "../parameters/oceanId.yaml"
   responses:
     200:
-      $ref: "../responses/clusterRollGetAllResponse.yaml"
+      $ref: "../responses/roll/clusterRollGetAllResponse.yaml"
     400:
       description: "Bad Request"
