@@ -2,7 +2,7 @@
 
 Spot OpenAPI Specification is a static site built using [OpenAPI][openapi] definitions and powered by [ReDoc][redoc].
 
-## Table of Contents
+## Table of Contents 
 
 - [Requirements](#requirements)
 - [Local Development](#local-development)
