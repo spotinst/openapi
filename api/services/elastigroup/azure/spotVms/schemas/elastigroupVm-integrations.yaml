@@ -1,2 +1,64 @@
 type: object
 title: Elastigroup Integrations
+description: |
+  Set integrations for the VMs in the Elastigroup.
+properties:
+  azureDns:
+    description: |
+      Set DNS zones for the VMs in the Elastigroup.
+      [Read more](https://docs.spot.io/elastigroup/features-azure/dns)
+    type: object
+    properties:
+      dnsZones:
+        type: array
+        items:
+          type: object
+          title: Azure DNS
+          properties:
+            type:
+              type: string
+              description: |
+                The type of the DNS zone. Currently we only support public DNS zones.
+              enum:
+                - "public"
+              example: "public"
+            resourceGroup:
+              type: string
+              description: |
+                The resource group name of the DNS zone.
+              example: "myResourceGroup"
+            name:
+              type: string
+              description: |
+                The name of the DNS zone.
+              example: "myDnsName"
+            recordSets:
+              type: array
+              description:
+                List of record sets to be add the Virtual Machine IPs to the DNS.
+              items:
+                type: object
+                title: Record Sets
+                properties:
+                  name:
+                    type: string
+                    example: "myRecordSet"
+            spotAccountId:
+              type: string
+              description: |
+                The Spot account ID that connected to the Azure subscription to which the DNS zone belongs. 
+                Relevant only in case of cross-subscription shared DNS zones.
+  insights:
+    type: object
+    description: |
+      Set insights for the VMs in the Elastigroup.
+    properties:
+      isEnabled:
+        type: boolean
+        description: |
+          Enable insights for the VMs in the Elastigroup.
+      dataCollectionRuleId:
+        type: string
+        description:
+          The ID of the data collection rule to be associated with the VMs in the Elastigroup.
+        example: "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/myResourceGroup/providers/Microsoft.Insights/dataCollectionRules/myDataCollectionRule"
