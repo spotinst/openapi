@@ -48,53 +48,15 @@ properties:
             The type of the scheduling task.
           enum:
             - clusterRoll
+            - autoUpgradeVersion
           example: clusterRoll
         parameters:
           type: object
           description: >
             The parameters of the scheduling task. Each task type will have properties relevant only to it.
-          properties:
-            clusterRoll:
-              type: object
-              description: >
-                The parameters of the cluster roll scheduling task.
-              properties:
-                batchSizePercentage:
-                  type: integer
-                  minimum: 1
-                  maximum: 100
-                  description: >
-                    The percentage of the cluster that will be rolled at each batch.
-                  example: 20
-                comment:
-                  type: string
-                  description: >
-                    A comment to be added to the cluster roll.
-                  example: Scheduled cluster roll
-                respectPdb:
-                  type: boolean
-                  description: >
-                    During the roll, if the parameter is set to true we honor PDB during the instance replacement.
-                  example: true
-                respectRestrictScaleDown:
-                  type: boolean
-                  description: >
-                    During the roll, if the parameter is set to true we honor Restrict Scale Down label during the nodes replacement.
-                  example: true
-                batchMinHealthyPercentage:
-                  type: integer
-                  minimum: 1
-                  maximum: 100
-                  description: >
-                    The minimum percentage of the scaled nodes that should be healthy at each batch.
-                  example: 80
-                vngIds:
-                  type: array
-                  description: >
-                    List of Virtual Node Group IDs to be rolled. If not set or set to null, cluster roll will be applied.
-                  items:
-                    type: string
-                  example: [ "vng-123456" ]
+          oneOf:
+            - $ref: './clusterRoll.yaml'
+            - $ref: './upgradeConfig.yaml'
   suspensionHours:
     type: object
     description: >

@@ -1,0 +1,85 @@
+description: Cluster Roll Response
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        rollId:
+          type: string
+          example: roll-1234
+        oceanId:
+          type: string
+          example: o-12e31234
+        scope:
+          type: string
+          enum: [ Cluster, Vngs, Vng, Instances, Instance ]
+          example: Cluster
+        status:
+          type: string
+          example: IN_PROGRESS
+          enum: [ IN_PROGRESS, COMPLETED, FAILED, STOPPED ]
+        batchNumber:
+          type: integer
+          example: 1
+        numOfBatches:
+          type: integer
+          example: 5
+        comment:
+          type: string
+          example: "This is why I deployed my cluster."
+        respectPdb:
+          type: boolean
+          example: true
+        progress:
+          type: object
+          properties:
+            unit:
+              type: string
+              example: percentage
+            value:
+              type: integer
+              example: 0
+            detailedStatus:
+              type: object
+              properties:
+                oldInstances:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      instanceName:
+                        type: string
+                      status:
+                        type: string
+                  example:
+                    - instanceName: sin-0a4becc0-sig-1234abcd
+                      status: REPLACED
+                    - instanceName: sin-1a4becc0-sig-1234abcd
+                      status: TO_BE_REPLACED
+                    - instanceName: sin-2a4becc0-sig-1234abcd
+                      status: COULD_NOT_BE_REPLACED
+                    - instanceName: sin-3a4becc0-sig-1234abcd
+                      status: NOT_REPLACED_DUE_TO_PDB
+        instanceNames:
+          type: array
+          items:
+            type: string
+          example:
+            - sin-0a4becc0-sig-6952238d
+            - sin-0542ecc0-sig-695223r4
+        launchSpecIds:
+          type: array
+          items:
+            type: string
+          example:
+            - ols-76694a7d
+            - ols-56694a76
+        batchMinHealthyPercentage:
+          type: integer
+          example: 100
+        createdAt:
+          type: string
+          example: 2019-03-24T15:46:09.000Z
+        updatedAt:
+          type: string
+          example: 2019-03-24T15:46:09.000Z
