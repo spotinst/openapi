@@ -1,0 +1,193 @@
+get:
+  tags:
+    - Best Practice Checks
+  summary: Get Checks
+  description: Returns a list of checks and infraction counts for the assessment.
+  operationId: getChecksCbiV1BestPracticeAssessmentAssessmentIdCheckGet
+  parameters:
+    - name: assessmentId
+      in: path
+      required: true
+      schema:
+        type: string
+        description: Assessment ID
+      description: Assessment ID
+    - name: ordering
+      in: query
+      required: false
+      schema:
+        type: string
+        description: Sort order of the fields in the list, separated by commas.
+      description: Sort order of the fields in the list, separated by commas.
+    - name: paginationSize
+      in: query
+      required: false
+      schema:
+        type: integer
+        description: Number of items to include in the response
+      description: Number of items to include in the response
+    - name: paginationKey
+      in: query
+      required: false
+      schema:
+        type: string
+        description: Key used to fetch a specific page of items
+      description: Key used to fetch a specific page of items
+    - name: accountId
+      in: query
+      required: false
+      schema:
+        anyOf:
+          - type: string
+          - type: 'null'
+        description: Spot account ID
+      description: Spot account ID
+    - name: subAccountIds
+      in: query
+      required: false
+      schema:
+        anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+        description: Subaccount IDs
+      description: Subaccount IDs
+    - name: category
+      in: query
+      required: false
+      schema:
+        anyOf:
+          - type: array
+            items:
+              $ref: ../schemas/checkCategoryEnum.yaml
+          - type: 'null'
+        description: Identifier of the check type.
+      description: Identifier of the check type.
+    - name: source
+      in: query
+      required: false
+      schema:
+        anyOf:
+          - type: array
+            items:
+              $ref: ../schemas/checkDefintionSource.yaml
+          - type: 'null'
+        description: Check source.
+      description: Check source.
+    - name: importance
+      in: query
+      required: false
+      schema:
+        anyOf:
+          - type: array
+            items:
+              $ref: ../schemas/checkImportanceEnum.yaml
+          - type: 'null'
+        description: The importance or impact of the check.
+      description: The importance or impact of the check.
+    - name: targetedServiceCategory
+      in: query
+      required: false
+      schema:
+        anyOf:
+          - type: array
+            items:
+              $ref: ../schemas/serviceTypeEnum.yaml
+          - type: 'null'
+        description: The targeted service category of the check.
+      description: The targeted service category of the check.
+    - name: supportsAutoRemediation
+      in: query
+      required: false
+      schema:
+        anyOf:
+          - type: array
+            items:
+              type: boolean
+          - type: 'null'
+        description: None returns all the checks. True returns only checks that support auto remediation. False returns only checks that do not support auto remediation.
+      description: None returns all the checks. True returns only checks that support auto remediation. False returns only checks that do not support auto remediation.
+    - name: providerName
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          $ref: ../schemas/cloudProvider.yaml
+        description: Cloud Provider(s)
+        default: []
+      description: Cloud Provider(s)
+    - name: manualRemediationAvailable
+      in: query
+      required: false
+      schema:
+        anyOf:
+          - type: array
+            items:
+              type: boolean
+          - type: 'null'
+        description: None returns all the checks. True returns only checks that support manual remediation. False returns only checks that do not support manual remediation.
+      description: None returns all the checks. True returns only checks that support manual remediation. False returns only checks that do not support manual remediation.
+    - name: remediationEffort
+      in: query
+      required: false
+      schema:
+        anyOf:
+          - type: array
+            items:
+              $ref: ../schemas/remediationEffortEnum.yaml
+          - type: 'null'
+        description: The remediation effort of the check.
+      description: The remediation effort of the check.
+    - name: includeChecksWithNoFailures
+      in: query
+      required: false
+      schema:
+        anyOf:
+          - type: boolean
+          - type: 'null'
+        description: Include/exclude checks with an infractionCount of 0.
+        default: true
+      description: Include/exclude checks with an infractionCount of 0.
+    - name: name
+      in: query
+      required: false
+      schema:
+        anyOf:
+          - type: string
+          - type: 'null'
+        description: Check Name
+      description: Check Name
+    - name: supportsManagedByOcean
+      in: query
+      required: false
+      schema:
+        anyOf:
+          - type: array
+            items:
+              type: boolean
+          - type: 'null'
+        description: None returns all the checks. True returns only checks that support managed by Ocean. False returns only checks that do not support managed by Ocean.
+      description: None returns all the checks. True returns only checks that support managed by Ocean. False returns only checks that do not support managed by Ocean.
+  responses:
+    '200':
+      $ref: ../responses/get200cbiV1BestPracticeAssessmentIdCheck.yaml
+    '400':
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../commons/schemas/errorResponse.yaml
+      description: Invalid request error response. Adjust the request before retrying.
+    '404':
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../commons/schemas/errorResponse.yaml
+      description: Not found error response. The requested resource does not exist.
+    '422':
+      description: Error response.
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../commons/schemas/errorResponse.yaml

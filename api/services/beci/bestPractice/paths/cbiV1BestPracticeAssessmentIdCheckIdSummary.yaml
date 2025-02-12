@@ -1,0 +1,82 @@
+get:
+  tags:
+    - Best Practice Checks
+  summary: Get Check Detail Summary
+  description: Returns the total sum for the estimated cost and potential savings fields for an assessment check.
+  operationId: getCheckDetailSummaryCbiV1BestPracticeAssessmentAssessmentIdCheckCheckIdSummaryGet
+  parameters:
+    - name: assessmentId
+      in: path
+      required: true
+      schema:
+        type: string
+        description: Assessment ID
+      description: Assessment ID
+    - name: checkId
+      in: path
+      required: true
+      schema:
+        type: string
+        description: Check ID
+      description: Check ID
+    - name: accountId
+      in: query
+      required: false
+      schema:
+        anyOf:
+          - type: string
+          - type: 'null'
+        description: Spot account ID
+      description: Spot account ID
+    - name: subAccountIds
+      in: query
+      required: false
+      schema:
+        anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+        description: Subaccount IDs
+      description: Subaccount IDs
+    - name: groupBy
+      in: query
+      required: false
+      schema:
+        anyOf:
+          - $ref: ../schemas/checkDetailSummaryEnum.yaml
+          - type: 'null'
+        description: Identifier of which unit to group by
+        default: currency
+      description: Identifier of which unit to group by
+    - name: providerName
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          $ref: ../schemas/cloudProvider.yaml
+        description: Cloud Provider(s)
+        default: []
+      description: Cloud Provider(s)
+  responses:
+    '200':
+      $ref: ../responses/get200cbiV1BestPracticeAssessmentIdCheckIdSummary.yaml
+    '400':
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../commons/schemas/errorResponse.yaml
+      description: Invalid request error response. Adjust the request before retrying.
+    '404':
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../commons/schemas/errorResponse.yaml
+      description: Not found error response. The requested resource does not exist.
+    '422':
+      description: Error response.
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../commons/schemas/errorResponse.yaml
