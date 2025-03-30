@@ -1,2 +1,65 @@
 type: object
 title: Elastigroup Integrations
+description: |
+  Configure integrations for the VMs in the Elastigroup.
+properties:
+  azureDns:
+    description: |
+      Configure DNS zones for the VMs in the Elastigroup.
+      [Read more](https://docs.spot.io/elastigroup/features-azure/dns)
+    type: object
+    properties:
+      dnsZones:
+        type: array
+        items:
+          type: object
+          title: Azure DNS
+          properties:
+            type:
+              type: string
+              description: |
+                The type of DNS zone. Currently, only public is supported.
+              enum:
+                - "public"
+              example: "public"
+            resourceGroup:
+              type: string
+              description: |
+                The resource group name of the DNS zone.
+              example: "myResourceGroup"
+            name:
+              type: string
+              description: |
+                The name of the DNS zone.
+              example: "myDnsName"
+            recordSets:
+              type: array
+              description:
+                The record sets of virtual machine IPs to add to the DNS.
+              items:
+                type: object
+                title: Record Sets
+                properties:
+                  name:
+                    type: string
+                    description: |
+                        The name of the record set.
+                    example: "myRecordSet"
+            spotAccountId:
+              type: string
+              description: |
+                For cross-subscription shared DNS zones, this is the Spot account ID of the Azure subscription in the DNS zone.
+  insights:
+    type: object
+    description: |
+      Configure insights for the VMs in the Elastigroup.
+    properties:
+      isEnabled:
+        type: boolean
+        description: |
+          Enable insights for the VMs in the Elastigroup.
+      dataCollectionRuleId:
+        type: string
+        description:
+          The ID of the data collection rule to be associated with the VMs in the Elastigroup.
+        example: "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/myResourceGroup/providers/Microsoft.Insights/dataCollectionRules/myDataCollectionRule"
