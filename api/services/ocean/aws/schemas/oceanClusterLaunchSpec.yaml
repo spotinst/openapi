@@ -378,6 +378,16 @@ properties:
         minimum: 300
         example: 300
         default: 300
+      orientation:
+        type: object
+        properties:
+          availabilityVsCost:
+            type: string
+            description: |
+              Set this value to control the approach that Ocean takes while launching nodes.
+            enum: [ costOriented, balanced, cheapest ]
+            example: balanced
+            default: balanced
   associatePublicIpAddress:
     type: boolean
     description: |
@@ -394,3 +404,32 @@ properties:
     $ref: "./ocean-launch-spec-scheduling.yaml"
   instanceMetadataOptions:
     $ref: "./launchSpecInstanceMetadataOptions.yaml"
+  startupTaints:
+    type: array
+    description: |
+      Temporary taints applied to a node during its initialization phase. 
+      For a startup taint to work, it must also be set as a regular taint
+      in the userData for the VNG.
+    items:
+      type: object
+      properties:
+        key:
+          type: string
+          description: |
+            Set startup taint key.
+        value:
+          type: string
+          description: |
+            Set startup taint value.
+        effect:
+          type: string
+          description: |
+            Set startup taint effect.
+    example:
+      - key: node.cilium.io/agent-not-ready
+        value: true
+        effect: NoSchedule
+  instanceStorePolicy:
+    $ref: "./instanceStorePolicy.yaml"
+  gpu:
+    $ref: "./oceanGpuConfiguration.yaml"
