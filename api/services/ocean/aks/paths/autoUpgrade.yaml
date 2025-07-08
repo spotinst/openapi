@@ -14,3 +14,35 @@ get:
       $ref: "../responses/autoUpgradeListResponse.yaml"
     400:
       description: "Bad Request"
+
+post:
+  summary: "Initiate Auto upgrade"
+  description: >
+    Update the Ocean AKS cluster's VNGs with the latest version of the control plane's version after upgrading by specifying the scope. 
+    Performing this request will update the VNGs with a new version if available and run a cluster roll if set. 
+    If the response is successful, the old and new versions will be included in the response along with the updated VNGs. 
+    If a cluster roll is set in the request, the first response for a successful request will indicate the start of a roll. 
+    In order to check the status of the roll, you can use the GET Roll API.
+  operationId: "oceanAksAutoUpgradeInit"
+  tags:
+    - "Ocean AKS"
+  parameters:
+    - $ref: "../../../../commons/parameters/accountId.yaml"
+    - $ref: "../../commons/parameters/oceanId.yaml"
+    - $ref: "../../commons/parameters/resourceGroupName.yaml"
+    - $ref: "../../commons/parameters/aksClusterName.yaml"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          allOf:
+            - $ref: "../schemas/upgradeConfig-initiate.yaml"
+  responses:
+    200:
+      $ref: "../responses/autoUpgradeCreateResponse.yaml"
+    400:
+      description: "Bad Request"
+
+
+
