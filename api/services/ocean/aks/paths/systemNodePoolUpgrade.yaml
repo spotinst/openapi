@@ -1,0 +1,43 @@
+summary: Ocean for AKS
+post:
+  summary: "Start system node pool upgrade"
+  description: >
+    Initiates a Kubernetes version upgrade for specified system node pools in an Ocean AKS cluster.
+  operationId: "oceanAksStartSystemNodePoolUpgrade"
+  tags:
+    - "Ocean AKS"
+  parameters:
+    - $ref: "../../../../commons/parameters/accountId.yaml"
+    - $ref: "../../commons/parameters/oceanId.yaml"
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - oceanId
+            - scope
+            - systemNodePoolNames
+          properties:
+            oceanId:
+              type: string
+              description: The ID of the Ocean AKS cluster.
+              example: "o-12345abc"
+            scope:
+              type: string
+              enum: [ PATCH ]
+              description: The scope of the upgrade operation. Currently, only "PATCH" is supported.
+              example: "PATCH"
+            systemNodePoolNames:
+              type: array
+              description: List of system node pool names to be upgraded.
+              items:
+                type: string
+                example: [ "np1", "np2" ]
+              minItems: 1
+  responses:
+    200:
+      $ref: "../responses/systemNodePoolUpgradeOperationResponse.yaml"
+    400:
+      description: "Bad Request"
