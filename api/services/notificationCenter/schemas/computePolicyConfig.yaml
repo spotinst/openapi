@@ -1,0 +1,51 @@
+type: object
+description: |
+  You can only use one resource type. For example: All resources (use "shouldIncludeAllResources": true), Rule Based Resources (use at least one dynamicRules), OR Individual Resources (use a least one resourceIds).
+required:
+    - events
+properties:
+  events:
+    type: array
+    items:
+      type: object
+      properties:
+        event:
+          type: string
+          example: "Event Name"
+        type:
+          type: string
+          enum: ["INFO", "WARN", "ERROR"]
+          example: "INFO"
+  shouldIncludeAllResources:
+    type: boolean
+    example: false
+  resourceIds:
+    type: array
+    description: |
+      Manually specified resource IDs to include in the policy. Must be resources related to the account.
+    example:
+     - "act-123456789"
+     - "act-987654321"
+    items:
+      type: string
+  dynamicRules:
+    type: array
+    items:
+      type: object
+      properties:
+        filterConditions:
+          type: array
+          items:
+            type: object
+            properties:
+              identifier:
+                type: string
+                enum: ["resource_name", "resource_id", "region", "image", "tag", "load_balancer", "availability_zones", "security_groups"]
+                example: "resource_name"
+              operator:
+                type: string
+                enum: ["equals", "not_equals", "contains", "not_contains", "start_with", "end_with"]
+                example: "equals"
+              expression:
+                type: string
+                example: "value"
