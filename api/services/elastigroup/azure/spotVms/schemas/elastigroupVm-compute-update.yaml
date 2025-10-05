@@ -18,7 +18,7 @@ properties:
       spotSizes:
         type: array
         description: |
-          Available Spot-VM sizes.
+          Available spot VM sizes.
         items:
           type: string
           example: "standard_a2_v2"
@@ -30,6 +30,15 @@ properties:
         items:
           type: string
           example: "standard_a2_v2"
+      spotSizeAttributes:
+        $ref: "../schemas/elastigroupVm-spotSizeAttributes.yaml"
+      excludedVmSizes:
+        type: array
+        description: |
+          Exclude these spot VM sizes when using attribute-based VM sizes.
+        example: [ "standard_a2_v2", "standard_d2s_v3" ]
+        items:
+          type: string
   launchSpecification:
     type: object
     properties:
@@ -581,9 +590,14 @@ properties:
               Confidential disk encryption binds the disk encryption keys to the VM's TPM, ensuring VM-only access.
               The security type must be "ConfidentialVM" to enable defining this preference as “true”.
             example: false
+          encryptionAtHost:
+            type: boolean
+            description: |
+              Enables host encryption for the virtual machine. Encryption at host can only be enabled if this property is set to true for the resource.
+            example: true
       proximityPlacementGroups:
         type: array
-        description: Defines the proximity placement group in which the VM will be launched.
+        description: The proximity placement group where the VM is launched.
         items:
           type: object
           required:

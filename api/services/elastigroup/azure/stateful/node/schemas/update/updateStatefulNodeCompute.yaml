@@ -38,8 +38,8 @@ properties:
       spotSizeAttributes:
         type: object
         description: |
-          Defines values and ranges for attributes of the spot sizes to use when launching VMs.
-          <a style=color:red>Required if spotSizes isn't specified.</a>
+          The values and ranges for spot size attributes when launching VMs.
+           <a style=color:red>Required if spotSizes isn't specified.</a>
         properties:
           minCpu:
             type: integer
@@ -74,7 +74,7 @@ properties:
       excludedVmSizes:
         type: array
         description: |
-          Defines the VM sizes to exclude when defining spot types with spotSizeAttributes.
+          Exclude these spot VM sizes when using attribute-based VM sizes.
         items:
           type: string
           example: "standard_a2_v2"
@@ -480,7 +480,6 @@ properties:
         maximum: 44
       managedServiceIdentities:
         type: array
-        writeOnly: true
         description: |
           Add a user-assigned managed identity to the Stateful Node's VM.
         items:
@@ -499,6 +498,18 @@ properties:
               description: |
                 The Resource Group that the user-assigned managed identity resides in.
               example: "myResourceGroup"
+            subscriptionId:
+              type: string
+              description: |
+                Defines the subscription ID of the managed service identities.
+                
+                Required if the managed service identity is in a different subscription.
+                To use a user-assigned managed identity in a different subscription, you must | 
+                ensure that the spotAccount's Service Principal has access to the defined subscription and that it |
+                has the two following permissions:
+                1. Microsoft.ManagedIdentity/userAssignedIdentities/assign/action
+                2. Microsoft.ManagedIdentity/userAssignedIdentities/read
+              example: "12345678-abcd-1234-abcd-123456789ab"
       extensions:
         type: array
         description: |
@@ -749,7 +760,7 @@ properties:
             example: false
       proximityPlacementGroups:
         type: array
-        description: Defines the proximity placement group in which the VM will be launched.
+        description: The proximity placement group where the VM is launched.
         items:
           type: object
           required:

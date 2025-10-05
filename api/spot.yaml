@@ -12,9 +12,9 @@ info:
     developer guides, concepts, and tutorials, see the external [Spot Documentation](https://docs.spot.io/).
   title: Spot by Flexera API
   x-logo:
-    url: https://docs.spot.io/_media/images/flexera-spot.png
+    url: https://spec.dev.spot.io/flexera-spot.png
     altText: SpotByFlexeraLogo
-    href: https://docs.spot.io/api
+    href: https://spec.dev.spot.io
   contact:
     email: support@spot.io
 externalDocs:
@@ -73,12 +73,12 @@ tags:
       url: https://docs.spot.io/ocean/
 
 
-#  Deprecated - not deleted for future use
-#  - name: Ocean On-Premise
-#    description: Ocean On-Premise API - Understand cost drivers within your on-premise clusters and compare the costs to the Ocean Cloud.
-#    externalDocs:
-#      description: Ocean Concepts and Tutorials
-#      url: https://docs.spot.io/ocean/
+  #  Deprecated - not deleted for future use
+  #  - name: Ocean On-Premise
+  #    description: Ocean On-Premise API - Understand cost drivers within your on-premise clusters and compare the costs to the Ocean Cloud.
+  #    externalDocs:
+  #      description: Ocean Concepts and Tutorials
+  #      url: https://docs.spot.io/ocean/
 
   - name: Ocean AKS
     description: Ocean - Serverless containers for Azure Kubernetes Service
@@ -174,9 +174,16 @@ tags:
     externalDocs:
       url: https://docs.spot.io/elastigroup/tools-integrations/custom-health-check-service
 
-  - name: Notifications Service
+  - name: Notification Subscription Service
     description: |
-      A Spot Notifications service enables you a fast, flexible, fully managed push notification service that lets you know about major events that happened in your Spot account.ֿ Spot Notifications makes it simple and cost-effective to get push notifications to your email address, HTTP, HTTPS or AWS SNS (Simple Notifications Service).
+      The Spot notification service enables you a fast, flexible, fully managed push notification service that lets you know about major events that happened in your Spot account.ֿ Spot Notifications makes it simple and cost-effective to get push notifications to your email address, HTTP, HTTPS or AWS SNS (Simple Notifications Service).
+
+      > **Note**: This service is deprecated. Use the
+      [Notification Center Service](https://docs.spot.io/api/#tag/Notification-Center-Service).
+
+  - name: Notification Center Service
+    description: |
+      Manage your compute notification policies. You can create new policies, apply updates, or delete the policy entirely.
 
   - name: Insights Service
 
@@ -191,7 +198,7 @@ x-tagGroups:
       - Ocean ECS
       - Ocean GKE
       - Ocean AKS
-#      - Ocean On-Premise
+      #      - Ocean On-Premise
       - Ocean Insights
       - Ocean CD
       - Ocean Spark
@@ -210,8 +217,9 @@ x-tagGroups:
     tags:
       - Audit Service
       - Health Check Service
-      - Notifications Service
+      - Notification Center Service
       - Insights Service
+      - Notification Subscription Service
   - name: Spot Connect
     tags:
       - Connect Executions
@@ -526,7 +534,7 @@ paths:
   /ocean/aws/k8s/cluster/{oceanClusterId}/detachInstances:
     $ref: services/ocean/aws/paths/detachInstances.yaml
   /ocean/aws/k8s/cluster/{oceanClusterId}/aggregatedCosts:
-    $ref:  services/ocean/aws/paths/cluster-aggregated-costs.yaml
+    $ref: services/ocean/aws/paths/cluster-aggregated-costs.yaml
   /ocean/aws/k8s/cluster/{oceanClusterId}/aggregatedCosts/summary:
     $ref: services/ocean/aws/paths/cluster-aggregated-costs-summary.yaml
   /ocean/aws/eks/cluster/{oceanClusterId}/amiAutoUpdate:
@@ -535,18 +543,22 @@ paths:
     $ref: services/ocean/aws/paths/clusters-launchSpec.yaml
   /ocean/aws/k8s/launchSpec/{launchSpecId}:
     $ref: services/ocean/aws/paths/cluster-launchSpec.yaml
+  /ocean/aws/k8s/launchSpec/{launchSpecId}/loadBalancer/attach:
+    $ref: services/ocean/aws/paths/cluster-launchSpec-attachLb.yaml
+  /ocean/aws/k8s/launchSpec/{launchSpecId}/loadBalancer/detach:
+    $ref: services/ocean/aws/paths/cluster-launchSpec-detachLb.yaml
   /ocean/aws/k8s/launchSpec/{launchSpecId}/instanceTypeFiltersSimulation:
-      $ref: services/ocean/aws/paths/instanceTypeFiltersSimulationForVng.yaml
+    $ref: services/ocean/aws/paths/instanceTypeFiltersSimulationForVng.yaml
   /ocean/aws/k8s/launchSpec/{launchSpecId}/allowedInstanceTypesByFilters:
     $ref: services/ocean/aws/paths/allowedInstanceTypesByFilters.yaml
   /ocean/aws/k8s/launchSpec/autoScalingGroup/import:
     $ref: services/ocean/aws/paths/importASG-launchSpec.yaml
   /ocean/aws/k8s/launchSpec/eksNodeGroup/import:
     $ref: services/ocean/aws/paths/importEksNodeGroup-launchSpec.yaml
-#  /ocean/onPrem/k8s/cluster:
-#    $ref: services/ocean/onpremise/paths/clusters.yaml
-#  /ocean/onPrem/k8s/cluster/{oceanClusterId}:
-#    $ref: services/ocean/onpremise/paths/cluster.yaml
+  #  /ocean/onPrem/k8s/cluster:
+  #    $ref: services/ocean/onpremise/paths/clusters.yaml
+  #  /ocean/onPrem/k8s/cluster/{oceanClusterId}:
+  #    $ref: services/ocean/onpremise/paths/cluster.yaml
   /aws/ec2/managedInstance:
     $ref: services/managedInstance/aws/paths/managed.yaml
   /aws/ec2/managedInstance/{MI_ID}:
@@ -581,6 +593,14 @@ paths:
     $ref: services/administration/general/paths/healthCheckID.yaml
   /events/notification/accountPolicy:
     $ref: services/administration/general/paths/accountPolicy.yaml
+  /notificationCenter/policy:
+    $ref: services/notificationCenter/paths/notificationCenterPolicies.yaml
+  /notificationCenter/policy/{policyId}:
+    $ref: services/notificationCenter/paths/notificationCenterPolicy.yaml
+  /notificationCenter/compute/resource:
+    $ref: services/notificationCenter/paths/notificationCenterAccountResource.yaml
+  /notificationCenter/compute/event:
+    $ref: services/notificationCenter/paths/notificationCenterEventType.yaml
   /events/subscription:
     $ref: services/administration/general/paths/subscription.yaml
   /events/subscription/{subscriptionId}:
@@ -679,21 +699,21 @@ paths:
   /ocean/gcp/k8s/launchSpec/{launchSpecId}/launchNodes:
     $ref: services/ocean/gke/paths/cluster-launchSpec-launchNodes.yaml
   /ocean/azure/np/cluster:
-      $ref: services/ocean/aks/paths/clusters.yaml
+    $ref: services/ocean/aks/paths/clusters.yaml
   /ocean/azure/np/cluster/{oceanClusterId}:
-      $ref: services/ocean/aks/paths/cluster.yaml
+    $ref: services/ocean/aks/paths/cluster.yaml
   /ocean/azure/np/cluster/aks/import:
-      $ref: services/ocean/aks/paths/importCluster.yaml
+    $ref: services/ocean/aks/paths/importCluster.yaml
   /ocean/azure/np/cluster/launchNewNodes:
     $ref: services/ocean/aks/paths/clusterLaunchNodes.yaml
   /ocean/azure/np/cluster/detachNodes:
     $ref: services/ocean/aksV2/paths/clusterDetachNodes.yaml
   /ocean/azure/np/virtualNodeGroup:
-      $ref: services/ocean/aks/paths/virtualNodeGroups.yaml
+    $ref: services/ocean/aks/paths/virtualNodeGroups.yaml
   /ocean/azure/np/virtualNodeGroup/{virtualNodeGroupId}:
-      $ref: services/ocean/aks/paths/virtualNodeGroup.yaml
+    $ref: services/ocean/aks/paths/virtualNodeGroup.yaml
   /ocean/azure/np/virtualNodeGroup/import:
-      $ref: services/ocean/aks/paths/importVirtualNodeGroup.yaml
+    $ref: services/ocean/aks/paths/importVirtualNodeGroup.yaml
   /ocean/azure/np/virtualNodeGroup/vmSizes:
     $ref: services/ocean/aks/paths/virtualNodeGroupAllowedVmSizes.yaml
   /ocean/azure/np/cluster/{oceanClusterId}/roll:
@@ -715,7 +735,11 @@ paths:
   /ocean/azure/np/cluster/{oceanClusterId}/log:
     $ref: services/ocean/aks/paths/clusterFetchElastilog.yaml
   /ocean/azure/np/cluster/{oceanClusterId}/autoUpgrade:
-    $ref: services/ocean/aks/paths/initiateAutoUpgrade.yaml
+    $ref: ./services/ocean/aks/paths/autoUpgrade.yaml
+  /ocean/azure/np/cluster/{oceanClusterId}/systemNodePool/upgradeVersion:
+    $ref: ./services/ocean/aks/paths/systemNodePoolUpgrade.yaml
+  /ocean/azure/np/cluster/{oceanClusterId}/systemNodePool/upgradeVersion/{systemNodePoolsOperationId}:
+    $ref: ./services/ocean/aks/paths/getSystemNodePoolUpgrade.yaml
   /ocean/azure/k8s/cluster/{oceanClusterId}/aggregatedCosts:
     $ref: services/ocean/aks/paths/cluster-aggregated-costs.yaml
   /ocean/azure/k8s/cluster/{oceanClusterId}/aggregatedCosts/summary:
@@ -839,7 +863,7 @@ paths:
   /ocean/spark/cluster/{clusterId}/workspace:
     $ref: services/ocean/spark/paths/workspaces.yaml
   /ocean/spark/cluster/{clusterId}/workspace/{workspaceId}:
-      $ref: services/ocean/spark/paths/workspace.yaml
+    $ref: services/ocean/spark/paths/workspace.yaml
   /ocean/spark/cluster/{clusterId}/workspace/{workspaceId}/start:
     $ref: services/ocean/spark/paths/workspaceStart.yaml
   /ocean/spark/cluster/{clusterId}/workspace/{workspaceId}/stop:
@@ -929,7 +953,7 @@ paths:
   /ocean/{oceanId}/rightSizing/rule/{ruleName}/detachment:
     $ref: services/ocean/rightsizing/paths/oceanRightsizingRuleDetachment.yaml
   /ocean/{oceanId}/rightSizing/recommendations:
-    $ref: services/ocean/rightsizing/paths/oceanRightsizingRecommendations.yaml 
+    $ref: services/ocean/rightsizing/paths/oceanRightsizingRecommendations.yaml
   /ocean/{oceanId}/rightSizing/rollbacks:
     $ref: services/ocean/rightsizing/paths/oceanRightsizingRollbacks.yaml
   /ocean/{oceanId}/rightSizing/rollbacks/acknowledge:
