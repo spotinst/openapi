@@ -1,0 +1,49 @@
+type: object
+description: >
+  An object used to specify time windows during which certain optimization constraints can be eased.
+title: Optimization Windows
+required:
+  - isEnabled
+properties:
+  isEnabled:
+    type: boolean
+    example: true
+    description: >
+      Used to enable or disable the optimization windows mechanism. Must be a boolean (null is invalid). When true, at least one window must be defined. When false, windows can be empty or omitted.
+  windows:
+    type: array
+    description: >
+      The times when the optimization windows will apply. Required if isEnabled is true.
+    items:
+      type: object
+      title: Optimization Window Definition
+      required:
+        - cronExpression
+        - duration
+        - effects
+      properties:
+        cronExpression:
+          type: string
+          example: "0 0 * * *"
+          description: >
+            A valid cron expression defining when the optimization window starts.
+            For example: "0 0 * * *" (daily at midnight).
+            The cron job runs in UTC time and follows Unix cron format.
+        duration:
+          type: string
+          example: "8h"
+          description: >
+            The duration of the optimization window. Must be in the format <number><unit> where unit is 'm' (minutes), 'h' (hours), or 'd' (days). Examples: 10m, 5h, 2d.
+        effects:
+          type: array
+          minItems: 1
+          description: >
+            The list of effects that will be applied during this optimization window.
+          items:
+            type: string
+            enum: ["ignorePdb", "ignoreRestrictScaleDown"]
+          example: ["ignorePdb", "ignoreRestrictScaleDown"]
+
+
+
+
