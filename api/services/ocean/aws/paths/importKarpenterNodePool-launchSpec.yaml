@@ -1,0 +1,32 @@
+summary: Ocean for EKS
+post:
+  summary: "Import Karpenter NodePool To Ocean Virtual Node Group"
+  description: >
+    <ul>
+    <li> Returns an Ocean Virtual Node Group (VNG) configuration based on a given Karpenter nodePool.
+         The returned value ("Imported VNG") can then be used as input to the Create Virtual Node Group API in order to create an actual VNG in your Ocean cluster.</li>
+    <li> Notes: <ul>
+                <li> Make sure to have the necessary permissions in your Spot policy: <b>eks:ListNodegroups, eks:DescribeNodegroup</b>.
+                     <a href="https://docs.spot.io/administration/api/spot-policy-in-aws?id=spot-policy-in-aws">Click here for the full Spot policy.</a></li>
+                <li> <b>Exactly one of region or oceanId must be supplied</b> as query parameters.</li>
+                <ul>
+    </li>
+    <ul>
+  operationId: "oceanEksImportKarpenterNodePoolToLaunchSpec"
+  tags:
+    - "Ocean AWS"
+  parameters:
+    - $ref: "../../../../commons/parameters/accountId.yaml"
+    - $ref: "../parameters/karpenterNodePool-query.yaml"
+    - $ref: "../parameters/oceanId-query-optional.yaml"
+  requestBody:
+    content:
+      application/json:
+        schema:
+          allOf:
+            - $ref: "../schemas/importKarpenterNodePool-launchSpecRequest.yaml"
+  responses:
+    200:
+      $ref: "../responses/importEksNodeGroup-launchSpec.yaml"
+    400:
+      description: "Bad Request"
