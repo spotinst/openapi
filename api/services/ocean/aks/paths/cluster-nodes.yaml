@@ -1,0 +1,73 @@
+get:
+  summary: "Get Cluster Nodes"
+  description: >
+    Get nodes data of an Ocean AKS cluster.
+  operationId: "oceanAKSGetNodes"
+  tags:
+    - "Ocean AKS"
+  parameters:
+    - $ref: "../../commons/parameters/oceanClusterId.yaml"
+    - in: query
+      name: "virtualNodeGroupId"
+      required: false
+      schema:
+        type: string
+      example: vng-12345abc
+      description: Filter nodes by Ocean Virtual Node Group identifier.
+    - in: query
+      name: "instanceId"
+      schema:
+        type: string
+      example: vm-123
+      description: Get a specific node by instance id.
+  responses:
+    200:
+      $ref: "../responses/clusterNodesResponse.yaml"
+    400:
+      description: "Bad Request"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              request:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "31c768ae-b236-472a-8054-557b92e3aad5"
+                  url:
+                    type: string
+                    example: "/azure/ocean/k8s/aks/cluster/o-7068d7a81/nodes"
+                  method:
+                    type: string
+                    example: "GET"
+                  timestamp:
+                    type: string
+                    example: "2026-02-10T08:14:26.143Z"
+              response:
+                type: object
+                properties:
+                  status:
+                    type: object
+                    properties:
+                      code:
+                        type: integer
+                        example: 400
+                      message:
+                        type: string
+                        example: "Bad Request"
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: "FAILED_TO_GET_OCEAN_CLUSTER"
+                        message:
+                          type: string
+                          example: "Ocean cluster o-7068d7a81 does not exist"
+                  count:
+                    type: integer
+                    example: 1
