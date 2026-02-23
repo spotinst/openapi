@@ -3,8 +3,24 @@ title: Ocean AKS Health
 description: >
   The Ocean AKS Health object.
 properties:
+  shouldReplaceUnhealthyInstances:
+    type: boolean
+    example: false
+    default: false
+    description: >
+      'Indicates whether Ocean automatically replaces nodes that remain in a NotReady or Unschedulable state. When false, unhealthy nodes are detected but not replaced. When true, unhealthy nodes are automatically replaced.
   gracePeriod:
     type: integer
-    example: 600
+    example: 120
+    default: 120
+    minimum: 60
     description: >
-      The amount of time to wait, in seconds, from the moment the instance has launched until monitoring of its health checks begins.
+      The amount of time, in seconds, from the moment the node is registered and observed by Ocean until health checks for replacement purposes begin. Defines a grace period during which health checks are suppressed for newly observed nodes.
+  healthCheckUnhealthyDurationBeforeReplacement:
+    type: integer
+    example: 180
+    default: 180
+    minimum: 120
+    maximum: 3600
+    description: >
+      The amount of time, in seconds, a node is allowed to remain unhealthy after the grace period has elapsed before Ocean automatically replaces it.
