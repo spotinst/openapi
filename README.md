@@ -92,3 +92,5 @@ Code is licensed under the [Apache License 2.0](LICENSE).
 [stackoverflow-spot-help]: https://stackoverflow.com/questions/tagged/spot-openapi
 [slack-spot]: http://slack.spot.io
 [github-new-issue]: https://github.com/spotinst/openapi/issues/new
+
+Test!
