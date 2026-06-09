@@ -110,8 +110,8 @@ function renderHtml() {
       #global-search-results .empty { padding: 10px; font-size: 12px; color: #5e6b7a; }
 
       /* Hover state */
-      #docs-container .menu-content label:hover,
-      #docs-container .menu-content li:not(.active) > label:hover {
+      #docs-container .menu-content li:not(.active) > label:hover,
+      #docs-container .menu-content li:not(.active) > label:hover * {
         background-color: #f0f4f8 !important;
         color: #1e2a3a !important;
       }
@@ -123,7 +123,25 @@ function renderHtml() {
         font-weight: 600 !important;
         border-left: 3px solid #0086ff !important;
       }
-      #docs-container .menu-content li.active > label span { color: #0086ff !important; }
+      #docs-container .menu-content li.active > label:hover,
+      #docs-container .menu-content li.active > label:hover * {
+        background-color: #e6f2ff !important;
+        color: #0086ff !important;
+      }
+      #docs-container .menu-content li.active > label,
+      #docs-container .menu-content li.active > label *,
+      #docs-container .menu-content li.active > label a,
+      #docs-container .menu-content li.active > label a:visited,
+      #docs-container .menu-content li.active > label span {
+        color: #0086ff !important;
+      }
+      /* Keep menu interactions snappy */
+      #docs-container .menu-content label,
+      #docs-container .menu-content a,
+      #docs-container .menu-content li {
+        transition: none !important;
+        animation: none !important;
+      }
     </style>
   </head>
   <body>
@@ -224,8 +242,7 @@ function renderHtml() {
         if (!match) return false;
         scrollSidebarToNode(match);
         simulateUserClick(match);
-        setTimeout(function() { scrollSidebarToNode(match); }, 80);
-        setTimeout(function() { scrollSidebarToNode(match); }, 220);
+        setTimeout(function() { scrollSidebarToNode(match); }, 40);
         return true;
       }
 
@@ -249,8 +266,7 @@ function renderHtml() {
         if (!match) return false;
         scrollSidebarToNode(match);
         simulateUserClick(match);
-        setTimeout(function() { scrollSidebarToNode(match); }, 80);
-        setTimeout(function() { scrollSidebarToNode(match); }, 220);
+        setTimeout(function() { scrollSidebarToNode(match); }, 40);
         return true;
       }
 
@@ -283,10 +299,10 @@ function renderHtml() {
             clickSidebarByText(item.operationId, true) ||
             clickSidebarByText(item.operationId, false);
           if (!clicked) {
-            setTimeout(function() { tryClickOp(attemptsLeft - 1); }, 150);
+            setTimeout(function() { tryClickOp(attemptsLeft - 1); }, 60);
           }
         }
-        setTimeout(function() { tryClickOp(8); }, 200);
+        setTimeout(function() { tryClickOp(6); }, 50);
       }
 
       function escapeHtml(value) {
