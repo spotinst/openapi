@@ -7,9 +7,18 @@ const root = process.cwd();
 const spotYamlPath = path.join(root, "api", "spot.yaml");
 const buildDir = path.join(root, "build");
 const manifestPath = path.join(buildDir, "sections-manifest.json");
+const searchIndexPath = path.join(buildDir, "sections-search-index.json");
+
+function out(message) {
+  process.stdout.write(message + "\n");
+}
+
+function err(message) {
+  process.stderr.write(message + "\n");
+}
 
 if (!fs.existsSync(spotYamlPath)) {
-  console.error("Missing api/spot.yaml");
+  err("Missing api/spot.yaml");
   process.exit(1);
 }
 
@@ -26,6 +35,13 @@ const buildApiDir = path.join(buildDir, "api");
 fs.mkdirSync(buildApiDir, { recursive: true });
 
 const sections = [];
+const searchIndex = [];
+const HTTP_METHODS = ["get", "post", "put", "patch", "delete", "options", "head", "trace"];
+
+function toTagHash(tagName) {
+  if (!tagName) return "";
+  return "#tag/" + encodeURIComponent(tagName.replace(/\s+/g, "-"));
+}
 
 (async function() {
   for (const group of tagGroups) {
@@ -34,7 +50,7 @@ const sections = [];
     const folderPatterns = group["x-folders"] || [];
 
     if (groupTags.length === 0 || folderPatterns.length === 0) {
-      console.warn("Warning: x-tagGroup '" + groupName + "' missing tags or x-folders - skipping");
+      err("Warning: x-tagGroup '" + groupName + "' missing tags or x-folders - skipping");
       continue;
     }
 
@@ -51,7 +67,7 @@ const sections = [];
 
     const pathCount = Object.keys(filteredPaths).length;
     if (pathCount === 0) {
-      console.warn("Warning: x-tagGroup '" + groupName + "' has no matching paths - skipping");
+      err("Warning: x-tagGroup '" + groupName + "' has no matching paths - skipping");
       continue;
     }
 
@@ -78,13 +94,36 @@ const sections = [];
     const bundledPath = path.join(buildApiDir, "spot-" + sectionId + ".yaml");
     try {
       const dereffed = await $RefParser.dereference(tmpYamlPath);
+
+      Object.entries(dereffed.paths || {}).forEach(function([apiPath, pathItem]) {
+        if (!pathItem || typeof pathItem !== "object") return;
+        HTTP_METHODS.forEach(function(method) {
+          const operation = pathItem[method];
+          if (!operation || typeof operation !== "object") return;
+          const operationId = operation.operationId || "";
+          const tags = Array.isArray(operation.tags) ? operation.tags : [];
+          const summary = operation.summary || operation.description || "";
+          const hash = operationId ? "#operation/" + encodeURIComponent(operationId) : toTagHash(tags[0] || "");
+          searchIndex.push({
+            sectionId: sectionId,
+            sectionTitle: groupName,
+            method: method.toUpperCase(),
+            path: apiPath,
+            operationId: operationId,
+            summary: summary,
+            tags: tags,
+            hash: hash
+          });
+        });
+      });
+
       fs.writeFileSync(bundledPath, yaml.dump(dereffed, { lineWidth: -1 }), "utf8");
       const sizeKB = Math.round(fs.statSync(bundledPath).size / 1024);
-      console.log("Created spot-" + sectionId + ".yaml (" + pathCount + " paths, " + sizeKB + " KB dereferenced)");
-    } catch (err) {
-      console.error("Dereference failed for " + sectionId + ": " + err.message);
+      out("Created spot-" + sectionId + ".yaml (" + pathCount + " paths, " + sizeKB + " KB dereferenced)");
+    } catch (caughtErr) {
+      err("Dereference failed for " + sectionId + ": " + caughtErr.message);
       fs.copyFileSync(tmpYamlPath, bundledPath);
-      console.log("Created spot-" + sectionId + ".yaml (" + pathCount + " paths, unbundled fallback)");
+      out("Created spot-" + sectionId + ".yaml (" + pathCount + " paths, unbundled fallback)");
     }
 
     // Cleanup tmp file
@@ -96,5 +135,8 @@ const sections = [];
   // Create manifest
   const manifest = { defaultSection: sections[0] ? sections[0].id : "", sections: sections };
   fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), "utf8");
-  console.log("Created " + manifestPath);
+  out("Created " + manifestPath);
+
+  fs.writeFileSync(searchIndexPath, JSON.stringify(searchIndex, null, 2), "utf8");
+  out("Created " + searchIndexPath);
 })();
