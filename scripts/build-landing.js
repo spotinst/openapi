@@ -135,14 +135,19 @@ function renderHtml() {
       #docs-container .menu-content li.active > label span {
         color: #0086ff !important;
       }
-      /* Keep menu interactions snappy */
-      #docs-container .menu-content label,
-      #docs-container .menu-content a,
-      #docs-container .menu-content li {
-        transition: none !important;
-        animation: none !important;
-      }
-    </style>
+       /* Keep menu interactions snappy */
+       #docs-container .menu-content label,
+       #docs-container .menu-content a,
+       #docs-container .menu-content li {
+         transition: none !important;
+         animation: none !important;
+       }
+       /* Hide ReDoc's built-in search input */
+       .sc-kqGoIF.gfkSLd.search-input,
+       input.search-input {
+         display: none !important;
+       }
+     </style>
   </head>
   <body>
     <div id="docs-container">
@@ -435,12 +440,21 @@ function renderHtml() {
         return div;
       }
 
+      function removeRedocSearchElements() {
+        const sidebar = container.querySelector('.menu-content');
+        if (!sidebar) return;
+        const redocSearchInputs = sidebar.querySelectorAll('input.search-input');
+        redocSearchInputs.forEach(function(el) { el.remove(); });
+      }
+
       function injectControls() {
         const sidebar = container.querySelector('.menu-content');
         if (!sidebar) return false;
         // Remove old one if present
         const old = document.getElementById('our-controls');
         if (old) old.remove();
+        // Remove ReDoc's built-in search elements
+        removeRedocSearchElements();
         // Insert before the search element (children[1] = search, children[0] = hidden logo)
         const insertBefore = sidebar.children[1] || sidebar.firstChild;
         sidebar.insertBefore(buildControls(), insertBefore);
@@ -454,6 +468,8 @@ function renderHtml() {
           if (!document.getElementById('our-controls')) {
             injectControls();
           }
+          // Also remove any ReDoc search inputs that might have been re-added
+          removeRedocSearchElements();
         });
         observer.observe(container, { childList: true, subtree: true });
       }
