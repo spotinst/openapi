@@ -150,6 +150,7 @@ function renderHtml() {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/redoc@latest/bundles/redoc.standalone.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
     <script>
       const container = document.getElementById("docs-container");
       const sections = ${JSON.stringify(manifest.sections)};
@@ -159,6 +160,16 @@ function renderHtml() {
           .filter(function(op) { return op && op.operationId && op.sectionId; })
           .map(function(op) { return [String(op.operationId).toLowerCase(), op.sectionId]; })
       );
+
+      // Initialize Fuse.js for fuzzy search
+      const fuseIndex = new Fuse(globalOperations, {
+        keys: ['operationId', 'summary', 'path', 'method', 'sectionTitle', 'tags'],
+        threshold: 0.3,
+        minMatchCharLength: 2,
+        includeScore: true,
+        useExtendedSearch: true
+      });
+
       let currentSection = null;
       let blockHashChange = false;
       let observer = null;
@@ -469,30 +480,16 @@ function renderHtml() {
       }
 
       function findMatches(query) {
-        const q = String(query || "").trim().toLowerCase();
+        const q = String(query || "").trim();
         if (!q) return [];
-        const matches = [];
-        for (const item of globalOperations) {
-          if (!item || !item.sectionId) continue;
-          const haystack = [
-            item.summary,
-            item.operationId,
-            item.path,
-            item.method,
-            item.sectionTitle,
-            (Array.isArray(item.tags) ? item.tags.join(" ") : "")
-          ].join(" ").toLowerCase();
-          if (!haystack.includes(q)) continue;
-          let score = 0;
-          if (String(item.operationId || "").toLowerCase().includes(q)) score += 3;
-          if (String(item.summary || "").toLowerCase().includes(q)) score += 2;
-          if (String(item.path || "").toLowerCase().includes(q)) score += 1;
-          matches.push({ item: item, score: score });
-        }
-        return matches
-          .sort(function(a, b) { return b.score - a.score; })
+
+        // Use Fuse.js for fuzzy searching with typo tolerance
+        const fuseResults = fuseIndex.search(q);
+
+        // Return top 20 results
+        return fuseResults
           .slice(0, 20)
-          .map(function(entry) { return entry.item; });
+          .map(function(result) { return result.item; });
       }
 
       function loadSection(sectionId) {
