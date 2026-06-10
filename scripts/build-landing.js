@@ -403,7 +403,7 @@ function renderHtml() {
         div.innerHTML =
           '<a class="logo" href="#"><img src="./flexera-spot.png" alt="Spot by Flexera"/></a>' +
           '<div class="search-wrap">' +
-            '<input id="global-search" type="search" placeholder="Search all sections..." autocomplete="off" />' +
+            '<input id="global-search" type="search" placeholder="Search..." autocomplete="off" />' +
             '<div id="global-search-results"></div>' +
           '</div>' +
           '<select id="section-select">' +
