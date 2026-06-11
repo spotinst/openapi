@@ -148,6 +148,14 @@ function renderHtml() {
        input.search-input {
          display: none !important;
        }
+
+       /* Force proper paragraph spacing in markdown content */
+       .api-content p,
+       div[class*="Markdown"] p,
+       div[class*="markdown"] p,
+       div[class*="sc-"] p {
+         margin-bottom: 1em !important;
+       }
      </style>
   </head>
   <body>
@@ -155,7 +163,7 @@ function renderHtml() {
       <p style="padding:40px;color:#5e6b7a;">Loading documentation...</p>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/redoc@latest/bundles/redoc.standalone.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/redoc@2.0.0/bundles/redoc.standalone.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js" crossorigin="anonymous"></script>
     <script>
       const container = document.getElementById("docs-container");
@@ -523,7 +531,18 @@ function renderHtml() {
         currentSection = sectionId;
         setSectionInUrl(sectionId);
         syncSectionSelect();
-        container.innerHTML = "<p style='padding:40px;color:#5e6b7a;'>Loading " + sectionId + " documentation...</p>";
+
+        // Properly clear the container to avoid React unmount issues
+        while (container.firstChild) {
+          container.removeChild(container.firstChild);
+        }
+
+        var loadingMsg = document.createElement('p');
+        loadingMsg.style.padding = '40px';
+        loadingMsg.style.color = '#5e6b7a';
+        loadingMsg.textContent = 'Loading ' + sectionId + ' documentation...';
+        container.appendChild(loadingMsg);
+
         blockHashChange = true;
         watchSidebar();
         Redoc.init("./api/spot-" + sectionId + ".yaml", {
@@ -533,7 +552,10 @@ function renderHtml() {
           expandSingleSchemaField: true,
           sortPropsAlphabetically: true,
           generatedPayloadSamplesMaxDepth: 3,
-          theme: { colors: { primary: { main: "#0086ff" } } }
+          theme: { colors: { primary: { main: "#0086ff" } } },
+          disableSearch: false,
+          nativeScrollbars: false,
+          hideSchemaPattern: false
         }, container, function() {
           injectControls();
           syncSectionSelect();
