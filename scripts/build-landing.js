@@ -189,6 +189,7 @@ function renderHtml() {
       let observer = null;
       let currentSearchMatches = [];
       let pendingSearchTarget = null;
+      let redocContainer = null;
 
       function syncSectionSelect() {
         const sel = document.getElementById('section-select');
@@ -233,7 +234,8 @@ function renderHtml() {
 
       function scrollSidebarToNode(node) {
         if (!node) return false;
-        const sidebar = container.querySelector('.menu-content');
+        const activeContainer = redocContainer || container;
+        const sidebar = activeContainer.querySelector('.menu-content');
         if (!sidebar) return false;
         const scroller = sidebar.querySelector('.scrollbar-container') || sidebar;
         const target = node.closest('li') || node;
@@ -251,7 +253,8 @@ function renderHtml() {
       // Find a sidebar link by hash value and click it (same as user clicking manually).
       function clickSidebarLink(hash) {
         if (!hash) return false;
-        const sidebar = container.querySelector('.menu-content');
+        const activeContainer = redocContainer || container;
+        const sidebar = activeContainer.querySelector('.menu-content');
         if (!sidebar) return false;
         const decoded = decodeURIComponent(hash);
         const links = Array.prototype.slice.call(sidebar.querySelectorAll('a[href]'));
@@ -273,7 +276,8 @@ function renderHtml() {
 
       function clickSidebarByText(text, exactOnly) {
         if (!text) return false;
-        const sidebar = container.querySelector('.menu-content');
+        const activeContainer = redocContainer || container;
+        const sidebar = activeContainer.querySelector('.menu-content');
         if (!sidebar) return false;
         const target = normalizeText(text);
         const clickables = Array.prototype.slice.call(sidebar.querySelectorAll('a, label, button'))
@@ -450,14 +454,16 @@ function renderHtml() {
       }
 
       function removeRedocSearchElements() {
-        const sidebar = container.querySelector('.menu-content');
+        const activeContainer = redocContainer || container;
+        const sidebar = activeContainer.querySelector('.menu-content');
         if (!sidebar) return;
         const redocSearchInputs = sidebar.querySelectorAll('input.search-input');
         redocSearchInputs.forEach(function(el) { el.remove(); });
       }
 
       function injectControls() {
-        const sidebar = container.querySelector('.menu-content');
+        const activeContainer = redocContainer || container;
+        const sidebar = activeContainer.querySelector('.menu-content');
         if (!sidebar) return false;
         // Remove old one if present
         const old = document.getElementById('our-controls');
@@ -480,7 +486,8 @@ function renderHtml() {
           // Also remove any ReDoc search inputs that might have been re-added
           removeRedocSearchElements();
         });
-        observer.observe(container, { childList: true, subtree: true });
+        const targetContainer = redocContainer || container;
+        observer.observe(targetContainer, { childList: true, subtree: true });
       }
 
       function getSectionFromHash() {
@@ -532,40 +539,54 @@ function renderHtml() {
         setSectionInUrl(sectionId);
         syncSectionSelect();
 
-        // Properly clear the container to avoid React unmount issues
-        while (container.firstChild) {
-          container.removeChild(container.firstChild);
+        // Disconnect observer before clearing to prevent race conditions
+        if (observer) {
+          observer.disconnect();
+          observer = null;
         }
 
-        var loadingMsg = document.createElement('p');
-        loadingMsg.style.padding = '40px';
-        loadingMsg.style.color = '#5e6b7a';
-        loadingMsg.textContent = 'Loading ' + sectionId + ' documentation...';
-        container.appendChild(loadingMsg);
+        // Create a completely new container to avoid React conflicts
+        if (redocContainer) {
+          // Remove the old container completely
+          redocContainer.remove();
+        }
+
+        // Create fresh container
+        redocContainer = document.createElement('div');
+        redocContainer.id = 'redoc-container-inner';
+        redocContainer.innerHTML = '<p style="padding:40px;color:#5e6b7a;">Loading ' + sectionId + ' documentation...</p>';
+
+        // Clear main container and add the fresh one
+        container.innerHTML = '';
+        container.appendChild(redocContainer);
 
         blockHashChange = true;
-        watchSidebar();
-        Redoc.init("./api/spot-" + sectionId + ".yaml", {
-          hideHostname: true,
-          hideDownloadButton: true,
-          menuToggle: true,
-          expandSingleSchemaField: true,
-          sortPropsAlphabetically: true,
-          generatedPayloadSamplesMaxDepth: 3,
-          theme: { colors: { primary: { main: "#0086ff" } } },
-          disableSearch: false,
-          nativeScrollbars: false,
-          hideSchemaPattern: false
-        }, container, function() {
-          injectControls();
-          syncSectionSelect();
-          blockHashChange = false;
-          if (pendingSearchTarget) {
-            var t = pendingSearchTarget;
-            pendingSearchTarget = null;
-            activateSidebarItem(t);
-          }
-        });
+
+        // Delay to ensure DOM is ready
+        setTimeout(function() {
+          Redoc.init("./api/spot-" + sectionId + ".yaml", {
+            hideHostname: true,
+            hideDownloadButton: true,
+            menuToggle: true,
+            expandSingleSchemaField: true,
+            sortPropsAlphabetically: true,
+            generatedPayloadSamplesMaxDepth: 3,
+            theme: { colors: { primary: { main: "#0086ff" } } },
+            disableSearch: false,
+            nativeScrollbars: false,
+            hideSchemaPattern: false
+          }, redocContainer, function() {
+            watchSidebar();
+            injectControls();
+            syncSectionSelect();
+            blockHashChange = false;
+            if (pendingSearchTarget) {
+              var t = pendingSearchTarget;
+              pendingSearchTarget = null;
+              activateSidebarItem(t);
+            }
+          });
+        }, 150);  // Increased delay to ensure DOM cleanup is complete
       }
 
       window.addEventListener("hashchange", function() {
