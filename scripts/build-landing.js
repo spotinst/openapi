@@ -203,10 +203,13 @@ function renderHtml() {
         return sections.some(function(s) { return s.id === section; }) ? section : null;
       }
 
-      function setSectionInUrl(sectionId) {
+      function setSectionInUrl(sectionId, clearHash) {
         if (!sectionId) return;
         const url = new URL(window.location.href);
         url.searchParams.set("section", sectionId);
+        if (clearHash) {
+          url.hash = '';
+        }
         window.history.replaceState({}, "", url.pathname + url.search + url.hash);
       }
 
@@ -426,7 +429,7 @@ function renderHtml() {
           '</select>';
         div.querySelector('select').addEventListener('change', function() {
           if (!this.value) return;
-          setSectionInUrl(this.value);
+          setSectionInUrl(this.value, true);  // Clear hash when user changes section
           if (this.value !== currentSection) loadSection(this.value);
         });
         const searchInput = div.querySelector('#global-search');
