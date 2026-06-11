@@ -117,7 +117,8 @@ function toTagHash(tagName) {
         });
       });
 
-      fs.writeFileSync(bundledPath, yaml.dump(dereffed, { lineWidth: -1 }), "utf8");
+      // Use lineWidth -1 to prevent wrapping and preserve formatting
+      fs.writeFileSync(bundledPath, yaml.dump(dereffed, { lineWidth: -1, noCompatMode: false, condenseFlow: false }), "utf8");
       const sizeKB = Math.round(fs.statSync(bundledPath).size / 1024);
       out("Created spot-" + sectionId + ".yaml (" + pathCount + " paths, " + sizeKB + " KB dereferenced)");
     } catch (caughtErr) {
