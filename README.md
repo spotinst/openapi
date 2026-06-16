@@ -158,3 +158,93 @@ Your new section will appear in the left menu automatically.
 | `api/services/*/` | Service-specific paths, schemas, responses |
 | `scripts/build-sections.js` | Generates split YAMLs per section (reads from `x-tagGroups`) |
 | `scripts/build-landing.js` | Generates landing page with menu |
+
+## Response Schema Patterns
+
+### Using Response Wrappers
+
+Spot API uses standardized response wrappers to maintain consistency across all endpoints. When creating response schemas, follow these patterns:
+
+#### Common Response Wrappers
+
+- **`responseWrapper.yaml`** - Base wrapper with `request` and `response.status` properties
+- **`responseItemWrapper.yaml`** - Extends base wrapper, adds `count` and `kind` properties
+- **`paginatedResponseItemWrapper.yaml`** - Extends item wrapper, adds `paginationInfo`
+
+#### ⚠️ IMPORTANT: You MUST Define `items` Array
+
+The common response wrappers (`responseItemWrapper.yaml` and `paginatedResponseItemWrapper.yaml`) **do not include** the `response.items` array. This is intentional to allow each endpoint to define its specific item type.
+
+**❌ Incorrect Usage (Missing `items`):**
+
+```yaml
+# api/services/myservice/responses/myResponse.yaml
+description: My Response
+content:
+  application/json:
+    schema:
+      $ref: "../../../commons/schemas/responseItemWrapper.yaml"
+```
+
+**✅ Correct Usage (Explicit `items` Definition):**
+
+```yaml
+# api/services/myservice/responses/myResponse.yaml
+description: My Response
+content:
+  application/json:
+    schema:
+      allOf:
+        - $ref: "../../../commons/schemas/responseItemWrapper.yaml"
+        - type: object
+          properties:
+            response:
+              type: object
+              properties:
+                items:
+                  type: array
+                  items:
+                    $ref: "../schemas/myItemSchema.yaml"
+                kind:
+                  example: spotinst:myservice:item
+```
+
+#### Why This Pattern?
+
+1. **Type Safety**: Each endpoint explicitly defines its item schema, enabling better code generation
+2. **Flexibility**: Different endpoints can return different item types without conflicts
+3. **Validation**: OpenAPI tools can validate the specific schema for each endpoint
+4. **Documentation**: Generated docs show the exact response structure for each endpoint
+
+#### Checklist for New Responses
+
+When creating a new response that returns a list of items:
+
+- [ ] Use `allOf` to extend `responseItemWrapper.yaml` or `paginatedResponseItemWrapper.yaml`
+- [ ] Define `response.items` as an array with a specific item schema reference
+- [ ] Define `response.kind` with an example value following the pattern: `spotinst:service:itemType`
+- [ ] If paginated, ensure you're using `paginatedResponseItemWrapper.yaml`
+
+#### Example: Complete Response File
+
+```yaml
+# api/services/elastigroup/aws/responses/groups.yaml
+description: Elastigroup Response
+content:
+  application/json:
+    schema:
+      allOf:
+        - $ref: "../../../../commons/schemas/responseItemWrapper.yaml"
+        - type: object
+          properties:
+            response:
+              type: object
+              properties:
+                items:
+                  type: array
+                  items:
+                    $ref: "../schemas/elastigroup.yaml"
+                kind:
+                  example: spotinst:aws:ec2:group
+```
+
