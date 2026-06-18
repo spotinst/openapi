@@ -1,0 +1,3055 @@
+openapi: 3.0.0
+info:
+  version: '1.0'
+  description: |
+    Welcome to the Spot by Flexera OpenAPI Specification.
+    Here you will find REST definitions for all Spot products and platform administration tasks.
+
+    The API is hosted at `https://api.spotinst.io` and requires Bearer Token
+    Authentication.
+
+    For more information on how to use the Spot platform, including user guides,
+    developer guides, concepts, and tutorials, see the external [Spot Documentation](https://docs.flexera.com/spot/).
+  title: Spot by Flexera API - Spot Security
+  x-logo:
+    url: https://spec.dev.spot.io/flexera-spot.png
+    altText: SpotByFlexeraLogo
+    href: https://spec.dev.spot.io
+  contact:
+    email: support@spot.io
+servers:
+  - url: https://api.spotinst.io
+security:
+  - auth: []
+components:
+  securitySchemes:
+    auth:
+      description: |
+        To generate bearer tokens and understand more about Spot by Flexera
+        authentication see the howto for
+        [token creation](https://docs.flexera.com/spot/administration/api/create-api-token)
+        on the Spot Help site.
+
+        ### Organizations and Accounts
+
+        Each Spot account is assigned to an organization and a set of environment Accounts.
+        An account is then linked to a specific cloud provider account.
+
+        Spot accounts are given an ID in the format `act-123abcd` that is sent as a query parameter while performing API calls.
+
+        To locate the account ID navigate to Settings -> Account in the Spot console.
+
+        ### Organizations with a Single Account
+        Each API call you make can be used with or without the account ID.
+
+        ### Organizations with Multiple Accounts
+        Each API call you make should be appended to the account ID. For example:
+
+        GET `https://api.spotinst.io/aws/ec2/group?accountId=act-123de678`
+        This call will return the list of Elastigroups for the specific Account used.
+
+        > NOTE: If no `accountId` is provided, the default (dldest) account for the Organization will be used.
+      type: http
+      scheme: bearer
+    authWithoutAccount:
+      description: |
+        To generate bearer tokens and learn more about Spot by Flexera
+        authentication, see [token creation](https://docs-spot.flexera.com/administration/api/create-api-token).
+      type: http
+      scheme: bearer
+tags: []
+paths:
+  /security/v1/compliances:
+    get:
+      description: |-
+        A cyber security compliance determines how compliant an asset is. It checks against specific security standards.
+        This API returns list of all compliances supported in Spot.
+        A compliance consists of one or more controls.
+      operationId: get_compliances_v1_compliances_get
+      parameters:
+        - &ref_3
+          description: Token of the page to return.
+          in: query
+          name: paginationKey
+          required: false
+          schema:
+            description: Token of the page to return.
+            title: Paginationkey
+            type: string
+        - &ref_4
+          description: Number of items to return per page.
+          in: query
+          name: paginationSize
+          required: false
+          schema:
+            default: 100
+            description: Number of items to return per page.
+            maximum: 100
+            minimum: 1
+            title: Paginationsize
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    allOf:
+                      - &ref_0
+                        properties:
+                          code:
+                            title: Code
+                            type: string
+                          message:
+                            title: Message
+                            type: string
+                        required:
+                          - code
+                          - message
+                        title: ErrorModel
+                        type: object
+                    title: Error
+                  request: &ref_1
+                    properties:
+                      body:
+                        title: Body
+                        type: object
+                      id:
+                        title: Id
+                        type: string
+                      method:
+                        title: Method
+                        type: string
+                      queryParameters:
+                        title: Queryparameters
+                        type: object
+                      timestamp:
+                        title: Timestamp
+                        type: string
+                      url:
+                        title: Url
+                        type: string
+                    required:
+                      - id
+                      - url
+                      - method
+                      - queryParameters
+                      - body
+                      - timestamp
+                    title: RequestModel
+                    type: object
+                  response:
+                    allOf:
+                      - properties:
+                          count:
+                            default: 0
+                            description: The number of items.
+                            title: Count
+                            type: integer
+                          items:
+                            description: The array of objects in this response. The length of the array is according to the 'count' attribute.
+                            items:
+                              properties:
+                                complianceName:
+                                  title: Compliancename
+                                  type: string
+                              title: ComplianceModel
+                              type: object
+                            title: Items
+                            type: array
+                          paginationInfo: &ref_5
+                            properties:
+                              nextKey:
+                                description: Each API call has a unique token. This is the token for the next page of results.
+                                title: Nextkey
+                                type: string
+                              paginationSize:
+                                description: The maximum number of items in the page. The attribute 'item' indicates the actual number of items in the page.
+                                title: Paginationsize
+                                type: integer
+                              previousKey:
+                                description: Each API call has a unique token. This is the token for the previous page of results.
+                                title: Previouskey
+                                type: string
+                            title: PaginationModel
+                            type: object
+                          status: &ref_2
+                            properties:
+                              code:
+                                title: Code
+                                type: integer
+                              message:
+                                title: Message
+                                type: string
+                            required:
+                              - code
+                              - message
+                            title: StatusModel
+                            type: object
+                        required:
+                          - status
+                          - items
+                          - paginationInfo
+                        title: PaginatedResponse[ComplianceModel]
+                        type: object
+                  responseTime:
+                    title: Responsetime
+                    type: number
+                required:
+                  - request
+                title: SpotResponse[PaginatedResponse[ComplianceModel]]
+                type: object
+          description: Successful Response
+        '400':
+          content: {}
+          description: Bad Request
+        '404':
+          description: Not Found
+        '422':
+          content:
+            application/json:
+              schema: &ref_6
+                properties:
+                  detail:
+                    items:
+                      properties:
+                        loc:
+                          items:
+                            anyOf:
+                              - type: string
+                              - type: integer
+                          title: Location
+                          type: array
+                        msg:
+                          title: Message
+                          type: string
+                        type:
+                          title: Error Type
+                          type: string
+                      required:
+                        - loc
+                        - msg
+                        - type
+                      title: ValidationError
+                      type: object
+                    title: Detail
+                    type: array
+                title: HTTPValidationError
+                type: object
+          description: Validation Error
+      summary: Get Compliances
+      tags:
+        - Compliance
+    parameters: []
+  /security/v1/compliances/count:
+    get:
+      description: Get the total number of compliances.
+      operationId: get_compliance_count_v1_compliances_count_get
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: &ref_9
+                properties:
+                  error:
+                    allOf:
+                      - *ref_0
+                    title: Error
+                  request: *ref_1
+                  response:
+                    allOf:
+                      - properties:
+                          count:
+                            default: 0
+                            description: The number of items.
+                            title: Count
+                            type: integer
+                          items:
+                            description: The array of objects in this response. The length of the array is according to the 'count' attribute.
+                            items:
+                              properties:
+                                value:
+                                  description: The number of items.
+                                  title: Value
+                                  type: integer
+                              required:
+                                - value
+                              title: CountModel
+                              type: object
+                            title: Items
+                            type: array
+                          status: *ref_2
+                        required:
+                          - status
+                          - items
+                        title: BaseResponse[CountModel]
+                        type: object
+                  responseTime:
+                    title: Responsetime
+                    type: number
+                required:
+                  - request
+                title: SpotResponse[BaseResponse[CountModel]]
+                type: object
+          description: Successful Response
+        '400':
+          content: {}
+          description: Bad Request
+        '404':
+          description: Not Found
+      summary: Get Compliance Count
+      tags:
+        - Compliance
+    parameters: []
+  /security/v1/compliances/{complianceName}/controls:
+    get:
+      description: |-
+        A control is countermeasures to avoid, detect, counteract, or minimize security risks of cloud assets.
+        A control may be part of one or more compliances. A control is verified in one or more rules.
+        This API returns the list of controls mapped to a specific compliance.
+      operationId: get_compliance_controls_v1_compliances__complianceName__controls_get
+      parameters:
+        - &ref_7
+          description: The name of the cyber security compliance.
+          example: SOC_2
+          in: path
+          name: complianceName
+          required: true
+          schema:
+            description: The name of the cyber security compliance.
+            title: Compliancename
+            type: string
+        - &ref_8
+          description: If this is not a manual control, the value is True.
+          in: query
+          name: isAutomated
+          required: false
+          schema:
+            description: If this is not a manual control, the value is True.
+            title: Isautomated
+            type: boolean
+        - *ref_3
+        - *ref_4
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    allOf:
+                      - *ref_0
+                    title: Error
+                  request: *ref_1
+                  response:
+                    allOf:
+                      - properties:
+                          count:
+                            default: 0
+                            description: The number of items.
+                            title: Count
+                            type: integer
+                          items:
+                            description: The array of objects in this response. The length of the array is according to the 'count' attribute.
+                            items:
+                              properties:
+                                controlId:
+                                  title: Controlid
+                                  type: string
+                                description:
+                                  title: Description
+                                  type: string
+                                isAutomated:
+                                  title: Isautomated
+                                  type: boolean
+                              title: ControlModel
+                              type: object
+                            title: Items
+                            type: array
+                          paginationInfo: *ref_5
+                          status: *ref_2
+                        required:
+                          - status
+                          - items
+                          - paginationInfo
+                        title: PaginatedResponse[ControlModel]
+                        type: object
+                  responseTime:
+                    title: Responsetime
+                    type: number
+                required:
+                  - request
+                title: SpotResponse[PaginatedResponse[ControlModel]]
+                type: object
+          description: Successful Response
+        '400':
+          content: {}
+          description: Bad Request
+        '404':
+          description: Not Found
+        '422':
+          content:
+            application/json:
+              schema: *ref_6
+          description: Validation Error
+      summary: Get Compliance Controls
+      tags:
+        - Compliance
+    parameters: []
+  /security/v1/compliances/{complianceName}/controls/count:
+    get:
+      description: Get the total number of controls for the selected compliance.
+      operationId: get_compliance_controls_count_v1_compliances__complianceName__controls_count_get
+      parameters:
+        - *ref_7
+        - *ref_8
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: *ref_9
+          description: Successful Response
+        '400':
+          content: {}
+          description: Bad Request
+        '404':
+          description: Not Found
+        '422':
+          content:
+            application/json:
+              schema: *ref_6
+          description: Validation Error
+      summary: Get Compliance Controls Count
+      tags:
+        - Compliance
+    parameters: []
+  /security/v1/misconfigurations:
+    get:
+      description: This API returns the list of assets that have misconfigurations.
+      operationId: get_misconfigurations_v1_misconfigurations_get
+      parameters:
+        - &ref_10
+          in: query
+          name: cloud
+          required: true
+          schema:
+            description: Enumeration of supported cloud providers.
+            enum:
+              - aws
+              - azure
+            title: CloudProvider
+            type: string
+        - &ref_11
+          description: A comma-separated list of cloud account IDs. For AWS this is the account ID. For Azure, this is the subscription ID.
+          in: query
+          name: accountId
+          required: false
+          schema:
+            description: A comma-separated list of cloud account IDs. For AWS this is the account ID. For Azure, this is the subscription ID.
+            title: Accountid
+            type: string
+        - &ref_12
+          description: A comma-separated list of cloud account IDs to exclude. For AWS this is the account ID. For Azure, this is the subscription ID.
+          in: query
+          name: notAccountId
+          required: false
+          schema:
+            description: A comma-separated list of cloud account IDs to exclude. For AWS this is the account ID. For Azure, this is the subscription ID.
+            title: Notaccountid
+            type: string
+        - &ref_13
+          description: A comma-separated list of cloud account names.
+          in: query
+          name: accountName
+          required: false
+          schema:
+            description: A comma-separated list of cloud account names.
+            title: Accountname
+            type: string
+        - &ref_14
+          description: A comma-separated list of cloud account names to exclude
+          in: query
+          name: notAccountName
+          required: false
+          schema:
+            description: A comma-separated list of cloud account names to exclude
+            title: Notaccountname
+            type: string
+        - &ref_15
+          description: A comma-separated list of cloud regions.
+          example: us-east-1
+          in: query
+          name: region
+          required: false
+          schema:
+            description: A comma-separated list of cloud regions.
+            title: Region
+            type: string
+        - &ref_16
+          description: A comma-separated list of cloud regions to exclude.
+          example: us-east-1
+          in: query
+          name: notRegion
+          required: false
+          schema:
+            description: A comma-separated list of cloud regions to exclude.
+            title: Notregion
+            type: string
+        - &ref_17
+          description: The date the finding was most recently found (YYYY-MM-DD).
+          example: '1997-11-11'
+          in: query
+          name: date
+          required: false
+          schema:
+            description: The date the finding was most recently found (YYYY-MM-DD).
+            format: date
+            title: Date
+            type: string
+        - &ref_18
+          description: A comma-separated list of cloud services.
+          in: query
+          name: service
+          required: false
+          schema:
+            description: A comma-separated list of cloud services.
+            title: Service
+            type: string
+        - &ref_19
+          description: A comma-separated list of cloud services to exclude.
+          in: query
+          name: notService
+          required: false
+          schema:
+            description: A comma-separated list of cloud services to exclude.
+            title: Notservice
+            type: string
+        - &ref_20
+          description: A comma-separated list of cloud resources for the service.
+          in: query
+          name: assetType
+          required: false
+          schema:
+            description: A comma-separated list of cloud resources for the service.
+            title: Assettype
+            type: string
+        - &ref_21
+          description: A comma-separated list of cloud resources for the service to exclude.
+          in: query
+          name: notAssetType
+          required: false
+          schema:
+            description: A comma-separated list of cloud resources for the service to exclude.
+            title: Notassettype
+            type: string
+        - &ref_22
+          description: The unique name of the rule.
+          in: query
+          name: ruleName
+          required: false
+          schema:
+            description: The unique name of the rule.
+            title: Rulename
+            type: string
+        - &ref_23
+          description: The asset's ID (a cloud resource).
+          in: query
+          name: assetId
+          required: false
+          schema:
+            description: The asset's ID (a cloud resource).
+            title: Assetid
+            type: string
+        - *ref_3
+        - *ref_4
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    allOf:
+                      - *ref_0
+                    title: Error
+                  request: *ref_1
+                  response:
+                    allOf:
+                      - properties:
+                          count:
+                            default: 0
+                            description: The number of items.
+                            title: Count
+                            type: integer
+                          items:
+                            description: The array of objects in this response. The length of the array is according to the 'count' attribute.
+                            items:
+                              properties:
+                                organizationId:
+                                  description: The Spot Organization ID.
+                                  title: Organizationid
+                                  type: string
+                                what:
+                                  properties:
+                                    args:
+                                      description: 'Certain misconfiguration rules have arguments. This field contains the arguments in the form of an comma separated array. Example: ["MongoDB", "TCP", "27017"]'
+                                      items:
+                                        type: string
+                                      title: Args
+                                      type: array
+                                    isSuppressed:
+                                      description: If this finding is suppressed, the value is True.
+                                      title: Issuppressed
+                                      type: boolean
+                                    ruleDescription:
+                                      description: Description of the rule.
+                                      title: Ruledescription
+                                      type: string
+                                    ruleName:
+                                      description: The unique name of the rule.
+                                      title: Rulename
+                                      type: string
+                                    ruleTitle:
+                                      description: The name of the rule.
+                                      title: Ruletitle
+                                      type: string
+                                    severity:
+                                      description: The severity of the rule.
+                                      title: Severity
+                                      type: string
+                                    state:
+                                      description: The state of the misconfiguration. It is either open or closed.
+                                      title: State
+                                      type: string
+                                  required:
+                                    - ruleName
+                                    - ruleTitle
+                                    - ruleDescription
+                                    - args
+                                    - severity
+                                    - state
+                                    - isSuppressed
+                                  title: MisconfigurationWhatModel
+                                  type: object
+                                when:
+                                  properties:
+                                    lastSeen:
+                                      description: The date the finding was most recently found (YYYY-MM-DD).
+                                      title: Lastseen
+                                      type: string
+                                    suppressedAt:
+                                      description: When the finding was suppressed.
+                                      format: date-time
+                                      title: Suppressedat
+                                      type: string
+                                  required:
+                                    - lastSeen
+                                    - suppressedAt
+                                  title: MisconfigurationWhenModel
+                                  type: object
+                                where:
+                                  properties:
+                                    accountId:
+                                      description: A comma-separated list of cloud account IDs. For AWS this is the account ID. For Azure, this is the subscription ID.
+                                      title: Accountid
+                                      type: string
+                                    assetId:
+                                      description: The asset's ID (a cloud resource).
+                                      title: Assetid
+                                      type: string
+                                    assetName:
+                                      description: The name of the asset ID.
+                                      title: Assetname
+                                      type: string
+                                    assetType:
+                                      description: A comma-separated list of cloud resources for the service.
+                                      title: Assettype
+                                      type: string
+                                    findingLocation:
+                                      description: 'For a misconfiguration: the cloud resource or a subelement of the cloud resource.                        For a vulnerability: the cloud resource, an OS image, or a filename.'
+                                      title: Findinglocation
+                                      type: string
+                                    region:
+                                      description: A comma-separated list of cloud regions.
+                                      title: Region
+                                      type: string
+                                    service:
+                                      description: The cloud service.
+                                      title: Service
+                                      type: string
+                                  required:
+                                    - accountId
+                                    - service
+                                    - assetId
+                                    - assetName
+                                    - assetType
+                                    - region
+                                    - findingLocation
+                                  title: MisconfigurationWhereModel
+                                  type: object
+                                who:
+                                  properties:
+                                    suppressedBy:
+                                      description: The user who suppressed the finding.
+                                      title: Suppressedby
+                                      type: string
+                                  required:
+                                    - suppressedBy
+                                  title: MisconfigurationWhoModel
+                                  type: object
+                              required:
+                                - organizationId
+                                - when
+                                - what
+                                - where
+                                - who
+                              title: MisconfigurationModel
+                              type: object
+                            title: Items
+                            type: array
+                          paginationInfo: *ref_5
+                          status: *ref_2
+                        required:
+                          - status
+                          - items
+                          - paginationInfo
+                        title: PaginatedResponse[MisconfigurationModel]
+                        type: object
+                  responseTime:
+                    title: Responsetime
+                    type: number
+                required:
+                  - request
+                title: SpotResponse[PaginatedResponse[MisconfigurationModel]]
+                type: object
+          description: Successful Response
+        '400':
+          content: {}
+          description: Bad Request
+        '404':
+          description: Not Found
+        '422':
+          content:
+            application/json:
+              schema: *ref_6
+          description: Validation Error
+      summary: Get Misconfigurations
+      tags:
+        - Misconfiguration
+    parameters: []
+  /security/v1/misconfigurations/count:
+    get:
+      description: This API returns a count of assets that have misconfigurations.
+      operationId: get_misconfigurations_count_v1_misconfigurations_count_get
+      parameters:
+        - *ref_10
+        - *ref_11
+        - *ref_12
+        - *ref_13
+        - *ref_14
+        - *ref_15
+        - *ref_16
+        - *ref_17
+        - *ref_18
+        - *ref_19
+        - *ref_20
+        - *ref_21
+        - *ref_22
+        - *ref_23
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: *ref_9
+          description: Successful Response
+        '400':
+          content: {}
+          description: Bad Request
+        '404':
+          description: Not Found
+        '422':
+          content:
+            application/json:
+              schema: *ref_6
+          description: Validation Error
+      summary: Get Misconfigurations Count
+      tags:
+        - Misconfiguration
+    parameters: []
+  /security/v1/misconfigurations/rules:
+    get:
+      description: |-
+        Rules are configuration checks that detect misconfigurations in your cloud environment.
+        Rules are cloud service provider specific. A rule is mapped to one or more controls.
+        This API returns the list of rules that can determine the state of a specific control.
+      operationId: get_rules_v1_misconfigurations_rules_get
+      parameters:
+        - *ref_10
+        - &ref_24
+          description: The name of the cyber security compliance.
+          example: SOC_2
+          in: query
+          name: complianceName
+          required: false
+          schema:
+            description: The name of the cyber security compliance.
+            title: Compliancename
+            type: string
+        - &ref_25
+          description: The ID of the control defined in the compliance.
+          example: A1.2
+          in: query
+          name: controlId
+          required: false
+          schema:
+            description: The ID of the control defined in the compliance.
+            title: Controlid
+            type: string
+        - *ref_18
+        - *ref_3
+        - *ref_4
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    allOf:
+                      - *ref_0
+                    title: Error
+                  request: *ref_1
+                  response:
+                    allOf:
+                      - properties:
+                          count:
+                            default: 0
+                            description: The number of items.
+                            title: Count
+                            type: integer
+                          items:
+                            description: The array of objects in this response. The length of the array is according to the 'count' attribute.
+                            items:
+                              properties:
+                                args:
+                                  description: 'Certain misconfiguration rules have arguments. This field contains the arguments in the form of an comma separated array. Example: ["MongoDB", "TCP", "27017"]'
+                                  items:
+                                    type: string
+                                  title: Args
+                                  type: array
+                                cloud:
+                                  description: The name of the cloud.
+                                  title: Cloud
+                                  type: string
+                                complianceName:
+                                  description: The name of the cyber security compliance.
+                                  items:
+                                    type: string
+                                  title: Compliancename
+                                  type: array
+                                controls:
+                                  description: The ID of the control defined in the compliance.
+                                  items:
+                                    additionalProperties:
+                                      type: string
+                                    type: object
+                                  title: Controls
+                                  type: array
+                                description:
+                                  description: Description of the rule.
+                                  title: Description
+                                  type: string
+                                effort:
+                                  allOf:
+                                    - enum:
+                                        - High
+                                        - Medium
+                                        - Low
+                                        - ''
+                                      title: Effort
+                                      type: string
+                                  description: The effort required to fix the finding.
+                                ruleName:
+                                  description: The unique name of the rule.
+                                  title: Rulename
+                                  type: string
+                                ruleTitle:
+                                  description: The name of the rule.
+                                  title: Ruletitle
+                                  type: string
+                                service:
+                                  description: The cloud service.
+                                  title: Service
+                                  type: string
+                                severity:
+                                  allOf:
+                                    - enum:
+                                        - Critical
+                                        - High
+                                        - Medium
+                                        - Low
+                                      title: Severity
+                                      type: string
+                                  description: The severity of the rule.
+                              required:
+                                - ruleName
+                                - ruleTitle
+                                - description
+                                - cloud
+                                - service
+                                - args
+                                - severity
+                                - effort
+                                - complianceName
+                                - controls
+                              title: RulesModel
+                              type: object
+                            title: Items
+                            type: array
+                          paginationInfo: *ref_5
+                          status: *ref_2
+                        required:
+                          - status
+                          - items
+                          - paginationInfo
+                        title: PaginatedResponse[RulesModel]
+                        type: object
+                  responseTime:
+                    title: Responsetime
+                    type: number
+                required:
+                  - request
+                title: SpotResponse[PaginatedResponse[RulesModel]]
+                type: object
+          description: Successful Response
+        '400':
+          content: {}
+          description: Bad Request
+        '404':
+          description: Not Found
+        '422':
+          content:
+            application/json:
+              schema: *ref_6
+          description: Validation Error
+      summary: Get Rules
+      tags:
+        - Misconfiguration
+    parameters: []
+  /security/v1/misconfigurations/rules/count:
+    get:
+      description: |-
+        Rules are configuration checks that detect misconfigurations in your cloud environment.
+        Rules are cloud service provider specific. A rule is mapped to one or more controls.
+        This API returns the list of rules that can determine the state of a specific control.
+      operationId: get_rules_count_v1_misconfigurations_rules_count_get
+      parameters:
+        - *ref_10
+        - *ref_24
+        - *ref_25
+        - *ref_18
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: *ref_9
+          description: Successful Response
+        '400':
+          content: {}
+          description: Bad Request
+        '404':
+          description: Not Found
+        '422':
+          content:
+            application/json:
+              schema: *ref_6
+          description: Validation Error
+      summary: Get Rules Count
+      tags:
+        - Misconfiguration
+    parameters: []
+  /security/v1/assets/filters/{filterKey}:
+    get:
+      description: |-
+        Get a list of values in your organization for a specific filter type.
+        For example, if you select accountId, you'll get a list of all the account IDs in your organization.
+      operationId: get_asset_sim_filter_v1_assets_filters__filterKey__get
+      parameters:
+        - description: The name of the filter.
+          in: path
+          name: filterKey
+          required: true
+          schema:
+            allOf:
+              - description: The list of filter types, for example accountId, region, assetName.
+                enum:
+                  - accountId
+                  - accountName
+                  - region
+                  - assetId
+                  - assetName
+                  - service
+                  - assetType
+                title: AssetFilters
+                type: string
+            description: The name of the filter.
+            title: Filterkey
+        - *ref_10
+        - *ref_11
+        - *ref_12
+        - *ref_13
+        - *ref_14
+        - *ref_15
+        - *ref_16
+        - *ref_17
+        - *ref_18
+        - *ref_19
+        - *ref_20
+        - *ref_21
+        - *ref_23
+        - description: The name of the asset ID.
+          in: query
+          name: assetName
+          required: false
+          schema:
+            description: The name of the asset ID.
+            title: Assetname
+            type: string
+        - description: If there are findings for the assets, the value is True.
+          example: 'true'
+          in: query
+          name: isRisky
+          required: false
+          schema:
+            description: If there are findings for the assets, the value is True.
+            title: Isrisky
+            type: boolean
+        - description: |-
+            The sum of misconfigurations and vulnerabilities for today's date, and threats and anomalies identified that are still applicable today.
+                    <br>
+                    Enter either a number or prefix it with one of these operators:
+                    <table>
+                    <tr>
+                    <th>Operator</th>
+                    <th>Notation</th>
+                    <th>Example</th>
+                    </tr>
+                    <tr>
+                    <td>Equals</td>
+                    <td>No prefix or \~eq\~</td>
+                    <td>10 or \~eq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Not equals</td>
+                    <td>\~neq\~</td>
+                    <td>\~neq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than</td>
+                    <td>\~gt\~</td>
+                    <td>\~gt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than equals</td>
+                    <td>\~gte\~</td>
+                    <td>\~gte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than</td>
+                    <td>\~lt\~</td>
+                    <td>\~lt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than equals</td>
+                    <td>\~lte\~</td>
+                    <td>\~lte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Between two numbers</td>
+                    <td>\~bt\~</td>
+                    <td>\~bt\~10,20</td>
+                    </tr>
+                    </table>
+                    
+          in: query
+          name: allFindingsCount
+          required: false
+          schema:
+            description: |-
+              The sum of misconfigurations and vulnerabilities for today's date, and threats and anomalies identified that are still applicable today.
+                      <br>
+                      Enter either a number or prefix it with one of these operators:
+                      <table>
+                      <tr>
+                      <th>Operator</th>
+                      <th>Notation</th>
+                      <th>Example</th>
+                      </tr>
+                      <tr>
+                      <td>Equals</td>
+                      <td>No prefix or \~eq\~</td>
+                      <td>10 or \~eq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Not equals</td>
+                      <td>\~neq\~</td>
+                      <td>\~neq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than</td>
+                      <td>\~gt\~</td>
+                      <td>\~gt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than equals</td>
+                      <td>\~gte\~</td>
+                      <td>\~gte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than</td>
+                      <td>\~lt\~</td>
+                      <td>\~lt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than equals</td>
+                      <td>\~lte\~</td>
+                      <td>\~lte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Between two numbers</td>
+                      <td>\~bt\~</td>
+                      <td>\~bt\~10,20</td>
+                      </tr>
+                      </table>
+                      
+            title: Allfindingscount
+            type: string
+        - description: |-
+            The total number of vulnerabilities found for the asset.
+                    <br>
+                    Enter either a number or prefix it with one of these operators:
+                    <table>
+                    <tr>
+                    <th>Operator</th>
+                    <th>Notation</th>
+                    <th>Example</th>
+                    </tr>
+                    <tr>
+                    <td>Equals</td>
+                    <td>No prefix or \~eq\~</td>
+                    <td>10 or \~eq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Not equals</td>
+                    <td>\~neq\~</td>
+                    <td>\~neq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than</td>
+                    <td>\~gt\~</td>
+                    <td>\~gt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than equals</td>
+                    <td>\~gte\~</td>
+                    <td>\~gte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than</td>
+                    <td>\~lt\~</td>
+                    <td>\~lt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than equals</td>
+                    <td>\~lte\~</td>
+                    <td>\~lte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Between two numbers</td>
+                    <td>\~bt\~</td>
+                    <td>\~bt\~10,20</td>
+                    </tr>
+                    </table>
+                    
+          in: query
+          name: allVulnCount
+          required: false
+          schema:
+            description: |-
+              The total number of vulnerabilities found for the asset.
+                      <br>
+                      Enter either a number or prefix it with one of these operators:
+                      <table>
+                      <tr>
+                      <th>Operator</th>
+                      <th>Notation</th>
+                      <th>Example</th>
+                      </tr>
+                      <tr>
+                      <td>Equals</td>
+                      <td>No prefix or \~eq\~</td>
+                      <td>10 or \~eq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Not equals</td>
+                      <td>\~neq\~</td>
+                      <td>\~neq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than</td>
+                      <td>\~gt\~</td>
+                      <td>\~gt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than equals</td>
+                      <td>\~gte\~</td>
+                      <td>\~gte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than</td>
+                      <td>\~lt\~</td>
+                      <td>\~lt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than equals</td>
+                      <td>\~lte\~</td>
+                      <td>\~lte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Between two numbers</td>
+                      <td>\~bt\~</td>
+                      <td>\~bt\~10,20</td>
+                      </tr>
+                      </table>
+                      
+            title: Allvulncount
+            type: string
+        - description: |-
+            The number of critical vulnerabilities found for the asset.
+                    <br>
+                    Enter either a number or prefix it with one of these operators:
+                    <table>
+                    <tr>
+                    <th>Operator</th>
+                    <th>Notation</th>
+                    <th>Example</th>
+                    </tr>
+                    <tr>
+                    <td>Equals</td>
+                    <td>No prefix or \~eq\~</td>
+                    <td>10 or \~eq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Not equals</td>
+                    <td>\~neq\~</td>
+                    <td>\~neq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than</td>
+                    <td>\~gt\~</td>
+                    <td>\~gt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than equals</td>
+                    <td>\~gte\~</td>
+                    <td>\~gte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than</td>
+                    <td>\~lt\~</td>
+                    <td>\~lt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than equals</td>
+                    <td>\~lte\~</td>
+                    <td>\~lte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Between two numbers</td>
+                    <td>\~bt\~</td>
+                    <td>\~bt\~10,20</td>
+                    </tr>
+                    </table>
+                    
+          in: query
+          name: criticalVulnCount
+          required: false
+          schema:
+            description: |-
+              The number of critical vulnerabilities found for the asset.
+                      <br>
+                      Enter either a number or prefix it with one of these operators:
+                      <table>
+                      <tr>
+                      <th>Operator</th>
+                      <th>Notation</th>
+                      <th>Example</th>
+                      </tr>
+                      <tr>
+                      <td>Equals</td>
+                      <td>No prefix or \~eq\~</td>
+                      <td>10 or \~eq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Not equals</td>
+                      <td>\~neq\~</td>
+                      <td>\~neq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than</td>
+                      <td>\~gt\~</td>
+                      <td>\~gt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than equals</td>
+                      <td>\~gte\~</td>
+                      <td>\~gte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than</td>
+                      <td>\~lt\~</td>
+                      <td>\~lt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than equals</td>
+                      <td>\~lte\~</td>
+                      <td>\~lte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Between two numbers</td>
+                      <td>\~bt\~</td>
+                      <td>\~bt\~10,20</td>
+                      </tr>
+                      </table>
+                      
+            title: Criticalvulncount
+            type: string
+        - description: |-
+            The number of high vulnerabilities found for the asset.
+                    <br>
+                    Enter either a number or prefix it with one of these operators:
+                    <table>
+                    <tr>
+                    <th>Operator</th>
+                    <th>Notation</th>
+                    <th>Example</th>
+                    </tr>
+                    <tr>
+                    <td>Equals</td>
+                    <td>No prefix or \~eq\~</td>
+                    <td>10 or \~eq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Not equals</td>
+                    <td>\~neq\~</td>
+                    <td>\~neq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than</td>
+                    <td>\~gt\~</td>
+                    <td>\~gt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than equals</td>
+                    <td>\~gte\~</td>
+                    <td>\~gte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than</td>
+                    <td>\~lt\~</td>
+                    <td>\~lt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than equals</td>
+                    <td>\~lte\~</td>
+                    <td>\~lte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Between two numbers</td>
+                    <td>\~bt\~</td>
+                    <td>\~bt\~10,20</td>
+                    </tr>
+                    </table>
+                    
+          in: query
+          name: highVulnCount
+          required: false
+          schema:
+            description: |-
+              The number of high vulnerabilities found for the asset.
+                      <br>
+                      Enter either a number or prefix it with one of these operators:
+                      <table>
+                      <tr>
+                      <th>Operator</th>
+                      <th>Notation</th>
+                      <th>Example</th>
+                      </tr>
+                      <tr>
+                      <td>Equals</td>
+                      <td>No prefix or \~eq\~</td>
+                      <td>10 or \~eq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Not equals</td>
+                      <td>\~neq\~</td>
+                      <td>\~neq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than</td>
+                      <td>\~gt\~</td>
+                      <td>\~gt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than equals</td>
+                      <td>\~gte\~</td>
+                      <td>\~gte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than</td>
+                      <td>\~lt\~</td>
+                      <td>\~lt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than equals</td>
+                      <td>\~lte\~</td>
+                      <td>\~lte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Between two numbers</td>
+                      <td>\~bt\~</td>
+                      <td>\~bt\~10,20</td>
+                      </tr>
+                      </table>
+                      
+            title: Highvulncount
+            type: string
+        - description: |-
+            The number of medium vulnerabilities found for the asset.
+                    <br>
+                    Enter either a number or prefix it with one of these operators:
+                    <table>
+                    <tr>
+                    <th>Operator</th>
+                    <th>Notation</th>
+                    <th>Example</th>
+                    </tr>
+                    <tr>
+                    <td>Equals</td>
+                    <td>No prefix or \~eq\~</td>
+                    <td>10 or \~eq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Not equals</td>
+                    <td>\~neq\~</td>
+                    <td>\~neq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than</td>
+                    <td>\~gt\~</td>
+                    <td>\~gt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than equals</td>
+                    <td>\~gte\~</td>
+                    <td>\~gte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than</td>
+                    <td>\~lt\~</td>
+                    <td>\~lt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than equals</td>
+                    <td>\~lte\~</td>
+                    <td>\~lte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Between two numbers</td>
+                    <td>\~bt\~</td>
+                    <td>\~bt\~10,20</td>
+                    </tr>
+                    </table>
+                    
+          in: query
+          name: mediumVulnCount
+          required: false
+          schema:
+            description: |-
+              The number of medium vulnerabilities found for the asset.
+                      <br>
+                      Enter either a number or prefix it with one of these operators:
+                      <table>
+                      <tr>
+                      <th>Operator</th>
+                      <th>Notation</th>
+                      <th>Example</th>
+                      </tr>
+                      <tr>
+                      <td>Equals</td>
+                      <td>No prefix or \~eq\~</td>
+                      <td>10 or \~eq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Not equals</td>
+                      <td>\~neq\~</td>
+                      <td>\~neq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than</td>
+                      <td>\~gt\~</td>
+                      <td>\~gt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than equals</td>
+                      <td>\~gte\~</td>
+                      <td>\~gte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than</td>
+                      <td>\~lt\~</td>
+                      <td>\~lt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than equals</td>
+                      <td>\~lte\~</td>
+                      <td>\~lte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Between two numbers</td>
+                      <td>\~bt\~</td>
+                      <td>\~bt\~10,20</td>
+                      </tr>
+                      </table>
+                      
+            title: Mediumvulncount
+            type: string
+        - description: |-
+            The number of low vulnerabilities found for the asset.
+                    <br>
+                    Enter either a number or prefix it with one of these operators:
+                    <table>
+                    <tr>
+                    <th>Operator</th>
+                    <th>Notation</th>
+                    <th>Example</th>
+                    </tr>
+                    <tr>
+                    <td>Equals</td>
+                    <td>No prefix or \~eq\~</td>
+                    <td>10 or \~eq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Not equals</td>
+                    <td>\~neq\~</td>
+                    <td>\~neq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than</td>
+                    <td>\~gt\~</td>
+                    <td>\~gt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than equals</td>
+                    <td>\~gte\~</td>
+                    <td>\~gte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than</td>
+                    <td>\~lt\~</td>
+                    <td>\~lt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than equals</td>
+                    <td>\~lte\~</td>
+                    <td>\~lte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Between two numbers</td>
+                    <td>\~bt\~</td>
+                    <td>\~bt\~10,20</td>
+                    </tr>
+                    </table>
+                    
+          in: query
+          name: lowVulnCount
+          required: false
+          schema:
+            description: |-
+              The number of low vulnerabilities found for the asset.
+                      <br>
+                      Enter either a number or prefix it with one of these operators:
+                      <table>
+                      <tr>
+                      <th>Operator</th>
+                      <th>Notation</th>
+                      <th>Example</th>
+                      </tr>
+                      <tr>
+                      <td>Equals</td>
+                      <td>No prefix or \~eq\~</td>
+                      <td>10 or \~eq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Not equals</td>
+                      <td>\~neq\~</td>
+                      <td>\~neq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than</td>
+                      <td>\~gt\~</td>
+                      <td>\~gt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than equals</td>
+                      <td>\~gte\~</td>
+                      <td>\~gte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than</td>
+                      <td>\~lt\~</td>
+                      <td>\~lt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than equals</td>
+                      <td>\~lte\~</td>
+                      <td>\~lte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Between two numbers</td>
+                      <td>\~bt\~</td>
+                      <td>\~bt\~10,20</td>
+                      </tr>
+                      </table>
+                      
+            title: Lowvulncount
+            type: string
+        - description: |-
+            The number of informational vulnerabilities found for the asset.
+                    <br>
+                    Enter either a number or prefix it with one of these operators:
+                    <table>
+                    <tr>
+                    <th>Operator</th>
+                    <th>Notation</th>
+                    <th>Example</th>
+                    </tr>
+                    <tr>
+                    <td>Equals</td>
+                    <td>No prefix or \~eq\~</td>
+                    <td>10 or \~eq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Not equals</td>
+                    <td>\~neq\~</td>
+                    <td>\~neq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than</td>
+                    <td>\~gt\~</td>
+                    <td>\~gt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than equals</td>
+                    <td>\~gte\~</td>
+                    <td>\~gte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than</td>
+                    <td>\~lt\~</td>
+                    <td>\~lt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than equals</td>
+                    <td>\~lte\~</td>
+                    <td>\~lte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Between two numbers</td>
+                    <td>\~bt\~</td>
+                    <td>\~bt\~10,20</td>
+                    </tr>
+                    </table>
+                    
+          in: query
+          name: infoVulnCount
+          required: false
+          schema:
+            description: |-
+              The number of informational vulnerabilities found for the asset.
+                      <br>
+                      Enter either a number or prefix it with one of these operators:
+                      <table>
+                      <tr>
+                      <th>Operator</th>
+                      <th>Notation</th>
+                      <th>Example</th>
+                      </tr>
+                      <tr>
+                      <td>Equals</td>
+                      <td>No prefix or \~eq\~</td>
+                      <td>10 or \~eq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Not equals</td>
+                      <td>\~neq\~</td>
+                      <td>\~neq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than</td>
+                      <td>\~gt\~</td>
+                      <td>\~gt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than equals</td>
+                      <td>\~gte\~</td>
+                      <td>\~gte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than</td>
+                      <td>\~lt\~</td>
+                      <td>\~lt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than equals</td>
+                      <td>\~lte\~</td>
+                      <td>\~lte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Between two numbers</td>
+                      <td>\~bt\~</td>
+                      <td>\~bt\~10,20</td>
+                      </tr>
+                      </table>
+                      
+            title: Infovulncount
+            type: string
+        - description: |-
+            The total number of misconfigurations found for the asset.
+                    <br>
+                    Enter either a number or prefix it with one of these operators:
+                    <table>
+                    <tr>
+                    <th>Operator</th>
+                    <th>Notation</th>
+                    <th>Example</th>
+                    </tr>
+                    <tr>
+                    <td>Equals</td>
+                    <td>No prefix or \~eq\~</td>
+                    <td>10 or \~eq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Not equals</td>
+                    <td>\~neq\~</td>
+                    <td>\~neq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than</td>
+                    <td>\~gt\~</td>
+                    <td>\~gt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than equals</td>
+                    <td>\~gte\~</td>
+                    <td>\~gte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than</td>
+                    <td>\~lt\~</td>
+                    <td>\~lt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than equals</td>
+                    <td>\~lte\~</td>
+                    <td>\~lte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Between two numbers</td>
+                    <td>\~bt\~</td>
+                    <td>\~bt\~10,20</td>
+                    </tr>
+                    </table>
+                    
+          in: query
+          name: allMisconfigCount
+          required: false
+          schema:
+            description: |-
+              The total number of misconfigurations found for the asset.
+                      <br>
+                      Enter either a number or prefix it with one of these operators:
+                      <table>
+                      <tr>
+                      <th>Operator</th>
+                      <th>Notation</th>
+                      <th>Example</th>
+                      </tr>
+                      <tr>
+                      <td>Equals</td>
+                      <td>No prefix or \~eq\~</td>
+                      <td>10 or \~eq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Not equals</td>
+                      <td>\~neq\~</td>
+                      <td>\~neq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than</td>
+                      <td>\~gt\~</td>
+                      <td>\~gt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than equals</td>
+                      <td>\~gte\~</td>
+                      <td>\~gte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than</td>
+                      <td>\~lt\~</td>
+                      <td>\~lt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than equals</td>
+                      <td>\~lte\~</td>
+                      <td>\~lte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Between two numbers</td>
+                      <td>\~bt\~</td>
+                      <td>\~bt\~10,20</td>
+                      </tr>
+                      </table>
+                      
+            title: Allmisconfigcount
+            type: string
+        - description: |-
+            The number of high misconfigurations found for the asset.
+                    <br>
+                    Enter either a number or prefix it with one of these operators:
+                    <table>
+                    <tr>
+                    <th>Operator</th>
+                    <th>Notation</th>
+                    <th>Example</th>
+                    </tr>
+                    <tr>
+                    <td>Equals</td>
+                    <td>No prefix or \~eq\~</td>
+                    <td>10 or \~eq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Not equals</td>
+                    <td>\~neq\~</td>
+                    <td>\~neq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than</td>
+                    <td>\~gt\~</td>
+                    <td>\~gt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than equals</td>
+                    <td>\~gte\~</td>
+                    <td>\~gte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than</td>
+                    <td>\~lt\~</td>
+                    <td>\~lt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than equals</td>
+                    <td>\~lte\~</td>
+                    <td>\~lte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Between two numbers</td>
+                    <td>\~bt\~</td>
+                    <td>\~bt\~10,20</td>
+                    </tr>
+                    </table>
+                    
+          in: query
+          name: highMisconfigCount
+          required: false
+          schema:
+            description: |-
+              The number of high misconfigurations found for the asset.
+                      <br>
+                      Enter either a number or prefix it with one of these operators:
+                      <table>
+                      <tr>
+                      <th>Operator</th>
+                      <th>Notation</th>
+                      <th>Example</th>
+                      </tr>
+                      <tr>
+                      <td>Equals</td>
+                      <td>No prefix or \~eq\~</td>
+                      <td>10 or \~eq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Not equals</td>
+                      <td>\~neq\~</td>
+                      <td>\~neq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than</td>
+                      <td>\~gt\~</td>
+                      <td>\~gt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than equals</td>
+                      <td>\~gte\~</td>
+                      <td>\~gte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than</td>
+                      <td>\~lt\~</td>
+                      <td>\~lt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than equals</td>
+                      <td>\~lte\~</td>
+                      <td>\~lte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Between two numbers</td>
+                      <td>\~bt\~</td>
+                      <td>\~bt\~10,20</td>
+                      </tr>
+                      </table>
+                      
+            title: Highmisconfigcount
+            type: string
+        - description: |-
+            The number of medium misconfigurations found for the asset.
+                    <br>
+                    Enter either a number or prefix it with one of these operators:
+                    <table>
+                    <tr>
+                    <th>Operator</th>
+                    <th>Notation</th>
+                    <th>Example</th>
+                    </tr>
+                    <tr>
+                    <td>Equals</td>
+                    <td>No prefix or \~eq\~</td>
+                    <td>10 or \~eq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Not equals</td>
+                    <td>\~neq\~</td>
+                    <td>\~neq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than</td>
+                    <td>\~gt\~</td>
+                    <td>\~gt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than equals</td>
+                    <td>\~gte\~</td>
+                    <td>\~gte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than</td>
+                    <td>\~lt\~</td>
+                    <td>\~lt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than equals</td>
+                    <td>\~lte\~</td>
+                    <td>\~lte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Between two numbers</td>
+                    <td>\~bt\~</td>
+                    <td>\~bt\~10,20</td>
+                    </tr>
+                    </table>
+                    
+          in: query
+          name: mediumMisconfigCount
+          required: false
+          schema:
+            description: |-
+              The number of medium misconfigurations found for the asset.
+                      <br>
+                      Enter either a number or prefix it with one of these operators:
+                      <table>
+                      <tr>
+                      <th>Operator</th>
+                      <th>Notation</th>
+                      <th>Example</th>
+                      </tr>
+                      <tr>
+                      <td>Equals</td>
+                      <td>No prefix or \~eq\~</td>
+                      <td>10 or \~eq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Not equals</td>
+                      <td>\~neq\~</td>
+                      <td>\~neq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than</td>
+                      <td>\~gt\~</td>
+                      <td>\~gt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than equals</td>
+                      <td>\~gte\~</td>
+                      <td>\~gte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than</td>
+                      <td>\~lt\~</td>
+                      <td>\~lt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than equals</td>
+                      <td>\~lte\~</td>
+                      <td>\~lte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Between two numbers</td>
+                      <td>\~bt\~</td>
+                      <td>\~bt\~10,20</td>
+                      </tr>
+                      </table>
+                      
+            title: Mediummisconfigcount
+            type: string
+        - description: |-
+            The number of low misconfigurations found for the asset.
+                    <br>
+                    Enter either a number or prefix it with one of these operators:
+                    <table>
+                    <tr>
+                    <th>Operator</th>
+                    <th>Notation</th>
+                    <th>Example</th>
+                    </tr>
+                    <tr>
+                    <td>Equals</td>
+                    <td>No prefix or \~eq\~</td>
+                    <td>10 or \~eq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Not equals</td>
+                    <td>\~neq\~</td>
+                    <td>\~neq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than</td>
+                    <td>\~gt\~</td>
+                    <td>\~gt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than equals</td>
+                    <td>\~gte\~</td>
+                    <td>\~gte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than</td>
+                    <td>\~lt\~</td>
+                    <td>\~lt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than equals</td>
+                    <td>\~lte\~</td>
+                    <td>\~lte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Between two numbers</td>
+                    <td>\~bt\~</td>
+                    <td>\~bt\~10,20</td>
+                    </tr>
+                    </table>
+                    
+          in: query
+          name: lowMisconfigCount
+          required: false
+          schema:
+            description: |-
+              The number of low misconfigurations found for the asset.
+                      <br>
+                      Enter either a number or prefix it with one of these operators:
+                      <table>
+                      <tr>
+                      <th>Operator</th>
+                      <th>Notation</th>
+                      <th>Example</th>
+                      </tr>
+                      <tr>
+                      <td>Equals</td>
+                      <td>No prefix or \~eq\~</td>
+                      <td>10 or \~eq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Not equals</td>
+                      <td>\~neq\~</td>
+                      <td>\~neq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than</td>
+                      <td>\~gt\~</td>
+                      <td>\~gt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than equals</td>
+                      <td>\~gte\~</td>
+                      <td>\~gte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than</td>
+                      <td>\~lt\~</td>
+                      <td>\~lt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than equals</td>
+                      <td>\~lte\~</td>
+                      <td>\~lte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Between two numbers</td>
+                      <td>\~bt\~</td>
+                      <td>\~bt\~10,20</td>
+                      </tr>
+                      </table>
+                      
+            title: Lowmisconfigcount
+            type: string
+        - description: |-
+            The total number of events found for the asset.
+                    <br>
+                    Enter either a number or prefix it with one of these operators:
+                    <table>
+                    <tr>
+                    <th>Operator</th>
+                    <th>Notation</th>
+                    <th>Example</th>
+                    </tr>
+                    <tr>
+                    <td>Equals</td>
+                    <td>No prefix or \~eq\~</td>
+                    <td>10 or \~eq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Not equals</td>
+                    <td>\~neq\~</td>
+                    <td>\~neq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than</td>
+                    <td>\~gt\~</td>
+                    <td>\~gt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than equals</td>
+                    <td>\~gte\~</td>
+                    <td>\~gte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than</td>
+                    <td>\~lt\~</td>
+                    <td>\~lt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than equals</td>
+                    <td>\~lte\~</td>
+                    <td>\~lte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Between two numbers</td>
+                    <td>\~bt\~</td>
+                    <td>\~bt\~10,20</td>
+                    </tr>
+                    </table>
+                    
+          in: query
+          name: allEventsCount
+          required: false
+          schema:
+            description: |-
+              The total number of events found for the asset.
+                      <br>
+                      Enter either a number or prefix it with one of these operators:
+                      <table>
+                      <tr>
+                      <th>Operator</th>
+                      <th>Notation</th>
+                      <th>Example</th>
+                      </tr>
+                      <tr>
+                      <td>Equals</td>
+                      <td>No prefix or \~eq\~</td>
+                      <td>10 or \~eq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Not equals</td>
+                      <td>\~neq\~</td>
+                      <td>\~neq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than</td>
+                      <td>\~gt\~</td>
+                      <td>\~gt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than equals</td>
+                      <td>\~gte\~</td>
+                      <td>\~gte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than</td>
+                      <td>\~lt\~</td>
+                      <td>\~lt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than equals</td>
+                      <td>\~lte\~</td>
+                      <td>\~lte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Between two numbers</td>
+                      <td>\~bt\~</td>
+                      <td>\~bt\~10,20</td>
+                      </tr>
+                      </table>
+                      
+            title: Alleventscount
+            type: string
+        - description: |-
+            The number of configuration events found for the asset.
+                    <br>
+                    Enter either a number or prefix it with one of these operators:
+                    <table>
+                    <tr>
+                    <th>Operator</th>
+                    <th>Notation</th>
+                    <th>Example</th>
+                    </tr>
+                    <tr>
+                    <td>Equals</td>
+                    <td>No prefix or \~eq\~</td>
+                    <td>10 or \~eq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Not equals</td>
+                    <td>\~neq\~</td>
+                    <td>\~neq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than</td>
+                    <td>\~gt\~</td>
+                    <td>\~gt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than equals</td>
+                    <td>\~gte\~</td>
+                    <td>\~gte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than</td>
+                    <td>\~lt\~</td>
+                    <td>\~lt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than equals</td>
+                    <td>\~lte\~</td>
+                    <td>\~lte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Between two numbers</td>
+                    <td>\~bt\~</td>
+                    <td>\~bt\~10,20</td>
+                    </tr>
+                    </table>
+                    
+          in: query
+          name: configEventsCount
+          required: false
+          schema:
+            description: |-
+              The number of configuration events found for the asset.
+                      <br>
+                      Enter either a number or prefix it with one of these operators:
+                      <table>
+                      <tr>
+                      <th>Operator</th>
+                      <th>Notation</th>
+                      <th>Example</th>
+                      </tr>
+                      <tr>
+                      <td>Equals</td>
+                      <td>No prefix or \~eq\~</td>
+                      <td>10 or \~eq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Not equals</td>
+                      <td>\~neq\~</td>
+                      <td>\~neq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than</td>
+                      <td>\~gt\~</td>
+                      <td>\~gt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than equals</td>
+                      <td>\~gte\~</td>
+                      <td>\~gte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than</td>
+                      <td>\~lt\~</td>
+                      <td>\~lt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than equals</td>
+                      <td>\~lte\~</td>
+                      <td>\~lte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Between two numbers</td>
+                      <td>\~bt\~</td>
+                      <td>\~bt\~10,20</td>
+                      </tr>
+                      </table>
+                      
+            title: Configeventscount
+            type: string
+        - description: |-
+            The number of critical events found for the asset.
+                    <br>
+                    Enter either a number or prefix it with one of these operators:
+                    <table>
+                    <tr>
+                    <th>Operator</th>
+                    <th>Notation</th>
+                    <th>Example</th>
+                    </tr>
+                    <tr>
+                    <td>Equals</td>
+                    <td>No prefix or \~eq\~</td>
+                    <td>10 or \~eq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Not equals</td>
+                    <td>\~neq\~</td>
+                    <td>\~neq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than</td>
+                    <td>\~gt\~</td>
+                    <td>\~gt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than equals</td>
+                    <td>\~gte\~</td>
+                    <td>\~gte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than</td>
+                    <td>\~lt\~</td>
+                    <td>\~lt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than equals</td>
+                    <td>\~lte\~</td>
+                    <td>\~lte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Between two numbers</td>
+                    <td>\~bt\~</td>
+                    <td>\~bt\~10,20</td>
+                    </tr>
+                    </table>
+                    
+          in: query
+          name: criticalEventsCount
+          required: false
+          schema:
+            description: |-
+              The number of critical events found for the asset.
+                      <br>
+                      Enter either a number or prefix it with one of these operators:
+                      <table>
+                      <tr>
+                      <th>Operator</th>
+                      <th>Notation</th>
+                      <th>Example</th>
+                      </tr>
+                      <tr>
+                      <td>Equals</td>
+                      <td>No prefix or \~eq\~</td>
+                      <td>10 or \~eq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Not equals</td>
+                      <td>\~neq\~</td>
+                      <td>\~neq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than</td>
+                      <td>\~gt\~</td>
+                      <td>\~gt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than equals</td>
+                      <td>\~gte\~</td>
+                      <td>\~gte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than</td>
+                      <td>\~lt\~</td>
+                      <td>\~lt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than equals</td>
+                      <td>\~lte\~</td>
+                      <td>\~lte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Between two numbers</td>
+                      <td>\~bt\~</td>
+                      <td>\~bt\~10,20</td>
+                      </tr>
+                      </table>
+                      
+            title: Criticaleventscount
+            type: string
+        - description: |-
+            The number of data change events found for the asset.
+                    <br>
+                    Enter either a number or prefix it with one of these operators:
+                    <table>
+                    <tr>
+                    <th>Operator</th>
+                    <th>Notation</th>
+                    <th>Example</th>
+                    </tr>
+                    <tr>
+                    <td>Equals</td>
+                    <td>No prefix or \~eq\~</td>
+                    <td>10 or \~eq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Not equals</td>
+                    <td>\~neq\~</td>
+                    <td>\~neq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than</td>
+                    <td>\~gt\~</td>
+                    <td>\~gt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than equals</td>
+                    <td>\~gte\~</td>
+                    <td>\~gte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than</td>
+                    <td>\~lt\~</td>
+                    <td>\~lt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than equals</td>
+                    <td>\~lte\~</td>
+                    <td>\~lte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Between two numbers</td>
+                    <td>\~bt\~</td>
+                    <td>\~bt\~10,20</td>
+                    </tr>
+                    </table>
+                    
+          in: query
+          name: dataChangeEventsCount
+          required: false
+          schema:
+            description: |-
+              The number of data change events found for the asset.
+                      <br>
+                      Enter either a number or prefix it with one of these operators:
+                      <table>
+                      <tr>
+                      <th>Operator</th>
+                      <th>Notation</th>
+                      <th>Example</th>
+                      </tr>
+                      <tr>
+                      <td>Equals</td>
+                      <td>No prefix or \~eq\~</td>
+                      <td>10 or \~eq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Not equals</td>
+                      <td>\~neq\~</td>
+                      <td>\~neq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than</td>
+                      <td>\~gt\~</td>
+                      <td>\~gt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than equals</td>
+                      <td>\~gte\~</td>
+                      <td>\~gte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than</td>
+                      <td>\~lt\~</td>
+                      <td>\~lt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than equals</td>
+                      <td>\~lte\~</td>
+                      <td>\~lte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Between two numbers</td>
+                      <td>\~bt\~</td>
+                      <td>\~bt\~10,20</td>
+                      </tr>
+                      </table>
+                      
+            title: Datachangeeventscount
+            type: string
+        - description: |-
+            The number of IAM change events found for the asset.
+                    <br>
+                    Enter either a number or prefix it with one of these operators:
+                    <table>
+                    <tr>
+                    <th>Operator</th>
+                    <th>Notation</th>
+                    <th>Example</th>
+                    </tr>
+                    <tr>
+                    <td>Equals</td>
+                    <td>No prefix or \~eq\~</td>
+                    <td>10 or \~eq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Not equals</td>
+                    <td>\~neq\~</td>
+                    <td>\~neq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than</td>
+                    <td>\~gt\~</td>
+                    <td>\~gt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than equals</td>
+                    <td>\~gte\~</td>
+                    <td>\~gte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than</td>
+                    <td>\~lt\~</td>
+                    <td>\~lt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than equals</td>
+                    <td>\~lte\~</td>
+                    <td>\~lte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Between two numbers</td>
+                    <td>\~bt\~</td>
+                    <td>\~bt\~10,20</td>
+                    </tr>
+                    </table>
+                    
+          in: query
+          name: iamChangeEventsCount
+          required: false
+          schema:
+            description: |-
+              The number of IAM change events found for the asset.
+                      <br>
+                      Enter either a number or prefix it with one of these operators:
+                      <table>
+                      <tr>
+                      <th>Operator</th>
+                      <th>Notation</th>
+                      <th>Example</th>
+                      </tr>
+                      <tr>
+                      <td>Equals</td>
+                      <td>No prefix or \~eq\~</td>
+                      <td>10 or \~eq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Not equals</td>
+                      <td>\~neq\~</td>
+                      <td>\~neq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than</td>
+                      <td>\~gt\~</td>
+                      <td>\~gt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than equals</td>
+                      <td>\~gte\~</td>
+                      <td>\~gte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than</td>
+                      <td>\~lt\~</td>
+                      <td>\~lt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than equals</td>
+                      <td>\~lte\~</td>
+                      <td>\~lte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Between two numbers</td>
+                      <td>\~bt\~</td>
+                      <td>\~bt\~10,20</td>
+                      </tr>
+                      </table>
+                      
+            title: Iamchangeeventscount
+            type: string
+        - description: |-
+            The number of related assets affected by the finding.
+                    <br>
+                    Enter either a number or prefix it with one of these operators:
+                    <table>
+                    <tr>
+                    <th>Operator</th>
+                    <th>Notation</th>
+                    <th>Example</th>
+                    </tr>
+                    <tr>
+                    <td>Equals</td>
+                    <td>No prefix or \~eq\~</td>
+                    <td>10 or \~eq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Not equals</td>
+                    <td>\~neq\~</td>
+                    <td>\~neq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than</td>
+                    <td>\~gt\~</td>
+                    <td>\~gt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than equals</td>
+                    <td>\~gte\~</td>
+                    <td>\~gte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than</td>
+                    <td>\~lt\~</td>
+                    <td>\~lt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than equals</td>
+                    <td>\~lte\~</td>
+                    <td>\~lte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Between two numbers</td>
+                    <td>\~bt\~</td>
+                    <td>\~bt\~10,20</td>
+                    </tr>
+                    </table>
+                    
+          in: query
+          name: affectedAssetsCount
+          required: false
+          schema:
+            description: |-
+              The number of related assets affected by the finding.
+                      <br>
+                      Enter either a number or prefix it with one of these operators:
+                      <table>
+                      <tr>
+                      <th>Operator</th>
+                      <th>Notation</th>
+                      <th>Example</th>
+                      </tr>
+                      <tr>
+                      <td>Equals</td>
+                      <td>No prefix or \~eq\~</td>
+                      <td>10 or \~eq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Not equals</td>
+                      <td>\~neq\~</td>
+                      <td>\~neq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than</td>
+                      <td>\~gt\~</td>
+                      <td>\~gt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than equals</td>
+                      <td>\~gte\~</td>
+                      <td>\~gte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than</td>
+                      <td>\~lt\~</td>
+                      <td>\~lt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than equals</td>
+                      <td>\~lte\~</td>
+                      <td>\~lte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Between two numbers</td>
+                      <td>\~bt\~</td>
+                      <td>\~bt\~10,20</td>
+                      </tr>
+                      </table>
+                      
+            title: Affectedassetscount
+            type: string
+        - description: |-
+            The total number of anomalies found for the asset identified that are still applicable today.
+                    <br>
+                    Enter either a number or prefix it with one of these operators:
+                    <table>
+                    <tr>
+                    <th>Operator</th>
+                    <th>Notation</th>
+                    <th>Example</th>
+                    </tr>
+                    <tr>
+                    <td>Equals</td>
+                    <td>No prefix or \~eq\~</td>
+                    <td>10 or \~eq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Not equals</td>
+                    <td>\~neq\~</td>
+                    <td>\~neq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than</td>
+                    <td>\~gt\~</td>
+                    <td>\~gt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than equals</td>
+                    <td>\~gte\~</td>
+                    <td>\~gte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than</td>
+                    <td>\~lt\~</td>
+                    <td>\~lt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than equals</td>
+                    <td>\~lte\~</td>
+                    <td>\~lte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Between two numbers</td>
+                    <td>\~bt\~</td>
+                    <td>\~bt\~10,20</td>
+                    </tr>
+                    </table>
+                    
+          in: query
+          name: allAnomaliesCount
+          required: false
+          schema:
+            description: |-
+              The total number of anomalies found for the asset identified that are still applicable today.
+                      <br>
+                      Enter either a number or prefix it with one of these operators:
+                      <table>
+                      <tr>
+                      <th>Operator</th>
+                      <th>Notation</th>
+                      <th>Example</th>
+                      </tr>
+                      <tr>
+                      <td>Equals</td>
+                      <td>No prefix or \~eq\~</td>
+                      <td>10 or \~eq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Not equals</td>
+                      <td>\~neq\~</td>
+                      <td>\~neq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than</td>
+                      <td>\~gt\~</td>
+                      <td>\~gt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than equals</td>
+                      <td>\~gte\~</td>
+                      <td>\~gte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than</td>
+                      <td>\~lt\~</td>
+                      <td>\~lt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than equals</td>
+                      <td>\~lte\~</td>
+                      <td>\~lte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Between two numbers</td>
+                      <td>\~bt\~</td>
+                      <td>\~bt\~10,20</td>
+                      </tr>
+                      </table>
+                      
+            title: Allanomaliescount
+            type: string
+        - description: |-
+            The total number of threats found for the asset identified that are still applicable today.
+                    <br>
+                    Enter either a number or prefix it with one of these operators:
+                    <table>
+                    <tr>
+                    <th>Operator</th>
+                    <th>Notation</th>
+                    <th>Example</th>
+                    </tr>
+                    <tr>
+                    <td>Equals</td>
+                    <td>No prefix or \~eq\~</td>
+                    <td>10 or \~eq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Not equals</td>
+                    <td>\~neq\~</td>
+                    <td>\~neq\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than</td>
+                    <td>\~gt\~</td>
+                    <td>\~gt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Greater than equals</td>
+                    <td>\~gte\~</td>
+                    <td>\~gte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than</td>
+                    <td>\~lt\~</td>
+                    <td>\~lt\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Less than equals</td>
+                    <td>\~lte\~</td>
+                    <td>\~lte\~10</td>
+                    </tr>
+                    <tr>
+                    <td>Between two numbers</td>
+                    <td>\~bt\~</td>
+                    <td>\~bt\~10,20</td>
+                    </tr>
+                    </table>
+                    
+          in: query
+          name: allThreatsCount
+          required: false
+          schema:
+            description: |-
+              The total number of threats found for the asset identified that are still applicable today.
+                      <br>
+                      Enter either a number or prefix it with one of these operators:
+                      <table>
+                      <tr>
+                      <th>Operator</th>
+                      <th>Notation</th>
+                      <th>Example</th>
+                      </tr>
+                      <tr>
+                      <td>Equals</td>
+                      <td>No prefix or \~eq\~</td>
+                      <td>10 or \~eq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Not equals</td>
+                      <td>\~neq\~</td>
+                      <td>\~neq\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than</td>
+                      <td>\~gt\~</td>
+                      <td>\~gt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Greater than equals</td>
+                      <td>\~gte\~</td>
+                      <td>\~gte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than</td>
+                      <td>\~lt\~</td>
+                      <td>\~lt\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Less than equals</td>
+                      <td>\~lte\~</td>
+                      <td>\~lte\~10</td>
+                      </tr>
+                      <tr>
+                      <td>Between two numbers</td>
+                      <td>\~bt\~</td>
+                      <td>\~bt\~10,20</td>
+                      </tr>
+                      </table>
+                      
+            title: Allthreatscount
+            type: string
+        - description: The field to sort the results by.
+          in: query
+          name: ordering
+          required: false
+          schema:
+            allOf:
+              - description: The order you want to sort the assets.
+                enum:
+                  - item
+                  - '-item'
+                  - accId
+                  - '-accId'
+                  - service
+                  - '-service'
+                  - assetType
+                  - '-assetType'
+                  - isRisky
+                  - '-isRisky'
+                  - colDate
+                  - '-colDate'
+                  - region
+                  - '-region'
+                  - allFindingsCount
+                  - '-allFindingsCount'
+                  - allVulnCount
+                  - '-allVulnCount'
+                  - criticalVulnCount
+                  - '-criticalVulnCount'
+                  - highVulnCount
+                  - '-highVulnCount'
+                  - mediumVulnCount
+                  - '-mediumVulnCount'
+                  - lowVulnCount
+                  - '-lowVulnCount'
+                  - infoVulnCount
+                  - '-infoVulnCount'
+                  - allMisconfigCount
+                  - '-allMisconfigCount'
+                  - highMisconfigCount
+                  - '-highMisconfigCount'
+                  - mediumMisconfigCount
+                  - '-mediumMisconfigCount'
+                  - lowMisconfigCount
+                  - '-lowMisconfigCount'
+                  - allEventsCount
+                  - '-allEventsCount'
+                  - configEventsCount
+                  - '-configEventsCount'
+                  - criticalEventsCount
+                  - '-criticalEventsCount'
+                  - dataChangeEventsCount
+                  - '-dataChangeEventsCount'
+                  - iamChangeEventsCount
+                  - '-iamChangeEventsCount'
+                  - affectedAssetsCount
+                  - '-affectedAssetsCount'
+                  - allAnomaliesCount
+                  - '-allAnomaliesCount'
+                  - allThreatsCount
+                title: Ordering
+                type: string
+            default: '-allMisconfigCount'
+            description: The field to sort the results by.
+            title: Ordering
+        - *ref_3
+        - *ref_4
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  error:
+                    allOf:
+                      - *ref_0
+                    title: Error
+                  request: *ref_1
+                  response:
+                    allOf:
+                      - properties:
+                          count:
+                            default: 0
+                            description: The number of items.
+                            title: Count
+                            type: integer
+                          items:
+                            description: The array of objects in this response. The length of the array is according to the 'count' attribute.
+                            items:
+                              properties:
+                                value:
+                                  description: The list of values in your organization for the filter type you selected.
+                                  title: Value
+                                  type: string
+                              title: AssetSimFilterResponseModel
+                              type: object
+                            title: Items
+                            type: array
+                          paginationInfo: *ref_5
+                          status: *ref_2
+                        required:
+                          - status
+                          - items
+                          - paginationInfo
+                        title: PaginatedResponse[AssetSimFilterResponseModel]
+                        type: object
+                  responseTime:
+                    title: Responsetime
+                    type: number
+                required:
+                  - request
+                title: SpotResponse[PaginatedResponse[AssetSimFilterResponseModel]]
+                type: object
+          description: Successful Response
+        '400':
+          content: {}
+          description: Bad Request
+        '404':
+          description: Not Found
+        '422':
+          content:
+            application/json:
+              schema: *ref_6
+          description: Validation Error
+      summary: Get Asset Sim Filter
+      tags:
+        - Assets
+    parameters: []

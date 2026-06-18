@@ -1,0 +1,1502 @@
+openapi: 3.0.0
+info:
+  version: '1.0'
+  description: |
+    Welcome to the Spot by Flexera OpenAPI Specification.
+    Here you will find REST definitions for all Spot products and platform administration tasks.
+
+    The API is hosted at `https://api.spotinst.io` and requires Bearer Token
+    Authentication.
+
+    For more information on how to use the Spot platform, including user guides,
+    developer guides, concepts, and tutorials, see the external [Spot Documentation](https://docs.flexera.com/spot/).
+  title: Spot by Flexera API - Ocean Automatic Rightsizing
+  x-logo:
+    url: https://spec.dev.spot.io/flexera-spot.png
+    altText: SpotByFlexeraLogo
+    href: https://spec.dev.spot.io
+  contact:
+    email: support@spot.io
+servers:
+  - url: https://api.spotinst.io
+security:
+  - auth: []
+components:
+  securitySchemes:
+    auth:
+      description: |
+        To generate bearer tokens and understand more about Spot by Flexera
+        authentication see the howto for
+        [token creation](https://docs.flexera.com/spot/administration/api/create-api-token)
+        on the Spot Help site.
+
+        ### Organizations and Accounts
+
+        Each Spot account is assigned to an organization and a set of environment Accounts.
+        An account is then linked to a specific cloud provider account.
+
+        Spot accounts are given an ID in the format `act-123abcd` that is sent as a query parameter while performing API calls.
+
+        To locate the account ID navigate to Settings -> Account in the Spot console.
+
+        ### Organizations with a Single Account
+        Each API call you make can be used with or without the account ID.
+
+        ### Organizations with Multiple Accounts
+        Each API call you make should be appended to the account ID. For example:
+
+        GET `https://api.spotinst.io/aws/ec2/group?accountId=act-123de678`
+        This call will return the list of Elastigroups for the specific Account used.
+
+        > NOTE: If no `accountId` is provided, the default (dldest) account for the Organization will be used.
+      type: http
+      scheme: bearer
+    authWithoutAccount:
+      description: |
+        To generate bearer tokens and learn more about Spot by Flexera
+        authentication, see [token creation](https://docs-spot.flexera.com/administration/api/create-api-token).
+      type: http
+      scheme: bearer
+tags:
+  - name: Ocean Automatic Rightsizing
+    description: |
+      New Automatic Rightsizing version available for EKS and AKS only.
+
+      If you wish to learn more about it reach out to our support team.
+paths:
+  /ocean/{oceanId}/rightSizing/rule:
+    post:
+      summary: Create Ocean Rightsizing Rule
+      description: ''
+      operationId: oceanRightsizingRuleCreate
+      tags:
+        - Ocean Automatic Rightsizing
+      parameters:
+        - &ref_7
+          in: path
+          name: oceanId
+          schema:
+            type: string
+          required: true
+          example: o-abcd1234
+          description: |
+            Identifier of the Ocean cluster.
+        - &ref_8
+          in: query
+          name: accountId
+          example: act-123456789
+          description: |
+            The ID of the account associated with your token.
+          schema:
+            type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  title: Ocean Rightsizing Rule
+                  description: |
+                    Determines the Ocean Rightsizing rule
+                  required:
+                    - recommendationApplicationIntervals
+                  properties:
+                    ruleName:
+                      type: string
+                      description: The unique name of the rule
+                      example: dev-rule
+                    restartReplicas:
+                      type: string
+                      description: Enable to sequentially restart pod batches according to recommendations, for all pods, only more than 1 replica, or not any pod.
+                      enum:
+                        - MORE_THAN_ONE_REPLICA
+                        - ALL_MANIFEST
+                        - NO_RESTART
+                      example: ALL_MANIFEST
+                    excludePreliminaryRecommendations:
+                      type: boolean
+                      description: Exclude preliminary recommendations (recommendations based on less than 4 full days of data).
+                      example: false
+                    recommendationApplicationIntervals:
+                      description: Determines the Ocean Rightsizing rule recommendation application intervals
+                      type: array
+                      example:
+                        - repetitionBasis: WEEKLY
+                          weeklyRepetitionBasis:
+                            intervalDays:
+                              - MONDAY
+                              - WEDNESDAY
+                            intervalHours:
+                              startTime: '12:00'
+                              endTime: '14:00'
+                        - repetitionBasis: MONTHLY
+                          monthlyRepetitionBasis:
+                            intervalMonths:
+                              - 2
+                              - 4
+                              - 6
+                            weekOfTheMonth:
+                              - FIRST
+                              - LAST
+                            weeklyRepetitionBasis:
+                              intervalDays:
+                                - MONDAY
+                              intervalHours:
+                                startTime: '03:00'
+                                endTime: '04:00'
+                      items: &ref_1
+                        type: object
+                        title: Ocean Rightsizing Rule Recommendation Application Interval
+                        description: |
+                          Determines the Ocean Rightsizing rule recommendation application interval
+                        properties:
+                          repetitionBasis:
+                            type: string
+                            description: The repetition basis
+                            enum:
+                              - WEEKLY
+                              - MONTHLY
+                          monthlyRepetitionBasis:
+                            type: object
+                            title: Ocean Rightsizing Rule Monthly Repetition Basis
+                            description: |
+                              Determines the Ocean Rightsizing rule monthly repetition basis
+                            properties:
+                              intervalMonths:
+                                type: array
+                                description: |
+                                  Array of the months (in number), when we want to trigger the apply recommendations.
+                                items:
+                                  type: integer
+                                  example: 2
+                              weekOfTheMonth:
+                                type: string
+                                description: |
+                                  Array of the weeks in the month, when we want to trigger the apply recommendations.
+                                enum:
+                                  - FIRST
+                                  - SECOND
+                                  - THIRD
+                                  - FOURTH
+                                  - LAST
+                              weeklyRepetitionBasis: &ref_0
+                                type: object
+                                title: Ocean Rightsizing Rule Weekly Repetition Basis
+                                description: |
+                                  Determines the Ocean Rightsizing rule weekly repetition basis
+                                properties:
+                                  intervalDays:
+                                    type: array
+                                    description: |
+                                      Array of the days of the week, when we want to trigger the apply recommendations.
+                                    items:
+                                      type: string
+                                      enum:
+                                        - SUNDAY
+                                        - MONDAY
+                                        - TUESDAY
+                                        - WEDNESDAY
+                                        - THURSDAY
+                                        - FRIDAY
+                                        - SATURDAY
+                                      example: MONDAY
+                                  intervalHours:
+                                    type: object
+                                    properties:
+                                      startTime:
+                                        type: string
+                                        example: '12:00'
+                                      endTime:
+                                        type: string
+                                        example: '14:00'
+                          weeklyRepetitionBasis: *ref_0
+                    recommendationApplicationMinThreshold: &ref_2
+                      type: object
+                      title: Ocean Rightsizing Rule Recommendation Application Min Threshold
+                      description: |
+                        Determines the extent of difference between current request and recommendation to trigger a change in percentage
+                      properties:
+                        cpuPercentage:
+                          type: number
+                          minimum: 0.05
+                          maximum: 1
+                          default: 0.05
+                          example: 0.412
+                        memoryPercentage:
+                          type: number
+                          minimum: 0.05
+                          maximum: 1
+                          default: 0.05
+                          example: 0.36
+                    recommendationApplicationBoundaries: &ref_3
+                      type: object
+                      title: Ocean Rightsizing Rule Recommendation Application Boundaries
+                      description: |
+                        Determines the Ocean Rightsizing rule recommendation application boundaries.
+                      properties:
+                        cpu:
+                          type: object
+                          properties:
+                            min:
+                              type: integer
+                              description: the minimal value of cpu in vCpu
+                              example: 0
+                            max:
+                              type: integer
+                              description: the maximal value of cpu in vCpu
+                              example: 100
+                        memory:
+                          type: object
+                          properties:
+                            min:
+                              type: integer
+                              description: the minimal value of memory in Gib
+                              minimum: 0
+                              example: 1
+                            max:
+                              type: integer
+                              description: the maximal value of memory in Gib
+                              minimum: 0
+                              example: 80
+                    recommendationApplicationOverheadValues: &ref_4
+                      type: object
+                      title: Ocean Rightsizing Rule Recommendation Application Overhead Values
+                      description: |
+                        Determines the Ocean Rightsizing rule recommendation application overhead values
+                      properties:
+                        cpuPercentage:
+                          type: number
+                          minimum: 0.1
+                          maximum: 1
+                          default: 0.1
+                          example: 0.8
+                        memoryPercentage:
+                          type: number
+                          minimum: 0.1
+                          maximum: 1
+                          default: 0.1
+                          example: 0.5
+                    recommendationApplicationHPA: &ref_5
+                      type: object
+                      title: Ocean Rightsizing Rule Recommendation Application For HPA
+                      description: HPA Rightsizing Rule Recommendation Configuration
+                      properties:
+                        allowHPARecommendations:
+                          type: boolean
+                          description: Determines by the rule if recommendation application is allowed for workloads with HPA definition.
+                          example: true
+                    autoApplyDefinition: &ref_6
+                      type: object
+                      title: Ocean Rightsizing Rule Auto Apply Definition
+                      description: Ocean Rightsizing Rule Auto Apply Configuration
+                      properties:
+                        enabled:
+                          type: boolean
+                          description: Determines if auto apply is enabled.
+                          example: true
+                        namespaces:
+                          type: array
+                          description: A list of namespaces that match the auto-apply rule.
+                          items:
+                            type: string
+                          example:
+                            - namespace1
+                            - namespace2
+                            - namespace3
+                        labels:
+                          type: object
+                          description: |
+                            A set of key-value label pairs used to automatically apply this rule to all workloads in the cluster that match these labels.
+                          example:
+                            app: my-app
+                            environment: production
+                    downsideOnly:
+                      type: boolean
+                      description: When set to 'true', only downscale recommendations will be applied.
+                      default: false
+      responses:
+        '200': &ref_11
+          description: Ocean Rightsizing Rule Create Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - &ref_9
+                    type: object
+                    allOf:
+                      - &ref_14
+                        type: object
+                        properties:
+                          request:
+                            type: object
+                            description: |
+                              Original request properties.
+                            properties:
+                              id:
+                                type: string
+                                example: e593ff58-067d-4340-92f9-8b1c0bad70d7
+                                description: |
+                                  Unique identifier associated with this request.
+                              url:
+                                type: string
+                                description: |
+                                  The URL that was used for the request.
+                              method:
+                                type: string
+                                description: |
+                                  The HTTP **METHOD** used for the request.
+                              timestamp:
+                                type: string
+                                example: '2018-06-20T11:35:01.745Z'
+                                description: |
+                                  When the request was received by Spot.
+                          response:
+                            type: object
+                            description: |
+                              Response package that includes status, type, and any relevant data.
+                            properties:
+                              status:
+                                type: object
+                                properties:
+                                  code:
+                                    type: integer
+                                    example: 200
+                                    description: |
+                                      HTTP status code assigned to this response.
+                                  message:
+                                    type: string
+                                    example: OK
+                                    description: |
+                                      HTTP status message for the respective status code.
+                      - type: object
+                        properties:
+                          response:
+                            type: object
+                            properties:
+                              count:
+                                type: integer
+                                example: 1
+                                description: |
+                                  Size of the data object array.
+                              kind:
+                                type: string
+                                description: |
+                                  The data type of each item in the response.
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /ocean/{oceanId}/rightSizing/rule
+                          method:
+                            example: POST
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items: &ref_10
+                              description: Rightsizing rule
+                              type: object
+                              properties:
+                                oceanId:
+                                  type: string
+                                  example: o-482d9d26
+                                clusterIdentifier:
+                                  type: string
+                                  example: dev-cluster
+                                ruleName:
+                                  type: string
+                                  example: dev-rule
+                                restartReplicas:
+                                  type: string
+                                  description: Enable to sequentially restart pod batches according to recommendations, for all pods, only more than 1 replica, or not any pod.
+                                  enum:
+                                    - MORE_THAN_ONE_REPLICA
+                                    - ALL_MANIFEST
+                                    - NO_RESTART
+                                  example: ALL_MANIFEST
+                                excludePreliminaryRecommendations:
+                                  type: boolean
+                                  description: Exclude preliminary recommendations (recommendations based on less than 4 full days of data).
+                                  example: false
+                                recommendationApplicationIntervals:
+                                  type: array
+                                  example:
+                                    - repetitionBasis: WEEKLY
+                                      weeklyRepetitionBasis:
+                                        intervalDays:
+                                          - MONDAY
+                                          - WEDNESDAY
+                                        intervalHours:
+                                          startTime: '12:00'
+                                          endTime: '14:00'
+                                    - repetitionBasis: MONTHLY
+                                      monthlyRepetitionBasis:
+                                        intervalMonths:
+                                          - 2
+                                          - 4
+                                          - 6
+                                        weekOfTheMonth:
+                                          - FIRST
+                                          - LAST
+                                        weeklyRepetitionBasis:
+                                          intervalDays:
+                                            - MONDAY
+                                          intervalHours:
+                                            startTime: '03:00'
+                                            endTime: '04:00'
+                                  items: *ref_1
+                                recommendationApplicationMinThreshold: *ref_2
+                                recommendationApplicationBoundaries: *ref_3
+                                recommendationApplicationOverheadValues: *ref_4
+                                recommendationApplicationHPA: *ref_5
+                                autoApplyDefinition: *ref_6
+                                downsideOnly:
+                                  type: boolean
+                                  description: When set to 'true', only downscale recommendations will be applied.
+                                  example: false
+                          kind:
+                            example: mcs:ocean:rightsizing:rule
+        '400':
+          description: Bad Request
+    get:
+      summary: List Ocean Rightsizing Rules
+      description: ''
+      operationId: oceanRightsizingRulesList
+      tags:
+        - Ocean Automatic Rightsizing
+      parameters:
+        - *ref_7
+        - *ref_8
+      responses:
+        '200':
+          description: Ocean Rightsizing Rules Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_9
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /ocean/{oceanId}/rightSizing/rule
+                          method:
+                            example: GET
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items: *ref_10
+                          kind:
+                            example: mcs:ocean:rightsizing:rule
+        '400':
+          description: Bad Request
+    delete:
+      summary: Delete Ocean Rightsizing Rules
+      description: ''
+      operationId: oceanRightsizingRuleDelete
+      tags:
+        - Ocean Automatic Rightsizing
+      parameters:
+        - *ref_7
+        - *ref_8
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  title: Ocean Rightsizing Rule Names
+                  description: |
+                    Rightsizing Rule Names to delete.
+                  properties:
+                    ruleNames:
+                      type: array
+                      items:
+                        type: string
+                      example:
+                        - dev-rule
+                        - test-rule
+      responses:
+        '200':
+          description: Ocean Rightsizing Deleted Rule Names Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_9
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /ocean/{oceanId}/rightSizing/rule
+                          method:
+                            example: DELETE
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                ruleNames:
+                                  type: array
+                                  example:
+                                    - dev-rule
+                                    - test-rule
+                                  items:
+                                    type: string
+                          kind:
+                            example: mcs:ocean:rightsizing:rule
+        '400':
+          description: Bad Request
+  /ocean/{oceanId}/rightSizing/rule/{ruleName}:
+    get:
+      summary: Get Ocean Rightsizing Rule
+      description: ''
+      operationId: oceanRightsizingRuleGet
+      tags:
+        - Ocean Automatic Rightsizing
+      parameters:
+        - *ref_7
+        - &ref_12
+          in: path
+          name: ruleName
+          schema:
+            type: string
+          required: true
+          example: dev-rule
+          description: |
+            Identifier of rightsizing rule.
+        - *ref_8
+      responses:
+        '200': *ref_11
+        '400':
+          description: Bad Request
+    put:
+      summary: Update Ocean Rightsizing Rule
+      description: ''
+      operationId: oceanRightsizingRuleUpdate
+      tags:
+        - Ocean Automatic Rightsizing
+      parameters:
+        - *ref_7
+        - *ref_12
+        - *ref_8
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  title: Ocean Rightsizing Rule
+                  description: |
+                    Determines the Ocean Rightsizing rule
+                  required:
+                    - recommendationApplicationIntervals
+                  properties:
+                    restartReplicas:
+                      type: string
+                      description: Enable to sequentially restart pod batches according to recommendations, for all pods, only more than 1 replica, or not any pod.
+                      enum:
+                        - MORE_THAN_ONE_REPLICA
+                        - ALL_MANIFEST
+                        - NO_RESTART
+                      example: ALL_MANIFEST
+                    excludePreliminaryRecommendations:
+                      type: boolean
+                      description: Exclude preliminary recommendations (recommendations based on less than 4 full days of data).
+                      example: false
+                    recommendationApplicationIntervals:
+                      description: Determines the Ocean Rightsizing rule recommendation application intervals
+                      type: array
+                      example:
+                        - repetitionBasis: WEEKLY
+                          weeklyRepetitionBasis:
+                            intervalDays:
+                              - MONDAY
+                              - WEDNESDAY
+                            intervalHours:
+                              startTime: '12:00'
+                              endTime: '14:00'
+                        - repetitionBasis: MONTHLY
+                          monthlyRepetitionBasis:
+                            intervalMonths:
+                              - 2
+                              - 4
+                              - 6
+                            weekOfTheMonth:
+                              - FIRST
+                              - LAST
+                            weeklyRepetitionBasis:
+                              intervalDays:
+                                - MONDAY
+                              intervalHours:
+                                startTime: '03:00'
+                                endTime: '04:00'
+                      items: *ref_1
+                    recommendationApplicationMinThreshold: *ref_2
+                    recommendationApplicationBoundaries: *ref_3
+                    recommendationApplicationOverheadValues: *ref_4
+                    recommendationApplicationHPA: *ref_5
+                    autoApplyDefinition: *ref_6
+                    downsideOnly:
+                      type: boolean
+                      description: When set to 'true', only downscale recommendations will be applied.
+                      default: false
+      responses:
+        '200':
+          description: Ocean Rightsizing Rule Update Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_9
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /ocean/{oceanId}/rightSizing/rule/{ruleName]
+                          method:
+                            example: PUT
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items: *ref_10
+                          kind:
+                            example: mcs:ocean:rightsizing:rule
+        '400':
+          description: Bad Request
+  /ocean/{oceanId}/rightSizing/rule/{ruleName}/attachment:
+    post:
+      summary: Attach Ocean Rightsizing Rule
+      description: ''
+      operationId: oceanRightsizingRuleMatchingAttachment
+      tags:
+        - Ocean Automatic Rightsizing
+      parameters:
+        - *ref_7
+        - *ref_12
+        - *ref_8
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - &ref_13
+                  type: object
+                  properties:
+                    namespaces:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          namespaceName:
+                            type: string
+                            description: List of namespaces
+                            example: kube-system
+                          workloads:
+                            type: array
+                            description: List of workloads
+                            items:
+                              type: object
+                              properties:
+                                name:
+                                  type: string
+                                  description: The name of the workload
+                                  example: kube-proxy
+                                workloadType:
+                                  type: string
+                                  description: The type of the workload
+                                  example: Deployment
+                                regexName:
+                                  type: string
+                                  description: The regex for the workload name
+                                  example: spotinst*
+                            example:
+                              - name: kube-proxy
+                                workloadType: DaemonSet
+                              - regexName: spotinst*
+                                workloadType: Deployment
+      responses:
+        '200':
+          description: Ocean Rightsizing Rule Attachment Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_9
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /ocean/{oceanId}/rightSizing/rule/{ruleName}/attachment
+                          method:
+                            example: POST
+                      response:
+                        type: object
+                        properties:
+                          kind:
+                            type: string
+                            example: mcs:ocean:rightsizing:ruleMatching
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                rulesMatchings:
+                                  type: array
+                                  example:
+                                    - oceanId: o-6ea3032a
+                                      clusterIdentifier: dev-cluster
+                                      namespace: kube-system
+                                      resourceType: Deployment
+                                      name: kube-proxy
+                                      ruleName: dev-rule
+                                      ruleMatching: workloadName:kube-proxy
+                                    - oceanId: o-6ea3032a
+                                      clusterIdentifier: dev-cluster
+                                      namespace: kube-system
+                                      resourceType: Deployment
+                                      name: spotinst-controller
+                                      ruleName: dev-rule
+                                      ruleMatching: regexName:spotinst*
+                                  items:
+                                    description: Rightsizing rule matching of rule to workload
+                                    type: object
+                                    properties:
+                                      oceanId:
+                                        type: string
+                                      clusterIdentifier:
+                                        type: string
+                                      namespace:
+                                        type: string
+                                      resourceType:
+                                        type: string
+                                      name:
+                                        type: string
+                                      ruleName:
+                                        type: string
+                                      ruleMatching:
+                                        type: string
+        '400':
+          description: Bad Request
+  /ocean/{oceanId}/rightSizing/rule/{ruleName}/detachment:
+    post:
+      summary: Detach Ocean Rightsizing Rule
+      description: ''
+      operationId: oceanRightsizingRuleMatchingDetachment
+      tags:
+        - Ocean Automatic Rightsizing
+      parameters:
+        - *ref_7
+        - *ref_12
+        - *ref_8
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - *ref_13
+      responses:
+        '200':
+          description: Ocean Rightsizing Rule Detached Workload Names Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_9
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /ocean/{oceanId}/rightSizing/rule/{ruleName}/detachment
+                          method:
+                            example: POST
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                workloadNames:
+                                  type: array
+                                  example:
+                                    - kube-proxy
+                                    - spotinst-controller
+                                  items:
+                                    type: string
+                          kind:
+                            example: mcs:ocean:rightsizing:rule
+        '400':
+          description: Bad Request
+  /ocean/{oceanId}/rightSizing/recommendations:
+    post:
+      summary: Get Ocean Rightsizing Recommendations
+      description: |
+        Get right-sizing recommendations for an Ocean cluster.
+      operationId: oceanRightsizingRecommendations
+      tags:
+        - Ocean Automatic Rightsizing
+      parameters:
+        - *ref_7
+        - *ref_8
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  title: Ocean Rightsizing Recommendations
+                  description: |
+                    Determines the Ocean Rightsizing recommendations
+                  required:
+                    - clusterResources OR clusterLabels
+                  properties:
+                    clusterResources:
+                      type: object
+                      title: Ocean Rightsizing Recommendation Cluster Resources
+                      description: |
+                        Determines the Ocean Recommendation filtering by the combinations of namespace::workload::containers
+                      properties:
+                        namespaceName:
+                          description: Determines the namespace to filter by with objects of it's workloads
+                          type: object
+                          properties:
+                            workloadName:
+                              description: Determines the workload to filter by with List of it's containers
+                              type: array
+                              items:
+                                type: string
+                                properties:
+                                  containerName:
+                                    type: string
+                                    description: container name
+                                    example: workloadContainer1
+                      example:
+                        namespaceName1:
+                          workloadName1:
+                            - workloadContainer1
+                            - workloadContainer2
+                          workloadName2:
+                            - workloadContainer2
+                            - workloadContainer3
+                        namespaceName2:
+                          workloadName1:
+                            - workloadContainer1
+                            - workloadContainer2
+                    clusterLabels:
+                      type: object
+                      title: Ocean Rightsizing Recommendation Cluster Labels
+                      description: |
+                        Determines the Ocean Recommendation filtering by the combinations of namespace::workloadsLabels
+                      properties:
+                        namespaceName:
+                          description: Determines the namespace to filter by with List of it's workloads labels
+                          type: array
+                          properties:
+                            containerName:
+                              type: string
+                              description: container name
+                              example: workloadContainer1
+                      example:
+                        namespaceName1:
+                          - workloadLabel1
+                          - workloadLabel2
+                          - workloadLabel3
+                        namespaceName2:
+                          - workloadLabel1
+                          - workloadLabel2
+      responses:
+        '200':
+          description: Ocean Rightsizing Recommendation Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_9
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /ocean/o-abcd1234/rightSizing/recommendations
+                          method:
+                            example: POST
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              title: Ocean Rightsizing Recommendation
+                              description: |
+                                Rightsizing Resource Container Recommendation.
+                              properties:
+                                namespace:
+                                  type: string
+                                  description: The namespace of the workload
+                                workloadName:
+                                  type: string
+                                  description: The name of the workload
+                                workloadType:
+                                  type: string
+                                  description: The type of the workload
+                                requestedCPU:
+                                  type: number
+                                  description: The requested cpu
+                                suggestedCPU:
+                                  type: integer
+                                  description: The suggested cpu
+                                requestedMemory:
+                                  type: number
+                                  description: The requested memory
+                                suggestedMemory:
+                                  type: integer
+                                  description: The requested memory
+                                monthlyMaxSavings":
+                                  type: number
+                                  description: The monthly potential savings
+                                ruleName:
+                                  type: string
+                                  description: The name of the attached rule
+                                optimizationStatus:
+                                  type: string
+                                  description: The optimization status of the workload
+                                reasonsForPartialOptimized:
+                                  type: array
+                                  description: The reasons for the partly optimized status
+                                  items:
+                                    type: string
+                                containers:
+                                  type: array
+                                  description: The containers of the workload
+                                  items:
+                                    type: object
+                                    properties:
+                                      name:
+                                        type: string
+                                        description: The name of the container
+                                      requestedCPU:
+                                        type: number
+                                        description: The requested cpu
+                                      suggestedCPU:
+                                        type: integer
+                                        description: The suggested cpu
+                                      requestedMemory:
+                                        type: number
+                                        description: The requested memory
+                                      suggestedMemory:
+                                        type: integer
+                                        description: The requested memory
+                                      preliminary:
+                                        type: boolean
+                                        description: The recommendation is preliminary
+                                      appliedAt:
+                                        type: string
+                                        format: date-time
+                                        description: The timestamp at which the recommendation was applied
+                                appliedAt:
+                                  type: string
+                                  format: date-time
+                                  description: The timestamp at which the recommendation was last applied
+                            example:
+                              - namespace: kube-system
+                                workloadName: redis-controller
+                                workloadType: deployment
+                                requestedCPU: 50
+                                suggestedCPU: 4
+                                requestedMemory: 50
+                                suggestedMemory: 19
+                                monthlyMaxSavings": 17.312044994154263
+                                ruleName: attachedRule
+                                optimizationStatus: PARTLY_OPTIMIZED
+                                reasonsForPartialOptimized:
+                                  - Threshold did not allow us to apply the recommendation
+                                  - The ranges of the rule prevent the apply of the recommendations
+                                  - Recommendation did not perform due to preliminary exclusion
+                                containers:
+                                  - name: dnsmasq
+                                    requestedCPU: 10
+                                    suggestedCPU: 2
+                                    requestedMemory: 40
+                                    suggestedMemory: 15
+                                    preliminary: false
+                                    appliedAt: '2026-04-24T04:55:22.043813'
+                                  - name: sidecar
+                                    requestedCPU: 40
+                                    suggestedCPU: 2
+                                    requestedMemory: 10
+                                    suggestedMemory: 4
+                                    preliminary: true
+                                    appliedAt: '2026-04-24T04:55:22.043813'
+                                appliedAt: '2026-04-24T04:55:22.043813'
+                              - namespace: sparkSpace
+                                workloadName: test-redis
+                                workloadType: deployment
+                                requestedCPU: 50
+                                suggestedCPU: 2
+                                requestedMemory: 30
+                                suggestedMemory: 20
+                                monthlyMaxSavings: 28.258386736965104
+                                ruleName: null
+                                optimizationStatus: NOT_OPTIMIZED
+                                containers:
+                                  - name: dns-controller
+                                    requestedCPU: 20
+                                    suggestedCPU: 1
+                                    requestedMemory: 20
+                                    suggestedMemory: 15
+                                    preliminary: false
+                                    appliedAt: '2026-04-24T04:55:22.043813'
+                                  - name: kubedns
+                                    requestedCPU: 30
+                                    suggestedCPU: 1
+                                    requestedMemory: 10
+                                    suggestedMemory: 5
+                                    preliminary: true
+                                    appliedAt: '2026-04-24T04:55:22.043813'
+                                appliedAt: '2026-04-24T04:55:22.043813'
+                          count:
+                            example: 2
+                          kind:
+                            example: mcs:ocean:rightSizing:recommendations
+        '400':
+          description: Bad Request
+  /ocean/{oceanId}/rightSizing/rollbacks:
+    get:
+      summary: List Ocean Rightsizing Rollbacks
+      description: List the rightsizing rollback for ocean cluster.
+      operationId: oceanRightsizingRollbackList
+      tags:
+        - Ocean Automatic Rightsizing
+      parameters:
+        - *ref_7
+        - *ref_8
+      responses:
+        '200':
+          description: Ocean Rightsizing Rollbacks Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_9
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /ocean/{oceanId}/rightSizing/rollbacks
+                          method:
+                            example: GET
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                clusterIdentifier:
+                                  type: string
+                                  description: The cluster identifier
+                                  example: test-k8s
+                                namespace:
+                                  type: string
+                                  description: The namespace of the workload
+                                  example: kube-system
+                                resourceType:
+                                  type: string
+                                  description: The type of the resource
+                                  example: deployment
+                                resourceName:
+                                  type: string
+                                  description: The name of the resource
+                                  example: resource-name
+                                rollbackType:
+                                  type: string
+                                  description: The type of the rollback
+                                  example: OUT_OF_MEMORY
+                                rollbackTime:
+                                  type: string
+                                  format: date-time
+                                  description: The time of the rollback
+                                  example: 2024-11-01T10:50:29.000+0000
+                                cpuAtRollback:
+                                  type: number
+                                  description: The cpu at the time of the rollback
+                                  example: 0.23
+                                cpuAfterRollback:
+                                  type: number
+                                  description: The cpu after the rollback
+                                  example: 0.33
+                                memoryAtRollback:
+                                  type: number
+                                  description: The memory at the time of the rollback
+                                  example: 128
+                                memoryAfterRollback:
+                                  type: number
+                                  description: The memory after the rollback
+                                  example: 185
+                          kind:
+                            example: mcs:ocean:rightsizing:rollback
+        '400':
+          description: Bad Request
+  /ocean/{oceanId}/rightSizing/rollbacks/acknowledge:
+    post:
+      summary: Acknowledge Rightsizing Rollbacks
+      description: |
+        Acknowledge rightsizing rollbacks For ocean cluster.
+      operationId: AcknowledgeRightsizingRollbacks
+      tags:
+        - Ocean Automatic Rightsizing
+      parameters:
+        - *ref_7
+        - &ref_15
+          in: query
+          name: clusterIdentifier
+          schema:
+            type: string
+          required: true
+          example: dev-cluster
+          description: |
+            Identifier of cluster.
+        - *ref_8
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  properties:
+                    acknowledgeRollbacks:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          namespace:
+                            type: string
+                            description: The namespace of the workload
+                            example: kube-system
+                          resourceType:
+                            type: string
+                            description: The type of the resource
+                            example: deployment
+                          resourceName:
+                            type: string
+                            description: The name of the resource
+                            example: resource-name
+      responses:
+        '200':
+          description: Ocean Rightsizing Acknowledge Rollbacks Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_14
+        '400':
+          description: Bad Request
+  /ocean/{oceanId}/rightSizing/cluster/configuration:
+    post:
+      summary: Set Cluster Recommendations Percentile
+      description: |
+        Set Recommendations Percentile for the Ocean Cluster.
+        <br />
+        <br />
+        **This action can take a few minutes to complete.**
+      operationId: SetClusterRecommendationsPercentile
+      tags:
+        - Ocean Automatic Rightsizing
+      parameters:
+        - *ref_7
+        - *ref_15
+        - *ref_8
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  required:
+                    - config
+                  properties:
+                    config:
+                      type: object
+                      minProperties: 1
+                      properties:
+                        recommendationsCpuPercentile:
+                          type: integer
+                          description: Change the cpu percentile that the right-sizing recommendations calculation will take into account.
+                          example: 85
+                          enum:
+                            - 85
+                            - 90
+                            - 95
+                            - 99
+                        recommendationsMemoryPercentile:
+                          type: integer
+                          description: Change the memory percentile that the right-sizing recommendations calculation will take into account.
+                          example: 85
+                          enum:
+                            - 85
+                            - 90
+                            - 95
+                            - 100
+                        downsideOnly:
+                          type: boolean
+                          description: When set to 'true', only downscale recommendations will be applied.
+                          default: false
+      responses:
+        '200':
+          description: Ocean Cluster Recommendations Percentile Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_9
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /ocean/{oceanId}/rightSizing/cluster/configuration
+                          method:
+                            example: POST
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                oceanId:
+                                  type: string
+                                  example: o-abcd1234
+                                clusterIdentifier:
+                                  type: string
+                                  example: dev-cluster
+                                config:
+                                  type: object
+                                  properties:
+                                    recommendationsCpuPercentile:
+                                      type: integer
+                                      example: 85
+                                    recommendationsMemoryPercentile:
+                                      type: integer
+                                      example: 85
+                                    downsideOnly:
+                                      type: boolean
+                                      example: false
+                          kind:
+                            example: mcs:ocean:rightSizing:clusterConfiguration
+        '400':
+          description: Bad Request
+  /ocean/{oceanId}/rightSizing/savings:
+    post:
+      summary: Get Ocean Right-Sizing Savings
+      description: |
+        Get right-sizing savings from downsizing operations for an Ocean cluster.
+      operationId: oceanRightsizingSavings
+      tags:
+        - Ocean Automatic Rightsizing
+      parameters:
+        - *ref_7
+        - *ref_8
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  title: Ocean Right-Sizing Savings
+                  description: |
+                    Determines the Ocean right-sizing savings
+                  required:
+                    - endTime
+                    - startTime
+                    - workloads
+                  properties:
+                    startTime:
+                      type: string
+                      example: '2025-01-20T11:35:02.745Z'
+                      description: |
+                        Start date value using either the date format "yyyy-MM-dd'T'HH:mm:ss'Z'" or ms "1494751821472".
+                    endTime:
+                      type: string
+                      example: '2025-01-30T11:30:01.745Z'
+                      description: |
+                        End date value using either the date format "yyyy-MM-dd'T'HH:mm:ss'Z'" or ms "1494751821472".
+                    workloads:
+                      title: Ocean Right-Sizing Savings Workloads
+                      description: |
+                        Determines the Ocean Savings filtering by the combinations of namespace::workload
+                      type: object
+                      properties:
+                        namespaceName:
+                          type: object
+                          additionalProperties:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                workloadName:
+                                  type: string
+                                  description: The name of the workload
+                                workloadType:
+                                  type: string
+                                  description: The type of the workload (e.g., Deployment, DaemonSet, StatefulSet)
+                      example:
+                        namespaceName1:
+                          - workloadName: workloadName1
+                            workloadType: Deployment
+                          - workloadName: workloadName2
+                            workloadType: DaemonSet
+                        namespaceName2:
+                          - workloadName: workloadName3
+                            workloadType: StatefulSet
+                          - workloadName: workloadName4
+                            workloadType: Deployment
+      responses:
+        '200':
+          description: Ocean right-sizing savings response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_9
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /ocean/o-abcd1234/rightSizing/savings
+                          method:
+                            example: POST
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              title: Ocean Right-Sizing Savings Response
+                              description: |
+                                Right-sizing savings response object
+                              properties:
+                                totalSavingsSummary:
+                                  type: object
+                                  description: A summary of the savings for all the workloads in the response
+                                  properties:
+                                    cpuWithOcean:
+                                      type: number
+                                    memoryWithOcean:
+                                      type: number
+                                    savings:
+                                      type: number
+                                    percentage:
+                                      type: number
+                                namespacesSavingsSummary:
+                                  type: array
+                                  description: A summary of the savings for each namespace in the response
+                                  items:
+                                    type: object
+                                    properties:
+                                      namespace:
+                                        type: string
+                                      savings:
+                                        type: number
+                                workloadSavings:
+                                  type: array
+                                  description: A list of the savings for each workload in the response
+                                  items:
+                                    type: object
+                                    properties:
+                                      workloadName:
+                                        type: string
+                                      workloadType:
+                                        type: string
+                                      namespace:
+                                        type: string
+                                      cpuWithOcean:
+                                        type: number
+                                      cpuWithoutOcean:
+                                        type: number
+                                      memoryWithOcean:
+                                        type: number
+                                      memoryWithoutOcean:
+                                        type: number
+                                      savings:
+                                        type: number
+                                      isDeleted:
+                                        type: boolean
+                            example:
+                              - totalSavingsSummary:
+                                  cpuWithOcean: 100,
+                                  memoryWithOcean: 128,
+                                  savings: 1000,
+                                  percentage: 0.75
+                                namespacesSavingsSummary:
+                                  - namespace: kube-system
+                                    savings: 500
+                                  - namespace: default
+                                    savings: 500
+                                workloadSavings:
+                                  - workloadName: coredns
+                                    workloadType: Deployment
+                                    namespace: kube-system
+                                    cpuWithOcean: 25
+                                    cpuWithoutOcean: 50
+                                    memoryWithOcean: 32
+                                    memoryWithoutOcean: 64
+                                    savings: 250
+                                    isDeleted: true
+                                  - workloadName: aws-node
+                                    workloadType: DaemonSet
+                                    namespace: kube-system
+                                    cpuWithOcean: 25
+                                    cpuWithoutOcean: 50
+                                    memoryWithOcean: 32
+                                    memoryWithoutOcean: 64
+                                    savings: 250
+                                    isDeleted": false
+                          count:
+                            example: 1
+                          kind:
+                            example: mcs:ocean:rightSizing:savings
+        '400':
+          description: Bad Request

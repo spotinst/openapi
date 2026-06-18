@@ -1,0 +1,384 @@
+openapi: 3.0.0
+info:
+  version: '1.0'
+  description: |
+    Welcome to the Spot by Flexera OpenAPI Specification.
+    Here you will find REST definitions for all Spot products and platform administration tasks.
+
+    The API is hosted at `https://api.spotinst.io` and requires Bearer Token
+    Authentication.
+
+    For more information on how to use the Spot platform, including user guides,
+    developer guides, concepts, and tutorials, see the external [Spot Documentation](https://docs.flexera.com/spot/).
+  title: Spot by Flexera API - Ocean Insights
+  x-logo:
+    url: https://spec.dev.spot.io/flexera-spot.png
+    altText: SpotByFlexeraLogo
+    href: https://spec.dev.spot.io
+  contact:
+    email: support@spot.io
+servers:
+  - url: https://api.spotinst.io
+security:
+  - auth: []
+components:
+  securitySchemes:
+    auth:
+      description: |
+        To generate bearer tokens and understand more about Spot by Flexera
+        authentication see the howto for
+        [token creation](https://docs.flexera.com/spot/administration/api/create-api-token)
+        on the Spot Help site.
+
+        ### Organizations and Accounts
+
+        Each Spot account is assigned to an organization and a set of environment Accounts.
+        An account is then linked to a specific cloud provider account.
+
+        Spot accounts are given an ID in the format `act-123abcd` that is sent as a query parameter while performing API calls.
+
+        To locate the account ID navigate to Settings -> Account in the Spot console.
+
+        ### Organizations with a Single Account
+        Each API call you make can be used with or without the account ID.
+
+        ### Organizations with Multiple Accounts
+        Each API call you make should be appended to the account ID. For example:
+
+        GET `https://api.spotinst.io/aws/ec2/group?accountId=act-123de678`
+        This call will return the list of Elastigroups for the specific Account used.
+
+        > NOTE: If no `accountId` is provided, the default (dldest) account for the Organization will be used.
+      type: http
+      scheme: bearer
+    authWithoutAccount:
+      description: |
+        To generate bearer tokens and learn more about Spot by Flexera
+        authentication, see [token creation](https://docs-spot.flexera.com/administration/api/create-api-token).
+      type: http
+      scheme: bearer
+tags:
+  - name: Ocean Insights
+    description: |
+      Insights allows Spot users on AWS to connect a Kubernetes cluster and within minutes get the cluster analyzed with insights
+      about the current state of infrastructure in the cluster, and the potential effect of migrating the specific cluster into Ocean.
+      Through its powerful features, Ocean presents significant opportunities for infrastructure optimization and automation, which are on display in the Insights console.
+      Connected to Kubernetes clusters and running a continuous analysis, Ocean Insights delivers a holistic picture of your cluster and workloads behavior, from expected cloud costs and resource utilization.
+      Through a simple UI, users will see a breakdown of potential savings when they first connect to Ocean Insights.
+    externalDocs:
+      description: Ocean Insights
+      url: https://docs.flexera.com/spot/ocean-insights/
+paths:
+  /ocean/insights/k8s/cluster:
+    summary: Ocean Insights
+    post:
+      summary: Create Cluster
+      description: |
+        Creates an Ocean Insight entity according to a given specification.
+
+        Prerequisite:
+
+        The Ocean Controller is used to monitor the cluster resources and report back to Ocean. The Ocean Controller is required for Ocean Insights.<br />
+
+        To install the Ocean Controller, complete and run the following script on a machine with the kubectl command line tool installed and configured:
+
+        ```
+        #!/usr/bin/env bash
+        curl -fsSL http://spotinst-public.s3.amazonaws.com/integrations/kubernetes/cluster-controller/scripts/init.sh | \
+        SPOTINST_TOKEN=<ENTER YOUR TOKEN HERE> \
+        SPOTINST_ACCOUNT=<ENTER YOUR SPOTINST ACCOUNT ID HERE> \
+        SPOTINST_CLUSTER_IDENTIFIER=<ENTER YOUR CLUSTER IDENTIFIER HERE> \
+        bash
+        ```
+      operationId: OceanInsightsClusterCreate
+      tags:
+        - Ocean Insights
+      parameters:
+        - &ref_0
+          in: query
+          name: accountId
+          example: act-123456789
+          description: |
+            The ID of the account associated with your token.
+          schema:
+            type: string
+          required: true
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  required:
+                    - cluster
+                  properties:
+                    cluster:
+                      type: object
+                      title: Ocean Insight
+                      required:
+                        - name
+                        - controllerClusterId
+                      properties:
+                        id:
+                          type: string
+                          example: oic-12345abc
+                          readOnly: true
+                          description: |
+                            Ocean Insight Cluster ID.
+                        name:
+                          type: string
+                          example: Ocean::my-ocean-insight-name
+                          description: |
+                            Add a name for the Ocean Insight cluster.
+                        controllerClusterId:
+                          type: string
+                          example: oceanInsight.k8s
+                          description: |
+                            The reporting identifier for the Ocean Controller.
+                        createdAt:
+                          type: string
+                          readOnly: true
+                          format: date-time
+                          example: '2019-06-03T08:13:08.000Z'
+                          description: |
+                            A timestamp of the Ocean insight creation.
+                        updatedAt:
+                          type: string
+                          readOnly: true
+                          format: date-time
+                          example: '2019-06-10T15:06:13.000Z'
+                          description: |
+                            A timestamp of the latest Ocean insight update.
+      responses:
+        '200':
+          description: Ocean Insight Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - &ref_1
+                    type: object
+                    allOf:
+                      - &ref_4
+                        type: object
+                        properties:
+                          request:
+                            type: object
+                            description: |
+                              Original request properties.
+                            properties:
+                              id:
+                                type: string
+                                example: e593ff58-067d-4340-92f9-8b1c0bad70d7
+                                description: |
+                                  Unique identifier associated with this request.
+                              url:
+                                type: string
+                                description: |
+                                  The URL that was used for the request.
+                              method:
+                                type: string
+                                description: |
+                                  The HTTP **METHOD** used for the request.
+                              timestamp:
+                                type: string
+                                example: '2018-06-20T11:35:01.745Z'
+                                description: |
+                                  When the request was received by Spot.
+                          response:
+                            type: object
+                            description: |
+                              Response package that includes status, type, and any relevant data.
+                            properties:
+                              status:
+                                type: object
+                                properties:
+                                  code:
+                                    type: integer
+                                    example: 200
+                                    description: |
+                                      HTTP status code assigned to this response.
+                                  message:
+                                    type: string
+                                    example: OK
+                                    description: |
+                                      HTTP status message for the respective status code.
+                      - type: object
+                        properties:
+                          response:
+                            type: object
+                            properties:
+                              count:
+                                type: integer
+                                example: 1
+                                description: |
+                                  Size of the data object array.
+                              kind:
+                                type: string
+                                description: |
+                                  The data type of each item in the response.
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /ocean/insight/k8s/cluster
+                          method:
+                            example: POST
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items: &ref_2
+                              type: object
+                              description: |
+                                The Ocean Insight cluster.
+                              properties:
+                                id:
+                                  type: string
+                                  readOnly: true
+                                  example: o-134abcd
+                                  description: |
+                                    Ocean Insight cluster ID.
+                                name:
+                                  type: string
+                                  example: test
+                                  description: |
+                                    Ocean Insight cluster name.
+                                controllerClusterId:
+                                  type: string
+                                  example: test-123124
+                                  description: |
+                                    The reporting identifier for the Ocean Controller.
+                                createdAt:
+                                  type: string
+                                  readOnly: true
+                                  format: date-time
+                                  example: '2021-03-17T08:13:08.000Z'
+                                  description: |
+                                    A timestamp of the Ocean creation.
+                                updatedAt:
+                                  type: string
+                                  readOnly: true
+                                  format: date-time
+                                  example: '2021-03-17T15:06:13.000Z'
+                                  description: |
+                                    A timestamp of the latest Ocean update.
+                          kind:
+                            example: spotinst:ocean:insight:k8s
+        '400':
+          description: Bad Request
+    get:
+      summary: List Clusters
+      description: |
+        Get the configurations for all Ocean Insights clusters in the specified account.
+      operationId: OceanInsightsClusterList
+      tags:
+        - Ocean Insights
+      parameters:
+        - *ref_0
+      responses:
+        '200':
+          description: Ocean Insight Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_1
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /ocean/insight/k8s/cluster
+                          method:
+                            example: GET
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items: *ref_2
+                          kind:
+                            example: spotinst:ocean:insight:k8s
+        '400':
+          description: Bad Request
+  /ocean/insights/k8s/cluster/{OCEAN_INSIGHT_ID}:
+    get:
+      summary: Get Cluster
+      description: |
+        Get the configurations for a specified Ocean Insight cluster.
+      operationId: OceanInsightsClusterGet
+      tags:
+        - Ocean Insights
+      parameters:
+        - *ref_0
+        - &ref_3
+          in: path
+          name: OCEAN_INSIGHT_ID
+          schema:
+            type: string
+          required: true
+          example: oic-abcd1234
+          description: |
+            The ID of the Ocean Insight cluster.
+      responses:
+        '200':
+          description: Ocean Insight Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_1
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /ocean/insight/k8s/cluster/oic-12345abc
+                          method:
+                            example: GET
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items: *ref_2
+                          kind:
+                            example: spotinst:ocean:insight:k8s
+        '400':
+          description: Bad Request
+    delete:
+      summary: Delete Cluster
+      description: |
+        Delete a specified Ocean Insight cluster.
+      operationId: OceanInsightClusterDelete
+      tags:
+        - Ocean Insights
+      parameters:
+        - *ref_0
+        - *ref_3
+      responses:
+        '200':
+          description: Ocean Insight Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_4
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /ocean/insight/k8s/cluster/oic-12345abc
+                          method:
+                            example: DELETE
+        '400':
+          description: Bad Request

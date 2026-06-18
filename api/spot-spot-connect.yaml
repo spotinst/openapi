@@ -1,0 +1,3468 @@
+openapi: 3.0.0
+info:
+  version: '1.0'
+  description: |
+    Welcome to the Spot by Flexera OpenAPI Specification.
+    Here you will find REST definitions for all Spot products and platform administration tasks.
+
+    The API is hosted at `https://api.spotinst.io` and requires Bearer Token
+    Authentication.
+
+    For more information on how to use the Spot platform, including user guides,
+    developer guides, concepts, and tutorials, see the external [Spot Documentation](https://docs.flexera.com/spot/).
+  title: Spot by Flexera API - Spot Connect
+  x-logo:
+    url: https://spec.dev.spot.io/flexera-spot.png
+    altText: SpotByFlexeraLogo
+    href: https://spec.dev.spot.io
+  contact:
+    email: support@spot.io
+servers:
+  - url: https://api.spotinst.io
+security:
+  - auth: []
+components:
+  securitySchemes:
+    auth:
+      description: |
+        To generate bearer tokens and understand more about Spot by Flexera
+        authentication see the howto for
+        [token creation](https://docs.flexera.com/spot/administration/api/create-api-token)
+        on the Spot Help site.
+
+        ### Organizations and Accounts
+
+        Each Spot account is assigned to an organization and a set of environment Accounts.
+        An account is then linked to a specific cloud provider account.
+
+        Spot accounts are given an ID in the format `act-123abcd` that is sent as a query parameter while performing API calls.
+
+        To locate the account ID navigate to Settings -> Account in the Spot console.
+
+        ### Organizations with a Single Account
+        Each API call you make can be used with or without the account ID.
+
+        ### Organizations with Multiple Accounts
+        Each API call you make should be appended to the account ID. For example:
+
+        GET `https://api.spotinst.io/aws/ec2/group?accountId=act-123de678`
+        This call will return the list of Elastigroups for the specific Account used.
+
+        > NOTE: If no `accountId` is provided, the default (dldest) account for the Organization will be used.
+      type: http
+      scheme: bearer
+    authWithoutAccount:
+      description: |
+        To generate bearer tokens and learn more about Spot by Flexera
+        authentication, see [token creation](https://docs-spot.flexera.com/administration/api/create-api-token).
+      type: http
+      scheme: bearer
+tags: []
+paths:
+  /connect/executions/formatted_execution/{exe_id}:
+    get:
+      description: Get details for the selected workflow execution.
+      operationId: get_formatted_execution_instance
+      parameters:
+        - &ref_0
+          description: unique execution id
+          in: path
+          name: exe_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  AutomationExecutionId:
+                    description: SSM doc automation execution id.
+                    type: string
+                  AutomationExecutionStatus:
+                    description: Status of execution.
+                    type: string
+                  DocumentName:
+                    description: Name of the workflow
+                    type: string
+                  DocumentVersion:
+                    description: Executed version of the workflow.
+                    type: integer
+                  ExecutedBy:
+                    description: AWS role that executed the workflow.
+                    type: string
+                  ExecutionEndTime:
+                    description: Time at which execution ended.
+                    format: date-time
+                    type: string
+                  ExecutionStartTime:
+                    description: Start time of the execution.
+                    format: date-time
+                    type: string
+                  Mode:
+                    type: string
+                  Outputs:
+                    description: Outputs of the execution.
+                    properties: {}
+                    type: object
+                  Parameters:
+                    description: Runtime parameters for execution.
+                    properties: {}
+                    type: object
+                  PostProcessingCompletedAt:
+                    description: Time at which post processing was completed.
+                    format: date-time
+                    type: string
+                  ResolvedTargets:
+                    properties: {}
+                    type: object
+                  StepExecutions:
+                    description: List of steps in workflow execution.
+                    items:
+                      properties:
+                        Action:
+                          description: Action of the step in the workflow.
+                          type: string
+                        ExecutionEndTime:
+                          description: Time when step execution ended.
+                          format: date-time
+                          type: string
+                        ExecutionStartTime:
+                          description: Time when execution started.
+                          format: date-time
+                          type: string
+                        Inputs:
+                          description: Inputs for the step.
+                          properties: {}
+                          type: object
+                        IsEnd:
+                          description: Indicator for final step.
+                          type: boolean
+                        NextStep:
+                          description: Name of the next step.
+                          type: string
+                        Outputs:
+                          description: Outputs of the step.
+                          properties: {}
+                          type: object
+                        OverriddenParameters:
+                          description: Overridden Parameters of the step.
+                          properties: {}
+                          type: object
+                        StepExecutionId:
+                          description: Unique execution id of the step.
+                          type: string
+                        StepName:
+                          description: Name of the step.
+                          type: string
+                        StepStatus:
+                          description: Status of the step.
+                          type: string
+                        ValidNextSteps:
+                          description: Valid next steps in the workflow.
+                          items:
+                            type: string
+                          type: array
+                      type: object
+                    type: array
+                  Targets:
+                    items:
+                      type: string
+                    type: array
+                  TaskId:
+                    description: Integer id for execution task.
+                    type: integer
+                  TenantId:
+                    description: Tenant id of the owner of the workflow.
+                    type: string
+                  Trigger:
+                    description: User who triggered the workflow.
+                    type: string
+                  WorkflowDeleted:
+                    description: Indicator if workflow is deleted.
+                    type: boolean
+                  WorkspaceId:
+                    description: ID of workspace this workflow belongs to.
+                    type: string
+                type: object
+          description: Success
+        '400':
+          content: {}
+          description: Bad request
+      summary: Get Execution
+      tags:
+        - Connect Executions
+    parameters: []
+  /connect/executions/formatted_execution/{exe_id}/download:
+    get:
+      description: Get link to download details for the selected workflow execution.
+      operationId: get_formatted_execution_instance_download
+      parameters:
+        - *ref_0
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  redirect_url:
+                    description: Redirect url.
+                    type: string
+                type: object
+          description: Success
+        '400':
+          content: {}
+          description: Bad request
+      summary: Get Execution download url
+      tags:
+        - Connect Executions
+    parameters: []
+  /connect/executions/{name}:
+    parameters: []
+    post:
+      description: Start the execution of the selected workflow.
+      operationId: post_workflow_execution
+      parameters:
+        - description: DisplayName of a workflow
+          in: path
+          name: name
+          required: true
+          schema:
+            type: string
+        - description: Selected workflow version
+          in: query
+          name: version
+          schema:
+            type: string
+        - description: Currently selected Workspace ID
+          in: query
+          name: workspace_id
+          schema:
+            type: string
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                properties:
+                  exe_id:
+                    description: Execution ID
+                    type: string
+                type: object
+          description: Created
+        '400':
+          content: {}
+          description: Bad Request
+      summary: Start Execution
+      tags:
+        - Connect Executions
+  /connect/schedules:
+    get:
+      description: List all scheduled workflows of the selected workspace.
+      operationId: get_schedules_list
+      parameters:
+        - description: (optional) filter related schedules to a task
+          in: query
+          name: task_id
+          schema:
+            type: string
+        - &ref_1
+          description: currently selected Workspace ID
+          in: query
+          name: workspace_id
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: &ref_3
+                properties:
+                  items:
+                    description: List of workflow schedules.
+                    items:
+                      properties:
+                        created_at:
+                          description: Time when the schedule was created.
+                          type: string
+                        created_by:
+                          description: Tenant ID for the user who created the schedule.
+                          type: integer
+                        created_by_username:
+                          description: Name of the user who created the schedule.
+                          type: string
+                        enabled:
+                          description: Status of the schedule (true for active and false for inactive).
+                          type: boolean
+                        rule:
+                          description: Rule ID of the schedule
+                          type: string
+                        schedule_expression:
+                          description: CRON expression for the schedule.
+                          type: string
+                        task_id:
+                          description: Task ID for the schedule.
+                          type: integer
+                        workflow:
+                          description: Name of the workflow.
+                          type: string
+                      type: object
+                    type: array
+                type: object
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: List Scheduled Workflows
+      tags:
+        - Connect Schedules
+    parameters: []
+  /connect/schedules/{workflow_name}:
+    delete:
+      description: Delete a selected execution schedule of the selected workflow.
+      operationId: delete_workflow_schedules
+      parameters:
+        - &ref_2
+          description: unique workflow name only
+          in: path
+          name: workflow_name
+          required: true
+          schema:
+            type: string
+        - *ref_1
+        - &ref_4
+          description: version of workflow in schedule
+          in: query
+          name: version
+          schema:
+            type: string
+      responses:
+        '200':
+          content: {}
+          description: Deleted
+        '400':
+          content: {}
+          description: Bad Request
+      summary: Delete Schedule
+      tags:
+        - Connect Schedules
+    get:
+      description: List all execution schedules for the selected workflow.
+      operationId: get_workflow_schedules
+      parameters:
+        - *ref_2
+        - *ref_1
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: *ref_3
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: List Schedules for Workflow
+      tags:
+        - Connect Schedules
+    parameters: []
+    post:
+      description: Create a new execution schedule for the selected workflow.
+      operationId: post_workflow_schedules
+      parameters:
+        - *ref_2
+        - *ref_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                expression:
+                  description: CRON expression of the schedule.
+                  type: string
+                params:
+                  description: Runtime parameters for the workflow.
+                  properties: {}
+                  type: object
+                version:
+                  description: Version of the workflow.
+                  type: integer
+              required:
+                - expression
+                - version
+              type: object
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                properties:
+                  rule_name:
+                    description: Rule ID of the schedule.
+                    type: string
+                type: object
+          description: Created
+        '400':
+          content: {}
+          description: Bad Request
+      summary: Create Schedule
+      tags:
+        - Connect Schedules
+      x-codegen-request-body-name: payload
+    put:
+      description: Enable/disable the status of the selected execution schedule.
+      operationId: put_workflow_schedules
+      parameters:
+        - *ref_2
+        - *ref_1
+        - *ref_4
+      responses:
+        '200':
+          content: {}
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: Update Schedule Status
+      tags:
+        - Connect Schedules
+  /connect/settings/apikeys:
+    get:
+      description: Endpoint to fetch list of API Keys and its values.
+      operationId: get_settings_api_keys
+      parameters:
+        - &ref_7
+          description: Disable redacting API keys
+          in: query
+          name: disable_redact
+          schema:
+            type: string
+        - &ref_5
+          description: Currently selected Workspace ID
+          in: query
+          name: workspace_id
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  body:
+                    allOf:
+                      - properties:
+                          apikeys:
+                            description: List of API keys.
+                            items: &ref_8
+                              properties:
+                                ApikeyName:
+                                  description: API key name.
+                                  type: string
+                                CreatedDate:
+                                  description: API key creation date.
+                                  format: date-time
+                                  type: string
+                                Value:
+                                  description: API key value.
+                                  type: string
+                              type: object
+                            type: array
+                        type: object
+                    description: Response body.
+                    type: object
+                  statusCode:
+                    description: HTTP status code.
+                    type: integer
+                type: object
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: List API Keys
+      tags:
+        - Connect Settings
+    parameters: []
+  /connect/settings/apikeys/{apikey_name}:
+    delete:
+      description: Endpoint to delete an API Key.
+      operationId: delete_settings_api_key_item
+      parameters:
+        - &ref_6
+          description: API key name
+          in: path
+          name: apikey_name
+          required: true
+          schema:
+            type: string
+        - *ref_5
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: &ref_10
+                properties:
+                  body:
+                    allOf:
+                      - &ref_9
+                        properties:
+                          message:
+                            description: Success message.
+                            type: string
+                        type: object
+                    description: Response body.
+                    type: object
+                  statusCode:
+                    description: HTTP status code.
+                    type: integer
+                type: object
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: Delete API Key
+      tags:
+        - Connect Settings
+    get:
+      description: Endpoint to fetch the selected API key's information from the selected workspace.
+      operationId: get_settings_api_key_item
+      parameters:
+        - *ref_6
+        - *ref_7
+        - *ref_5
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  body:
+                    allOf:
+                      - *ref_8
+                    description: Response body.
+                    type: object
+                  statusCode:
+                    description: HTTP status code.
+                    type: integer
+                type: object
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+        '500':
+          content: {}
+          description: Internal Server Error
+      summary: Get API Key
+      tags:
+        - Connect Settings
+    parameters: []
+    post:
+      description: Endpoint to create a new API Key.
+      operationId: post_settings_api_key_item
+      parameters:
+        - *ref_6
+        - *ref_5
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                properties:
+                  body:
+                    allOf:
+                      - allOf:
+                          - *ref_9
+                          - properties:
+                              value:
+                                description: API key value.
+                                type: string
+                            type: object
+                    description: Response body.
+                    type: object
+                  statusCode:
+                    description: HTTP status code.
+                    type: integer
+                type: object
+          description: Created
+        '400':
+          content: {}
+          description: Bad Request
+      summary: Create API Key
+      tags:
+        - Connect Settings
+    put:
+      description: Move the API key to the new workspace.
+      operationId: put_settings_api_key_item
+      parameters:
+        - *ref_6
+        - *ref_5
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: *ref_10
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: Update API Key
+      tags:
+        - Connect Settings
+  /connect/settings/available/{service}:
+    parameters: []
+    post:
+      description: |-
+        Checks whether given Alias name is available for use
+        for the selected service in the current organization.
+      operationId: post_setting_check_alias
+      parameters:
+        - &ref_16
+          description: Name of connector service (value=ansible|apikeys|bitbucket|datadog|git|humio|instana|jira|opsgenie|aws_health|pagerduty|prometheus|pulumi|slack|splunk|splunk_on_call|spot|squadcast|terraform|terraform_cli|twilio|zoom)
+          in: path
+          name: service
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                alias:
+                  description: The alias to check availability for.
+                  type: string
+              required:
+                - alias
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  body:
+                    allOf:
+                      - properties:
+                          alias:
+                            description: The alias that was checked for availability.
+                            type: string
+                          available:
+                            description: Whether the alias is available for use. True for available and false for not available.
+                            type: boolean
+                          message:
+                            description: A message indicating the availability of the alias.
+                            type: string
+                        type: object
+                    description: Response body.
+                    type: object
+                  statusCode:
+                    description: HTTP status code.
+                    type: integer
+                type: object
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: Get Alias Name Availability
+      tags:
+        - Connect Settings
+      x-codegen-request-body-name: payload
+  /connect/settings/connectors:
+    get:
+      description: |-
+        Retrieve a list of all enabled connectors (integration or resource), excluding those that are
+        exclusively trigger-based. For each connector, extract essential settings from its schema and
+        determine a boolean status indicating whether it's configured or not.
+      operationId: get_settings_connector_discovery
+      parameters:
+        - *ref_5
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  body:
+                    allOf:
+                      - properties:
+                          ansible:
+                            allOf:
+                              - &ref_11
+                                properties:
+                                  coming_soon:
+                                    description: Whether the connector is coming soon. True for coming soon and false if connector is active.
+                                    type: boolean
+                                  connector_type:
+                                    description: Type of connector (Integration, Resource, Cloud).
+                                    type: string
+                                  connectors:
+                                    items:
+                                      description: List of integrations this connector depends on.
+                                      type: string
+                                    type: array
+                                  display_name:
+                                    description: Display name of the connector.
+                                    type: string
+                                  is_configured:
+                                    description: Whether the connector is configured. True if configured and false for not configured.
+                                    type: boolean
+                                  is_trigger:
+                                    description: Whether the connector is trigger-based. True for trigger based and false for not trigger based.
+                                    type: boolean
+                                type: object
+                            description: ansible connector details.
+                            type: object
+                          apikeys:
+                            allOf:
+                              - *ref_11
+                            description: apikeys connector details.
+                            type: object
+                          aws:
+                            allOf:
+                              - *ref_11
+                            description: aws connector details.
+                            type: object
+                          aws_health:
+                            allOf:
+                              - *ref_11
+                            description: aws_health connector details.
+                            type: object
+                          azure:
+                            allOf:
+                              - *ref_11
+                            description: azure connector details.
+                            type: object
+                          azure_openai:
+                            allOf:
+                              - *ref_11
+                            description: azure_openai connector details.
+                            type: object
+                          bitbucket:
+                            allOf:
+                              - *ref_11
+                            description: bitbucket connector details.
+                            type: object
+                          cloudformation:
+                            allOf:
+                              - *ref_11
+                            description: cloudformation connector details.
+                            type: object
+                          datadog:
+                            allOf:
+                              - *ref_11
+                            description: datadog connector details.
+                            type: object
+                          eks:
+                            allOf:
+                              - *ref_11
+                            description: eks connector details.
+                            type: object
+                          elasticsearch:
+                            allOf:
+                              - *ref_11
+                            description: elasticsearch connector details.
+                            type: object
+                          gcp:
+                            allOf:
+                              - *ref_11
+                            description: gcp connector details.
+                            type: object
+                          git:
+                            allOf:
+                              - *ref_11
+                            description: git connector details.
+                            type: object
+                          gke:
+                            allOf:
+                              - *ref_11
+                            description: gke connector details.
+                            type: object
+                          http:
+                            allOf:
+                              - *ref_11
+                            description: http connector details.
+                            type: object
+                          humio:
+                            allOf:
+                              - *ref_11
+                            description: humio connector details.
+                            type: object
+                          instana:
+                            allOf:
+                              - *ref_11
+                            description: instana connector details.
+                            type: object
+                          jenkins:
+                            allOf:
+                              - *ref_11
+                            description: jenkins connector details.
+                            type: object
+                          jira:
+                            allOf:
+                              - *ref_11
+                            description: jira connector details.
+                            type: object
+                          new_relic:
+                            allOf:
+                              - *ref_11
+                            description: new_relic connector details.
+                            type: object
+                          opsgenie:
+                            allOf:
+                              - *ref_11
+                            description: opsgenie connector details.
+                            type: object
+                          pagerduty:
+                            allOf:
+                              - *ref_11
+                            description: pagerduty connector details.
+                            type: object
+                          prometheus:
+                            allOf:
+                              - *ref_11
+                            description: prometheus connector details.
+                            type: object
+                          pulumi:
+                            allOf:
+                              - *ref_11
+                            description: pulumi connector details.
+                            type: object
+                          s3:
+                            allOf:
+                              - *ref_11
+                            description: s3 connector details.
+                            type: object
+                          servicenow:
+                            allOf:
+                              - *ref_11
+                            description: servicenow connector details.
+                            type: object
+                          slack:
+                            allOf:
+                              - *ref_11
+                            description: slack connector details.
+                            type: object
+                          sns:
+                            allOf:
+                              - *ref_11
+                            description: sns connector details.
+                            type: object
+                          splunk:
+                            allOf:
+                              - *ref_11
+                            description: splunk connector details.
+                            type: object
+                          splunk_on_call:
+                            allOf:
+                              - *ref_11
+                            description: splunk_on_call connector details.
+                            type: object
+                          spot:
+                            allOf:
+                              - *ref_11
+                            description: spot connector details.
+                            type: object
+                          spot_security:
+                            allOf:
+                              - *ref_11
+                            description: spot_security connector details.
+                            type: object
+                          ssh:
+                            allOf:
+                              - *ref_11
+                            description: ssh connector details.
+                            type: object
+                          sumologic:
+                            allOf:
+                              - *ref_11
+                            description: sumologic connector details.
+                            type: object
+                          terraform:
+                            allOf:
+                              - *ref_11
+                            description: terraform connector details.
+                            type: object
+                          terraform_cli:
+                            allOf:
+                              - *ref_11
+                            description: terraform_cli connector details.
+                            type: object
+                          twilio:
+                            allOf:
+                              - *ref_11
+                            description: twilio connector details.
+                            type: object
+                          zendesk:
+                            allOf:
+                              - *ref_11
+                            description: zendesk connector details.
+                            type: object
+                        type: object
+                    description: Response body.
+                    type: object
+                  statusCode:
+                    description: HTTP status code.
+                    type: integer
+                type: object
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+        '404':
+          content: {}
+          description: Not Found
+      summary: List Enabled Connectors
+      tags:
+        - Connect Settings
+    parameters: []
+  /connect/settings/jira/finish_oauth:
+    parameters: []
+    post:
+      description: API for status of Jira OAuth approval by Customer (Jira administrator).
+      operationId: post_jira_auth_settings
+      parameters:
+        - &ref_13
+          description: URL of the Jira instance.
+          in: query
+          name: jira_url
+          schema:
+            type: string
+        - description: The request token provided by Jira for the integration.
+          in: query
+          name: req_token
+          schema:
+            type: string
+        - description: The request token secret provided by Jira for the integration.
+          in: query
+          name: req_token_secret
+          schema:
+            type: string
+        - &ref_12
+          description: Slack integration alias.
+          in: query
+          name: alias
+          schema:
+            type: string
+        - *ref_5
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  body:
+                    allOf:
+                      - allOf:
+                          - *ref_9
+                          - properties:
+                              status:
+                                description: Integration status. 'Successful' if the integration was created successfully; otherwise, an error message indicating the failure reason.
+                                type: string
+                            type: object
+                    description: Response body.
+                    type: object
+                  statusCode:
+                    description: HTTP status code.
+                    type: integer
+                type: object
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+        '403':
+          content: {}
+          description: Forbidden
+      summary: Authenticate Jira Integration
+      tags:
+        - Connect Settings
+  /connect/settings/jira/integration_url:
+    get:
+      description: This API is used to fetch Jira authorization URL.
+      operationId: get_jira_settings
+      parameters:
+        - *ref_12
+        - *ref_13
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  body:
+                    allOf:
+                      - properties:
+                          alias:
+                            description: Alias for the Jira integration.
+                            type: string
+                          jira_url:
+                            description: The URL of your Jira instance.
+                            type: string
+                          req_token:
+                            description: The request token provided by Jira for the integration.
+                            type: string
+                          req_token_secret:
+                            description: The request token secret provided by Jira for the integration.
+                            type: string
+                        type: object
+                    description: Response body.
+                    type: object
+                  statusCode:
+                    description: HTTP status code.
+                    type: integer
+                type: object
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: Get Jira Authorization URL
+      tags:
+        - Connect Settings
+    parameters: []
+  /connect/settings/plans:
+    get:
+      description: Fetch various Spot Connect plan details with quotas and pricing.
+      operationId: get_plan_details
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  body:
+                    allOf:
+                      - properties:
+                          commercial:
+                            allOf:
+                              - &ref_14
+                                properties:
+                                  execution_limit:
+                                    description: Execution limit for the plan.
+                                    type: integer
+                                  pricing:
+                                    description: Pricing for the plan.
+                                    type: integer
+                                  workflow_limit:
+                                    description: Workflow limit for the plan.
+                                    type: integer
+                                type: object
+                            description: Commercial plan details.
+                            type: object
+                          free:
+                            allOf:
+                              - *ref_14
+                            description: Free plan details.
+                            type: object
+                          internal:
+                            allOf:
+                              - *ref_14
+                            description: Internal plan details.
+                            type: object
+                          team:
+                            allOf:
+                              - *ref_14
+                            description: Team plan details.
+                            type: object
+                        type: object
+                    description: Response body.
+                    type: object
+                  statusCode:
+                    description: HTTP status code.
+                    type: integer
+                type: object
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: Get Spot Connect Plans
+      tags:
+        - Connect Settings
+    parameters: []
+  /connect/settings/public_ips:
+    get:
+      description: Returns a list of public IPs for customers to whitelist.
+      operationId: get_settings_public_i_ps
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  body:
+                    allOf:
+                      - properties:
+                          ips:
+                            items:
+                              description: List of IP addresses.
+                              type: string
+                            type: array
+                        type: object
+                    description: Response body.
+                    type: object
+                  statusCode:
+                    description: HTTP status code.
+                    type: integer
+                type: object
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: List Public IPs
+      tags:
+        - Connect Settings
+    parameters: []
+  /connect/settings/quotas:
+    get:
+      description: Fetch quotas for organization and provide information on their limits and current status.
+      operationId: get_quota_list
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  body:
+                    allOf:
+                      - properties:
+                          current_tier:
+                            description: Current plan tier.
+                            type: string
+                          executions:
+                            allOf:
+                              - &ref_15
+                                properties:
+                                  available:
+                                    description: Available number of workflows/executions in current plan.
+                                    type: integer
+                                  current_usage:
+                                    description: Total number of workflows/executions in current plan.
+                                    type: integer
+                                  workflow_limit:
+                                    description: Total limit of workflows/executions in current plan.
+                                    type: integer
+                                type: object
+                            description: Current plan's execution details.
+                            type: object
+                          plan_renew:
+                            description: Plan renewal date.
+                            format: date-time
+                            type: string
+                          workflows:
+                            allOf:
+                              - *ref_15
+                            description: Current plan's workflow details.
+                            type: object
+                        type: object
+                    description: Response body.
+                    type: object
+                  statusCode:
+                    description: HTTP status code.
+                    type: integer
+                type: object
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: Get Quotas
+      tags:
+        - Connect Settings
+    parameters: []
+  /connect/settings/schema/{service}:
+    get:
+      description: Get the JSON schema for the given integration or resource.
+      operationId: get_setting_schema
+      parameters:
+        - *ref_16
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  body:
+                    allOf:
+                      - properties:
+                          schema:
+                            description: The JSON schema for the value.
+                            properties: {}
+                            type: object
+                        type: object
+                    description: Response body.
+                    type: object
+                  statusCode:
+                    description: HTTP status code.
+                    type: integer
+                type: object
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: Get Schema
+      tags:
+        - Connect Settings
+    parameters: []
+  /connect/settings/slack/finish_oauth:
+    parameters: []
+    post:
+      description: |-
+        After the user installs/authorizes the Spot Connect Slack app in their workspace,
+        they will be redirected back to the Slack integration page in the Fylamynt web app
+        with an authorization code. The web app will then call this API endpoint with that
+        'code' in the query parameter. Instead, if the user rejects to authorize the Fylamynt
+        Slack app in their workspace, the API request from the web app will contain the
+        'error' code (e.g., error=access_denied) returned from Slack. The following code
+        processes the request and returns success or failure response to the web app.
+        Slack instance alias is part of 'state' query parameter, previously 'state' query
+        parameter contained subdomain.
+      operationId: post_slack_o_auth_post_install
+      parameters:
+        - description: Error message.  Provide either code or an error message, but not both.
+          in: query
+          name: error
+          schema:
+            type: string
+        - description: Slack authorization code. Provide either code or an error message, but not both.
+          in: query
+          name: code
+          schema:
+            type: string
+        - description: Alias of the Slack integration
+          in: query
+          name: state
+          required: true
+          schema:
+            type: string
+        - *ref_5
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: *ref_10
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+        '404':
+          content: {}
+          description: Not Found
+        '500':
+          content: {}
+          description: Internal Server Error
+      summary: Authenticate Slack Integration
+      tags:
+        - Connect Settings
+  /connect/settings/slack/integration_url:
+    get:
+      description: |-
+        This API is used to retrieve the Slack integration URL.
+        The integration_id URI parameter is optional for this API.
+      operationId: get_slack_integration_url
+      parameters:
+        - *ref_12
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  body:
+                    allOf:
+                      - properties:
+                          integration_url:
+                            description: Integration URL of the selected integration.
+                            type: string
+                        type: object
+                    description: Response body.
+                    type: object
+                  statusCode:
+                    description: HTTP status code.
+                    type: integer
+                type: object
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+        '500':
+          content: {}
+          description: Internal Server Error
+      summary: Get Slack Integration URL
+      tags:
+        - Connect Settings
+    parameters: []
+  /connect/settings/triggers:
+    get:
+      description: |-
+        Endpoint to fetch the list of trigger connectors each containing the name, display name, snippet name, and
+        configuration status of the respective connector.
+      operationId: get_trigger_connector_discovery
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  body:
+                    allOf:
+                      - properties:
+                          triggers:
+                            items:
+                              allOf:
+                                - properties:
+                                    display_name:
+                                      description: Display name of the trigger.
+                                      type: string
+                                    is_configured:
+                                      description: Boolean for the integration status of the connector (This is deprecated and now the value is set to True always).
+                                      type: boolean
+                                    name:
+                                      description: System name of the trigger service (including the 'manual' option).
+                                      type: string
+                                    snippet_name:
+                                      description: Name of the associated snippet to load as the first anchor node in the Editor.
+                                      type: string
+                                  type: object
+                              description: List of triggers.
+                              type: object
+                            type: array
+                        type: object
+                    description: Response body.
+                    type: object
+                  statusCode:
+                    description: HTTP status code.
+                    type: integer
+                type: object
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: List Trigger Connectors
+      tags:
+        - Connect Settings
+    parameters: []
+  /connect/settings/zoom/finish_oauth:
+    parameters: []
+    post:
+      description: |-
+        authorization code in the query parameter. Once we receive this request,
+        we will use the auth code and exchange it for an OAuth token with a
+        request type 'authorization_code' by calling back to Zoom.
+        If we successfully exchange the auth code for a token, we will then save
+        the returned 'refresh_token' to secrets manager.
+      operationId: post_zoom_o_auth_post_install
+      responses:
+        '200':
+          content: {}
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: The Fylamynt web app will make a POST request to this endpoint that contains an
+      tags:
+        - Connect Settings
+  /connect/settings/zoom/integration_url:
+    get:
+      operationId: get_zoom_integration_url
+      responses:
+        '200':
+          content: {}
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: This API is used for fetching the Zoom app integration URL
+      tags:
+        - Connect Settings
+    parameters: []
+  /connect/settings/{service}:
+    get:
+      description: Get the list of instances for a given service.
+      operationId: get_setting_items
+      parameters:
+        - *ref_16
+        - *ref_7
+        - *ref_5
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  body:
+                    description: List of integrations. The body contains a list of integration credentials.
+                    items:
+                      properties: {}
+                      type: object
+                    type: array
+                  statusCode:
+                    description: HTTP status code.
+                    type: integer
+                type: object
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: List Integration Instances
+      tags:
+        - Connect Settings
+    parameters: []
+    post:
+      description: |-
+        Create a new secret for a given service.
+
+        The `Example model` contains models for all services that can be created.
+        When calling this endpoint for a specific service, only the credentials
+        for that service should be provided in the payload.
+
+        The payload should be structured with the credentials inside a 'credentials' key.
+        For example, for an S3 integration:
+
+        {
+            "credentials": {
+                "alias": "my-s3-integration",
+                "target": "my-target",
+                "name": "my-bucket-name"
+            }
+        }
+
+        Not all fields from all_input_models need to be sent in the payload,
+        only those relevant to the specific service being created.
+
+        Response will be the instance credentials that was created.
+      operationId: post_setting_items
+      parameters:
+        - *ref_16
+        - *ref_5
+      requestBody:
+        content:
+          application/json:
+            schema: &ref_20
+              properties:
+                ansible:
+                  properties:
+                    alias:
+                      description: Alias for Ansible integration instance.
+                      type: string
+                    logs:
+                      description: Optional S3 bucket for execution logs. If not given, the logs will be uploaded to the same S3 bucket with the playbooks.
+                      type: string
+                    playbooks:
+                      description: S3 bucket with playbooks directory.
+                      type: string
+                    s3_access_role:
+                      description: Fylamynt IAM role for bucket policy in target account.
+                      type: string
+                    ssh_private_key:
+                      description: Ansible Controller Private ssh key.
+                      type: string
+                  type: object
+                azure_openai:
+                  properties:
+                    alias:
+                      description: Alias for OpenAI integration instance.
+                      type: string
+                    api_key:
+                      description: API Key for your API.
+                      type: string
+                    azure_endpoint:
+                      description: Azure Endpoint for your OpenAI service API.
+                      type: string
+                    model:
+                      description: The deployment Name of the model deployed in user's Azure OpenAI Service.
+                      type: string
+                  type: object
+                bitbucket:
+                  properties:
+                    access_token:
+                      description: Bitbucket Cloud Access Token for authentication using Access Token.
+                      type: string
+                    alias:
+                      description: Alias for Bitbucket repo instance.
+                      type: string
+                    url:
+                      description: 'Bitbucket repository URL, ex: Bitbucket personal repo -> `https://bitbucket.org/<username>/<repo-name>` for Bitbucket workspace repo -> `https://bitbucket.org/<workspace-name>/<repo-name>`.'
+                      type: string
+                  type: object
+                cloudformation:
+                  properties:
+                    alias:
+                      description: Alias for Cloudformation template.
+                      type: string
+                    filePath:
+                      description: Absolute filepath of template file.
+                      type: string
+                    ref:
+                      description: 'Github commit ref, (ie: main/master).'
+                      type: string
+                    repoId:
+                      description: The GitHub repo as a source for the Cloudformation template.
+                      type: string
+                  type: object
+                datadog:
+                  properties:
+                    alias:
+                      description: Alias for Datadog integration instance.
+                      type: string
+                    api_key:
+                      description: Datadog API key for your org.
+                      type: string
+                    app_key:
+                      description: Datadog application key for your org.
+                      type: string
+                  type: object
+                eks:
+                  properties:
+                    alias:
+                      description: Alias for EKS Permissions resource instance.
+                      type: string
+                    role_arn:
+                      description: IAM Role ARN to be used for the EKS cluster.
+                      type: string
+                    target:
+                      description: AWS Target Account for the EKS Cluster Role.
+                      type: string
+                  type: object
+                elasticsearch:
+                  properties:
+                    alias:
+                      description: Alias for Datadog integration instance.
+                      type: string
+                    api_key_id:
+                      description: Elasticsearch API key id.
+                      type: string
+                    api_key_value:
+                      description: Elasticsearch API key value.
+                      type: string
+                    cloud_id:
+                      description: Unique Id to configure your client to work with your Elastic Cloud deployment.
+                      type: string
+                  type: object
+                git:
+                  properties:
+                    access_token:
+                      description: Github Access Token for authentication using Access Token.
+                      type: string
+                    alias:
+                      description: Alias for GitHub repo instance.
+                      type: string
+                    url:
+                      description: 'Git repository URL, ex: GitHub personal repo -> `https://github.com/<username>/<repo-name>` for Organization repo -> `https://github.com/<org-name>/<repo-name>`.'
+                      type: string
+                  type: object
+                gke:
+                  properties:
+                    alias:
+                      description: Alias for GKE integration instance.
+                      type: string
+                    service_account_key:
+                      description: Provide Service Account Key in JSON Format.
+                      type: string
+                  type: object
+                http:
+                  properties:
+                    alias:
+                      description: Alias for Http Endpoint integration instance.
+                      type: string
+                    api_key:
+                      description: API Key for authentication.
+                      type: string
+                    authorization_type:
+                      description: Select a method for HTTP request authorization.
+                      type: string
+                    password:
+                      description: Password for authentication.
+                      type: string
+                    token:
+                      description: Bearer token for authentication.
+                      type: string
+                    url:
+                      description: A valid URL string based on the secure HTTPS protocol is required.
+                      type: string
+                    username:
+                      description: Username for authentication.
+                      type: string
+                  type: object
+                humio:
+                  properties:
+                    alias:
+                      description: Alias for Humio integration instance.
+                      type: string
+                    humio_api_token:
+                      description: API Token obtained from Humio.
+                      type: string
+                    humio_url:
+                      description: 'Provide Humio Cloud URL, example: https://cloud.us.humio.com.'
+                      type: string
+                  type: object
+                jenkins:
+                  properties:
+                    alias:
+                      description: Alias for Jenkins integration instance.
+                      type: string
+                    api_token:
+                      description: API Token from authorized user.
+                      type: string
+                    server_url:
+                      description: Jenkins server url:port.
+                      type: string
+                    username:
+                      description: Jenkins Username associated with the token.
+                      type: string
+                  type: object
+                jira:
+                  properties:
+                    JIRA_ACCESS_TOKEN:
+                      description: Jira Access Token.
+                      type: string
+                    JIRA_CONSUMER_KEY:
+                      description: Consumer Key for Fylamynt Application in Jira.
+                      type: string
+                    JIRA_CONSUMER_NAME:
+                      description: Consumer Name for Fylamynt Application in Jira.
+                      type: string
+                    JIRA_KEY_CERT:
+                      description: Jira Key Certificate.
+                      type: string
+                    JIRA_PUBLIC_KEY:
+                      description: Public Key for Fylamynt Application in Jira.
+                      type: string
+                    JIRA_TOKEN_SECRET:
+                      description: Jira Token Secret.
+                      type: string
+                    JIRA_URL:
+                      description: URL of your Jira account.
+                      type: string
+                    alias:
+                      description: Alias for Jira integration instance.
+                      type: string
+                  type: object
+                new_relic:
+                  properties:
+                    account_id:
+                      description: Unique account id to recognize your new relic account.
+                      type: integer
+                    alias:
+                      description: Alias for New Relic integration instance.
+                      type: string
+                    api_key:
+                      description: New Relic API key.
+                      type: string
+                  type: object
+                pagerduty:
+                  properties:
+                    alias:
+                      description: Alias for PagerDuty integration instance.
+                      type: string
+                    pagerduty_api_token:
+                      description: API Token obtained from PagerDuty.
+                      type: string
+                  type: object
+                pulumi:
+                  properties:
+                    access_token:
+                      description: Pulumi Access Token.
+                      type: string
+                    alias:
+                      description: Alias for Pulumi integration instance.
+                      type: string
+                    backend:
+                      description: S3 bucket with Pulumi Config.
+                      type: string
+                    passphrase:
+                      description: Passphrase for accessing Pulumi Config.
+                      type: string
+                    team:
+                      description: Pulumi Organization.
+                      type: string
+                  type: object
+                s3:
+                  properties:
+                    alias:
+                      description: Alias for S3 integration instance.
+                      type: string
+                    name:
+                      description: S3 bucket name.
+                      type: string
+                    target:
+                      description: Select an AWS Target Account for the S3 bucket.
+                      type: string
+                  type: object
+                servicenow:
+                  properties:
+                    alias:
+                      description: Alias for ServiceNow integration instance.
+                      type: string
+                    instance_url:
+                      description: ServiceNow instance URL.
+                      type: string
+                    password:
+                      description: Password for authorized user on ServiceNow instance.
+                      type: string
+                    username:
+                      description: Username for authorized user on ServiceNow instance.
+                      type: string
+                  type: object
+                slack:
+                  properties:
+                    access_token:
+                      description: Slack OAuth2 token.
+                      type: string
+                    alias:
+                      description: Alias for Slack integration instance.
+                      type: string
+                    expire_time:
+                      description: Slack OAuth2 token expire time.
+                      type: string
+                    refresh_token:
+                      description: Slack OAuth2 refresh token.
+                      type: string
+                    scope:
+                      description: Permission scope for the Fylamynt App.
+                      type: string
+                    slack_client_id:
+                      description: The ID associated with the Slack App.
+                      type: string
+                    slack_client_secret:
+                      description: Slack App Client Secret.
+                      type: string
+                    slack_signing_secret:
+                      description: Secret that Slack is signing every request with.
+                      type: string
+                    slack_team_id:
+                      description: Id of Slack team/workspace that the token belongs to.
+                      type: string
+                    slack_team_name:
+                      description: Name of Slack team/workspace that the token belongs to.
+                      type: string
+                    slack_user_id:
+                      description: ID of the Slack user authenticated with Fylamynt.
+                      type: string
+                    slack_user_name:
+                      description: Real name or username of the Slack user authenticated with Fylamynt.
+                      type: string
+                  type: object
+                splunk:
+                  properties:
+                    access_token:
+                      description: Token used to access the Splunk instance.
+                      type: string
+                    alias:
+                      description: Alias for Splunk integration instance.
+                      type: string
+                    splunk_url:
+                      description: URL of the Splunk instance (e.g. 65.132.55.921). Do not include the port number.
+                      type: string
+                  type: object
+                splunk_on_call:
+                  properties:
+                    alias:
+                      description: Alias for Splunk On-Call integration instance.
+                      type: string
+                    api_id:
+                      description: API ID obtained from Splunk On-Call (VictorOps).
+                      type: string
+                    api_key:
+                      description: API Key obtained from Splunk On-Call (VictorOps).
+                      type: string
+                  type: object
+                spot:
+                  properties:
+                    alias:
+                      description: Alias for Spot integration instance.
+                      type: string
+                    api_token:
+                      description: A Spot Programmatic API Token is recommended or you may use a Personal Access Token.
+                      type: string
+                  type: object
+                ssh:
+                  properties:
+                    alias:
+                      description: Alias for SSH target instance.
+                      type: string
+                    hostIdentifier:
+                      description: Identifier for SSH target host such as hostname or public IPv4.
+                      type: string
+                    privateKey:
+                      description: Private RSA key to run command without username/password.
+                      type: string
+                  type: object
+                sumologic:
+                  properties:
+                    access_id:
+                      description: Unique access_id to access your Sumo Logic account.
+                      type: string
+                    access_key:
+                      description: API key for authorization.
+                      type: string
+                    alias:
+                      description: Alias for Sumologic integration instance.
+                      type: string
+                  type: object
+                terraform:
+                  properties:
+                    alias:
+                      description: Alias for Terraform Cloud integration instance.
+                      type: string
+                    organization:
+                      description: Terraform Cloud organization.
+                      type: string
+                    token:
+                      description: Terraform Cloud API token (User or team token only).
+                      type: string
+                  type: object
+                terraform_cli:
+                  properties:
+                    alias:
+                      description: Alias for Terraform CLI instance.
+                      type: string
+                    git_repo:
+                      description: The GIT repo as a source for the Terraform module.
+                      type: string
+                    root:
+                      description: Directory with root module (defaults to .).
+                      type: string
+                    s3_bucket:
+                      description: An S3 bucket as a source for the Terraform module.
+                      type: string
+                    source_type:
+                      description: Different terraform source options.
+                      type: string
+                  type: object
+                twilio:
+                  properties:
+                    accountSid:
+                      description: Account SID from Twilio dashboard to identify user at twilio end.
+                      type: string
+                    alias:
+                      description: Alias for Twilio integration instance.
+                      type: string
+                    authToken:
+                      description: Authentication token for Twilio account.
+                      type: string
+                  type: object
+                zendesk:
+                  properties:
+                    alias:
+                      description: Alias for Zendesk integration instance.
+                      type: string
+                    api_token:
+                      description: API token for authorization.
+                      type: string
+                    email:
+                      description: Email id associated with your Zendesk account.
+                      type: string
+                    subdomain_name:
+                      description: Enter Zendesk Subdomain name - https://<subdomain_name>.zendesk.com.
+                      type: string
+                  type: object
+              type: object
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema: &ref_19
+                properties:
+                  body:
+                    allOf:
+                      - properties:
+                          ansible:
+                            allOf:
+                              - &ref_17
+                                properties:
+                                  alias:
+                                    description: Alias for the integration.
+                                    type: string
+                                  connection_status:
+                                    description: Connection status of the integration.
+                                    type: boolean
+                                  date_updated:
+                                    description: Timestamp of last update.
+                                    type: integer
+                                  date_verified:
+                                    description: Timestamp of last verification.
+                                    type: integer
+                                  integration_id:
+                                    description: Unique identifier for the integration.
+                                    type: string
+                                  is_default:
+                                    description: Default status of the integration.
+                                    type: string
+                                  workspace_id:
+                                    description: Workspace ID associated with the integration.
+                                    type: string
+                                type: object
+                              - properties:
+                                  playbooks:
+                                    description: S3 bucket with playbooks directory.
+                                    type: string
+                                  s3_access_role:
+                                    description: Fylamynt IAM role for bucket policy in target account.
+                                    type: string
+                                  ssh_private_key:
+                                    description: Ansible Controller Private ssh key.
+                                    type: string
+                                type: object
+                          azure_openai:
+                            allOf:
+                              - *ref_17
+                              - properties:
+                                  api_key:
+                                    description: API Key for your API.
+                                    type: string
+                                  azure_endpoint:
+                                    description: Azure Endpoint for your OpenAI serivce API.
+                                    type: string
+                                  model:
+                                    description: The deployment Name of the model deployed in user's Azure OpenAI Service.
+                                    type: string
+                                type: object
+                          bitbucket:
+                            allOf:
+                              - *ref_17
+                              - properties:
+                                  access_token:
+                                    description: Bitbucket Cloud Access Token for authentication using Access Token.
+                                    type: string
+                                  url:
+                                    description: 'Bitbucket repository URL, ex: Bitbucket personal repo -> `https://bitbucket.org/<username>/<repo-name>` for Bitbucket workspace repo -> `https://bitbucket.org/<workspace-name>/<repo-name>`.'
+                                    type: string
+                                type: object
+                          cloudformation:
+                            allOf:
+                              - *ref_17
+                              - properties:
+                                  filePath:
+                                    description: Absolute filepath of template file.
+                                    type: string
+                                  ref:
+                                    description: 'Github commit ref, (ie: main/master).'
+                                    type: string
+                                  repoId:
+                                    description: The GitHub repo as a source for the Cloudformation template.
+                                    type: string
+                                type: object
+                          datadog:
+                            allOf:
+                              - *ref_17
+                              - properties:
+                                  api_key:
+                                    description: Datadog API key for your org.
+                                    type: string
+                                  app_key:
+                                    description: Datadog application key for your org.
+                                    type: string
+                                type: object
+                          eks:
+                            allOf:
+                              - *ref_17
+                              - properties:
+                                  role_arn:
+                                    description: IAM Role ARN to be used for the EKS cluster.
+                                    type: string
+                                  target:
+                                    description: AWS Target Account for the EKS Cluster Role.
+                                    type: string
+                                type: object
+                          elasticsearch:
+                            allOf:
+                              - *ref_17
+                              - properties:
+                                  api_key_id:
+                                    description: Elasticsearch API key id.
+                                    type: string
+                                  api_key_value:
+                                    description: Elasticsearch API key value.
+                                    type: string
+                                  cloud_id:
+                                    description: Unique Id to configure your client to work with your Elastic Cloud deployment.
+                                    type: string
+                                type: object
+                          git:
+                            allOf:
+                              - *ref_17
+                              - properties:
+                                  access_token:
+                                    description: Github Access Token for authentication using Access Token.
+                                    type: string
+                                  repo_name:
+                                    description: Repository name.
+                                    type: string
+                                  url:
+                                    description: 'Git repository URL, ex: GitHub personal repo -> `https://github.com/<username>/<repo-name>` for Organization repo -> `https://github.com/<org-name>/<repo-name>`.'
+                                    type: string
+                                  user_name:
+                                    description: Git username.
+                                    type: string
+                                type: object
+                          gke:
+                            allOf:
+                              - *ref_17
+                              - properties:
+                                  service_account_key:
+                                    description: Provide Service Account Key in JSON Format.
+                                    type: string
+                                type: object
+                          http:
+                            allOf:
+                              - *ref_17
+                              - properties:
+                                  authorization_type:
+                                    description: Select a method for HTTP request authorization.
+                                    type: string
+                                  token:
+                                    description: Bearer token for authentication.
+                                    type: string
+                                  url:
+                                    description: A valid URL string based on the secure HTTPS protocol is required.
+                                    type: string
+                                type: object
+                          humio:
+                            allOf:
+                              - *ref_17
+                              - properties:
+                                  humio_api_token:
+                                    description: API Token obtained from Humio.
+                                    type: string
+                                  humio_url:
+                                    description: 'Provide Humio Cloud URL, example: https://cloud.us.humio.com.'
+                                    type: string
+                                type: object
+                          jenkins:
+                            allOf:
+                              - *ref_17
+                              - properties:
+                                  api_token:
+                                    description: API Token from authorized user.
+                                    type: string
+                                  server_url:
+                                    description: Jenkins server url:port.
+                                    type: string
+                                  username:
+                                    description: Jenkins Username associated with the token.
+                                    type: string
+                                type: object
+                          jira:
+                            allOf:
+                              - *ref_17
+                              - properties:
+                                  JIRA_CONSUMER_KEY:
+                                    description: Consumer Key for Fylamynt Application in Jira.
+                                    type: string
+                                  JIRA_CONSUMER_NAME:
+                                    description: Consumer Name for Fylamynt Application in Jira.
+                                    type: string
+                                  JIRA_PUBLIC_KEY:
+                                    description: Public Key for Fylamynt Application in Jira.
+                                    items:
+                                      type: string
+                                    type: array
+                                  JIRA_URL:
+                                    description: URL of your Jira account.
+                                    type: string
+                                type: object
+                          new_relic:
+                            allOf:
+                              - *ref_17
+                              - properties:
+                                  account_id:
+                                    description: Unique account id to recognize your new relic account.
+                                    type: integer
+                                  api_key:
+                                    description: New Relic API key.
+                                    type: string
+                                type: object
+                          pagerduty:
+                            allOf:
+                              - *ref_17
+                              - properties:
+                                  pagerduty_api_token:
+                                    description: API Token obtained from PagerDuty.
+                                    type: string
+                                type: object
+                          pulumi:
+                            allOf:
+                              - *ref_17
+                              - properties:
+                                  access_token:
+                                    description: Pulumi Access Token.
+                                    type: string
+                                type: object
+                          s3:
+                            allOf:
+                              - *ref_17
+                              - properties:
+                                  name:
+                                    description: S3 bucket name.
+                                    type: string
+                                  target:
+                                    description: Select an AWS Target Account for the S3 bucket.
+                                    type: string
+                                type: object
+                          servicenow:
+                            allOf:
+                              - *ref_17
+                              - properties:
+                                  instance_url:
+                                    description: ServiceNow instance URL.
+                                    type: string
+                                  password:
+                                    description: Password for authorized user on ServiceNow instance.
+                                    type: string
+                                  username:
+                                    description: Username for authorized user on ServiceNow instance.
+                                    type: string
+                                  webhook_url:
+                                    description: Webhook URL.
+                                    type: string
+                                type: object
+                          slack:
+                            allOf:
+                              - *ref_17
+                              - properties:
+                                  scope:
+                                    description: Permission scope for the Fylamynt App.
+                                    type: string
+                                  slack_team_id:
+                                    description: Id of Slack team/workspace that the token belongs to.
+                                    type: string
+                                  slack_team_name:
+                                    description: Name of Slack team/workspace that the token belongs to.
+                                    type: string
+                                  slack_user_id:
+                                    description: ID of the Slack user authenticated with Fylamynt.
+                                    type: string
+                                  slack_user_name:
+                                    description: Real name or username of the Slack user authenticated with Fylamynt.
+                                    type: string
+                                type: object
+                          splunk:
+                            allOf:
+                              - *ref_17
+                              - properties:
+                                  access_token:
+                                    description: Token used to access the Splunk instance.
+                                    type: string
+                                  splunk_url:
+                                    description: URL of the Splunk instance (e.g. 65.132.55.921). Do not include the port number.
+                                    type: string
+                                type: object
+                          splunk_on_call:
+                            allOf:
+                              - *ref_17
+                              - properties:
+                                  api_id:
+                                    description: API ID obtained from Splunk On-Call (VictorOps).
+                                    type: string
+                                  api_key:
+                                    description: API Key obtained from Splunk On-Call (VictorOps).
+                                    type: string
+                                type: object
+                          spot:
+                            allOf:
+                              - *ref_17
+                              - properties:
+                                  api_token:
+                                    description: A Spot Programmatic API Token is recommended or you may use a Personal Access Token.
+                                    type: string
+                                type: object
+                          ssh:
+                            allOf:
+                              - *ref_17
+                              - properties:
+                                  hostIdentifier:
+                                    description: Identifier for SSH target host such as hostname or public IPv4.
+                                    type: string
+                                  privateKey:
+                                    description: Private RSA key to run command without username/password.
+                                    type: string
+                                type: object
+                          sumologic:
+                            allOf:
+                              - *ref_17
+                              - properties:
+                                  access_id:
+                                    description: Unique access_id to access your Sumo Logic account.
+                                    type: string
+                                  access_key:
+                                    description: API key for authorization.
+                                    type: string
+                                type: object
+                          terraform:
+                            allOf:
+                              - *ref_17
+                              - properties:
+                                  organization:
+                                    description: Terraform Cloud organization.
+                                    type: string
+                                  token:
+                                    description: Terraform Cloud API token (User or team token only).
+                                    type: string
+                                type: object
+                          terraform_cli:
+                            allOf:
+                              - *ref_17
+                              - properties:
+                                  s3_bucket:
+                                    description: An S3 bucket as a source for the Terraform module.
+                                    type: string
+                                  source_type:
+                                    description: Different terraform source options.
+                                    type: string
+                                type: object
+                          twilio:
+                            allOf:
+                              - *ref_17
+                              - properties:
+                                  accountSid:
+                                    description: Account SID from Twilio dashboard to identify user at twilio end.
+                                    type: string
+                                  authToken:
+                                    description: Authentication token for Twilio account.
+                                    type: string
+                                type: object
+                          zendesk:
+                            allOf:
+                              - *ref_17
+                              - properties:
+                                  api_token:
+                                    description: API token for authorization.
+                                    type: string
+                                  email:
+                                    description: Email id associated with your Zendesk account.
+                                    type: string
+                                  subdomain_name:
+                                    description: Enter Zendesk Subdomain name - https://<subdomain_name>.zendesk.com.
+                                    type: string
+                                type: object
+                        type: object
+                    description: Response body.
+                    type: object
+                  statusCode:
+                    description: HTTP status code.
+                    type: integer
+                type: object
+          description: Created
+        '400':
+          content: {}
+          description: Bad Request
+        '404':
+          content: {}
+          description: Not Found
+        '409':
+          content: {}
+          description: Conflict
+        '422':
+          content: {}
+          description: Unprocessable Entity
+        '500':
+          content: {}
+          description: Internal Server Error
+      summary: Create Secret
+      tags:
+        - Connect Settings
+      x-codegen-request-body-name: payload
+  /connect/settings/{service}/{integration_id}:
+    delete:
+      description: |-
+        Endpoint handling two use cases for removing connector integration or resource:
+        1) For connectors storing secrets in the tenant secrets db, remove the dynamic
+           secret keys added during connector integration
+        2) For target account oriented resources stored in the Target Settings DB,
+           remove the resource associated with one 'alias' account or all accounts
+      operationId: delete_setting_item
+      parameters:
+        - *ref_16
+        - &ref_18
+          in: path
+          name: integration_id
+          required: true
+          schema:
+            type: string
+        - *ref_5
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: *ref_10
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: Delete Integration/Resource
+      tags:
+        - Connect Settings
+    get:
+      description: |-
+        Get the details of the selected integration/resource instance.
+
+        Note: The JSON response will contain credentials specific to the selected service and integration,
+        unlike the response model which shows all possible fields for all services. The model is provided
+        to illustrate the complete set of fields that may be present in the response, depending on which
+        service and integration is selected.
+      operationId: get_setting_item
+      parameters:
+        - *ref_16
+        - *ref_18
+        - *ref_7
+        - *ref_5
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: *ref_19
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: Get Integration/Resource
+      tags:
+        - Connect Settings
+    parameters: []
+    patch:
+      description: |-
+        An empty PATCH body "{}" will set the instance to default.
+
+        To move an individual instance:
+        call this endpoint with the 'old' workspace_id as the query parameter
+        and the 'new' workspace_id in the body.
+
+        E.X.:
+        PATCH
+        https://<be url>/settings/<service>/<instance_id>?workspace_id=cws-movefrom
+        body: {"workspace_id": "cws-moveto"}
+      operationId: patch_setting_item
+      parameters:
+        - *ref_16
+        - *ref_18
+      requestBody:
+        content:
+          application/json: {}
+        description: Workspace ID of the workspace to move integration/resource to.
+        required: false
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: *ref_10
+          description: Success
+        '201':
+          content: {}
+          description: Created
+        '400':
+          content: {}
+          description: Bad Request
+      summary: Set Default/Move Integration/Resource
+      tags:
+        - Connect Settings
+      x-codegen-request-body-name: workspace_id
+    put:
+      description: |-
+        Update the Integration/Resource secrets for a given service and given integration instance.
+
+        Note: The displayed request and response models show the structure for each service. 
+        When calling this endpoint, only the credentials for the specific service being updated 
+        should be provided in the payload under the 'credentials' key. The response will contain 
+        the newly updated integration information for that service.
+
+        For example, to update a Slack integration:
+
+        Request:
+        {
+            "credentials": {
+                "alias": "updated-slack-integration",
+                "bot_token": "xoxb-updated-token",
+                "signing_secret": "updated-secret"
+            }
+        }
+
+        Response will contain the updated Slack integration details.
+      operationId: put_setting_item
+      parameters:
+        - *ref_16
+        - *ref_18
+        - *ref_7
+        - *ref_5
+      requestBody:
+        content:
+          application/json:
+            schema: *ref_20
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: *ref_19
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+        '404':
+          content: {}
+          description: Not Found
+        '422':
+          content: {}
+          description: Unprocessable Entity
+        '500':
+          content: {}
+          description: Internal Server Error
+      summary: Update Integration/Resource
+      tags:
+        - Connect Settings
+      x-codegen-request-body-name: payload
+  /connect/targets:
+    get:
+      operationId: get_target_account_list
+      parameters:
+        - &ref_21
+          description: Currently selected Workspace ID
+          in: query
+          name: workspace_id
+          schema:
+            type: string
+      responses:
+        '200':
+          content: {}
+          description: Success
+        '400': &ref_23
+          content: {}
+          description: Bad Request
+      summary: Gets a list of all accounts
+      tags:
+        - Connect Targets
+    parameters: []
+    post:
+      operationId: post_target_account_list
+      parameters:
+        - *ref_21
+      requestBody:
+        content:
+          application/json:
+            schema: &ref_22
+              properties:
+                alias:
+                  type: string
+                external_id:
+                  type: string
+                is_default:
+                  type: boolean
+                preferred_region:
+                  type: string
+                role_arn:
+                  type: string
+              required:
+                - alias
+                - external_id
+                - is_default
+                - preferred_region
+                - role_arn
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: *ref_22
+          description: Success
+        '400': *ref_23
+      summary: Creates a new entry in the database
+      tags:
+        - Connect Targets
+      x-codegen-request-body-name: payload
+  /connect/targets/default:
+    get:
+      description: |-
+        It's acceptable to have zero defaults, but more than one should
+        be cleaned up. This can be done by updating an existing entry to set is_default=True.
+      operationId: get_target_account_get_default
+      parameters:
+        - *ref_21
+      responses:
+        '200':
+          content: {}
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: Only return the default entry
+      tags:
+        - Connect Targets
+    parameters: []
+  /connect/targets/{target_alias}:
+    delete:
+      operationId: delete_target_account_item
+      parameters:
+        - &ref_24
+          description: Unique alias for the target account
+          in: path
+          name: target_alias
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content: {}
+          description: Success
+        '400': &ref_25
+          content: {}
+          description: Bad Request
+      summary: delete the entry
+      tags:
+        - Connect Targets
+    get:
+      operationId: get_target_account_item
+      parameters:
+        - *ref_24
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: *ref_22
+          description: Success
+        '400': *ref_25
+      summary: get all fields of a specific account
+      tags:
+        - Connect Targets
+    parameters: []
+    patch:
+      description: |-
+        This will only change the updated fields and will
+        leave all other fields in place.
+      operationId: patch_target_account_item
+      parameters:
+        - *ref_24
+        - *ref_21
+      requestBody:
+        content:
+          application/json:
+            schema: *ref_22
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: *ref_22
+          description: Success
+        '400': *ref_25
+      summary: Update fields on an account
+      tags:
+        - Connect Targets
+      x-codegen-request-body-name: payload
+  /connect/workflows:
+    get:
+      operationId: get_workflow_list
+      parameters:
+        - &ref_26
+          description: Currently selected Workspace ID
+          in: query
+          name: workspace_id
+          schema:
+            type: string
+        - description: SSM document owner (value=Self|Amazon|All, default=All)
+          in: query
+          name: owner
+          schema:
+            type: string
+      responses:
+        '200':
+          content: {}
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: Return all user workflows for a given workspace
+      tags:
+        - Connect Workflows
+    parameters: []
+    post:
+      operationId: post_workflow_list
+      parameters:
+        - *ref_26
+      requestBody:
+        content:
+          application/json:
+            schema: &ref_27
+              properties:
+                Content:
+                  allOf:
+                    - &ref_29
+                      properties:
+                        assumeRole:
+                          type: string
+                        description:
+                          type: string
+                        mainSteps:
+                          items:
+                            properties:
+                              action:
+                                type: string
+                              inputs:
+                                properties:
+                                  Choices:
+                                    items:
+                                      properties:
+                                        NextStep:
+                                          type: string
+                                        Variable:
+                                          type: string
+                                      required:
+                                        - NextStep
+                                        - Variable
+                                      type: object
+                                    type: array
+                                  Default:
+                                    type: string
+                                  Duration:
+                                    type: string
+                                  FunctionName:
+                                    type: string
+                                  Payload:
+                                    type: string
+                                type: object
+                              isEnd:
+                                type: boolean
+                              maxAttempts:
+                                type: integer
+                              name:
+                                type: string
+                              nextStep:
+                                type: string
+                              onFailure:
+                                type: string
+                              outputs:
+                                items:
+                                  properties:
+                                    Name:
+                                      type: string
+                                    Selector:
+                                      type: string
+                                    Type:
+                                      type: string
+                                  required:
+                                    - Name
+                                    - Selector
+                                    - Type
+                                  type: object
+                                type: array
+                              timeoutSeconds:
+                                type: integer
+                            required:
+                              - action
+                              - inputs
+                              - name
+                            type: object
+                          type: array
+                        parameters:
+                          properties:
+                            AutomationAssumeRole:
+                              properties:
+                                default:
+                                  type: string
+                                description:
+                                  type: string
+                                type:
+                                  type: string
+                              required:
+                                - description
+                                - type
+                              type: object
+                            WorkflowSession:
+                              properties:
+                                default:
+                                  type: string
+                                description:
+                                  type: string
+                                type:
+                                  type: string
+                              required:
+                                - description
+                                - type
+                              type: object
+                          type: object
+                        schemaVersion:
+                          type: string
+                      required:
+                        - description
+                        - mainSteps
+                        - schemaVersion
+                      type: object
+                  description: SSM document for the workflow.
+                  type: object
+                Name:
+                  description: A unique name for the workflow.
+                  type: string
+                StepDocuments:
+                  description: List of step documents used in the SSM document.
+                  items: &ref_30
+                    properties:
+                      document_id:
+                        description: Document ID from step_store.
+                        type: string
+                      version:
+                        description: Version of the document.
+                        type: string
+                    type: object
+                  type: array
+                Tags:
+                  description: List of tags for the workflow.
+                  items:
+                    type: string
+                  type: array
+              required:
+                - Content
+                - Name
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_27
+                  - properties:
+                      DocumentFormat:
+                        description: SSM document format
+                        type: string
+                      DocumentType:
+                        description: SSM document type
+                        type: string
+                      DocumentVersion:
+                        description: SSM document version
+                        type: string
+                      Status:
+                        description: SSM document status
+                        type: string
+                    required:
+                      - DocumentType
+                      - DocumentVersion
+                      - Status
+                    type: object
+          description: Success
+        '201':
+          content: {}
+          description: Workflow created successfully
+        '400':
+          content: {}
+          description: Request validation error
+        '409':
+          content: {}
+          description: Duplicate workflow
+      summary: Create a new workflow in the selected workspace.
+      tags:
+        - Connect Workflows
+      x-codegen-request-body-name: payload
+  /connect/workflows/{workflow_name}:
+    delete:
+      description: |-
+        Delete a selected version of the selected workflow.
+        If no version is specified, delete all versions of the workflow.
+      operationId: delete_workflow_instance
+      parameters:
+        - &ref_28
+          description: Unique workflow name
+          in: path
+          name: workflow_name
+          required: true
+          schema:
+            type: string
+        - *ref_26
+        - &ref_31
+          description: Selected workflow version
+          in: query
+          name: version
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    description: Status of the task. OK if workflow deleted successfully.
+                    type: string
+                type: object
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: Delete Workflow
+      tags:
+        - Connect Workflows
+    parameters: []
+    put:
+      description: |-
+        Update a selected workflow by creating a new version.
+        New workflow is created off of the latest version in SSM.
+      operationId: put_workflow_instance
+      parameters:
+        - *ref_28
+        - *ref_26
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                Content:
+                  allOf:
+                    - *ref_29
+                  description: SSM document for the workflow.
+                  type: object
+                Tags:
+                  description: List of workflow tags.
+                  items:
+                    type: string
+                  type: array
+              required:
+                - Content
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: &ref_32
+                allOf:
+                  - properties:
+                      Description:
+                        description: Workflow description.
+                        type: string
+                      DocumentVersion:
+                        description: Version of the SSM document.
+                        type: string
+                      Editor:
+                        description: Editor of the workflow.
+                        type: string
+                      EditorId:
+                        description: ID of the workflow editor.
+                        type: string
+                      Name:
+                        description: Name to display to owner
+                        type: string
+                      ReadOnly:
+                        description: True for read only workflows else false.
+                        type: boolean
+                      Tags:
+                        description: List of workflow tags.
+                        items:
+                          type: string
+                        type: array
+                      UpdatedDate:
+                        description: Last updated date of the SSM document.
+                        type: string
+                      WorkflowId:
+                        description: Unique ID for a workflow document version.
+                        type: string
+                      WorkflowOwner:
+                        description: Owner of the workflow.
+                        type: string
+                      WorkflowOwnerId:
+                        description: ID of the workflow owner.
+                        type: string
+                      WorkspaceId:
+                        description: Workspace the workflow belongs to.
+                        type: string
+                    required:
+                      - Description
+                      - DocumentVersion
+                      - Name
+                    type: object
+                  - properties:
+                      CreatedDate:
+                        description: Date when workflow was created.
+                        type: string
+                      DefaultVersion:
+                        description: Current default version in SSM.
+                        type: string
+                      DisplayName:
+                        description: Display name of the workflow.
+                        type: string
+                      DocumentFormat:
+                        description: SSM document format.
+                        type: string
+                      DocumentType:
+                        description: SSM document type.
+                        type: string
+                      Editor:
+                        description: Editor of the workflow.
+                        type: string
+                      HashType:
+                        description: Hash type of the SSM.
+                        type: string
+                      IsDefault:
+                        description: Tells the default version of the SSM.(true for default version and false for not default version.)
+                        type: boolean
+                      LatestVersion:
+                        description: Newest version of the document.
+                        type: string
+                      Parameters:
+                        description: Runtime parameters for the workflow.
+                        items:
+                          properties: {}
+                          type: object
+                        type: array
+                      PlatformTypes:
+                        description: SSM document platforms.
+                        type: string
+                      SSMDocument:
+                        description: Original SSM document.
+                        type: string
+                      SchemaVersion:
+                        description: SSM schema.
+                        type: string
+                      SsmHash:
+                        description: Hash value of the SSM.
+                        type: string
+                      SsmName:
+                        description: Name of the workflow in ssm.
+                        type: string
+                      Status:
+                        description: Ssm document status
+                        type: string
+                      StepDocuments:
+                        description: List of step documents used in the SSM document.
+                        items: *ref_30
+                        type: array
+                      TenantId:
+                        description: Cognito ID of the owner.
+                        type: string
+                      Versions:
+                        description: List of available versions.
+                        items:
+                          properties: {}
+                          type: object
+                        type: array
+                      WorkflowId:
+                        type: string
+                      WorkflowOwner:
+                        description: Owner of the workflow.
+                        type: string
+                    required:
+                      - CreatedDate
+                      - DefaultVersion
+                      - DisplayName
+                      - DocumentFormat
+                      - DocumentType
+                      - HashType
+                      - IsDefault
+                      - LatestVersion
+                      - PlatformTypes
+                      - SSMDocument
+                      - SchemaVersion
+                      - SsmHash
+                      - SsmName
+                      - Status
+                      - TenantId
+                    type: object
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: Update Workflow
+      tags:
+        - Connect Workflows
+      x-codegen-request-body-name: payload
+  /connect/workflows/{workflow_name}/availability:
+    get:
+      description: Check if workflow name is available for use.
+      operationId: get_workflow_name_validation
+      parameters:
+        - *ref_28
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  available:
+                    description: Tells if workflow name is available for use.(true for available and false for unavailable.
+                    type: boolean
+                  message:
+                    description: Helper message.
+                    type: string
+                  name:
+                    description: Name of the workflow to check.
+                    type: string
+                type: object
+          description: Success
+        '400':
+          content: {}
+          description: Bad request
+      summary: Get Workflow Name Availability
+      tags:
+        - Connect Workflows
+    parameters: []
+  /connect/workflows/{workflow_name}/content:
+    get:
+      description: Return the content of the default/selected version of the selected workflow.
+      operationId: get_workflow_content
+      parameters:
+        - *ref_28
+        - *ref_31
+        - *ref_26
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  Content:
+                    allOf:
+                      - *ref_29
+                    description: SSM document for the workflow.
+                    type: object
+                  Description:
+                    description: Workflow description.
+                    type: string
+                  Name:
+                    description: Name of the workflow.
+                    type: string
+                  Parameters:
+                    description: Runtime parameters for the workflow.
+                    items:
+                      properties: {}
+                      type: object
+                    type: array
+                  StepDocuments:
+                    description: List of step documents used in the SSM document.
+                    items: *ref_30
+                    type: array
+                  UpdatedDate:
+                    description: Date when the workflow was updated.
+                    type: string
+                  WorkflowId:
+                    description: Unique ID for a workflow document version.
+                    type: string
+                  showModal:
+                    description: Boolean value to show workflow modal.(true for showing and false for not showing.
+                    type: boolean
+                required:
+                  - Content
+                  - Name
+                type: object
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: Get Workflow Content
+      tags:
+        - Connect Workflows
+    parameters: []
+  /connect/workflows/{workflow_name}/duplicate:
+    parameters: []
+    post:
+      description: Duplicate a specific version of the selected workflow.
+      operationId: post_workflow_duplicate
+      parameters:
+        - description: Name of workflow to be duplicated
+          in: query
+          name: name
+          schema:
+            type: string
+        - *ref_28
+        - *ref_26
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                NewName:
+                  description: Name of new workflow.
+                  type: string
+                Version:
+                  description: Version of the workflow to be duplicated.
+                  type: string
+              required:
+                - NewName
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: *ref_32
+          description: Success
+        '201':
+          content: {}
+          description: Workflow duplicated successfully
+        '400':
+          content: {}
+          description: Request validation error
+      summary: Create Duplicate Workflow
+      tags:
+        - Connect Workflows
+      x-codegen-request-body-name: payload
+  /connect/workflows/{workflow_name}/info:
+    get:
+      description: |-
+        Return the information for the default/selected version of the selected workflow,
+        including workflow description and tags.
+      operationId: get_workflow_info
+      parameters:
+        - *ref_28
+        - *ref_31
+        - *ref_26
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: &ref_33
+                allOf:
+                  - *ref_32
+                  - properties:
+                      Schedules:
+                        description: Schedules of the workflow.
+                        properties: {}
+                        type: object
+                    type: object
+          description: Success
+        '400':
+          content: {}
+          description: Bad request
+      summary: Get Workflow Information
+      tags:
+        - Connect Workflows
+    parameters: []
+    put:
+      description: Update the default version of the workflow to a specific version.
+      operationId: put_workflow_info
+      parameters:
+        - *ref_28
+        - *ref_31
+        - *ref_26
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: *ref_33
+          description: Success
+        '400':
+          content: {}
+          description: Bad request
+      summary: Update Workflow Version
+      tags:
+        - Connect Workflows
+  /connect/workflows/{workflow_name}/integrations:
+    get:
+      description: Return a list of integration instances for the default/selected version of a selected workflow.
+      operationId: get_workflow_integration_info
+      parameters:
+        - *ref_28
+        - *ref_31
+        - description: Only include integrations that can be moved to new workspace
+          in: query
+          name: movable_only
+          schema:
+            type: string
+        - *ref_26
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  integration_type:
+                    description: Names of the integrations used in the workflow.
+                    items:
+                      type: string
+                    type: array
+                type: object
+          description: Success
+        '400':
+          content: {}
+          description: Bad request
+      summary: List Workflow Integrations
+      tags:
+        - Connect Workflows
+    parameters: []
+  /connect/workspaces:
+    get:
+      description: List all workspaces the user is authorized to view.
+      operationId: get_workspace_list
+      parameters:
+        - &ref_34
+          description: An optional fields mask
+          in: header
+          name: X-Fields
+          schema:
+            format: mask
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: &ref_36
+                allOf:
+                  - allOf:
+                      - &ref_35
+                        properties:
+                          description:
+                            description: Description of workspace
+                            type: string
+                          name:
+                            description: Name of workspace
+                            type: string
+                          owner:
+                            description: Owner of workspace
+                            type: string
+                          type:
+                            description: Type of workspace
+                            type: string
+                        type: object
+                      - properties:
+                          workspace_id:
+                            description: Unique workspace ID
+                            type: string
+                        type: object
+                  - properties:
+                      permissions:
+                        description: List of permissions for that workspace
+                        items:
+                          type: string
+                        type: array
+                      workspace_id:
+                        description: Unique workspace ID
+                        type: string
+                    type: object
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: List Workspaces
+      tags:
+        - Connect Workspaces
+    parameters: []
+    post:
+      description: Create a new workspace.
+      operationId: post_workspace_list
+      parameters:
+        - *ref_34
+      requestBody:
+        content:
+          application/json:
+            schema: &ref_39
+              allOf:
+                - *ref_35
+                - properties:
+                    entities:
+                      description: List of entities
+                      items:
+                        properties:
+                          id:
+                            description: Spot ID of the user
+                            type: string
+                          isGroup:
+                            description: If the user is present in any group
+                            type: boolean
+                          isOwner:
+                            description: If the user is owner of that workspace
+                            type: boolean
+                          name:
+                            description: Name of user
+                            type: string
+                          permissions:
+                            description: List of permissions for that workspace
+                            items:
+                              type: string
+                            type: array
+                        type: object
+                      type: array
+                  type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: *ref_36
+          description: Workspace created successfully
+        '400':
+          content: {}
+          description: Request validation error
+        '409':
+          content: {}
+          description: Workspace name already exists
+      summary: Create Workspace
+      tags:
+        - Connect Workspaces
+      x-codegen-request-body-name: payload
+  /connect/workspaces/name/available:
+    parameters: []
+    post:
+      description: Check if Workspace name is available for use.
+      operationId: post_workspace_name_availability_check
+      parameters:
+        - *ref_34
+      requestBody:
+        content:
+          application/json:
+            schema: &ref_37
+              properties:
+                name:
+                  description: Workspace name to check
+                  type: string
+              required:
+                - name
+              type: object
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_37
+                  - properties:
+                      available:
+                        description: Check if workspace name is available for use
+                        type: boolean
+                      message:
+                        description: Response message on availability check
+                        type: string
+                    type: object
+          description: Success
+        '400':
+          content: {}
+          description: Request validation error
+      summary: Check Workspace Availability
+      tags:
+        - Connect Workspaces
+      x-codegen-request-body-name: payload
+  /connect/workspaces/name/{workspace_name}:
+    get:
+      description: Get details of a specific workspace using workspace name.
+      operationId: get_workspace_instance_by_name
+      parameters:
+        - description: Workspace name
+          in: path
+          name: workspace_name
+          required: true
+          schema:
+            type: string
+        - *ref_34
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_35
+                  - properties:
+                      workspace_id:
+                        description: cws-XXXXXXX
+                        type: string
+                    type: object
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: Get Workspace by Name
+      tags:
+        - Connect Workspaces
+    parameters: []
+  /connect/workspaces/{workspace_id}:
+    delete:
+      description: Delete a workspace specified by workspace_id
+      operationId: delete_workspace_instance
+      parameters:
+        - &ref_38
+          description: Unique workspace ID
+          in: path
+          name: workspace_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content: {}
+          description: Deleted
+        '400':
+          content: {}
+          description: Bad Request
+      summary: Delete Workspace
+      tags:
+        - Connect Workspaces
+    get:
+      description: Get details of a workspace specified by workspace_id.
+      operationId: get_workspace_instance
+      parameters:
+        - *ref_38
+        - *ref_34
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: *ref_36
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: Get Workspace by ID
+      tags:
+        - Connect Workspaces
+    parameters: []
+    put:
+      description: Update a workspace specified by workspace_id.
+      operationId: put_workspace_instance
+      parameters:
+        - *ref_38
+        - *ref_34
+      requestBody:
+        content:
+          application/json:
+            schema: *ref_39
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: *ref_36
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: Update Workspace
+      tags:
+        - Connect Workspaces
+      x-codegen-request-body-name: payload
+  /connect/workspaces/{workspace_id}/move-order:
+    parameters: []
+    post:
+      description: |-
+        It moves a workflow and all integrations it uses
+        in new workspace. Following things are needed -
+        Permissions the user needs in both workspaces:
+            updateWorkflow
+            updateIntegration
+            updateSchedule
+            updateExecution
+      operationId: post_move_order_view
+      parameters:
+        - *ref_38
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                move_all_integrations:
+                  description: If we need to move all integrations used in that workflow
+                  type: boolean
+                workflow_name:
+                  description: Name of the workflow to move to the new workspace
+                  type: string
+                workspace_id:
+                  description: Workspace ID to move the workflow into
+                  type: string
+              type: object
+        required: true
+      responses:
+        '200':
+          content: {}
+          description: Success
+        '400':
+          content: {}
+          description: Bad Request
+      summary: Move Workflow and its Integrations to Another Workpace
+      tags:
+        - Connect Workspaces
+      x-codegen-request-body-name: payload

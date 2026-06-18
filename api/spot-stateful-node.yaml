@@ -1,0 +1,1761 @@
+openapi: 3.0.0
+info:
+  version: '1.0'
+  description: |
+    Welcome to the Spot by Flexera OpenAPI Specification.
+    Here you will find REST definitions for all Spot products and platform administration tasks.
+
+    The API is hosted at `https://api.spotinst.io` and requires Bearer Token
+    Authentication.
+
+    For more information on how to use the Spot platform, including user guides,
+    developer guides, concepts, and tutorials, see the external [Spot Documentation](https://docs.flexera.com/spot/).
+  title: Spot by Flexera API - Stateful Node
+  x-logo:
+    url: https://spec.dev.spot.io/flexera-spot.png
+    altText: SpotByFlexeraLogo
+    href: https://spec.dev.spot.io
+  contact:
+    email: support@spot.io
+servers:
+  - url: https://api.spotinst.io
+security:
+  - auth: []
+components:
+  securitySchemes:
+    auth:
+      description: |
+        To generate bearer tokens and understand more about Spot by Flexera
+        authentication see the howto for
+        [token creation](https://docs.flexera.com/spot/administration/api/create-api-token)
+        on the Spot Help site.
+
+        ### Organizations and Accounts
+
+        Each Spot account is assigned to an organization and a set of environment Accounts.
+        An account is then linked to a specific cloud provider account.
+
+        Spot accounts are given an ID in the format `act-123abcd` that is sent as a query parameter while performing API calls.
+
+        To locate the account ID navigate to Settings -> Account in the Spot console.
+
+        ### Organizations with a Single Account
+        Each API call you make can be used with or without the account ID.
+
+        ### Organizations with Multiple Accounts
+        Each API call you make should be appended to the account ID. For example:
+
+        GET `https://api.spotinst.io/aws/ec2/group?accountId=act-123de678`
+        This call will return the list of Elastigroups for the specific Account used.
+
+        > NOTE: If no `accountId` is provided, the default (dldest) account for the Organization will be used.
+      type: http
+      scheme: bearer
+    authWithoutAccount:
+      description: |
+        To generate bearer tokens and learn more about Spot by Flexera
+        authentication, see [token creation](https://docs-spot.flexera.com/administration/api/create-api-token).
+      type: http
+      scheme: bearer
+tags:
+  - name: Stateful Node AWS
+    description: |
+      Stateful Node is a Spot solution for launching and managing a single compute instance.
+      On the AWS cloud, for a standard single instance workload, an On-Demand EC2 instance is launched.
+      The instance is expected to be highly available, easily manageable, and integrate well with additional services and monitoring tools.
+      For more information please review the concepts section.
+    externalDocs:
+      description: Stateful Node for AWS Concepts and Tutorials
+      url: https://docs.flexera.com/spot/managed-instance/
+paths:
+  /aws/ec2/managedInstance:
+    post:
+      summary: Create Stateful Node
+      description: |
+        Create a new Stateful Node resource.
+      operationId: AWSManagedInstanceCreate
+      tags:
+        - Stateful Node AWS
+      parameters:
+        - &ref_1
+          in: query
+          name: accountId
+          example: act-123456789
+          description: |
+            The ID of the account associated with your token.
+          schema:
+            type: string
+          required: true
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              allOf:
+                - &ref_0
+                  type: object
+                  properties:
+                    managedInstance:
+                      type: object
+                      required:
+                        - name
+                        - region
+                      properties:
+                        name:
+                          type: string
+                          example: mi-test
+                          description: |
+                            Stateful Node name
+                        description:
+                          type: string
+                          example: This is my Stateful Node
+                          description: |
+                            Describe your Stateful Node resource
+                        region:
+                          type: string
+                          example: us-east-1
+                          description: |
+                            The AWS region your resource will be created in.
+                        strategy: &ref_3
+                          type: object
+                          title: MI Strategy
+                          properties:
+                            lifeCycle:
+                              type: string
+                              example: spot
+                              description: |
+                                Set lifecycle, valid values: `spot`, `on_demand` Default: spot
+                            orientation:
+                              type: string
+                              example: availabilityOriented
+                              description: |
+                                The strategy orientation. valid values: `costOriented`, `availabilityOriented`, `balanced`, `cheapest` Default: availabilityOriented
+                            drainingTimeout:
+                              type: integer
+                              description: |
+                                The time in seconds to allow the instance be drained from incoming TCP connections and detached from ELB before terminating it, during a scale down operation
+                            fallbackToOd:
+                              type: boolean
+                              example: true
+                              description: |
+                                In case of no spots available, Stateful Node will launch an On-demand instance instead Default: true
+                            utilizeReservedInstances:
+                              type: boolean
+                              default: false
+                              example: true
+                              description: |
+                                In case of any available Reserved Instances, Stateful Node will utilize them before purchasing Spot instances Default: false
+                            utilizeCommitments:
+                              type: boolean
+                              description: |
+                                If there are available Reserved Instances or Savings Plans, Elastigroup will utilize them before using Spot instances
+                              example: false
+                            optimizationWindows:
+                              type: array
+                              description: |
+                                When performAt is 'timeWindow': must specify a list of 'timeWindows' with at least one time window Each string is in the format of - ddd:hh:mm-ddd:hh:mm ddd = day of week = Sun | Mon | Tue | Wed | Thu | Fri | Sat hh = hour 24 = 0 -23 mm = minute = 0 - 59
+                              items:
+                                type: string
+                                example: Mon:03:00-Wed:02:30
+                            revertToSpot:
+                              type: object
+                              title: When Elastigroup moves from OnDemand back to Spot capacity
+                              properties:
+                                performAt:
+                                  type: string
+                                  example: timeWindow
+                                  enum:
+                                    - never
+                                    - always
+                                    - timeWindow
+                                  description: |
+                                    Valid values: `always`, `never`, "timeWindow" Example: never Default: never
+                        compute: &ref_4
+                          type: object
+                          title: MI Compute
+                          required:
+                            - subnetIds
+                            - vpcId
+                          properties:
+                            subnetIds:
+                              type: array
+                              description: |
+                                A comma-separated list of subnet identifiers for your instance.
+                              items:
+                                type: string
+                                example: subnet-79da021e
+                            vpcId:
+                              type: string
+                              example: vpc-111
+                              description: |
+                                VPC ID for your instance.
+                            elasticIp:
+                              type: string
+                              example: ip
+                              description: |
+                                Elastic IP Allocation Id to associate to the instance
+                            privateIp:
+                              type: string
+                              example: ip
+                              description: |
+                                Private IP Allocation Id to associate to the instance
+                            product:
+                              type: string
+                              example: Linux/UNIX
+                              description: |
+                                Operation system type. Possible values: Linux/UNIX, SUSE Linux, Windows, Red Hat Enterprise Linux In case of EC2 classic: Linux/UNIX (Amazon VPC), SUSE Linux (Amazon VPC), Windows (Amazon VPC), Red Hat Enterprise Linux (Amazon VPC)
+                            volumeAttachments:
+                              type: object
+                              title: AWS Volume Attachments
+                              description: |
+                                Any volumes specified in this field will be automatically attached to every instance launched in the group.
+                                All volumes must be located within the availability zone of the group. 
+                                Additionally, the group must have at least one persistence configuration.
+                                If your group has more than one instance or you want to share the same volume between several instances,
+                                it's important to use [Amazon EBS Multi-Attach supported volumes](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volumes-multi.html)
+                                to enable concurrent attachment of the volumes to multiple instances. This ensures that your volumes can be effectively
+                                shared among instances in your group.
+                              required:
+                                - volumes
+                              properties:
+                                volumes:
+                                  type: array
+                                  items:
+                                    type: object
+                                    required:
+                                      - volumeId
+                                      - deviceName
+                                    properties:
+                                      volumeId:
+                                        type: string
+                                        description: |
+                                          The volume id to attach
+                                        example: vol-1234567
+                                      deviceName:
+                                        type: string
+                                        description: |
+                                          The device name to attach. When you attach a volume to your instance, you include a device name for the volume.
+                                          Do not use a device name that is reserved for the root volume (for example - `/dev/sda1` or `/dev/xvda`).
+                                        example: /dev/sdb
+                            launchSpecification:
+                              type: object
+                              properties:
+                                instanceTypes:
+                                  type: object
+                                  properties:
+                                    preferredType:
+                                      type: string
+                                      example: t2.micro
+                                      description: |
+                                        Prioritized instance type. The instance type must be included in the selected instance types or  meet the resource requirements if defined. Note: Either preferredType or preferredTypes can be defined,  but not both.
+                                    preferredTypes:
+                                      type: array
+                                      description: |
+                                        Prioritized subset of instance types. The list must be a subset of the selected instance types or meet the  resource requirements if defined. Note: Either preferredType or preferredTypes can be defined, but not  both.
+                                      items:
+                                        type: string
+                                        example:
+                                          - t2.micro
+                                          - t3.micro
+                                          - t2.medium
+                                          - t3.medium
+                                    types:
+                                      type: array
+                                      description: |
+                                        Set instance types settings.  
+                                        Note: Cannot be defined if 'resourceRequirements' is defined.
+                                      items:
+                                        type: string
+                                        example: t2.micro
+                                    resourceRequirements:
+                                      type: object
+                                      title: Resource Requirements
+                                      description: |
+                                        Required instance attributes. Instance types will be selected based on these requirements.
+                                      required:
+                                        - requiredVCpu
+                                        - requiredMemory
+                                      properties:
+                                        requiredGpu:
+                                          type: object
+                                          description: Required instance GPU
+                                          properties:
+                                            minimum:
+                                              type: integer
+                                              minimum: 1
+                                            maximum:
+                                              type: integer
+                                              maximum: 16
+                                        requiredVCpu:
+                                          type: object
+                                          description: Required instance vCPU
+                                          properties:
+                                            minimum:
+                                              type: integer
+                                              minimum: 1
+                                            maximum:
+                                              type: integer
+                                              maximum: 64
+                                        requiredMemory:
+                                          type: object
+                                          description: Required instance memory (GiB)
+                                          properties:
+                                            minimum:
+                                              type: integer
+                                              minimum: 1
+                                            maximum:
+                                              type: integer
+                                              maximum: 512
+                                        excludedInstanceTypes:
+                                          type: array
+                                          description: Instance types to exclude
+                                          items:
+                                            type: string
+                                            example:
+                                              - c4.large
+                                        excludedInstanceFamilies:
+                                          type: array
+                                          description: Instance families to exclude
+                                          items:
+                                            type: string
+                                            example:
+                                              - A
+                                              - C
+                                              - D
+                                        excludedInstanceGenerations:
+                                          type: array
+                                          description: Instance generations to exclude
+                                          items:
+                                            type: string
+                                            example:
+                                              - '1'
+                                              - '2'
+                                              - '3'
+                                ebsOptimized:
+                                  type: boolean
+                                  example: false
+                                  description: |
+                                    Enable EBS optimization for supported instance which is not enabled by default. Note - additional charges will be applied. Default: false
+                                monitoring:
+                                  type: boolean
+                                  example: false
+                                  description: |
+                                    Describes whether instance Enhanced Monitoring is enabled. Default: false
+                                tenancy:
+                                  type: string
+                                  example: default
+                                  description: |
+                                    Valid values: "default", "dedicated" Default: default
+                                iamRole:
+                                  type: object
+                                  properties:
+                                    name:
+                                      type: string
+                                      example: name
+                                    arn:
+                                      type: string
+                                      example: arn
+                                securityGroupIds:
+                                  type: array
+                                  items:
+                                    type: string
+                                    example: sg-0dfc2c8760df6fec7
+                                imageId:
+                                  type: string
+                                  example: ami-01e24be29428c15b2
+                                keyPair:
+                                  type: string
+                                  example: labs-oregon
+                                tags:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      tagKey:
+                                        type: string
+                                        example: Creator
+                                      tagValue:
+                                        type: string
+                                        example: test1@spot.io
+                                resourceTagSpecification:
+                                  type: object
+                                  description: Optional field. User will specified which resources should be tagged with group tags.
+                                  properties:
+                                    volumes:
+                                      type: object
+                                      description: Optional field. Tag specification for Volume resources.
+                                      properties:
+                                        shouldTag:
+                                          type: boolean
+                                          description: Optional field. Volume resources will be tagged with group tags.
+                                          default: false
+                                          example: false
+                                    snapshots:
+                                      type: object
+                                      description: Optional field. Tag specification for Snapshot resources.
+                                      properties:
+                                        shouldTag:
+                                          type: boolean
+                                          description: Optional field. Snapshot resources will be tagged with group tags.
+                                          default: true
+                                          example: true
+                                    enis:
+                                      type: object
+                                      description: Optional field. Tag specification for ENI resources.
+                                      properties:
+                                        shouldTag:
+                                          type: boolean
+                                          description: Optional field. ENI resources will be tagged with group tags.
+                                          default: false
+                                          example: false
+                                    amis:
+                                      type: object
+                                      description: Optional field. Tag specification for AMI resources.
+                                      properties:
+                                        shouldTag:
+                                          type: boolean
+                                          description: Optional field. AMI resources will be tagged with group tags.
+                                          default: true
+                                          example: true
+                                userData:
+                                  type: string
+                                  example: dXNlcmJhc2g2NGVuY29kZWQ=
+                                shutdownScript:
+                                  type: string
+                                  example: dXNlcmJhc2g2NGVuY29kZWQ=
+                                creditSpecification:
+                                  type: object
+                                  properties:
+                                    cpuCredits:
+                                      type: string
+                                      example: unlimited
+                                networkInterfaces:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      deviceIndex:
+                                        type: integer
+                                        example: 0
+                                      associatePublicIpAddress:
+                                        type: boolean
+                                        example: true
+                                      associateIpv6Address:
+                                        type: boolean
+                                        example: true
+                                blockDeviceMappings:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      deviceName:
+                                        type: string
+                                        example: /dev/xvdcz
+                                      ebs:
+                                        type: object
+                                        properties:
+                                          iops:
+                                            type: integer
+                                            minimum: 0
+                                            description: |
+                                              Must be greater than or equal to 0
+                                            example: 0
+                                          throughput:
+                                            type: integer
+                                            minimum: 125
+                                            maximum: 1000
+                                            example: 125
+                                            description: |
+                                              The amount of data transferred to or from a storage device per second, you can use this param just in a case that volumetype=‘gp3’.
+                                          deleteOnTermination:
+                                            type: boolean
+                                            example: true
+                                          encrypted:
+                                            type: boolean
+                                            example: true
+                                          volumeSize:
+                                            type: integer
+                                            example: 12
+                                          volumeType:
+                                            type: string
+                                            example: gp2
+                                          kmsKeyId:
+                                            type: string
+                                          snapshotId:
+                                            type: string
+                                metadataOptions:
+                                  title: Metadata Options
+                                  type: object
+                                  description: Optional field. Used for IMDSv2.
+                                  required:
+                                    - httpTokens
+                                  properties:
+                                    httpTokens:
+                                      title: HTTP Tokens
+                                      type: string
+                                      description: Required for IMDSv2. Can’t be null in Create or Update. Values can be "optional" or "required".
+                                      example: optional
+                                    httpPutResponseHopLimit:
+                                      type: integer
+                                      example: '33'
+                                      description: |
+                                        An integer within 1,64 range (including).
+                                        The desired HTTP PUT response hop limit for instance metadata requests.
+                                        The larger the number, the further instance metadata requests can travel.
+                                    instanceMetadataTags:
+                                      title: Instance Metadata Tags
+                                      type: string
+                                      enum:
+                                        - Enabled
+                                        - Disabled
+                                      description: |
+                                        Indicates whether access to instance tags from the instance metadata is enabled or disabled.
+                                        Can’t be null.
+                                      example: Enabled
+                        integrations: &ref_5
+                          type: object
+                          title: MI integrations
+                          properties:
+                            loadBalancersConfig:
+                              type: object
+                              properties:
+                                loadBalancers:
+                                  type: array
+                                  items:
+                                    anyOf:
+                                      - type: object
+                                        properties:
+                                          name:
+                                            type: string
+                                            example: name
+                                          arn:
+                                            type: string
+                                            example: arn
+                                          type:
+                                            type: string
+                                            example: CLASSIC
+                                            description: |
+                                              The resource type. Valid Values: CLASSIC, TARGET_GROUP
+                            route53:
+                              type: object
+                              properties:
+                                domains:
+                                  type: array
+                                  items:
+                                    anyOf:
+                                      - type: object
+                                        properties:
+                                          hostedZoneId:
+                                            type: string
+                                            example: Z00275642KS5ZZJFIQBCA
+                                          recordSetType:
+                                            type: string
+                                            example: a
+                                          spotinstAccountId:
+                                            type: string
+                                            example: act-1234
+                                          recordSets:
+                                            type: array
+                                            items:
+                                              anyOf:
+                                                - type: object
+                                                  properties:
+                                                    usePublicIp:
+                                                      type: boolean
+                                                      example: true
+                                                    name:
+                                                      type: string
+                                                      example: testa.spot.io
+                        scheduling: &ref_6
+                          type: object
+                          title: MI Scheduling
+                          properties:
+                            tasks:
+                              type: array
+                              items:
+                                type: object
+                                title: Task Definition
+                                properties:
+                                  taskType:
+                                    type: string
+                                    example: recycle
+                                    enum:
+                                      - pause
+                                      - resume
+                                      - recycle
+                                    description: |
+                                      The task type to run.
+                                  startTime:
+                                    type: string
+                                    example: '2018-05-23T10:55:09Z'
+                                    description: |
+                                      DATETIME in ISO-8601 format. Sets a start time for scheduled actions. If `frequency` or `cronExpression` are not used - the task will run only once at the start time and will then be deleted from the group configuration
+                                  cronExpression:
+                                    type: string
+                                    example: 0 1 * * *
+                                    description: |
+                                      A valid cron expression. For example : " * * * * * ". The cron is running in UTC time zone and is in Unix cron format Cron Expression Validator Script. Only one of ‘frequency' or ‘cronExpression' should be used at a time.
+                                  isEnabled:
+                                    type: boolean
+                                    default: true
+                                    example: true
+                                    description: |
+                                      Describes whether the task is enabled. When true the task should run when false it should not run.
+                                  frequency:
+                                    type: string
+                                    enum:
+                                      - hourly
+                                      - daily
+                                      - weekly
+                                    description: |
+                                      The recurrence frequency to run this task. Only one of `frequency` or `cronExpression` should be used at a time
+                        persistence:
+                          type: object
+                          description: |
+                            Persistence settings. Should omit at least one of the persist options below.
+                          properties:
+                            blockDevicesMode:
+                              type: string
+                              example: reattach
+                              description: |
+                                Determine the way we attach the data volumes to the data devices.
+                              enum:
+                                - reattach
+                                - onLaunch
+                              default: onLaunch
+                            persistRootDevice:
+                              type: boolean
+                              example: true
+                              description: |
+                                Should the instance maintain its root device volumes
+                            persistBlockDevices:
+                              type: boolean
+                              example: true
+                              description: |
+                                Should the instance maintain its Data volumes
+                            persistPrivateIp:
+                              type: boolean
+                              example: true
+                              description: |
+                                Should the instance maintain its private IP
+                        healthCheck:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                              example: EC2
+                              description: |
+                                The service to use for the health check.
+                              enum:
+                                - EC2
+                                - ELB
+                                - TARGET_GROUP
+                              default: EC2
+                            autoHealing:
+                              type: boolean
+                              example: true
+                              description: |
+                                Enable the auto healing which auto replaces the instance in case the health check fails
+                              default: true
+                            gracePeriod:
+                              type: integer
+                              example: 120
+                              description: |
+                                The amount of time, in seconds, after the instance has launched to starts and check its health.
+                              default: 120
+                            unhealthyDuration:
+                              type: integer
+                              example: 120
+                              description: |
+                                The amount of time, in seconds, an existing instance should remain active after becoming unhealthy.\
+                                After the set time out the instance will be replaced
+                              default: 120
+      responses:
+        '200': &ref_7
+          description: Elastigroup Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - &ref_2
+                    type: object
+                    allOf:
+                      - &ref_9
+                        type: object
+                        properties:
+                          request:
+                            type: object
+                            description: |
+                              Original request properties.
+                            properties:
+                              id:
+                                type: string
+                                example: e593ff58-067d-4340-92f9-8b1c0bad70d7
+                                description: |
+                                  Unique identifier associated with this request.
+                              url:
+                                type: string
+                                description: |
+                                  The URL that was used for the request.
+                              method:
+                                type: string
+                                description: |
+                                  The HTTP **METHOD** used for the request.
+                              timestamp:
+                                type: string
+                                example: '2018-06-20T11:35:01.745Z'
+                                description: |
+                                  When the request was received by Spot.
+                          response:
+                            type: object
+                            description: |
+                              Response package that includes status, type, and any relevant data.
+                            properties:
+                              status:
+                                type: object
+                                properties:
+                                  code:
+                                    type: integer
+                                    example: 200
+                                    description: |
+                                      HTTP status code assigned to this response.
+                                  message:
+                                    type: string
+                                    example: OK
+                                    description: |
+                                      HTTP status message for the respective status code.
+                      - type: object
+                        properties:
+                          response:
+                            type: object
+                            properties:
+                              count:
+                                type: integer
+                                example: 1
+                                description: |
+                                  Size of the data object array.
+                              kind:
+                                type: string
+                                description: |
+                                  The data type of each item in the response.
+                  - type: object
+                    properties:
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items: *ref_0
+                          kind:
+                            example: spotinst:aws:ec2:managedInstance
+        '400':
+          description: Bad Request
+    get:
+      summary: List Stateful Nodes
+      description: |
+        List all Stateful Node resources in the account.
+      operationId: AWSManagedInstanceList
+      tags:
+        - Stateful Node AWS
+      parameters:
+        - *ref_1
+      responses:
+        '200':
+          description: Elastigroup Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_2
+                  - type: object
+                    properties:
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                createdAt:
+                                  type: string
+                                  example: '2020-04-10T21:41:31.000Z'
+                                updatedAt:
+                                  type: string
+                                  example: '2020-05-12T22:37:18.000Z'
+                                id:
+                                  type: string
+                                  example: smi-34ae3a42
+                                config:
+                                  type: object
+                                  required:
+                                    - region
+                                  properties:
+                                    name:
+                                      type: string
+                                      example: mi-test
+                                      description: |
+                                        Stateful Node name
+                                    region:
+                                      type: string
+                                      example: us-east-1
+                                      description: |
+                                        The AWS region your resource will be created in.
+                                    strategy: *ref_3
+                                    persistence:
+                                      type: object
+                                      description: |
+                                        Persistence settings. Should omit at least one of the persist options below.
+                                      properties:
+                                        blockDevicesMode:
+                                          type: string
+                                          example: reattach
+                                          description: |
+                                            Determine the way we attach the data volumes to the data devices. Valid values: ‘reattach', ‘onLaunch' Default: onLaunch
+                                        persistRootDevice:
+                                          type: boolean
+                                          example: true
+                                          description: |
+                                            Should the instance maintain its root device volumes
+                                        persistBlockDevices:
+                                          type: boolean
+                                          example: true
+                                          description: |
+                                            Should the instance maintain its Data volumes
+                                        persistPrivateIp:
+                                          type: boolean
+                                          example: true
+                                          description: |
+                                            Should the instance maintain its private IP
+                                    healthCheck:
+                                      type: object
+                                      properties:
+                                        type:
+                                          type: string
+                                          example: EC2
+                                          description: |
+                                            The service to use for the health check. Valid values: `EC2`, `ELB`, `TARGET_GROUP` Default: EC2
+                                        autoHealing:
+                                          type: boolean
+                                          example: true
+                                          description: |
+                                            Enable the auto healing which auto replaces the instance in case the health check fails Default: true
+                                        gracePeriod:
+                                          type: integer
+                                          example: 120
+                                          description: |
+                                            The amount of time, in seconds, after the instance has launched to starts and check its health. Default: 120
+                                        unhealthyDuration:
+                                          type: integer
+                                          example: 120
+                                          description: |
+                                            The amount of time, in seconds, an existing instance should remain active after becoming unhealthy. After the set time out the instance will be replaced Default: 120
+                                    compute: *ref_4
+                                    integrations: *ref_5
+                                    scheduling: *ref_6
+                          kind:
+                            example: spotinst:aws:ec2:managedInstance
+        '400':
+          description: Bad Request
+  /aws/ec2/managedInstance/{MI_ID}:
+    put:
+      summary: Update Stateful Node
+      description: |
+        <ul> <li>Update one or more attributes in your Stateful Node.
+        <li>This API supports partial updates, so only specific fields can be updated separately.
+        <li>In order to remove a setting from the instance config, set the object value to null.
+        <li>For a Full List of the Elastigroup JSON object reference please see Stateful Node Create. <ul>
+      operationId: AWSManagedInstanceUpdate
+      tags:
+        - Stateful Node AWS
+      parameters:
+        - *ref_1
+        - &ref_8
+          in: path
+          name: MI_ID
+          example: smi-111
+          description: |
+            Stateful Node ID you want to get
+          schema:
+            type: string
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - *ref_0
+      responses:
+        '200': *ref_7
+        '400':
+          description: Bad Request
+    get:
+      summary: Get Stateful Node
+      description: |
+        Get specific Stateful Node config.
+      operationId: AWSManagedInstanceGet
+      tags:
+        - Stateful Node AWS
+      parameters:
+        - *ref_1
+        - *ref_8
+      responses:
+        '200': *ref_7
+        '400':
+          description: Bad Request
+    delete:
+      summary: Delete Stateful Node
+      description: |
+        Get specific Stateful Node config.
+      operationId: AWSManagedInstanceDelete
+      tags:
+        - Stateful Node AWS
+      parameters:
+        - *ref_1
+        - *ref_8
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  properties:
+                    deallocationConfig:
+                      type: object
+                      properties:
+                        shouldDeleteImages:
+                          type: boolean
+                          example: true
+                          description: |
+                            Flag to remove persistent image
+                            Default: false
+                        shouldDeleteNetworkInterfaces:
+                          type: boolean
+                          example: true
+                          description: |
+                            Flag to remove network interfaces
+                            Default: false
+                        shouldDeleteVolumes:
+                          type: boolean
+                          example: true
+                          description: |
+                            Flag to remove persistent volumes
+                            Default: false
+                        shouldDeleteSnapshots:
+                          type: boolean
+                          example: true
+                          description: |
+                            Flag to remove snapshots
+                            Default: false
+                        shouldTerminateInstance:
+                          type: boolean
+                          example: true
+                          description: |
+                            Flag to detach a machine without terminating it on AWS side. This will enable rollback to AWS.
+                            Example: false
+                    amiBackup:
+                      type: object
+                      properties:
+                        shouldDeleteImages:
+                          type: boolean
+                          example: true
+                          description: |
+                            Mark if images collected during AMI Auto Backup should be deleted during instance deletion
+                            Default: false
+      responses:
+        '200': &ref_10
+          description: Spot Response
+          content:
+            application/json:
+              schema: *ref_9
+        '400':
+          description: Bad Request
+  /aws/ec2/managedInstance/{MI_ID}/pause:
+    put:
+      summary: Pause Stateful Node
+      description: |
+        Pause an existing Stateful Node.
+      operationId: AWSManagedInstancePause
+      tags:
+        - Stateful Node AWS
+      parameters:
+        - *ref_1
+        - *ref_8
+      responses:
+        '200': *ref_10
+        '400':
+          description: Bad Request
+  /aws/ec2/managedInstance/{MI_ID}/resume:
+    put:
+      summary: Resume Stateful Node
+      description: |
+        Resume an existing Stateful Node.
+      operationId: AWSManagedInstanceResume
+      tags:
+        - Stateful Node AWS
+      parameters:
+        - *ref_1
+        - *ref_8
+      responses:
+        '200': *ref_10
+        '400':
+          description: Bad Request
+  /aws/ec2/managedInstance/{MI_ID}/recycle:
+    put:
+      summary: Recycle Stateful Node
+      description: |
+        Recycle an existing Stateful Node.
+      operationId: AWSManagedInstanceRecycle
+      tags:
+        - Stateful Node AWS
+      parameters:
+        - *ref_1
+        - *ref_8
+      responses:
+        '200': *ref_10
+        '400':
+          description: Bad Request
+  /aws/ec2/managedInstance/{MI_ID}/costs:
+    get:
+      summary: Get Stateful Node Costs
+      description: |
+        Get financial information on a specific Stateful Node.
+        To use this API, managedInstanceId must be defined.
+      operationId: AWSManagedInstanceCostsPerManagedInstance
+      tags:
+        - Stateful Node AWS
+      parameters:
+        - *ref_1
+        - *ref_8
+        - in: query
+          name: fromDate
+          example: '2019-05-17'
+          required: true
+          description: Get items on or after this date (ISO 8601)
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: toDate
+          example: '2019-05-25'
+          required: true
+          description: Get items on or before this date (ISO 8601)
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: aggregationPeriod
+          schema:
+            type: string
+          description: |
+            Data values following either a date format (YYYY-MM-DDTHH:mm:ss.SSSZ ; 2016-01-10T00:00:00.000Z) or Unix seconds Timestamp (1494751821)
+      responses:
+        '200':
+          description: Get Elastigroup Costs
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_2
+                  - type: object
+                    properties:
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                running:
+                                  type: object
+                                  properties:
+                                    value:
+                                      type: integer
+                                      example: 4
+                                    unit:
+                                      type: string
+                                      example: hours
+                                savings:
+                                  type: object
+                                  properties:
+                                    value:
+                                      type: integer
+                                      example: 0
+                                    unit:
+                                      type: string
+                                      example: percentage
+                                costs:
+                                  type: object
+                                  properties:
+                                    actual:
+                                      type: integer
+                                      example: 0.268
+                                    potential:
+                                      type: integer
+                                      example: 0.268
+                          kind:
+                            example: spotinst:aws:ec2:managedInstance:costs
+        '400':
+          description: Bad Request
+  /aws/ec2/managedInstance/{MI_ID}/status:
+    get:
+      summary: Get Stateful Node Status
+      description: |
+        Describes the current status of a specific Stateful Node – entailing information regarding running instance and its status.
+      operationId: AWSManagedInstanceStatus
+      tags:
+        - Stateful Node AWS
+      parameters:
+        - *ref_1
+        - *ref_8
+      responses:
+        '200':
+          description: Elastigroup Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_2
+                  - type: object
+                    properties:
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                  example: smi-50739ad2
+                                name:
+                                  type: string
+                                  example: i-0db00q51ec9069ebf
+                                status:
+                                  type: string
+                                  example: ACTIVE
+                                instanceId:
+                                  type: string
+                                  example: i-0vc9530daq19c4aad
+                                instanceType:
+                                  type: string
+                                  example: t2.micro
+                                imageId:
+                                  type: string
+                                  example: ami-03238ecdbdc7d6d6a
+                                privateIp:
+                                  type: string
+                                  example: 172.31.10.21
+                                publicIp:
+                                  type: string
+                                  example: 34.212.65.224
+                                createdAt:
+                                  type: string
+                                  example: '2020-05-05T08:53:12.000Z'
+                                launchedAt:
+                                  type: string
+                                  example: '2020-05-05T08:53:12.000Z'
+                          kind:
+                            example: spotinst:aws:ec2:managedInstanceStatus
+        '400':
+          description: Bad Request
+  /aws/ec2/managedInstance/{MI_ID}/volume/{volumeId}:
+    delete:
+      summary: Delete Volume in a Stateful Node
+      description: |
+        Delete a Volume that is part of a Stateful Node
+      operationId: deleteVolumeManagedInstance
+      tags:
+        - Stateful Node AWS
+      parameters:
+        - *ref_1
+        - in: path
+          name: MI_ID
+          schema:
+            type: string
+          required: true
+          example: smi-123456
+          description: |
+            Stateful Node ID
+        - in: path
+          name: volumeId
+          schema:
+            type: string
+          required: true
+          example: vol-0faa4b2957a3d59c8
+          description: |
+            Volume ID
+      responses:
+        '200':
+          description: Delete Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        description: |
+                          Original request properties
+                        properties:
+                          id:
+                            type: string
+                            example: 3b750eff-3940-46b3-a309-aa2b415272fd
+                            description: |
+                              Unique ID associated with this request
+                          url:
+                            type: string
+                            example: /aws/ec2/managedInstance/smi-123456/volume/vol-0faa4b2957a3d59c8
+                            description: |
+                              The URL that was used for the request
+                          method:
+                            type: string
+                            example: DELETE
+                            description: |
+                              The HTTP **METHOD** used for the request
+                          timestamp:
+                            type: string
+                            example: '2021-11-03T11:02:55.608Z'
+                            description: |
+                              When the request was received by Spot
+                      response:
+                        type: object
+                        description: |
+                          Response package that includes, status, type and any relevant data.
+                        properties:
+                          status:
+                            type: object
+                            properties:
+                              code:
+                                type: integer
+                                example: 200
+                                description: |
+                                  HTTP status code assigned to this response
+                              message:
+                                type: string
+                                example: OK
+                                description: |
+                                  HTTP status message for the respective status code
+        '400':
+          description: Bad Request
+  /aws/ec2/managedInstance/migration:
+    post:
+      summary: Import Instance from AWS
+      description: |
+        <ul> <li>Import an instance from AWS into Stateful Node, while keeping the instance data and its persistence settings.
+        <li>This call is starting the migration and returns migration ID.
+        <li>In order to get migration status use the Get Migration Status call <ul>
+      operationId: AWSManagedInstanceImportInstanceFromAWS
+      tags:
+        - Stateful Node AWS
+      parameters:
+        - *ref_1
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  required:
+                    - migration
+                  properties:
+                    migration:
+                      title: Migration
+                      description: Migration Configuration
+                      type: object
+                      required:
+                        - originalInstanceId
+                        - region
+                      properties:
+                        shouldKeepPrivateIp:
+                          type: boolean
+                          example: false
+                          description: |
+                            Set whether the instance should keep its private ip or not
+                        shouldKeepMetadataOptions:
+                          type: boolean
+                          example: false
+                          description: |
+                            Set whether the instance should keep its metadataOptions or not
+                        originalInstanceId:
+                          type: string
+                          example: i-123
+                          description: |
+                            The instance ID on AWS
+                        region:
+                          type: string
+                          example: us-east-1
+                          description: |
+                            Set instance's region
+                        shouldTerminateInstance:
+                          type: boolean
+                          example: false
+                          description: |
+                            Set true or false whether to terminate the instance in AWS. Note: If shouldKeepPrivateIp is true, then shouldTerminateInstance must be true. Otherwise an error will be returned.
+                        managedInstanceName:
+                          type: string
+                          example: us-east-1
+                          description: |
+                            Set Stateful Node name
+                        product:
+                          type: string
+                          example: Linux/UNIX
+                          description: |
+                            Set instance's product
+                        spotInstanceTypes:
+                          type: array
+                          description: |
+                            List of possible instance types for the Stateful Node
+                          items:
+                            type: string
+                            example: m3.large
+                        availabilityZones:
+                          title: Availability Zones
+                          description: List of availability zones for the Stateful Node. Should exist only if shouldKeepPrivateIp is false.
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                                description: Availability Zone name
+                                example: us-west-2c
+                              subnetIds:
+                                type: array
+                                items:
+                                  type: string
+                                  example: subnet-fdfb00a0
+      responses:
+        '200':
+          description: Migration Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_2
+                  - type: object
+                    properties:
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                migrationId:
+                                  type: string
+                                  title: The id of the migration
+                                  description: In order to fetch migration status, you can utilize this id as a `Get Instance Migration Status` API call input
+                                  example: smg-123
+                                managedInstanceId:
+                                  type: string
+                                  title: Stateful Node ID
+                                  example: smi-123
+                                data:
+                                  type: object
+                                  properties:
+                                    originalInstanceId:
+                                      type: string
+                                      title: Instance id
+                                      description: Original AWS EC2 Instance id
+                                      example: i-123
+                                    shouldKeepPrivateIp:
+                                      type: boolean
+                                      title: Should keep private IP
+                                      example: true
+                                    shouldKeepMetadataOptions:
+                                      type: boolean
+                                      title: Should keep metadataOptions
+                                      example: true
+                                    shouldTerminateInstance:
+                                      type: boolean
+                                      title: Should terminate instance
+                                      example: true
+                                state:
+                                  type: string
+                                  title: Migration state
+                                  description: On initiation, the migration would be in the following state - `MIGRATE_START`. Possible end states for the migration are -  `MIGRATE_CANCEL`, `MIGRATE_FINISH`, `MIGRATE_ERROR`.
+                                  example: MIGRATE_START
+                          kind:
+                            example: spotinst:aws:ec2:managedInstance:migration
+        '400':
+          description: Bad Request
+  /aws/ec2/managedInstance/migration/bulk:
+    post:
+      summary: Import Multiple Instances from AWS
+      description: |
+        <ul> <li>Import multiple stateful instances from AWS into Stateful Node, preserving both instance data and persistence settings.
+        <li>This call initiates migration for all instances and returns the associated migration IDs.
+        <li>To check the status of multiple migrations, use the `Get Multiple Instance Migration Status` call.
+        <li>Note: The response contains a `failures` field. In the event that one or more instances failed to migrate, this field will provide the corresponding resource IDs and error messages. If all migrations were successful, this field will return an empty list. <ul>
+      operationId: AWSManagedInstanceBulkImportInstanceFromAWS
+      tags:
+        - Stateful Node AWS
+      parameters:
+        - *ref_1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  required:
+                    - migrations
+                  properties:
+                    migrations:
+                      title: Migrations
+                      description: List of Migration requests
+                      type: array
+                      items:
+                        type: object
+                        title: Migration
+                        description: Migration request
+                        required:
+                          - originalInstanceId
+                          - region
+                        properties:
+                          shouldKeepPrivateIp:
+                            type: boolean
+                            example: false
+                            description: |
+                              Set whether the instance should keep its private ip or not
+                          shouldKeepMetadataOptions:
+                            type: boolean
+                            example: false
+                            description: |
+                              Set whether the instance should keep its metadataOptions or not
+                          originalInstanceId:
+                            type: string
+                            example: i-123
+                            description: |
+                              The instance ID on AWS
+                          region:
+                            type: string
+                            example: us-east-1
+                            description: |
+                              Set instance's region
+                          shouldTerminateInstance:
+                            type: boolean
+                            example: false
+                            description: |
+                              Set true or false whether to terminate the instance in AWS. Note: If shouldKeepPrivateIp is true, then shouldTerminateInstance must be true. Otherwise an error will be returned.
+                          managedInstanceName:
+                            type: string
+                            example: us-east-1
+                            description: |
+                              Set Stateful Node name
+                          product:
+                            type: string
+                            example: Linux/UNIX
+                            description: |
+                              Set instance's product
+                          spotInstanceTypes:
+                            type: array
+                            description: |
+                              List of possible instance types for the Stateful Node
+                            items:
+                              type: string
+                              example: m3.large
+                          availabilityZones:
+                            title: Availability Zones
+                            description: List of availability zones for the Stateful Node. Should exist only if shouldKeepPrivateIp is false.
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                name:
+                                  type: string
+                                  description: Availability Zone name
+                                  example: us-west-2c
+                                subnetIds:
+                                  type: array
+                                  items:
+                                    type: string
+                                    example: subnet-fdfb00a0
+      responses:
+        '200':
+          description: Bulk Migration Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_2
+                  - type: object
+                    properties:
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              title: Migration
+                              properties:
+                                migrationId:
+                                  type: string
+                                  title: The id of the migration
+                                  description: In order to fetch migration status, you can utilize this id as a `Get Instance Migration Status` API call input
+                                  example: smg-123
+                                managedInstanceId:
+                                  type: string
+                                  title: Stateful Node ID
+                                  example: smi-123
+                                data:
+                                  type: object
+                                  properties:
+                                    originalInstanceId:
+                                      type: string
+                                      title: Instance id
+                                      description: Original AWS EC2 Instance id
+                                      example: i-123
+                                    managedInstanceName:
+                                      type: string
+                                      title: Stateful Node name
+                                      description: Your chosen Stateful Node name, so you would be able to distinct between your requests
+                                      example: MI-PROD-123
+                                    shouldKeepPrivateIp:
+                                      type: boolean
+                                      title: Should keep private IP
+                                      example: true
+                                    shouldKeepMetadataOptions:
+                                      type: boolean
+                                      title: Should keep metadataOptions
+                                      example: true
+                                    shouldTerminateInstance:
+                                      type: boolean
+                                      title: Should terminate instance
+                                      example: true
+                                state:
+                                  type: string
+                                  title: Migration state
+                                  description: On initiation, the migration would be in the following state - `MIGRATE_START`. Possible end states for the migration are -  `MIGRATE_CANCEL`, `MIGRATE_FINISH`, `MIGRATE_ERROR`.
+                                  example: MIGRATE_START
+                          failures:
+                            type: array
+                            title: Failed instances
+                            description: AWS EC2 instances that we failed to start migrating. In case there are no failures, would return empty list
+                            items:
+                              type: object
+                              properties:
+                                resourceId:
+                                  type: string
+                                  title: Original Instance Id
+                                  example: i-456
+                                errorMessage:
+                                  title: Error Message
+                                  type: string
+                                  description: Failure reason
+                                  example: Failed to create migration for Stateful Node
+                          kind:
+                            example: spotinst:aws:ec2:managedInstance:migration
+        '400':
+          description: Bad Request
+  /aws/ec2/managedInstance/migration/{MIGRATION_ID}:
+    get:
+      summary: Get Instance Migration Status
+      description: |
+        <ul> <li>Get a previously initiated instance migration status.
+        <li>To initiate an instance migration from AWS use the Import Instance From AWS call.
+        <li>On initiation, the migration would be in the following state: `MIGRATE_START`.
+        <li>Possible end states for the migration are: `MIGRATE_CANCEL`, `MIGRATE_FINISH`, `MIGRATE_ERROR`. <ul>
+      operationId: AWSManagedInstanceGetInstanceMigrationStatus
+      tags:
+        - Stateful Node AWS
+      parameters:
+        - *ref_1
+        - in: path
+          name: MIGRATION_ID
+          example: smg-123
+          description: |
+            Migration ID for which you want to get the status
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Stateful Node Migration Status Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_2
+                  - type: object
+                    properties:
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items: &ref_11
+                              type: object
+                              properties:
+                                migrationId:
+                                  type: string
+                                  title: Stateful Migration id
+                                  example: smg-1234
+                                managedInstanceId:
+                                  type: string
+                                  title: Stateful Node id
+                                  example: smi-1234
+                                instanceId:
+                                  type: string
+                                  title: AWS EC2 Instance id
+                                  example: i-1234
+                                state:
+                                  type: string
+                                  title: Current migration state
+                                  example: MIGRATE_START
+                                stateDescription:
+                                  type: string
+                                  title: Current state description
+                                  example: Creating an image from the instance
+                          kind:
+                            example: spotinst:aws:ec2:managedInstance:migration
+        '400':
+          description: Bad Request
+  /aws/ec2/managedInstance/migration/search:
+    post:
+      summary: Get Multiple Instance Migration Status
+      description: |
+        <ul> <li>Retrieve the status of a previously initiated multiple instance migrations.
+        <li>To initiate multiple instance migrations from AWS, use the `Import Multiple Instances From AWS` call.
+        <li>Upon initiation, the migration will be in the state of `MIGRATE_START`.
+        <li>Possible final states for each migration include `MIGRATE_CANCEL`, `MIGRATE_FINISH`, and `MIGRATE_ERROR`. <ul>
+      operationId: AWSManagedInstanceGetMultipleInstanceMigrationStatus
+      tags:
+        - Stateful Node AWS
+      parameters:
+        - *ref_1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  required:
+                    - migrationIds
+                  properties:
+                    migrationIds:
+                      title: Migration Ids
+                      description: List of Migration ids. Use the `migrationId` field received in a `Import Multiple Instances from AWS` response
+                      type: array
+                      items:
+                        type: string
+                        title: Migration Id
+                        example:
+                          - smg-1234
+                          - smi-5678
+      responses:
+        '200':
+          description: Bulk Stateful Node Migration Status Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_2
+                  - type: object
+                    properties:
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            example:
+                              - migrationId: smg-1234
+                                managedInstanceId: smi-1234
+                                instanceId: i-1234
+                                state: MIGRATE_START
+                                stateDescription: Current state description
+                              - migrationId: smg-5678
+                                managedInstanceId: smi-5678
+                                instanceId: i-5678
+                                state: MIGRATE_START
+                                stateDescription: Current state description
+                            items: *ref_11
+                          kind:
+                            example: spotinst:aws:ec2:managedInstance:migration
+                          count:
+                            type: integer
+                            example: 2
+        '400':
+          description: Bad Request
+  /aws/ec2/managedInstance/state:
+    put:
+      summary: Update Stateful Node States
+      description: |
+        Update the state of multiple Stateful Nodes.
+      operationId: AWSManagedInstanceUpdateStates
+      tags:
+        - Stateful Node AWS
+      parameters:
+        - *ref_1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - title: Update Stateful Node states
+                  type: object
+                  description: |
+                    Contains the details of a request to update Stateful Node states.
+                  required:
+                    - managedInstanceStates
+                  properties:
+                    managedInstanceStates:
+                      type: array
+                      description: |
+                        An array of Stateful Node State objects (must contain at least 1 object).
+                      items:
+                        title: Stateful Node State
+                        type: object
+                        description: |
+                          Contains the details of a Stateful Node state.
+                        required:
+                          - id
+                          - state
+                        properties:
+                          id:
+                            type: string
+                            description: |
+                              Identifier of the Stateful Node.
+                            example: smi-12345678
+                          state:
+                            type: string
+                            description: |
+                              The new state of the Stateful Node.
+                            enum:
+                              - PAUSE
+                              - RESUME
+                            example: PAUSE
+                      example:
+                        - id: smi-12345678
+                          state: PAUSE
+                        - id: smi-12345679
+                          state: RESUME
+      responses:
+        '200':
+          description: Update Stateful Node States Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_9
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /aws/ec2/managedInstance/state?spotinstAccountId=act-123456
+                          method:
+                            example: PUT
+        '400':
+          description: Bad Request

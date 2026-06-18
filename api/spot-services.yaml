@@ -1,0 +1,3049 @@
+openapi: 3.0.0
+info:
+  version: '1.0'
+  description: |
+    Welcome to the Spot by Flexera OpenAPI Specification.
+    Here you will find REST definitions for all Spot products and platform administration tasks.
+
+    The API is hosted at `https://api.spotinst.io` and requires Bearer Token
+    Authentication.
+
+    For more information on how to use the Spot platform, including user guides,
+    developer guides, concepts, and tutorials, see the external [Spot Documentation](https://docs.flexera.com/spot/).
+  title: Spot by Flexera API - Services
+  x-logo:
+    url: https://spec.dev.spot.io/flexera-spot.png
+    altText: SpotByFlexeraLogo
+    href: https://spec.dev.spot.io
+  contact:
+    email: support@spot.io
+servers:
+  - url: https://api.spotinst.io
+security:
+  - auth: []
+components:
+  securitySchemes:
+    auth:
+      description: |
+        To generate bearer tokens and understand more about Spot by Flexera
+        authentication see the howto for
+        [token creation](https://docs.flexera.com/spot/administration/api/create-api-token)
+        on the Spot Help site.
+
+        ### Organizations and Accounts
+
+        Each Spot account is assigned to an organization and a set of environment Accounts.
+        An account is then linked to a specific cloud provider account.
+
+        Spot accounts are given an ID in the format `act-123abcd` that is sent as a query parameter while performing API calls.
+
+        To locate the account ID navigate to Settings -> Account in the Spot console.
+
+        ### Organizations with a Single Account
+        Each API call you make can be used with or without the account ID.
+
+        ### Organizations with Multiple Accounts
+        Each API call you make should be appended to the account ID. For example:
+
+        GET `https://api.spotinst.io/aws/ec2/group?accountId=act-123de678`
+        This call will return the list of Elastigroups for the specific Account used.
+
+        > NOTE: If no `accountId` is provided, the default (dldest) account for the Organization will be used.
+      type: http
+      scheme: bearer
+    authWithoutAccount:
+      description: |
+        To generate bearer tokens and learn more about Spot by Flexera
+        authentication, see [token creation](https://docs-spot.flexera.com/administration/api/create-api-token).
+      type: http
+      scheme: bearer
+tags:
+  - name: Audit Service
+    externalDocs:
+      url: https://spec.dev.spot.io/#tag/Audit-Service
+  - name: Health Check Service
+    externalDocs:
+      url: https://docs.flexera.com/spot/elastigroup/tools-integrations/custom-health-check-service
+  - name: Notification Subscription Service
+    description: |
+      The Spot notification service enables you a fast, flexible, fully managed push notification service that lets you know about major events that happened in your Spot account.ֿ Spot Notifications makes it simple and cost-effective to get push notifications to your email address, HTTP, HTTPS or AWS SNS (Simple Notifications Service).
+
+      > **Note**: This service is deprecated. Use the
+      [Notification Center Service](https://spec.dev.spot.io/#tag/Notification-Center-Service).
+  - name: Notification Center Service
+    description: |
+      Manage your compute notification policies. You can create new policies, apply updates, or delete the policy entirely.
+  - name: Insights Service
+paths:
+  /aws/potentialSavings:
+    get:
+      summary: Potential Savings
+      description: Describe Potential Savings for AWS resources like - ASG (Auto-scaling groups), Beanstalk, ELB, ECS, EMR and tagged instances. The response will provide Potential monthly savings in USD
+      operationId: elastigroupAwsPotentialSavings
+      tags:
+        - Insights Service
+      parameters:
+        - in: query
+          name: accountId
+          example: act-123456789
+          description: |
+            ID of the account associated with your token
+          schema:
+            type: string
+          required: false
+      responses:
+        '200':
+          description: Potential Savings Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        description: |
+                          Original request properties
+                        properties:
+                          url:
+                            type: string
+                            example: /aws/ec2/group/sig-12345/suspension
+                            description: |
+                              The URL that was used for the request
+                          method:
+                            type: string
+                            example: GET
+                            description: |
+                              The HTTP **METHOD** used for the request
+                      response:
+                        type: object
+                        description: |
+                          Response package that includes, status, type and any relevant data.
+                        properties:
+                          status:
+                            type: object
+                            properties:
+                              code:
+                                type: integer
+                                example: 200
+                                description: |
+                                  HTTP status code assigned to this response
+                              message:
+                                type: string
+                                example: OK
+                                description: |
+                                  HTTP status message for the respective status code
+                  - type: object
+                    properties:
+                      response:
+                        type: object
+                        properties:
+                          kind:
+                            type: string
+                            example: spotinst:cs:aws:potentialSavings
+                            description: |
+                              The data type of each item in the response
+                          items:
+                            type: array
+                            description: |
+                              Array of data objects
+                            items:
+                              type: array
+                              title: spotinst:cs:aws:potentialSavings
+                              items:
+                                type: object
+                                properties:
+                                  resourceType:
+                                    type: string
+                                    example: Auto Scaling Group
+                                  name:
+                                    type: string
+                                    example: Prod_ASG
+                                  region:
+                                    type: string
+                                    example: us-west-1
+                                  instances:
+                                    type: integer
+                                    example: 5
+                                  instanceTypes:
+                                    type: string
+                                    example:
+                                      - c4.4xlarge
+                                  potentialSavings:
+                                    type: integer
+                                    example: 2700
+                          count:
+                            type: integer
+                            example: 1
+                            description: |
+                              Size of the data object array
+        '400':
+          description: Bad Request
+  /aws/instancePotentialSavings:
+    get:
+      summary: Instances Potential Savings
+      description: Describe potential savings for the listed instances. You can provide multiple instance IDs separated by a comma. The response will provide potential monthly savings in USD.
+      operationId: elastigroupAwsInstancesPotentialSavings
+      tags:
+        - Insights Service
+      parameters:
+        - &ref_0
+          in: query
+          name: accountId
+          example: act-123456789
+          description: |
+            The ID of the account associated with your token.
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: region
+          example: us-east-1
+          description: |
+            The AWS Region
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: instanceIds
+          example: i-1234567
+          description: |
+            The instance ID
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Instances Potential Savings Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        description: |
+                          Original request properties
+                        properties:
+                          id:
+                            type: string
+                            example: ff3e1e5b-91b8-42fa-8267-b988efc7f662
+                            description: |
+                              Unique ID associated with this request
+                          url:
+                            type: string
+                            example: /aws/instancePotentialSavings?instanceIds=i-08674ba9a6ddb73f4%2Ci-0973dc7a755d34894®ion=us-west-2
+                            description: |
+                              The URL that was used for the request
+                          method:
+                            type: string
+                            example: GET
+                            description: |
+                              The HTTP **METHOD** used for the request
+                          timestamp:
+                            type: string
+                            example: '2015-06-29T13:01:55.060Z'
+                            description: |
+                              When the request was received by Spot
+                      response:
+                        type: object
+                        description: |
+                          Response package that includes, status, type and any relevant data.
+                        properties:
+                          status:
+                            type: object
+                            properties:
+                              code:
+                                type: integer
+                                example: 200
+                                description: |
+                                  HTTP status code assigned to this response
+                              message:
+                                type: string
+                                example: OK
+                                description: |
+                                  HTTP status message for the respective status code
+                  - type: object
+                    properties:
+                      response:
+                        type: object
+                        properties:
+                          kind:
+                            type: string
+                            example: spotinst:cs:aws:potentialSavings
+                            description: |
+                              The data type of each item in the response
+                          items:
+                            type: array
+                            description: |
+                              Array of data objects
+                            items:
+                              type: object
+                              title: spotinst:cs:aws:potentialSavings
+                              properties:
+                                newSpotRequests:
+                                  type: array
+                                  items:
+                                    type: object
+                                  description: New Spot Requests
+                                  example:
+                                    - resourceType: EC2Instance
+                                      name: i-12345abcde12345
+                                      instances: 1
+                                      instanceTypes:
+                                        - t2.medium
+                                      potentialSavings: 28
+                                    - resourceType: EC2Instance
+                                      name: i-0973dc7a755d34894
+                                      instances: 1
+                                      instanceTypes:
+                                        - m4.large
+                                      potentialSavings: 60
+                          count:
+                            type: integer
+                            example: 2
+                            description: |
+                              Size of the data object array
+        '400':
+          description: Bad Request
+  /aws/costs:
+    get:
+      summary: Get Costs per Account
+      description: Retrieve costs up to one year back per specified account over a specified time period.
+      operationId: awsCostsPerAccount
+      tags:
+        - Insights Service
+      parameters:
+        - in: query
+          name: accountId
+          example: act-123456789
+          description: |
+            ID of the account associated with your token
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: fromDate
+          example: '2018-06-20'
+          description: |
+            Date can be either in ISO-8601 date format (yyyy-mm-dd) or in Unix Timestamp format (e.g. 1494751821472).
+            *Minimum from date can be one year ago.
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: toDate
+          example: '2018-11-20'
+          description: |
+            Date can be either in ISO-8601 date format (yyyy-mm-dd) or in Unix Timestamp format (e.g. 1494751821472).
+            *Data is shown until the past day (Does not include today's costs)
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: aggregationPeriod
+          example: daily
+          description: |
+            Optional. The time period over which data is aggregated. Can only be "daily". For example, the figures in each data set are per day
+          schema:
+            type: string
+          required: false
+      responses:
+        '200':
+          description: Costs Per Account Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        description: |
+                          Original request properties
+                        properties:
+                          id:
+                            type: string
+                            example: 67582d0c-108b-4ef7-9fdc-d39678a30844
+                            description: |
+                              Unique ID associated with this request
+                          url:
+                            type: string
+                            example: /aws/costs
+                            description: |
+                              The URL that was used for the request
+                          method:
+                            type: string
+                            example: GET
+                            description: |
+                              The HTTP **METHOD** used for the request
+                          timestamp:
+                            type: string
+                            example: '2018-01-07T07:30:58.622Z'
+                            description: |
+                              When the request was received by Spot
+                      response:
+                        type: object
+                        description: |
+                          Response package that includes, status, type and any relevant data.
+                        properties:
+                          status:
+                            type: object
+                            properties:
+                              code:
+                                type: integer
+                                example: 200
+                                description: |
+                                  HTTP status code assigned to this response
+                              message:
+                                type: string
+                                example: OK
+                                description: |
+                                  HTTP status message for the respective status code
+                  - type: object
+                    properties:
+                      response:
+                        type: object
+                        properties:
+                          kind:
+                            type: string
+                            example: spotinst:aws:costs
+                            description: |
+                              The data type of each item in the response
+                          items:
+                            type: array
+                            description: |
+                              Array of data objects
+                            items:
+                              type: array
+                              title: spotinst:aws:ec2:group
+                              items:
+                                type: object
+                                properties:
+                                  timestamp:
+                                    type: string
+                                    example: '2020-03-06T00:00:00.000Z'
+                                    description: Time
+                                  spot:
+                                    type: object
+                                    properties:
+                                      runningHours:
+                                        type: number
+                                        format: float
+                                        example: 1470.8
+                                      actualCosts:
+                                        type: number
+                                        format: float
+                                        example: 107.3
+                                      potentialCosts:
+                                        type: number
+                                        format: float
+                                        example: 378.41
+                                      savingsPercentage:
+                                        type: number
+                                        format: float
+                                        example: 71.64
+                          count:
+                            type: integer
+                            example: 1
+                            description: |
+                              Size of the data object array
+        '400':
+          description: Bad Request
+  /aws/ec2/instanceTypeRecommendation:
+    post:
+      summary: Suggested Instance Type
+      description: |-
+        Get suggested instance types by required resources.
+        Note that request must include region, and at least one of the following values - baselineInstanceType, requiredVCpu, requiredMemoryGib
+      operationId: elastigroupAwsSuggestedInstanceType
+      tags:
+        - Insights Service
+      parameters:
+        - in: query
+          name: accountId
+          example: act-123abc
+          description: |
+            ID of the account associated with your token
+          schema:
+            type: string
+          required: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  title: spotinst:aws:ec2:instanceTypeRecommendation
+                  properties:
+                    requirements:
+                      type: object
+                      title: AWS Elastigroup
+                      properties:
+                        region:
+                          type: string
+                          description: Set valid AWS region
+                          example: us-east-1
+                        baselineInstanceType:
+                          type: string
+                          description: Set valid AWS instance type as baseline
+                          example: m5.large
+                        requiredVCpu:
+                          type: object
+                          description: Set required CPU resources by min / max
+                          properties:
+                            minimum:
+                              type: integer
+                              description: Minimum amount of VCpu
+                              example: 2
+                            maximum:
+                              type: integer
+                              description: Maximum amount of VCpu
+                              example: 4
+                        requiredMemoryGib:
+                          type: object
+                          description: Set required Memory (in Gib) resources by min / max
+                          properties:
+                            minimum:
+                              type: integer
+                              description: Minimum amount of Gib
+                              example: 16
+                            maximum:
+                              type: integer
+                              description: Maximum amount of Gib
+                              example: 64
+      responses:
+        '200':
+          description: Suggested Instance Type Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        description: |
+                          Original request properties
+                        properties:
+                          id:
+                            type: string
+                            example: 0bb5db74-2457-4a34-b8f3-174e6bf5578e
+                            description: |
+                              Unique ID associated with this request
+                          url:
+                            type: string
+                            example: /aws/ec2/instanceTypeRecommendation
+                            description: |
+                              The URL that was used for the request
+                          method:
+                            type: string
+                            example: POST
+                            description: |
+                              The HTTP **METHOD** used for the request
+                          timestamp:
+                            type: string
+                            example: '2016-06-19T08:41:57.516Z'
+                            description: |
+                              When the request was received by Spot
+                      response:
+                        type: object
+                        description: |
+                          Response package that includes, status, type and any relevant data.
+                        properties:
+                          status:
+                            type: object
+                            properties:
+                              code:
+                                type: integer
+                                example: 200
+                                description: |
+                                  HTTP status code assigned to this response
+                              message:
+                                type: string
+                                example: OK
+                                description: |
+                                  HTTP status message for the respective status code
+                  - type: object
+                    properties:
+                      response:
+                        type: object
+                        properties:
+                          kind:
+                            type: string
+                            example: spotinst:aws:ec2:instanceTypeRecommendation
+                            description: |
+                              The data type of each item in the response
+                          items:
+                            type: array
+                            description: |
+                              Array of data objects
+                            items:
+                              type: object
+                              example:
+                                - instanceType: m4.large
+                                - instanceType: m5.large
+                          count:
+                            type: integer
+                            example: 2
+                            description: |
+                              Size of the data object array
+        '400':
+          description: Bad Request
+  /azure/costs:
+    get:
+      summary: Get Costs Per Account
+      description: |
+        Get costs per time filter.
+      operationId: azureCostsPerAccount
+      tags:
+        - Elastigroup Azure Scale Set VMs
+      parameters:
+        - *ref_0
+        - in: query
+          name: fromDate
+          required: true
+          description: |
+            Get items on or after this date (ISO 8601 or Unix timestamp)
+          schema:
+            type: string
+          example: 2020-09-01 or fromDate=1598918400000
+        - in: query
+          name: toDate
+          required: true
+          description: Get items on or before this date (ISO 8601 or Unix timestamp)
+          schema:
+            type: string
+          example: 2020-09-01 or fromDate=1598918400000
+      responses:
+        '200':
+          description: Costs Per Account Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: 67582d0c-108b-4ef7-9fdc-d39678a30844
+                          url:
+                            type: string
+                            example: /azure/costs
+                          method:
+                            type: string
+                            example: GET
+                          timestamp:
+                            type: string
+                            example: '2018-01-07T07:30:58.622Z'
+                      response:
+                        type: object
+                        properties:
+                          kind:
+                            type: string
+                            example: spotinst:azure:costs
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              title: spotinst:azure:costs
+                              properties:
+                                lowPriority:
+                                  type: object
+                                  properties:
+                                    runningHours:
+                                      type: number
+                                      format: number
+                                      example: 1470.8
+                                    actualCosts:
+                                      type: number
+                                      format: number
+                                      example: 107.3
+                                    potentialCosts:
+                                      type: number
+                                      format: number
+                                      example: 378.41
+                                    savingsPercentage:
+                                      type: number
+                                      format: number
+                                      example: 71.64
+                          count:
+                            type: integer
+                            example: 1
+        '400':
+          description: Bad Request
+  /gcp/gce/costs:
+    get:
+      summary: Get Costs Per Account
+      description: Retrieve costs up to one year back per specified account over a specified time period.
+      operationId: gcpCostsPerAccount
+      tags:
+        - Insights Service
+      parameters:
+        - in: query
+          name: accountId
+          example: act-12345678
+          description: |
+            The Spot account ID for which the cost information should be returned.
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: fromDate
+          example: '2016-01-10T00:00:00.000Z'
+          description: |
+            * The start date of the requested time period. 
+            * Date values following either a date format (YYYY-MM-DDTHH:mm:ss.SSSZ) or Unix milliseconds timestamp (1668078050004).
+            * <a style=color:red>The value cannot be earlier than 1 year back.</a>
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: toDate
+          example: '2016-01-10T01:00:00.000Z'
+          description: |
+            * The end date of the requested time period. 
+            * Date values following either a date format (YYYY-MM-DDTHH:mm:ss.SSSZ) or Unix milliseconds timestamp (1668078050004).
+            * <a style=color:red>The maximum of time period length is 90 days.</a>
+          schema:
+            type: string
+          required: false
+      responses:
+        '200':
+          description: Costs Per Account Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: 67582d0c-108b-4ef7-9fdc-d39678a30844
+                          url:
+                            type: string
+                            example: /gcp/gce/costs
+                          method:
+                            type: string
+                            example: GET
+                          timestamp:
+                            type: string
+                            example: '2016-01-10T01:00:00.000Z'
+                      response:
+                        type: object
+                        properties:
+                          kind:
+                            type: string
+                            example: spotinst:gcp:costs
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              title: spotinst:gcp:costs
+                              properties:
+                                preemptible:
+                                  type: object
+                                  properties:
+                                    runningHours:
+                                      description: The sum of preemptible running hours.
+                                      type: number
+                                      format: number
+                                      example: 1470.8
+                                    actualCosts:
+                                      description: The actual cost of the preemptible instances.
+                                      type: number
+                                      format: number
+                                      example: 107.3
+                                    potentialCosts:
+                                      description: The OD cost of the running preemptible instances.
+                                      type: number
+                                      format: number
+                                      example: 378.41
+                                    savingsPercentage:
+                                      description: The total savings percentage.
+                                      type: number
+                                      format: number
+                                      example: 71.64
+                          count:
+                            type: integer
+                            example: 1
+        '400':
+          description: Bad Request
+  /audit/events:
+    get:
+      summary: List Audit Log Events
+      description: |
+        Gets audit events that have response status of 200. This is the default when the responseStatus parameter is not included in the query. When you use responseStatus in the query, you can get all audit events without regard to status.
+
+        The API requires one of the following permissions to be defined in Spot:
+
+        * Permission: Organization Viewer (See User Roles) or
+        * Action: setup:describeAllAuditEvents (See Access Policies)
+      operationId: AuditServiceListAll
+      tags:
+        - Audit Service
+      parameters:
+        - in: query
+          name: fromDate
+          required: true
+          description: Get items on or after this date (Unix timestamp)
+          example: '1598918400000'
+          schema:
+            type: string
+            format: string
+        - in: query
+          name: toDate
+          required: true
+          description: Get items on or before this date (Unix timestamp)
+          example: '1598918400000'
+          schema:
+            type: string
+            format: string
+        - in: query
+          name: accountId
+          example: act-123abc
+          description: |
+            ID of the account associated with your token
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: responseStatus
+          example: all
+          description: |
+            Determines whether the audit events should be filtered by their response status code or not. Valid values: "success": Gets only events with status 200. "all": Audit events will not be filtered by response status codes, and all the events will be returned. Default: success
+          schema:
+            type: string
+          required: false
+      responses:
+        '200':
+          description: All Response Statuses (responseStatus=all)
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - &ref_1
+                    type: object
+                    allOf:
+                      - &ref_3
+                        type: object
+                        properties:
+                          request:
+                            type: object
+                            description: |
+                              Original request properties.
+                            properties:
+                              id:
+                                type: string
+                                example: e593ff58-067d-4340-92f9-8b1c0bad70d7
+                                description: |
+                                  Unique identifier associated with this request.
+                              url:
+                                type: string
+                                description: |
+                                  The URL that was used for the request.
+                              method:
+                                type: string
+                                description: |
+                                  The HTTP **METHOD** used for the request.
+                              timestamp:
+                                type: string
+                                example: '2018-06-20T11:35:01.745Z'
+                                description: |
+                                  When the request was received by Spot.
+                          response:
+                            type: object
+                            description: |
+                              Response package that includes status, type, and any relevant data.
+                            properties:
+                              status:
+                                type: object
+                                properties:
+                                  code:
+                                    type: integer
+                                    example: 200
+                                    description: |
+                                      HTTP status code assigned to this response.
+                                  message:
+                                    type: string
+                                    example: OK
+                                    description: |
+                                      HTTP status message for the respective status code.
+                      - type: object
+                        properties:
+                          response:
+                            type: object
+                            properties:
+                              count:
+                                type: integer
+                                example: 1
+                                description: |
+                                  Size of the data object array.
+                              kind:
+                                type: string
+                                description: |
+                                  The data type of each item in the response.
+                  - type: object
+                    properties:
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                user:
+                                  type: string
+                                  example: test@spot.io
+                                namespace:
+                                  type: string
+                                  example: GENERAL
+                                actionType:
+                                  type: string
+                                  example: Sign in with SSO
+                                resourceType:
+                                  type: string
+                                  example: User
+                                resourceId:
+                                  type: string
+                                  example: 21126
+                                createdAt:
+                                  type: string
+                                  example: '2020-06-01T12:17:51.000Z'
+                                context:
+                                  type: string
+                                  example: '{"body":{"email":"test@spot.io","isMarketplaceCustomer":false},"url":"/signIn/sso","query":{}}'
+                                source:
+                                  type: string
+                                  example: UI
+                                agent:
+                                  type: string
+                                  example: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.9.1667.012 Safari/537.36
+                                responseStatus:
+                                  type: integer
+                                  example: 200
+                          kind:
+                            example: spotinst:audit
+        '400':
+          description: Bad Request
+  /healthCheck:
+    post:
+      summary: Create Health Check
+      description: |
+        Create an HCS for Spot Elastigroup.
+      operationId: HealthCheckServiceCreate
+      tags:
+        - Health Check Service
+      parameters:
+        - in: query
+          name: accountId
+          example: act-123abc
+          description: |
+            ID of the account associated with your token
+          schema:
+            type: string
+          required: false
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  required:
+                    - healthCheck
+                  properties:
+                    healthCheck:
+                      type: object
+                      description: Group
+                      required:
+                        - proxyAddress
+                        - resourceId
+                      properties:
+                        resourceId:
+                          type: string
+                          example: sig-12345
+                          description: |
+                            Spot Resource ID
+                        name:
+                          type: string
+                          example: Service-1-healthCheck
+                          description: |
+                            A logical name for the health check
+                        proxyAddress:
+                          type: string
+                          description: |
+                            The public hostname / IP where you installed the Spot HCS
+                          example: 51.22.125.47
+                        proxyPort:
+                          description: |
+                            The port of the HCS. Default: 80
+                          type: integer
+                          example: 80
+                        check:
+                          type: object
+                          required:
+                            - protocol
+                            - port
+                            - endpoint
+                            - unhealthyThreshold
+                            - healthyThreshold
+                            - interval
+                            - timeout
+                          properties:
+                            protocol:
+                              type: string
+                              example: http
+                              description: |
+                                The protocol to use to connect with the instance. Valid values: http https
+                            port:
+                              description: |
+                                The port to use to connect with the instance
+                              type: integer
+                              example: 80
+                            endpoint:
+                              description: |
+                                The destination for the request
+                              type: string
+                              example: index.html
+                            unhealthyThreshold:
+                              description: |
+                                The number of consecutive failed health checks that must occur before declaring an instance unhealthy
+                              type: integer
+                              example: 2
+                            healthyThreshold:
+                              description: |
+                                The number of consecutive successful health checks that must occur before declaring an instance healthy
+                              type: integer
+                              example: 2
+                            interval:
+                              description: |
+                                The amount of time (in seconds) between each health check. Minimum value is 10
+                              type: integer
+                              example: 30
+                            timeout:
+                              description: |
+                                The amount of time (in seconds) to wait when receiving a response from the health check
+                              type: integer
+                              example: 60
+      responses:
+        '200': &ref_2
+          description: Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_1
+                  - type: object
+                    properties:
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 1
+                                resourceId:
+                                  type: string
+                                  example: sig-12345
+                                name:
+                                  type: string
+                                  example: Service-1-healthCheck
+                                proxyAddress:
+                                  type: string
+                                  example: 51.22.125.47
+                                proxyPort:
+                                  type: integer
+                                  example: 80
+                                check:
+                                  type: object
+                                  properties:
+                                    protocol:
+                                      type: string
+                                      example: http
+                                    port:
+                                      type: integer
+                                      example: 80
+                                    endpoint:
+                                      type: string
+                                      example: index.html
+                                    unhealthyThreshold:
+                                      type: integer
+                                      example: 2
+                                    healthyThreshold:
+                                      type: integer
+                                      example: 2
+                                    interval:
+                                      type: integer
+                                      example: 30
+                                    timeout:
+                                      type: integer
+                                      example: 60
+                          kind:
+                            example: spotinst:healthCheck
+        '400':
+          description: Bad Request
+    get:
+      summary: List Health Checks
+      description: |
+        Get a list of all HCS services.
+      operationId: HealthCheckServiceListAllHcs
+      tags:
+        - Health Check Service
+      parameters:
+        - in: query
+          name: accountId
+          example: act-123abc
+          description: |
+            ID of the account associated with your token
+          schema:
+            type: string
+          required: false
+      responses:
+        '200': *ref_2
+        '400':
+          description: Bad Request
+  /healthCheck/{HEALTHCHECK_ID}:
+    put:
+      summary: Update Health Check
+      description: |
+        Update existing HCS.
+      operationId: HealthCheckServiceUpdate
+      tags:
+        - Health Check Service
+      parameters:
+        - in: query
+          name: accountId
+          example: act-123abc
+          description: |
+            ID of the account associated with your token
+          schema:
+            type: string
+          required: false
+        - in: path
+          name: HEALTHCHECK_ID
+          example: hcs-123
+          description: |
+            The HCS you want to update
+          schema:
+            type: string
+          required: true
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  required:
+                    - healthCheck
+                  properties:
+                    healthCheck:
+                      type: object
+                      description: Group
+                      properties:
+                        name:
+                          type: string
+                          example: Service-1-healthCheck
+                          description: |
+                            A logical name for the health check
+                        proxyAddress:
+                          type: string
+                          description: |
+                            The public hostname / IP where you installed the Spot HCS
+                          example: 51.22.125.47
+                        proxyPort:
+                          description: |
+                            The port of the HCS. Default: 80
+                          type: integer
+                          example: 80
+                        check:
+                          type: object
+                          properties:
+                            protocol:
+                              type: string
+                              example: http
+                              description: |
+                                The protocol to use to connect with the instance. Valid values: http https
+                            port:
+                              description: |
+                                The port to use to connect with the instance
+                              type: integer
+                              example: 80
+                            endpoint:
+                              description: |
+                                The destination for the request
+                              type: string
+                              example: index.html
+                            unhealthyThreshold:
+                              description: |
+                                The number of consecutive failed health checks that must occur before declaring an instance unhealthy
+                              type: integer
+                              example: 2
+                            healthyThreshold:
+                              description: |
+                                The number of consecutive successful health checks that must occur before declaring an instance healthy
+                              type: integer
+                              example: 2
+                            interval:
+                              description: |
+                                The amount of time (in seconds) between each health check. Minimum value is 10
+                              type: integer
+                              example: 30
+                            timeout:
+                              description: |
+                                The amount of time (in seconds) to wait when receiving a response from the health check
+                              type: integer
+                              example: 60
+      responses:
+        '200': &ref_4
+          description: Spot Response
+          content:
+            application/json:
+              schema: *ref_3
+        '400':
+          description: Bad Request
+    get:
+      summary: Get Health Check
+      description: |
+        List the information of a particular HCS
+      operationId: HealthCheckServiceListHcs
+      tags:
+        - Health Check Service
+      parameters:
+        - in: query
+          name: accountId
+          example: act-123abc
+          description: |
+            ID of the account associated with your token
+          schema:
+            type: string
+          required: false
+        - in: path
+          name: HEALTHCHECK_ID
+          example: hcs-123
+          description: |
+            The HCS you want to update
+          schema:
+            type: string
+          required: true
+      responses:
+        '200': *ref_2
+        '400':
+          description: Bad Request
+    delete:
+      summary: Delete Health Check
+      description: |
+        Delete existing HCS
+      operationId: HealthCheckServiceDelete
+      tags:
+        - Health Check Service
+      parameters:
+        - *ref_0
+        - in: path
+          name: HEALTHCHECK_ID
+          example: hcs-123
+          description: |
+            The HCS you want to update
+          schema:
+            type: string
+          required: true
+      responses:
+        '200': *ref_4
+        '400':
+          description: Bad Request
+  /events/notification/accountPolicy:
+    put:
+      summary: Update Account Notification Policy
+      description: |
+        Update the account notification policy
+          > **Note:** This service is deprecated. Use the 
+          [Notification Center Service](https://spec.dev.spot.io/#tag/Notification-Center-Service).
+      operationId: NotificationsServiceUpdateAccountNotificationPolicy
+      tags:
+        - Notification Subscription Service
+      parameters:
+        - *ref_0
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              allOf:
+                - &ref_5
+                  type: object
+                  properties:
+                    accountPolicy:
+                      type: object
+                      properties:
+                        emailPolicy:
+                          type: object
+                          properties:
+                            statements:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  category:
+                                    type: string
+                                    example: Elastigroup Errors
+                                    description: |
+                                      Event notification category
+                                  subCategory:
+                                    type: string
+                                    example: Launch instances failures
+                                    description: |
+                                      Event notification sub category (should match to the event category)
+                                  isEnabled:
+                                    type: boolean
+                                    example: true
+                                    description: |
+                                      Flag to enable/disable the notification statement
+                                  applyOnFutureResources:
+                                    type: boolean
+                                    example: true
+                                    description: |
+                                      Flag to set whether to auto apply on newly created resources
+                                  allowedResources:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        id:
+                                          type: string
+                                          example: sig-1234
+                                          description: |
+                                            Set resource ID
+                                  deniedResources:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        id:
+                                          type: string
+                                          example: sig-9999
+                                          description: |
+                                            List of denied resources for the statement settings
+                        slackPolicy:
+                          type: object
+                          properties:
+                            statements:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  category:
+                                    type: string
+                                    example: Elastigroup Errors
+                                    description: |
+                                      Event notification category
+                                  subCategory:
+                                    type: string
+                                    example: Launch instances failures
+                                    description: |
+                                      Event notification sub category (should match to the event category)
+                                  isEnabled:
+                                    type: boolean
+                                    example: true
+                                    description: |
+                                      Flag to enable/disable the notification statement
+                                  applyOnFutureResources:
+                                    type: boolean
+                                    example: true
+                                    description: |
+                                      Flag to set whether to auto apply on newly created resources
+                                  allowedResources:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        id:
+                                          type: string
+                                          example: sig-1234
+                                          description: |
+                                            Set resource ID
+                                  deniedResources:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        id:
+                                          type: string
+                                          example: sig-9999
+                                          description: |
+                                            List of denied resources for the statement settings
+      responses:
+        '200': *ref_4
+        '400':
+          description: Bad Request
+    get:
+      summary: Get Account Notification Policy
+      description: |
+        Get the account notification policy
+          > **Note:** This service is deprecated. Use the 
+          [Notification Center Service](https://spec.dev.spot.io/#tag/Notification-Center-Service).
+      operationId: NotificationsServiceGetAccountNotificationPolicy
+      tags:
+        - Notification Subscription Service
+      parameters:
+        - *ref_0
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_1
+                  - type: object
+                    properties:
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items: *ref_5
+        '400':
+          description: Bad Request
+  /notificationCenter/policy:
+    post:
+      summary: Create Notification Policy
+      description: |
+        Creates a notification policy. Only for Compute policies.
+      operationId: notificationPolicyCreate
+      tags:
+        - Notification Center Service
+      parameters:
+        - *ref_0
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - &ref_6
+                  type: object
+                  required:
+                    - computePolicyConfig
+                    - privacyLevel
+                  properties:
+                    name:
+                      type: string
+                      description: The name of the notification policy.
+                      example: Test Notification Policy
+                    description:
+                      type: string
+                      description: A brief description of the notification policy. Can be null or not empty.
+                      example: A description of the notification policy.
+                    privacyLevel:
+                      type: string
+                      description: The privacy level of the notification policy.
+                      enum:
+                        - public
+                        - private
+                      example: public
+                    subscriptions: &ref_7
+                      type: array
+                      description: For public policies, you can decide how the notifications are delivered. For example, by email, webhook, slack, sns.
+                      items:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            enum:
+                              - email
+                              - webhook
+                              - slack
+                              - sns
+                            example: email
+                          endpoint:
+                            description: Target endpoint [max limit 500 characters]
+                            type: string
+                            example: endpoint@example.com
+                    registeredUsers: &ref_8
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          userEmail:
+                            type: string
+                            description: User's email address. The user must be part of the organization.
+                            example: user@example.com
+                          subscriptionTypes:
+                            type: array
+                            items:
+                              type: string
+                              enum:
+                                - email
+                                - console
+                              example:
+                                - email
+                                - console
+                    isActive:
+                      type: boolean
+                      example: true
+                    computePolicyConfig: &ref_9
+                      type: object
+                      description: |
+                        You can only use one resource type. For example: All resources (use "shouldIncludeAllResources": true), Rule Based Resources (use at least one dynamicRules), OR Individual Resources (use a least one resourceIds).
+                      required:
+                        - events
+                      properties:
+                        events:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              event:
+                                type: string
+                                example: Event Name
+                              type:
+                                type: string
+                                enum:
+                                  - INFO
+                                  - WARN
+                                  - ERROR
+                                example: INFO
+                        shouldIncludeAllResources:
+                          type: boolean
+                          example: false
+                        resourceIds:
+                          type: array
+                          description: |
+                            Manually specified resource IDs to include in the policy. Must be resources related to the account.
+                          example:
+                            - act-123456789
+                            - act-987654321
+                          items:
+                            type: string
+                        dynamicRules:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              filterConditions:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    identifier:
+                                      type: string
+                                      enum:
+                                        - resource_name
+                                        - resource_id
+                                        - region
+                                        - image
+                                        - tag
+                                        - load_balancer
+                                        - availability_zones
+                                        - security_groups
+                                      example: resource_name
+                                    operator:
+                                      type: string
+                                      enum:
+                                        - equals
+                                        - not_equals
+                                        - contains
+                                        - not_contains
+                                        - start_with
+                                        - end_with
+                                      example: equals
+                                    expression:
+                                      type: string
+                                      example: value
+      responses:
+        '200':
+          description: Notification Policy Create Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_1
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /notificationCenter/policy/accountId=act-123456789
+                          method:
+                            example: POST
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              allOf:
+                                - type: object
+                                  properties:
+                                    Id:
+                                      type: string
+                                      description: The unique identifier of the notification policy.
+                                      example: snp-1a2b3c4d
+                                - *ref_6
+                          kind:
+                            example: spotinst:notificationPolicy
+        '400':
+          description: Bad Request
+    get:
+      summary: Get User Notification Policies
+      description: |
+        Retrieves a list of all notification policies for a specific user.
+      operationId: userNotificationPolicyList
+      tags:
+        - Notification Center Service
+      responses:
+        '200':
+          description: Notification Policy List Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_1
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /notificationCenter/policy
+                          method:
+                            example: GET
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              description: |
+                                Notification policy item.
+                              properties:
+                                policyId:
+                                  type: string
+                                  description: The unique identifier of the notification policy.
+                                  example: snp-12345
+                                type:
+                                  type: string
+                                  description: The type of the notification policy.
+                                  example: compute
+                                name:
+                                  type: string
+                                  description: The name of the notification policy.
+                                  example: Test Notification Policy
+                                description:
+                                  type: string
+                                  description: A brief description of the notification policy.
+                                  example: A description of the notification policy.
+                                owner:
+                                  type: string
+                                  description: The owner of the notification policy.
+                                  example: user@example.com
+                                registeredUsersCount:
+                                  type: integer
+                                  description: The number of registered users for the notification policy.
+                                  example: 2
+                                isActive:
+                                  type: boolean
+                                  description: The status of the notification policy.
+                                  example: true
+                                isRegistered:
+                                  type: boolean
+                                  description: Indicates if the user is registered for the notification policy.
+                                  example: true
+                                accountId:
+                                  type: string
+                                  description: The unique identifier of the account.
+                                  example: act-123456789
+                                notificationMethod:
+                                  type: array
+                                  description: The notification methods used for the policy.
+                                  items:
+                                    type: string
+                                    example:
+                                      - email
+                                      - console
+                          kind:
+                            example: spotinst:notification:userNotificationPolicy
+        '400':
+          description: Bad Request
+  /notificationCenter/policy/{policyId}:
+    get:
+      summary: Get Notification Policy
+      description: |
+        Get configuration for a notification policy.
+      operationId: notificationPolicyGet
+      tags:
+        - Notification Center Service
+      parameters:
+        - &ref_10
+          in: path
+          name: policyId
+          example: snp-1a2b3c4d
+          description: |
+            ID for the notification policy.
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Notification Policy Get Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_1
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /notificationCenter/policy/{policyId}
+                          method:
+                            example: GET
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              description: |
+                                The notification policy.
+                              properties:
+                                id:
+                                  type: string
+                                  readOnly: true
+                                  description: The unique identifier of the notification policy.
+                                  example: snp-12345
+                                name:
+                                  type: string
+                                  description: The name of the notification policy.
+                                  example: Test Notification Policy
+                                description:
+                                  type: string
+                                  description: A brief description of the notification policy.
+                                  example: A description of the notification policy.
+                                owner:
+                                  type: string
+                                  readOnly: true
+                                  description: The owner of the notification policy.
+                                  example: user@example.com
+                                privacyLevel:
+                                  type: string
+                                  description: The privacy level of the notification policy.
+                                  enum:
+                                    - public
+                                    - private
+                                  example: public
+                                subscriptions: *ref_7
+                                registeredUsers: *ref_8
+                                isActive:
+                                  type: boolean
+                                  example: true
+                                type:
+                                  type: string
+                                  enum:
+                                    - compute
+                                  example: compute
+                                computePolicyConfig:
+                                  type: array
+                                  items:
+                                    allOf:
+                                      - *ref_9
+                                      - type: object
+                                        properties:
+                                          accountId:
+                                            type: string
+                                            description: The unique identifier of the account.
+                                            example: acc-123456789
+                          kind:
+                            example: spotinst:notificationPolicy
+        '400':
+          description: Bad Request
+    put:
+      summary: Update Notification Policy
+      description: |
+        Update a notification policy (only for Compute policies). You can do a partial update of just the fields you want to.
+      operationId: notificationPolicyUpdate
+      tags:
+        - Notification Center Service
+      parameters:
+        - *ref_10
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  properties:
+                    name:
+                      type: string
+                      description: The name of the notification policy.
+                      example: Test Notification Policy
+                    description:
+                      type: string
+                      description: A brief description of the notification policy. Can be null or not empty.
+                      example: A description of the notification policy.
+                    subscriptions: *ref_7
+                    registeredUsers: *ref_8
+                    isActive:
+                      type: boolean
+                      example: true
+                    computePolicyConfig: *ref_9
+      responses:
+        '200':
+          description: Ok
+        '400':
+          description: Bad Request
+    delete:
+      summary: Delete Notification Policy
+      description: |
+        Delete a notification policy.
+      operationId: notificationPolicyDelete
+      tags:
+        - Notification Center Service
+      parameters:
+        - *ref_10
+      responses:
+        '200':
+          description: Notification Policy Delete Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_3
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /notificationCenter/policy/snp-a1b2c3d4
+                          method:
+                            example: DELETE
+        '400':
+          description: Bad Request
+  /notificationCenter/compute/resource:
+    get:
+      summary: Get Account Resources
+      description: |
+        Gets a list of all resources for a specific account.   
+      operationId: AccountResourceList
+      tags:
+        - Notification Center Service
+      parameters:
+        - *ref_0
+      responses:
+        '200':
+          description: Account Resource List Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_1
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /notificationCenter/compute/resource/act-123456789
+                          method:
+                            example: GET
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              description: |
+                                Account Resource.
+                              properties:
+                                Id:
+                                  type: string
+                                  description: The unique identifier of the account.
+                                  example: act-123456789
+                                name:
+                                  type: string
+                                  description: The name of the account.
+                                  example: Example for account name
+                                type:
+                                  type: string
+                                  description: The type of the resource.
+                                  example: ocean
+                          kind:
+                            example: spotinst:notification:compute:accountResource
+        '400':
+          description: Bad Request
+  /notificationCenter/compute/event:
+    get:
+      summary: Get Events Types
+      description: |
+        Gets all available event types for the notification policies, depending on your account provider.
+      operationId: EventTypeList
+      tags:
+        - Notification Center Service
+      parameters:
+        - *ref_0
+      responses:
+        '200':
+          description: Event Type List Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_1
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /notificationCenter/compute/event/act-123456789
+                          method:
+                            example: GET
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              description: |
+                                Event type for the notification policy.
+                              properties:
+                                event:
+                                  type: string
+                                  description: The event name.
+                                  example: Missing configuration
+                                type:
+                                  type: string
+                                  description: The severity level of the event.
+                                  example: error
+                          kind:
+                            example: spotinst:notification:compute:event
+        '400':
+          description: Bad Request
+  /events/subscription:
+    post:
+      summary: Subscribe
+      description: |
+        Create a notification for your resources
+          > **Note:** This service is deprecated. Use the 
+          [Notification Center Service](https://spec.dev.spot.io/#tag/Notification-Center-Service).
+      operationId: notificationsServiceSubscriptionsSubscribe
+      tags:
+        - Notification Subscription Service
+      parameters:
+        - in: query
+          name: accountId
+          example: act-123abc
+          description: |
+            ID of the account associated with your token
+          schema:
+            type: string
+          required: false
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  title: Elastigroup/Stateful Node event
+                  required:
+                    - subscription
+                  properties:
+                    subscription:
+                      type: object
+                      required:
+                        - resourceId
+                        - protocol
+                        - endpoint
+                        - eventType
+                      description: |
+                        Object defining the subscription parameters
+                      properties:
+                        resourceId:
+                          type: string
+                          example: sig-1234abcd
+                          description: |
+                            Spot Resource ID (Elastigroup ID, Ocean ID or Stateful Node ID)
+                        protocol:
+                          type: string
+                          enum:
+                            - aws-sns
+                            - email
+                            - email-json
+                            - web
+                          example: email
+                          description: |
+                            The protocol to send the notification.
+
+                            The following values are deprecated: http https
+                            You can use the generic web protocol instead.
+                            aws-sns is only supported with AWS provider
+                        endpoint:
+                          type: string
+                          example: YOUR@EMAIL.COM
+                          description: |
+                            The endpoint the notification will be sent to. url in case of http/https/web, email address in case of email/email-json and sns-topic-arn in case of aws-sns.
+                            For example: YOUR@EMAIL.COM or https://YOUR_ENDPOINT.COM or SNS_TOPIC_ARN
+                        eventType:
+                          enum:
+                            - AWS_EC2_INSTANCE_TERMINATE
+                            - AWS_EC2_INSTANCE_TERMINATED
+                            - AWS_EC2_INSTANCE_LAUNCH
+                            - AWS_EC2_INSTANCE_READY_SIGNAL_TIMEOUT
+                            - SIGNAL_TIMEOUT_SHUTDOWN_SCRIPT
+                            - AWS_EC2_CANT_SPIN_OD
+                            - AWS_EC2_INSTANCE_UNHEALTHY_IN_ELB
+                            - GROUP_ROLL_FAILED
+                            - GROUP_ROLL_FINISHED
+                            - CANT_SCALE_UP_GROUP_MAX_CAPACITY
+                            - GROUP_UPDATED
+                            - AWS_EMR_PROVISION_TIMEOUT
+                            - GROUP_BEANSTALK_INIT_READY
+                            - AZURE_VM_TERMINATED
+                            - AZURE_VM_TERMINATE
+                            - AWS_EC2_MANAGED_INSTANCE_PAUSING
+                            - AWS_EC2_MANAGED_INSTANCE_RESUMING
+                            - AWS_EC2_MANAGED_INSTANCE_RECYCLING
+                            - AWS_EC2_MANAGED_INSTANCE_DELETING
+                          type: string
+                          example: AWS_EC2_INSTANCE_TERMINATE
+                          description: |
+                            The event to send the notification when triggered.
+                        eventFormat:
+                          type: object
+                          description: |
+                            The format of the notification content (JSON Format: Key + Value).
+                            The keys can be renamed.
+                          properties:
+                            event:
+                              type: string
+                              enum:
+                                - '%event%'
+                              description: Allow to get name of event that happened
+                              example: '%event%'
+                            resourceId:
+                              type: string
+                              enum:
+                                - '%resource-id%'
+                              description: Allow to get ID of resource where event happened
+                              example: '%resource-id%'
+                            resourceName:
+                              type: string
+                              enum:
+                                - '%resource-name%'
+                              description: Allow to get the name of resource (related to ID)
+                              example: '%resource-name%'
+                            instanceId:
+                              type: string
+                              enum:
+                                - '%instance-id%'
+                              description: Allow to get the instance ID which related to the event
+                              example: '%instance-id%'
+                            myCustomKey:
+                              type: string
+                              description: Allow to use custom text in messages
+                              example: My content is set here
+                - type: object
+                  title: Ocean event
+                  required:
+                    - subscription
+                  properties:
+                    subscription:
+                      type: object
+                      required:
+                        - resourceId
+                        - protocol
+                        - endpoint
+                        - eventType
+                      description: |
+                        Object defining the subscription parameters
+                      properties:
+                        resourceId:
+                          type: string
+                          example: o-1234abcd
+                          description: |
+                            Spot Resource ID (Elastigroup ID, Ocean ID or Stateful Node ID)
+                        protocol:
+                          type: string
+                          enum:
+                            - aws-sns
+                            - email
+                            - email-json
+                            - web
+                          example: email
+                          description: |
+                            The protocol to send the notification.
+
+                            The following values are deprecated: http https
+                            You can use the generic web protocol instead.
+                            aws-sns is only supported with AWS provider
+                        endpoint:
+                          type: string
+                          example: YOUR@EMAIL.COM
+                          description: |
+                            The endpoint the notification will be sent to. url in case of http/https/web, email address in case of email/email-json and sns-topic-arn in case of aws-sns.
+                            For example: YOUR@EMAIL.COM or https://YOUR_ENDPOINT.COM or SNS_TOPIC_ARN
+                        eventType:
+                          enum:
+                            - AWS_EC2_INSTANCE_TERMINATE
+                            - AWS_EC2_INSTANCE_TERMINATED
+                            - AWS_EC2_INSTANCE_LAUNCH
+                            - AWS_EC2_INSTANCE_READY_SIGNAL_TIMEOUT
+                            - SIGNAL_TIMEOUT_SHUTDOWN_SCRIPT
+                            - AWS_EC2_CANT_SPIN_OD
+                            - AWS_EC2_INSTANCE_UNHEALTHY_IN_ELB
+                            - GROUP_ROLL_FAILED
+                            - GROUP_ROLL_FINISHED
+                            - CANT_SCALE_UP_GROUP_MAX_CAPACITY
+                            - GROUP_UPDATED
+                            - AWS_EMR_PROVISION_TIMEOUT
+                            - GROUP_BEANSTALK_INIT_READY
+                            - AZURE_VM_TERMINATED
+                            - AZURE_VM_TERMINATE
+                            - AWS_EC2_MANAGED_INSTANCE_PAUSING
+                            - AWS_EC2_MANAGED_INSTANCE_RESUMING
+                            - AWS_EC2_MANAGED_INSTANCE_RECYCLING
+                            - AWS_EC2_MANAGED_INSTANCE_DELETING
+                            - CLUSTER_ROLL_FINISHED
+                            - CLUSTER_ROLL_FAILED
+                            - OCEAN_CANT_SCALE_UP_MAX_RESOURCES
+                            - OCEAN_LAUNCH_SPEC_CANT_SCALE_UP_MAX_INSTANCES
+                            - OCEAN_K8S_NODE_REMOVED
+                          type: string
+                          example: OCEAN_K8S_NODE_REMOVED
+                          description: |
+                            The event to send the notification when triggered. \
+                            The following event types are relevant for Ocean events only: \
+                            CLUSTER_ROLL_FINISHED, \
+                            CLUSTER_ROLL_FAILED, \
+                            OCEAN_CANT_SCALE_UP_MAX_RESOURCES, \
+                            OCEAN_LAUNCH_SPEC_CANT_SCALE_UP_MAX_INSTANCES, \
+                            OCEAN_K8S_NODE_REMOVED
+                        eventFormat:
+                          type: object
+                          description: |
+                            The format of the notification content (JSON Format: Key + Value).
+                            The keys can be renamed.
+                          properties:
+                            event:
+                              type: string
+                              enum:
+                                - '%event%'
+                              description: Allow to get name of event that happened
+                              example: '%event%'
+                            resourceId:
+                              type: string
+                              enum:
+                                - '%resource-id%'
+                              description: Allow to get ID of resource where event happened
+                              example: '%resource-id%'
+                            resourceName:
+                              type: string
+                              enum:
+                                - '%resource-name%'
+                              description: Allow to get the name of resource (related to ID)
+                              example: '%resource-name%'
+                            instanceId:
+                              type: string
+                              enum:
+                                - '%instance-id%'
+                              description: Allow to get the instance ID which related to the event
+                              example: '%instance-id%'
+                            launchSpecId:
+                              type: string
+                              enum:
+                                - '%launchSpec-id%'
+                              description: Allow to get the Virtual Node Group ID which related to the event
+                              example: '%launchSpec-id%'
+                            launchSpecName:
+                              type: string
+                              enum:
+                                - '%launchSpec-name%'
+                              description: Allow to get the Virtual Node Group name which related to the event (relevant only for OCEAN_K8S_NODE_REMOVED)
+                              example: '%launchSpec-name%'
+                            nodeName:
+                              type: string
+                              enum:
+                                - '%node-name%'
+                              description: Allow to get the node name which related to the event (relevant only for OCEAN_K8S_NODE_REMOVED)
+                              example: '%node-name%'
+                            runningPodsOnNode:
+                              type: string
+                              enum:
+                                - '%running-pods-on-node%'
+                              description: Allow to get the running pods on the node which related to the event (relevant only for OCEAN_K8S_NODE_REMOVED)
+                              example: '%running-pods-on-node%'
+                            myCustomKey:
+                              type: string
+                              description: Allow to use custom text in messages
+                              example: My content is set here
+      responses:
+        '200': &ref_11
+          description: Subscription Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_1
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /events/subscription
+                          method:
+                            example: POST
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                  example: sis-1234abcd
+                                resourceId:
+                                  type: string
+                                  example: sig-1234abcd
+                                resourceName:
+                                  type: string
+                                  example: myGroup
+                                protocol:
+                                  type: string
+                                  example: email
+                                endpoint:
+                                  type: string
+                                  example: YOUR@EMAIL.COM
+                                eventType:
+                                  type: string
+                                  example: AWS_EC2_INSTANCE_TERMINATE
+                                eventFormat:
+                                  type: object
+                                  description: |
+                                    The format of the notification content (JSON Format: Key + Value).
+                                    The keys can be renamed.
+                                  properties:
+                                    event:
+                                      type: string
+                                      enum:
+                                        - '%event%'
+                                      description: Allow to get name of event that happened
+                                      example: '%event%'
+                                    resourceId:
+                                      type: string
+                                      enum:
+                                        - '%resource-id%'
+                                      description: Allow to get ID of resource where event happened
+                                      example: '%resource-id%'
+                                    resourceName:
+                                      type: string
+                                      enum:
+                                        - '%resource-name%'
+                                      description: Allow to get the name of resource (related to ID)
+                                      example: '%resource-name%'
+                                    instanceId:
+                                      type: string
+                                      enum:
+                                        - '%instance-id%'
+                                      description: Allow to get the instance ID which related to the event
+                                      example: '%instance-id%'
+                                    myCustomKey:
+                                      type: string
+                                      description: Allow to use custom text in messages
+                                      example: My content is set here
+                                updatedAt:
+                                  type: string
+                                  example: '2015-08-04T12:31:26.000Z'
+                                createdAt:
+                                  type: string
+                                  example: '2015-08-04T12:31:26.000Z'
+                          kind:
+                            example: spotinst:subscription
+        '400':
+          description: Bad Request
+    get:
+      summary: List Subscriptions
+      description: |
+        List all subscriptions and their information
+          > **Note:** This service is deprecated. Use the 
+          [Notification Center Service](https://spec.dev.spot.io/#tag/Notification-Center-Service).
+      operationId: notificationsServiceSubscriptionsList
+      tags:
+        - Notification Subscription Service
+      parameters:
+        - in: query
+          name: accountId
+          example: act-123abc
+          description: |
+            ID of the account associated with your token
+          schema:
+            type: string
+          required: false
+      responses:
+        '200': *ref_11
+        '400':
+          description: Bad Request
+  /events/subscription/{subscriptionId}:
+    delete:
+      summary: Unsubscribe
+      description: |
+        Delete an existing page
+          > **Note:** This service is deprecated. Use the 
+          [Notification Center Service](https://spec.dev.spot.io/#tag/Notification-Center-Service).
+      operationId: notificationsServiceSubscriptionsUnsubscribe
+      tags:
+        - Notification Subscription Service
+      parameters:
+        - in: query
+          name: accountId
+          example: act-123abc
+          description: |
+            ID of the account associated with your token
+          schema:
+            type: string
+          required: false
+        - &ref_12
+          in: path
+          name: subscriptionId
+          example: sis-1234abcd
+          description: |
+            The subscription ID to operate on.
+          schema:
+            type: string
+          required: true
+      responses:
+        '200': *ref_4
+        '400':
+          description: Bad Request
+    get:
+      summary: Get Subscription
+      description: |
+        Get a specific notification and its information
+          > **Note:** This service is deprecated. Use the 
+          [Notification Center Service](https://spec.dev.spot.io/#tag/Notification-Center-Service).
+      operationId: notificationsServiceSubscriptionsGet
+      tags:
+        - Notification Subscription Service
+      parameters:
+        - in: query
+          name: accountId
+          example: act-123abc
+          description: |
+            ID of the account associated with your token
+          schema:
+            type: string
+          required: false
+        - *ref_12
+      responses:
+        '200': *ref_11
+        '400':
+          description: Bad Request
+    put:
+      summary: Update Subscription
+      description: |
+        Update existing notification
+          > **Note:** This service is deprecated. Use the 
+          [Notification Center Service](https://spec.dev.spot.io/#tag/Notification-Center-Service).
+      operationId: notificationsServiceSubscriptionsUpdate
+      tags:
+        - Notification Subscription Service
+      parameters:
+        - in: query
+          name: accountId
+          example: act-123abc
+          description: |
+            ID of the account associated with your token
+          schema:
+            type: string
+          required: false
+        - *ref_12
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  required:
+                    - subscription
+                  properties:
+                    subscription:
+                      type: object
+                      description: Element that store all the subscription config
+                      properties:
+                        endpoint:
+                          type: string
+                          description: The endpoint the notification will be sent to. url in case of http/https/web, email address in case of email/email-json and sns-topic-arn in case of aws-sns
+                          example: SNS_TOPIC_ARN
+      responses:
+        '200':
+          description: Update Subscription Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        description: |
+                          Original request properties
+                        properties:
+                          id:
+                            type: string
+                            example: 46642c7d-bc29-417d-8ce4-79626f00c63c
+                            description: |
+                              Unique ID associated with this request
+                          url:
+                            type: string
+                            example: /events/subscription/sis-56879d5c?accountId=act-123abc
+                            description: |
+                              The URL that was used for the request
+                          method:
+                            type: string
+                            example: PUT
+                            description: |
+                              The HTTP **METHOD** used for the request
+                          timestamp:
+                            type: string
+                            example: '2018-11-19T13:49:11.911Z'
+                            description: |
+                              When the request was received by Spot
+                      response:
+                        type: object
+                        description: |
+                          Response package that includes, status, type and any relevant data.
+                        properties:
+                          status:
+                            type: object
+                            properties:
+                              code:
+                                type: integer
+                                example: 200
+                                description: |
+                                  HTTP status code assigned to this response
+                              message:
+                                type: string
+                                example: OK
+                                description: |
+                                  HTTP status message for the respective status code
+                          affectedRows:
+                            type: integer
+                            example: 1
+        '400':
+          description: Bad Request
+  /insights/dataIntegration:
+    post:
+      summary: Create Data Integration
+      description: |
+        Create a new data integration, an object representing a connection to a third-party vendor to export to and import data from.
+      operationId: DataIntegrationCreate
+      tags:
+        - Insights Service
+      parameters:
+        - *ref_0
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dataIntegration:
+                  type: object
+                  required:
+                    - vendor
+                    - name
+                    - config
+                  properties:
+                    vendor:
+                      type: string
+                      description: The vendor for the data integration. This value affects the expected `config`.
+                      enum:
+                        - s3
+                        - azureBlob
+                    name:
+                      description: The name of the data integration.
+                      type: string
+                      example: my-s3-integration
+                    config:
+                      description: The config of this data integration. Depends on the value of `vendor`.
+                      oneOf:
+                        - &ref_13
+                          type: object
+                          title: S3
+                          required:
+                            - bucketName
+                          properties:
+                            bucketName:
+                              type: string
+                              description: |
+                                The name of the bucket to use. Your spot IAM Role policy needs to include s3:putObject permissions for this bucket.
+                                **Can't be null**.
+                              example: mybucket
+                            subdir:
+                              description: |
+                                The subdirectory in which your files will be stored within the bucket. Adds the prefix `subdir/` to new objects' keys.
+                                **Can't be null or contain '/'**.
+                              type: string
+                              example: dev
+                        - &ref_14
+                          type: object
+                          title: Azure Blob
+                          required:
+                            - storageAccount
+                            - container
+                          properties:
+                            storageAccount:
+                              type: string
+                              description: |
+                                The name of the storage account to use.
+                              example: myStorageAccount
+                            container:
+                              description: |
+                                The container in which your files will be stored within the storage account.
+                              type: string
+                              example: dev
+      responses:
+        '200':
+          description: Create Data Integration Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_1
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /insights/dataIntegration
+                          method:
+                            example: POST
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items: &ref_15
+                              type: object
+                              required:
+                                - vendor
+                                - name
+                                - config
+                              properties:
+                                id:
+                                  type: string
+                                  description: The identifier of the data integration.
+                                  example: di-123
+                                vendor:
+                                  type: string
+                                  description: The vendor for the data integration. This value affects the expected `config`.
+                                  enum:
+                                    - s3
+                                    - azureBlob
+                                name:
+                                  description: The name of the data integration.
+                                  type: string
+                                  example: my-s3-integration
+                                status:
+                                  type: string
+                                  description: Determines if this data integration is on or off.
+                                  enum:
+                                    - enabled
+                                    - disabled
+                                health:
+                                  type: string
+                                  description: The health of this data integration.
+                                  example: valid
+                                code:
+                                  type: integer
+                                  description: The HTTP status code representing the health.
+                                  example: 200
+                                message:
+                                  type: string
+                                  description: The message received from the vendor in the last health update.
+                                  example: ok
+                                lastHealthCheck:
+                                  type: string
+                                  description: The time the health was last updated in UTC.
+                                  example: '2021-08-1T10:00:00.000Z'
+                                config:
+                                  description: The config of this data integration. Depends on the value of `vendor`.
+                                  oneOf:
+                                    - *ref_13
+                                    - *ref_14
+                          kind:
+                            example: spotinst:dataIntegration
+        '400':
+          description: Bad Request
+    get:
+      summary: List Data Integration
+      description: |
+        List data integrations.
+      operationId: dataIntegrationList
+      tags:
+        - Insights Service
+      parameters:
+        - *ref_0
+        - in: query
+          name: vendor
+          description: The vendor of the data integrations to list.
+          example: s3
+          schema:
+            type: string
+            enum:
+              - s3
+              - azureBlob
+        - in: query
+          name: name
+          description: The name of the data integrations to list.
+          example: my-data-integration
+          schema:
+            type: string
+        - in: query
+          name: status
+          description: The status of the data integrations to list.
+          example: enabled
+          schema:
+            type: string
+            enum:
+              - enabled
+              - disabled
+        - in: query
+          name: health
+          description: The health status of the data integrations to list.
+          example: valid
+          schema:
+            type: string
+            enum:
+              - valid
+              - invalid
+              - forbidden
+      responses:
+        '200':
+          description: Get Data Integration Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_1
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /insights/dataIntegration
+                          method:
+                            example: GET
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items: *ref_15
+                          kind:
+                            example: spotinst:dataIntegration
+        '400':
+          description: Bad Request
+  /insights/dataIntegration/{dataIntegrationId}:
+    put:
+      summary: Update Data Integration
+      description: |
+        Update an existing data integration.
+      operationId: updateDataIntegration
+      tags:
+        - Insights Service
+      parameters:
+        - *ref_0
+        - &ref_16
+          in: path
+          name: dataIntegrationId
+          example: di-123abc
+          description: |
+            Identifier of the data integration.
+          schema:
+            type: string
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dataIntegration:
+                  type: object
+                  required:
+                    - vendor
+                  properties:
+                    vendor:
+                      type: string
+                      description: |
+                        The vendor for the data integration. This value affects the expected `config`.
+                        **This value is immutable and must be the same as the existing data integration.**
+                      enum:
+                        - s3
+                        - azureBlob
+                    name:
+                      description: The name of the data integration.
+                      type: string
+                      example: my-s3-integration
+                    status:
+                      type: string
+                      description: Determines if this data integration is on or off.
+                      enum:
+                        - enabled
+                        - disabled
+                    config:
+                      description: The config of this data integration. Depends on the value of `vendor`.
+                      oneOf:
+                        - type: object
+                          title: S3
+                          properties:
+                            bucketName:
+                              type: string
+                              description: |
+                                The name of the bucket to use. Your spot IAM Role policy needs to include s3:putObject permissions for this bucket.
+                                **Can't be null**.
+                              example: mybucket
+                            subdir:
+                              description: |
+                                The subdirectory in which your files will be stored within the bucket. Adds the prefix `subdir/` to new objects' keys.
+                                **Can't be null or contain '/'**.
+                              type: string
+                              example: dev
+                        - type: object
+                          title: Azure Blob
+                          properties:
+                            storageAccount:
+                              type: string
+                              description: |
+                                The name of the storage account to use.
+                              example: myStorageAccount
+                            container:
+                              description: |
+                                The container in which your files will be stored within the storage account.
+                              type: string
+                              example: dev
+      responses:
+        '200':
+          description: Update Data Integration Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_1
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /insights/dataIntegration/di-123
+                          method:
+                            example: PUT
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items: *ref_15
+                          kind:
+                            example: spotinst:dataIntegration
+        '400':
+          description: Bad Request
+    get:
+      summary: Get Data Integration
+      description: |
+        Get an existing data integration.
+      operationId: dataIntegrationGet
+      tags:
+        - Insights Service
+      parameters:
+        - *ref_0
+        - *ref_16
+      responses:
+        '200':
+          description: Get Data Integration Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_1
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /insights/dataIntegration/di-123
+                          method:
+                            example: GET
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items: *ref_15
+                          kind:
+                            example: spotinst:dataIntegration
+        '400':
+          description: Bad Request
+    delete:
+      summary: Delete Data Integration
+      description: |
+        Delete an existing data integration.
+      operationId: dataIntegrationDelete
+      tags:
+        - Insights Service
+      parameters:
+        - *ref_0
+        - *ref_16
+      responses:
+        '200':
+          description: Delete Data Integration Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_3
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /insights/dataIntegration/di-123
+                          method:
+                            example: DELETE
+        '400':
+          description: Bad Request
+  /insights/savings:
+    get:
+      summary: Get Organization Savings
+      description: Get the savings of the organization between the input time range.
+      operationId: organizationSavings
+      tags:
+        - Insights Service
+      parameters:
+        - in: query
+          name: fromDate
+          example: '2022-06-20'
+          description: |
+            Date can be either in ISO-8601 date format (yyyy-mm-dd) or in Unix Timestamp format (e.g. 1494751821472).
+            *Minimum from date can be one year ago.
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: toDate
+          example: '2022-11-20'
+          description: |
+            Date can be either in ISO-8601 date format (yyyy-mm-dd) or in Unix Timestamp format (e.g. 1494751821472).
+            *Data is shown until the past day (Does not include today's costs)
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: includeVmIds
+          example: 'true'
+          description: |
+            If set to true, the response will include the VM IDs for each savings entry.
+            Default is false.
+          schema:
+            type: boolean
+            default: false
+          required: false
+      responses:
+        '200':
+          description: organization savings Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        description: |
+                          Original request properties
+                        properties:
+                          id:
+                            type: string
+                            example: 67582d0c-108b-4ef7-9fdc-d39678a30844
+                            description: |
+                              Unique ID associated with this request
+                          url:
+                            type: string
+                            example: /insights/savings
+                            description: |
+                              The URL that was used for the request
+                          method:
+                            type: string
+                            example: GET
+                            description: |
+                              The HTTP **METHOD** used for the request
+                          timestamp:
+                            type: string
+                            example: '2022-01-10T00:00:00.000Z'
+                            description: |
+                              When the request was received by Spot
+                      response:
+                        type: object
+                        description: |
+                          Response package that includes, status, type and any relevant data.
+                        properties:
+                          status:
+                            type: object
+                            properties:
+                              code:
+                                type: integer
+                                example: 200
+                                description: |
+                                  HTTP status code assigned to this response
+                              message:
+                                type: string
+                                example: OK
+                                description: |
+                                  HTTP status message for the respective status code
+                  - type: object
+                    properties:
+                      response:
+                        type: object
+                        properties:
+                          kind:
+                            type: string
+                            example: savings:extended:resource
+                            description: |
+                              The data type of each item in the response
+                          items:
+                            type: array
+                            description: |
+                              Array of data objects
+                            items:
+                              type: object
+                              title: savings:extended:resource
+                              properties:
+                                resources:
+                                  type: array
+                                  items:
+                                    anyOf:
+                                      - type: object
+                                        properties:
+                                          accountId:
+                                            type: string
+                                            example: act-12345678
+                                          accountName:
+                                            type: string
+                                            example: production account
+                                          resourceId:
+                                            type: string
+                                            example: o-7dd944535
+                                          resourceName:
+                                            type: string
+                                            example: Ocean Kubernetes cluster name
+                                          productType:
+                                            type: string
+                                            example: AWS_KUBERNETES_OCEAN
+                                          runningHours:
+                                            type: number
+                                            format: float
+                                            example: 107.3
+                                          actualCosts:
+                                            type: number
+                                            format: float
+                                            example: 107.3
+                                          potentialCosts:
+                                            type: number
+                                            format: float
+                                            example: 378.41
+                                          amountSaved:
+                                            type: number
+                                            format: float
+                                            example: 306.77
+                                      - type: object
+                                        properties:
+                                          accountId:
+                                            type: string
+                                            example: act-87654321
+                                          accountName:
+                                            type: string
+                                            example: dev account
+                                          resourceId:
+                                            type: string
+                                            example: sig-7drr944535
+                                          resourceName:
+                                            type: string
+                                            example: Elastigroup name
+                                          productType:
+                                            type: string
+                                            example: AWS_ELASTIGROUP
+                                          runningHours:
+                                            type: number
+                                            format: float
+                                            example: 10
+                                          actualCosts:
+                                            type: number
+                                            format: float
+                                            example: 100
+                                          potentialCosts:
+                                            type: number
+                                            format: float
+                                            example: 1100
+                                          amountSaved:
+                                            type: number
+                                            format: float
+                                            example: 1000
+                                summary:
+                                  type: object
+                                  properties:
+                                    runningHours:
+                                      type: number
+                                      format: float
+                                      example: 117.3
+                                    actualCosts:
+                                      type: number
+                                      format: float
+                                      example: 207.3
+                                    potentialCosts:
+                                      type: number
+                                      format: float
+                                      example: 11378.41
+                                    amountSaved:
+                                      type: number
+                                      format: float
+                                      example: 1306.77
+                          count:
+                            type: integer
+                            example: 1
+                            description: |
+                              Size of the data object array
+        '400':
+          description: Bad Request
