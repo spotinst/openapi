@@ -43,6 +43,107 @@ function toTagHash(tagName) {
   return "#tag/" + encodeURIComponent(tagName.replace(/\s+/g, "-"));
 }
 
+// Generate an example object from a schema by collecting field-level examples
+function generateExampleFromSchema(schema) {
+  if (!schema || typeof schema !== "object") return undefined;
+
+  // If schema already has an example, use it
+  if (schema.example !== undefined) {
+    return schema.example;
+  }
+
+  // For array types
+  if (schema.type === "array") {
+    if (schema.items && schema.items.example !== undefined) {
+      return [schema.items.example];
+    }
+    if (schema.items) {
+      const itemExample = generateExampleFromSchema(schema.items);
+      if (itemExample !== undefined) {
+        return [itemExample];
+      }
+    }
+    return [];
+  }
+
+  // For object types
+  if (schema.type === "object" || schema.properties) {
+    const example = {};
+    const properties = schema.properties || {};
+    let hasAnyExample = false;
+
+    for (const [propName, propSchema] of Object.entries(properties)) {
+      if (!propSchema || typeof propSchema !== "object") continue;
+
+      let propExample;
+
+      // First check if property has a direct example
+      if (propSchema.example !== undefined) {
+        propExample = propSchema.example;
+      }
+      // For arrays, try to get example from items
+      else if (propSchema.type === "array" && propSchema.items) {
+        if (propSchema.items.example !== undefined) {
+          propExample = [propSchema.items.example];
+        } else {
+          const itemExample = generateExampleFromSchema(propSchema.items);
+          if (itemExample !== undefined) {
+            propExample = [itemExample];
+          }
+        }
+      }
+      // For objects, recursively generate example
+      else if (propSchema.type === "object" || propSchema.properties) {
+        propExample = generateExampleFromSchema(propSchema);
+      }
+
+      if (propExample !== undefined) {
+        example[propName] = propExample;
+        hasAnyExample = true;
+      }
+    }
+
+    return hasAnyExample ? example : undefined;
+  }
+
+  return undefined;
+}
+
+// Recursively add examples to all object schemas that don't have them
+function addExamplesToSchemas(obj) {
+  if (!obj || typeof obj !== "object") return;
+
+  // Process arrays
+  if (Array.isArray(obj)) {
+    obj.forEach(function(item) {
+      addExamplesToSchemas(item);
+    });
+    return;
+  }
+
+  // Process objects
+  for (const key of Object.keys(obj)) {
+    const value = obj[key];
+
+    // If it's a schema object with properties but no example, generate one
+    if (value && typeof value === "object" &&
+        (value.properties || value.type === "object") &&
+        value.example === undefined &&
+        key !== "examples") {  // Don't process examples array
+
+      const generated = generateExampleFromSchema(value);
+      if (generated !== undefined) {
+        value.example = generated;
+      }
+    }
+
+    // Recurse into nested objects
+    if (value && typeof value === "object") {
+      addExamplesToSchemas(value);
+    }
+  }
+}
+
 (async function() {
   for (const group of tagGroups) {
     const groupName = group.name;
@@ -94,6 +195,9 @@ function toTagHash(tagName) {
     const bundledPath = path.join(buildApiDir, "spot-" + sectionId + ".yaml");
     try {
       const dereffed = await $RefParser.dereference(tmpYamlPath);
+
+      // Add examples to all schemas that have field-level examples but no object-level example
+      addExamplesToSchemas(dereffed);
 
       Object.entries(dereffed.paths || {}).forEach(function([apiPath, pathItem]) {
         if (!pathItem || typeof pathItem !== "object") return;
