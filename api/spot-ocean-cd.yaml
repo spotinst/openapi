@@ -85,7 +85,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - &ref_1
+                  - &ref_2
                     type: object
                     properties:
                       request:
@@ -111,6 +111,9 @@ paths:
                             example: '2018-06-20T11:35:01.745Z'
                             description: |
                               When the request was received by Spot.
+                        example:
+                          id: e593ff58-067d-4340-92f9-8b1c0bad70d7
+                          timestamp: '2018-06-20T11:35:01.745Z'
                       response:
                         type: object
                         description: |
@@ -129,6 +132,13 @@ paths:
                                 example: OK
                                 description: |
                                   HTTP status message for the respective status code.
+                            example:
+                              code: 200
+                              message: OK
+                        example:
+                          status:
+                            code: 200
+                            message: OK
                   - type: object
                     properties:
                       response:
@@ -185,6 +195,8 @@ paths:
                                           example: '2018-11-05T12:55:50.000Z'
                                           description: |
                                             Time stamp of latest time the operator controller sent heartbeat.
+                                      example:
+                                        lastHeartbeatTime: '2018-11-05T12:55:50.000Z'
                                     omInfo:
                                       type: object
                                       title: Ocean CD Operator Manager Info
@@ -210,6 +222,8 @@ paths:
                                           example: '2018-11-05T12:55:50.000Z'
                                           description: |
                                             Time stamp of latest time the operator manager controller sent heartbeat.
+                                      example:
+                                        lastHeartbeatTime: '2018-11-05T12:55:50.000Z'
                                     argoRolloutInfo:
                                       type: object
                                       title: Argo Rollouts Metadata
@@ -223,6 +237,8 @@ paths:
                                           example: '2018-11-05T12:55:50.000Z'
                                           description: |
                                             Time stamp of latest time the operator controller sent heartbeat.
+                                      example:
+                                        lastHeartbeatTime: '2018-11-05T12:55:50.000Z'
                                 - type: object
                                   properties:
                                     id:
@@ -282,10 +298,10 @@ paths:
                   properties:
                     verificationProvider:
                       type: object
-                      required: &ref_2
+                      required: &ref_3
                         - name
                         - clusterIds
-                      properties: &ref_3
+                      properties: &ref_4
                         name:
                           type: string
                           description: Identifier name for Ocean CD Verification Provider. Must be unique
@@ -295,27 +311,29 @@ paths:
                           type: array
                           items:
                             type: string
-                          example:
+                          example: &ref_1
                             - prod-cluster-1
                             - prod-cluster-2
                         prometheus:
                           type: object
-                          required: &ref_5
+                          required: &ref_6
                             - address
                           title: Ocean CD Verification Provider Prometheus
-                          properties: &ref_6
+                          properties: &ref_7
                             address:
                               type: string
                               description: The address which the Prometheus server available on
                               example: http://localhost:9090
+                          example:
+                            address: http://localhost:9090
                         datadog:
                           type: object
-                          required: &ref_7
+                          required: &ref_8
                             - address
                             - apiKey
                             - appKey
                           title: Ocean CD Verification Provider Datadog
-                          properties: &ref_8
+                          properties: &ref_9
                             address:
                               type: string
                               description: DataDog API URL
@@ -328,13 +346,17 @@ paths:
                               type: string
                               description: API key that gives users access to Datadog’s programmatic API
                               example: APP-113ndsKlfmaoN
+                          example:
+                            address: https://api.datadoghq.eu
+                            apiKey: AUO32RN20oUMD-40283
+                            appKey: APP-113ndsKlfmaoN
                         newRelic:
                           type: object
-                          required: &ref_9
+                          required: &ref_10
                             - personalApiKey
                             - accountId
                           title: Ocean CD Verification Provider NewRelic
-                          properties: &ref_10
+                          properties: &ref_11
                             personalApiKey:
                               type: string
                               description: The NewRelic user key
@@ -355,24 +377,32 @@ paths:
                               type: string
                               description: The base URL for NerdGraph for a proxy
                               example: https://nerdgraph.api.newrelic.eu
+                          example:
+                            personalApiKey: AUO32RN20oUMD-40283
+                            accountId: account-0189718
+                            region: eu
+                            baseUrlRest: https://rest.api.newrelic.eu
+                            baseUrlNerdGraph: https://nerdgraph.api.newrelic.eu
                         cloudWatch:
                           type: object
-                          required: &ref_11
+                          required: &ref_12
                             - iamArn
                           title: Ocean CD Verification Provider CloudWatch
-                          properties: &ref_12
+                          properties: &ref_13
                             iamArn:
                               type: string
                               description: AWS resource that has permissions for cloudwatch:GetMetricData
                               example: arn:aws:iam::123456789012:role/GetMetricData
+                          example:
+                            iamArn: arn:aws:iam::123456789012:role/GetMetricData
                         jenkins:
                           type: object
-                          required: &ref_13
+                          required: &ref_14
                             - baseUrl
                             - username
                             - apiToken
                           title: Ocean CD Verification Provider Jenkins
-                          properties: &ref_14
+                          properties: &ref_15
                             baseUrl:
                               type: string
                               description: The address of the Jenkins server within the cluster.
@@ -385,14 +415,39 @@ paths:
                               type: string
                               description: The Jenkins server’s access apiToken.
                               example: AbCDeeFFGG
+                          example:
+                            baseUrl: http://localhost:9090
+                            username: admin
+                            apiToken: AbCDeeFFGG
+                      example:
+                        name: datadog-prod
+                        clusterIds: *ref_1
+                        prometheus:
+                          address: http://localhost:9090
+                        datadog:
+                          address: https://api.datadoghq.eu
+                          apiKey: AUO32RN20oUMD-40283
+                          appKey: APP-113ndsKlfmaoN
+                        newRelic:
+                          personalApiKey: AUO32RN20oUMD-40283
+                          accountId: account-0189718
+                          region: eu
+                          baseUrlRest: https://rest.api.newrelic.eu
+                          baseUrlNerdGraph: https://nerdgraph.api.newrelic.eu
+                        cloudWatch:
+                          iamArn: arn:aws:iam::123456789012:role/GetMetricData
+                        jenkins:
+                          baseUrl: http://localhost:9090
+                          username: admin
+                          apiToken: AbCDeeFFGG
       responses:
-        '200': &ref_4
+        '200': &ref_5
           description: Ocean CD Verification Provider Response
           content:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_2
                   - type: object
                     properties:
                       response:
@@ -404,9 +459,9 @@ paths:
                             items:
                               allOf:
                                 - type: object
-                                  required: *ref_2
-                                  properties: *ref_3
-                                - &ref_23
+                                  required: *ref_3
+                                  properties: *ref_4
+                                - &ref_27
                                   type: object
                                   properties:
                                     createdAt:
@@ -427,7 +482,7 @@ paths:
       tags:
         - Ocean CD
       responses:
-        '200': *ref_4
+        '200': *ref_5
         '400':
           description: Bad Request
   /ocean/cd/verificationProvider/{name}:
@@ -449,7 +504,7 @@ paths:
           description: |
             The identifier of the Ocean CD Verification Provider
       responses:
-        '200': *ref_4
+        '200': *ref_5
         '400':
           description: Bad Request
     put:
@@ -492,34 +547,72 @@ paths:
                           type: array
                           items:
                             type: string
-                          example:
+                          example: &ref_16
                             - prod-cluster-1
                             - prod-cluster-2
                         prometheus:
                           type: object
-                          required: *ref_5
+                          required: *ref_6
                           title: Ocean CD Verification Provider Prometheus
-                          properties: *ref_6
+                          properties: *ref_7
+                          example:
+                            address: http://localhost:9090
                         datadog:
                           type: object
-                          required: *ref_7
+                          required: *ref_8
                           title: Ocean CD Verification Provider Datadog
-                          properties: *ref_8
+                          properties: *ref_9
+                          example:
+                            address: https://api.datadoghq.eu
+                            apiKey: AUO32RN20oUMD-40283
+                            appKey: APP-113ndsKlfmaoN
                         newRelic:
                           type: object
-                          required: *ref_9
+                          required: *ref_10
                           title: Ocean CD Verification Provider NewRelic
-                          properties: *ref_10
+                          properties: *ref_11
+                          example:
+                            personalApiKey: AUO32RN20oUMD-40283
+                            accountId: account-0189718
+                            region: eu
+                            baseUrlRest: https://rest.api.newrelic.eu
+                            baseUrlNerdGraph: https://nerdgraph.api.newrelic.eu
                         cloudWatch:
                           type: object
-                          required: *ref_11
+                          required: *ref_12
                           title: Ocean CD Verification Provider CloudWatch
-                          properties: *ref_12
+                          properties: *ref_13
+                          example:
+                            iamArn: arn:aws:iam::123456789012:role/GetMetricData
                         jenkins:
                           type: object
-                          required: *ref_13
+                          required: *ref_14
                           title: Ocean CD Verification Provider Jenkins
-                          properties: *ref_14
+                          properties: *ref_15
+                          example:
+                            baseUrl: http://localhost:9090
+                            username: admin
+                            apiToken: AbCDeeFFGG
+                      example:
+                        clusterIds: *ref_16
+                        prometheus:
+                          address: http://localhost:9090
+                        datadog:
+                          address: https://api.datadoghq.eu
+                          apiKey: AUO32RN20oUMD-40283
+                          appKey: APP-113ndsKlfmaoN
+                        newRelic:
+                          personalApiKey: AUO32RN20oUMD-40283
+                          accountId: account-0189718
+                          region: eu
+                          baseUrlRest: https://rest.api.newrelic.eu
+                          baseUrlNerdGraph: https://nerdgraph.api.newrelic.eu
+                        cloudWatch:
+                          iamArn: arn:aws:iam::123456789012:role/GetMetricData
+                        jenkins:
+                          baseUrl: http://localhost:9090
+                          username: admin
+                          apiToken: AbCDeeFFGG
       responses:
         '200':
           description: Ok
@@ -565,34 +658,72 @@ paths:
                           type: array
                           items:
                             type: string
-                          example:
+                          example: &ref_17
                             - prod-cluster-1
                             - prod-cluster-2
                         prometheus:
                           type: object
-                          required: *ref_5
+                          required: *ref_6
                           title: Ocean CD Verification Provider Prometheus
-                          properties: *ref_6
+                          properties: *ref_7
+                          example:
+                            address: http://localhost:9090
                         datadog:
                           type: object
-                          required: *ref_7
+                          required: *ref_8
                           title: Ocean CD Verification Provider Datadog
-                          properties: *ref_8
+                          properties: *ref_9
+                          example:
+                            address: https://api.datadoghq.eu
+                            apiKey: AUO32RN20oUMD-40283
+                            appKey: APP-113ndsKlfmaoN
                         newRelic:
                           type: object
-                          required: *ref_9
+                          required: *ref_10
                           title: Ocean CD Verification Provider NewRelic
-                          properties: *ref_10
+                          properties: *ref_11
+                          example:
+                            personalApiKey: AUO32RN20oUMD-40283
+                            accountId: account-0189718
+                            region: eu
+                            baseUrlRest: https://rest.api.newrelic.eu
+                            baseUrlNerdGraph: https://nerdgraph.api.newrelic.eu
                         cloudWatch:
                           type: object
-                          required: *ref_11
+                          required: *ref_12
                           title: Ocean CD Verification Provider CloudWatch
-                          properties: *ref_12
+                          properties: *ref_13
+                          example:
+                            iamArn: arn:aws:iam::123456789012:role/GetMetricData
                         jenkins:
                           type: object
-                          required: *ref_13
+                          required: *ref_14
                           title: Ocean CD Verification Provider Jenkins
-                          properties: *ref_14
+                          properties: *ref_15
+                          example:
+                            baseUrl: http://localhost:9090
+                            username: admin
+                            apiToken: AbCDeeFFGG
+                      example:
+                        clusterIds: *ref_17
+                        prometheus:
+                          address: http://localhost:9090
+                        datadog:
+                          address: https://api.datadoghq.eu
+                          apiKey: AUO32RN20oUMD-40283
+                          appKey: APP-113ndsKlfmaoN
+                        newRelic:
+                          personalApiKey: AUO32RN20oUMD-40283
+                          accountId: account-0189718
+                          region: eu
+                          baseUrlRest: https://rest.api.newrelic.eu
+                          baseUrlNerdGraph: https://nerdgraph.api.newrelic.eu
+                        cloudWatch:
+                          iamArn: arn:aws:iam::123456789012:role/GetMetricData
+                        jenkins:
+                          baseUrl: http://localhost:9090
+                          username: admin
+                          apiToken: AbCDeeFFGG
       responses:
         '200':
           description: Ok
@@ -643,11 +774,11 @@ paths:
                   properties:
                     verificationTemplate:
                       type: object
-                      required: &ref_21
+                      required: &ref_25
                         - name
                         - metrics
                       description: The object specifying a set of metrics that need to be analyzed during the rollout, and the values that are considered successful or failed
-                      properties: &ref_22
+                      properties: &ref_26
                         name:
                           type: string
                           example: latency-validation
@@ -658,9 +789,9 @@ paths:
                           items:
                             type: object
                             title: Ocean CD Verification Template argument
-                            required: &ref_25
+                            required: &ref_29
                               - name
-                            properties: &ref_26
+                            properties: &ref_30
                               name:
                                 type: string
                                 example: root-password
@@ -677,10 +808,10 @@ paths:
                                     type: object
                                     title: Ocean CD Verification Template Secret Key Ref
                                     description: Secret key to use
-                                    required: &ref_45
+                                    required: &ref_67
                                       - name
                                       - key
-                                    properties: &ref_46
+                                    properties: &ref_68
                                       name:
                                         description: The name of the secret
                                         example: root-password-secret
@@ -689,16 +820,30 @@ paths:
                                         description: The name of the field inside the secret
                                         example: root-password
                                         type: string
+                                    example:
+                                      name: root-password-secret
+                                      key: root-password
+                                example: &ref_31
+                                  secretKeyRef:
+                                    name: root-password-secret
+                                    key: root-password
+                            example:
+                              name: root-password
+                              value: 12345678
+                              valueFrom:
+                                secretKeyRef:
+                                  name: root-password-secret
+                                  key: root-password
                         metrics:
                           description: List of verification metrics
                           type: array
                           items:
                             type: object
-                            required: &ref_27
+                            required: &ref_32
                               - name
                               - provider
                             title: Ocean CD Verification Metric
-                            properties: &ref_28
+                            properties: &ref_33
                               name:
                                 type: string
                                 example: 5xx-errors
@@ -742,20 +887,22 @@ paths:
                                 properties:
                                   prometheus:
                                     type: object
-                                    required: &ref_15
+                                    required: &ref_19
                                       - query
                                     title: Ocean CD Verification Prometheus Metric
-                                    properties: &ref_16
+                                    properties: &ref_20
                                       query:
                                         type: string
                                         description: A request for information retrieved from Prometheus
                                         example: http_requests_total{status!~"5.."}"
+                                    example:
+                                      query: http_requests_total{status!~"5.."}"
                                   newRelic:
                                     type: object
                                     title: Ocean CD Verification NewRelic Metric
-                                    required: &ref_17
+                                    required: &ref_21
                                       - query
-                                    properties: &ref_18
+                                    properties: &ref_22
                                       profile:
                                         type: string
                                         example: account-12345678
@@ -764,12 +911,15 @@ paths:
                                         type: string
                                         example: FROM Metric SELECT count(*)
                                         description: A raw newrelic NRQL query to perform
+                                    example:
+                                      profile: account-12345678
+                                      query: FROM Metric SELECT count(*)
                                   datadog:
                                     type: object
                                     title: Ocean CD Verification Datadog Metric
-                                    required: &ref_19
+                                    required: &ref_23
                                       - query
-                                    properties: &ref_20
+                                    properties: &ref_24
                                       duration:
                                         type: string
                                         description: The window of time we are looking at in DataDog. For example, if the values is `5m` then basically we will fetch data from (now-5m) to now
@@ -778,6 +928,9 @@ paths:
                                         type: string
                                         description: A request for information retrieved from Datadog
                                         example: avg:kubernetes.cpu.user.total{*}
+                                    example:
+                                      duration: 1m
+                                      query: avg:kubernetes.cpu.user.total{*}
                                   cloudWatch:
                                     type: object
                                     title: Ocean CD Verification CloudWatch Metric
@@ -835,6 +988,15 @@ paths:
                                                             type: string
                                                             example: i-1234567890abcdef
                                                             description: The value of the dimensions. These values must contain only ASCII characters and must include at least one non-whitespace character
+                                                        example:
+                                                          name: InstanceId
+                                                          value: i-1234567890abcdef
+                                                  example:
+                                                    metricName: CPUUtilization
+                                                    namespace: AWS/EC2
+                                                    dimensions:
+                                                      - name: InstanceId
+                                                        value: i-1234567890abcdef
                                                 period:
                                                   type: integer
                                                   example: 300
@@ -875,6 +1037,16 @@ paths:
                                                     - Terabits/Second
                                                     - Count/Second
                                                     - None
+                                              example:
+                                                metric:
+                                                  metricName: CPUUtilization
+                                                  namespace: AWS/EC2
+                                                  dimensions:
+                                                    - name: InstanceId
+                                                      value: i-1234567890abcdef
+                                                period: 300
+                                                stat: Average
+                                                unit: None
                                             expression:
                                               type: string
                                               example: SELECT AVG(CPUUtilization) FROM SCHEMA(\"AWS/EC2\", InstanceId)
@@ -891,6 +1063,40 @@ paths:
                                               type: integer
                                               example: 300
                                               description: The granularity, in seconds, of the returned data points. For metrics with regular resolution, a period can be as short as one minute (60 seconds) and must be a multiple of 60. For high-resolution metrics that are collected at intervals of less than one minute, the period can be 1, 5, 10, 30, 60, or any multiple of 60. High-resolution metrics are those metrics stored by a PutMetricData call that includes a StorageResolution of 1 second.
+                                          example:
+                                            id: utilization
+                                            metricStat:
+                                              metric:
+                                                metricName: CPUUtilization
+                                                namespace: AWS/EC2
+                                                dimensions:
+                                                  - name: InstanceId
+                                                    value: i-1234567890abcdef
+                                              period: 300
+                                              stat: Average
+                                              unit: None
+                                            expression: SELECT AVG(CPUUtilization) FROM SCHEMA(\"AWS/EC2\", InstanceId)
+                                            label: Cluster CpuUtilization
+                                            returnData: false
+                                            period: 300
+                                    example:
+                                      duration: 5m
+                                      metricDataQueries:
+                                        - id: utilization
+                                          metricStat:
+                                            metric:
+                                              metricName: CPUUtilization
+                                              namespace: AWS/EC2
+                                              dimensions:
+                                                - name: InstanceId
+                                                  value: i-1234567890abcdef
+                                            period: 300
+                                            stat: Average
+                                            unit: None
+                                          expression: SELECT AVG(CPUUtilization) FROM SCHEMA(\"AWS/EC2\", InstanceId)
+                                          label: Cluster CpuUtilization
+                                          returnData: false
+                                          period: 300
                                   web:
                                     type: object
                                     title: Ocean CD Verification Web Metric
@@ -926,6 +1132,9 @@ paths:
                                               description: The value of a header
                                               example: Bearer {{ args.token }}
                                               type: string
+                                          example:
+                                            key: Authorization
+                                            value: Bearer {{ args.token }}
                                       body:
                                         type: string
                                         example: '{"key": "test"}'
@@ -942,6 +1151,16 @@ paths:
                                         type: boolean
                                         example: false
                                         description: Skips host TLS verification
+                                    example:
+                                      method: GET
+                                      url: https://oceancd.com/api/v1/metrics?clusterId={{ args.clusterId }}
+                                      headers:
+                                        - key: Authorization
+                                          value: Bearer {{ args.token }}
+                                      body: '{"key": "test"}'
+                                      timeoutSeconds: 10
+                                      jsonPath: '{$.data}'
+                                      insecure: false
                                   job:
                                     type: object
                                     title: Ocean CD Verification Job Metric
@@ -988,7 +1207,7 @@ paths:
                                                         command:
                                                           type: array
                                                           description: The entry point of a container
-                                                          example:
+                                                          example: &ref_18
                                                             - sh
                                                             - '-c'
                                                             - echo
@@ -999,6 +1218,10 @@ paths:
                                                           type: string
                                                           example: nginx:1.21
                                                           description: The image name of a container
+                                                      example:
+                                                        name: hello
+                                                        command: *ref_18
+                                                        image: nginx:1.21
                                                   restartPolicy:
                                                     type: string
                                                     description: Restart policy for all containers within the pod
@@ -1006,6 +1229,38 @@ paths:
                                                       - Never
                                                       - OnFailure
                                                     example: Never
+                                                example:
+                                                  containers:
+                                                    - name: hello
+                                                      command: *ref_18
+                                                      image: nginx:1.21
+                                                  restartPolicy: Never
+                                            example:
+                                              spec:
+                                                containers:
+                                                  - name: hello
+                                                    command: *ref_18
+                                                    image: nginx:1.21
+                                                restartPolicy: Never
+                                        example:
+                                          backoffLimit: 1
+                                          template:
+                                            spec:
+                                              containers:
+                                                - name: hello
+                                                  command: *ref_18
+                                                  image: nginx:1.21
+                                              restartPolicy: Never
+                                    example:
+                                      spec:
+                                        backoffLimit: 1
+                                        template:
+                                          spec:
+                                            containers:
+                                              - name: hello
+                                                command: *ref_18
+                                                image: nginx:1.21
+                                            restartPolicy: Never
                                   jenkins:
                                     type: object
                                     required:
@@ -1050,6 +1305,72 @@ paths:
                                           required:
                                             - key
                                             - value
+                                          example:
+                                            key: app
+                                            value: my-application
+                                    example:
+                                      pipelineName: pipelineName
+                                      tlsVerification: true
+                                      timeout: 120s/2m
+                                      interval: 5s
+                                      parameters:
+                                        - key: app
+                                          value: my-application
+                                example: &ref_34
+                                  prometheus:
+                                    query: http_requests_total{status!~"5.."}"
+                                  newRelic:
+                                    profile: account-12345678
+                                    query: FROM Metric SELECT count(*)
+                                  datadog:
+                                    duration: 1m
+                                    query: avg:kubernetes.cpu.user.total{*}
+                                  cloudWatch:
+                                    duration: 5m
+                                    metricDataQueries:
+                                      - id: utilization
+                                        metricStat:
+                                          metric:
+                                            metricName: CPUUtilization
+                                            namespace: AWS/EC2
+                                            dimensions:
+                                              - name: InstanceId
+                                                value: i-1234567890abcdef
+                                          period: 300
+                                          stat: Average
+                                          unit: None
+                                        expression: SELECT AVG(CPUUtilization) FROM SCHEMA(\"AWS/EC2\", InstanceId)
+                                        label: Cluster CpuUtilization
+                                        returnData: false
+                                        period: 300
+                                  web:
+                                    method: GET
+                                    url: https://oceancd.com/api/v1/metrics?clusterId={{ args.clusterId }}
+                                    headers:
+                                      - key: Authorization
+                                        value: Bearer {{ args.token }}
+                                    body: '{"key": "test"}'
+                                    timeoutSeconds: 10
+                                    jsonPath: '{$.data}'
+                                    insecure: false
+                                  job:
+                                    spec:
+                                      backoffLimit: 1
+                                      template:
+                                        spec:
+                                          containers:
+                                            - name: hello
+                                              command: *ref_18
+                                              image: nginx:1.21
+                                          restartPolicy: Never
+                                  jenkins:
+                                    pipelineName: pipelineName
+                                    tlsVerification: true
+                                    timeout: 120s/2m
+                                    interval: 5s
+                                    parameters:
+                                      - key: app
+                                        value: my-application
                               baseline:
                                 type: objet
                                 required:
@@ -1083,27 +1404,222 @@ paths:
                                     properties:
                                       prometheus:
                                         type: object
-                                        required: *ref_15
+                                        required: *ref_19
                                         title: Ocean CD Verification Prometheus Metric
-                                        properties: *ref_16
+                                        properties: *ref_20
+                                        example:
+                                          query: http_requests_total{status!~"5.."}"
                                       newRelic:
                                         type: object
                                         title: Ocean CD Verification NewRelic Metric
-                                        required: *ref_17
-                                        properties: *ref_18
+                                        required: *ref_21
+                                        properties: *ref_22
+                                        example:
+                                          profile: account-12345678
+                                          query: FROM Metric SELECT count(*)
                                       datadog:
                                         type: object
                                         title: Ocean CD Verification Datadog Metric
-                                        required: *ref_19
-                                        properties: *ref_20
+                                        required: *ref_23
+                                        properties: *ref_24
+                                        example:
+                                          duration: 1m
+                                          query: avg:kubernetes.cpu.user.total{*}
+                                    example:
+                                      prometheus:
+                                        query: http_requests_total{status!~"5.."}"
+                                      newRelic:
+                                        profile: account-12345678
+                                        query: FROM Metric SELECT count(*)
+                                      datadog:
+                                        duration: 1m
+                                        query: avg:kubernetes.cpu.user.total{*}
+                                example: &ref_35
+                                  threshold: '>'
+                                  minRange: 45
+                                  maxRange: 55
+                                  provider:
+                                    prometheus:
+                                      query: http_requests_total{status!~"5.."}"
+                                    newRelic:
+                                      profile: account-12345678
+                                      query: FROM Metric SELECT count(*)
+                                    datadog:
+                                      duration: 1m
+                                      query: avg:kubernetes.cpu.user.total{*}
+                            example:
+                              name: 5xx-errors
+                              dryRun: false
+                              interval: 5m
+                              initialDelay: 1m
+                              count: 10
+                              successCondition: result[0] <= 0.95
+                              failureCondition: result[0] >= 1.2
+                              failureLimit: 2
+                              consecutiveErrorLimit: 4
+                              provider:
+                                prometheus:
+                                  query: http_requests_total{status!~"5.."}"
+                                newRelic:
+                                  profile: account-12345678
+                                  query: FROM Metric SELECT count(*)
+                                datadog:
+                                  duration: 1m
+                                  query: avg:kubernetes.cpu.user.total{*}
+                                cloudWatch:
+                                  duration: 5m
+                                  metricDataQueries:
+                                    - id: utilization
+                                      metricStat:
+                                        metric:
+                                          metricName: CPUUtilization
+                                          namespace: AWS/EC2
+                                          dimensions:
+                                            - name: InstanceId
+                                              value: i-1234567890abcdef
+                                        period: 300
+                                        stat: Average
+                                        unit: None
+                                      expression: SELECT AVG(CPUUtilization) FROM SCHEMA(\"AWS/EC2\", InstanceId)
+                                      label: Cluster CpuUtilization
+                                      returnData: false
+                                      period: 300
+                                web:
+                                  method: GET
+                                  url: https://oceancd.com/api/v1/metrics?clusterId={{ args.clusterId }}
+                                  headers:
+                                    - key: Authorization
+                                      value: Bearer {{ args.token }}
+                                  body: '{"key": "test"}'
+                                  timeoutSeconds: 10
+                                  jsonPath: '{$.data}'
+                                  insecure: false
+                                job:
+                                  spec:
+                                    backoffLimit: 1
+                                    template:
+                                      spec:
+                                        containers:
+                                          - name: hello
+                                            command: *ref_18
+                                            image: nginx:1.21
+                                        restartPolicy: Never
+                                jenkins:
+                                  pipelineName: pipelineName
+                                  tlsVerification: true
+                                  timeout: 120s/2m
+                                  interval: 5s
+                                  parameters:
+                                    - key: app
+                                      value: my-application
+                              baseline:
+                                threshold: '>'
+                                minRange: 45
+                                maxRange: 55
+                                provider:
+                                  prometheus:
+                                    query: http_requests_total{status!~"5.."}"
+                                  newRelic:
+                                    profile: account-12345678
+                                    query: FROM Metric SELECT count(*)
+                                  datadog:
+                                    duration: 1m
+                                    query: avg:kubernetes.cpu.user.total{*}
+                      example:
+                        name: latency-validation
+                        args:
+                          - name: root-password
+                            value: 12345678
+                            valueFrom:
+                              secretKeyRef:
+                                name: root-password-secret
+                                key: root-password
+                        metrics:
+                          - name: 5xx-errors
+                            dryRun: false
+                            interval: 5m
+                            initialDelay: 1m
+                            count: 10
+                            successCondition: result[0] <= 0.95
+                            failureCondition: result[0] >= 1.2
+                            failureLimit: 2
+                            consecutiveErrorLimit: 4
+                            provider:
+                              prometheus:
+                                query: http_requests_total{status!~"5.."}"
+                              newRelic:
+                                profile: account-12345678
+                                query: FROM Metric SELECT count(*)
+                              datadog:
+                                duration: 1m
+                                query: avg:kubernetes.cpu.user.total{*}
+                              cloudWatch:
+                                duration: 5m
+                                metricDataQueries:
+                                  - id: utilization
+                                    metricStat:
+                                      metric:
+                                        metricName: CPUUtilization
+                                        namespace: AWS/EC2
+                                        dimensions:
+                                          - name: InstanceId
+                                            value: i-1234567890abcdef
+                                      period: 300
+                                      stat: Average
+                                      unit: None
+                                    expression: SELECT AVG(CPUUtilization) FROM SCHEMA(\"AWS/EC2\", InstanceId)
+                                    label: Cluster CpuUtilization
+                                    returnData: false
+                                    period: 300
+                              web:
+                                method: GET
+                                url: https://oceancd.com/api/v1/metrics?clusterId={{ args.clusterId }}
+                                headers:
+                                  - key: Authorization
+                                    value: Bearer {{ args.token }}
+                                body: '{"key": "test"}'
+                                timeoutSeconds: 10
+                                jsonPath: '{$.data}'
+                                insecure: false
+                              job:
+                                spec:
+                                  backoffLimit: 1
+                                  template:
+                                    spec:
+                                      containers:
+                                        - name: hello
+                                          command: *ref_18
+                                          image: nginx:1.21
+                                      restartPolicy: Never
+                              jenkins:
+                                pipelineName: pipelineName
+                                tlsVerification: true
+                                timeout: 120s/2m
+                                interval: 5s
+                                parameters:
+                                  - key: app
+                                    value: my-application
+                            baseline:
+                              threshold: '>'
+                              minRange: 45
+                              maxRange: 55
+                              provider:
+                                prometheus:
+                                  query: http_requests_total{status!~"5.."}"
+                                newRelic:
+                                  profile: account-12345678
+                                  query: FROM Metric SELECT count(*)
+                                datadog:
+                                  duration: 1m
+                                  query: avg:kubernetes.cpu.user.total{*}
       responses:
-        '200': &ref_24
+        '200': &ref_28
           description: Ocean CD Verification Template Response
           content:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_2
                   - type: object
                     properties:
                       response:
@@ -1115,10 +1631,10 @@ paths:
                             items:
                               allOf:
                                 - type: object
-                                  required: *ref_21
+                                  required: *ref_25
                                   description: The object specifying a set of metrics that need to be analyzed during the rollout, and the values that are considered successful or failed
-                                  properties: *ref_22
-                                - *ref_23
+                                  properties: *ref_26
+                                - *ref_27
         '400':
           description: Bad Request
     get:
@@ -1129,7 +1645,7 @@ paths:
       tags:
         - Ocean CD
       responses:
-        '200': *ref_24
+        '200': *ref_28
         '400':
           description: Bad Request
   /ocean/cd/verificationTemplate/{name}:
@@ -1151,7 +1667,7 @@ paths:
           description: |
             The identifier of the Ocean CD Verification Template
       responses:
-        '200': *ref_24
+        '200': *ref_28
         '400':
           description: Bad Request
     put:
@@ -1195,16 +1711,49 @@ paths:
                           items:
                             type: object
                             title: Ocean CD Verification Template argument
-                            required: *ref_25
-                            properties: *ref_26
+                            required: *ref_29
+                            properties: *ref_30
+                            example:
+                              name: root-password
+                              value: 12345678
+                              valueFrom: *ref_31
                         metrics:
                           description: List of verification metrics
                           type: array
                           items:
                             type: object
-                            required: *ref_27
+                            required: *ref_32
                             title: Ocean CD Verification Metric
-                            properties: *ref_28
+                            properties: *ref_33
+                            example:
+                              name: 5xx-errors
+                              dryRun: false
+                              interval: 5m
+                              initialDelay: 1m
+                              count: 10
+                              successCondition: result[0] <= 0.95
+                              failureCondition: result[0] >= 1.2
+                              failureLimit: 2
+                              consecutiveErrorLimit: 4
+                              provider: *ref_34
+                              baseline: *ref_35
+                      example:
+                        args:
+                          - name: root-password
+                            value: 12345678
+                            valueFrom: *ref_31
+                        metrics:
+                          - name: 5xx-errors
+                            dryRun: false
+                            interval: 5m
+                            initialDelay: 1m
+                            count: 10
+                            successCondition: result[0] <= 0.95
+                            failureCondition: result[0] >= 1.2
+                            failureLimit: 2
+                            consecutiveErrorLimit: 4
+                            provider: *ref_34
+                            baseline: *ref_35
       responses:
         '200':
           description: Ok
@@ -1253,16 +1802,49 @@ paths:
                           items:
                             type: object
                             title: Ocean CD Verification Template argument
-                            required: *ref_25
-                            properties: *ref_26
+                            required: *ref_29
+                            properties: *ref_30
+                            example:
+                              name: root-password
+                              value: 12345678
+                              valueFrom: *ref_31
                         metrics:
                           description: List of verification metrics
                           type: array
                           items:
                             type: object
-                            required: *ref_27
+                            required: *ref_32
                             title: Ocean CD Verification Metric
-                            properties: *ref_28
+                            properties: *ref_33
+                            example:
+                              name: 5xx-errors
+                              dryRun: false
+                              interval: 5m
+                              initialDelay: 1m
+                              count: 10
+                              successCondition: result[0] <= 0.95
+                              failureCondition: result[0] >= 1.2
+                              failureLimit: 2
+                              consecutiveErrorLimit: 4
+                              provider: *ref_34
+                              baseline: *ref_35
+                      example:
+                        args:
+                          - name: root-password
+                            value: 12345678
+                            valueFrom: *ref_31
+                        metrics:
+                          - name: 5xx-errors
+                            dryRun: false
+                            interval: 5m
+                            initialDelay: 1m
+                            count: 10
+                            successCondition: result[0] <= 0.95
+                            failureCondition: result[0] >= 1.2
+                            failureLimit: 2
+                            consecutiveErrorLimit: 4
+                            provider: *ref_34
+                            baseline: *ref_35
       responses:
         '200':
           description: Ok
@@ -1311,7 +1893,7 @@ paths:
                   required:
                     - strategy
                   properties:
-                    strategy: &ref_31
+                    strategy: &ref_41
                       type: object
                       title: Ocean CD Strategy
                       description: |
@@ -1321,7 +1903,7 @@ paths:
                           type: string
                           description: Identifier name for Ocean CD Strategy. Must be unique
                           example: service-strategy
-                        canary: &ref_33
+                        canary: &ref_43
                           type: object
                           title: Ocean CD Strategy Canary
                           description: |
@@ -1341,6 +1923,9 @@ paths:
                                     example: verification-template-name
                               required:
                                 - templateNames
+                              example:
+                                templateNames:
+                                  - verification-template-name
                             steps:
                               type: array
                               description: A set of separate conditions of rollout processing
@@ -1376,7 +1961,11 @@ paths:
                                         type: boolean
                                         description: Defines whether a rollout should match the current canary's setWeight step
                                         example: true
-                                  verification: &ref_29
+                                    example:
+                                      weight: 20
+                                      replicas: 20
+                                      matchTrafficWeight: true
+                                  verification: &ref_37
                                     type: object
                                     title: Ocean CD Strategy Step Verification
                                     description: |
@@ -1387,11 +1976,13 @@ paths:
                                         type: array
                                         items:
                                           type: string
-                                        example:
+                                        example: &ref_36
                                           - 5xx-errors
                                     required:
                                       - templateNames
-                                  pause: &ref_30
+                                    example: &ref_39
+                                      templateNames: *ref_36
+                                  pause: &ref_38
                                     type: object
                                     title: Ocean CD Strategy Step Pause
                                     description: |
@@ -1401,6 +1992,8 @@ paths:
                                         type: string
                                         description: The amount of time to wait before moving to the next step
                                         example: 5m
+                                    example: &ref_40
+                                      duration: 5m
                                   setHeaderRoute:
                                     type: object
                                     title: Ocean CD Strategy Canary Step Header
@@ -1443,15 +2036,75 @@ paths:
                                                   type: string
                                                   description: The value in a regex format
                                                   example: Mozilla(.*)
+                                              example:
+                                                exact: Mozilla
+                                                prefix: Mozilla-
+                                                regex: Mozilla(.*)
                                           required:
                                             - headerName
                                             - headerValue
+                                          example:
+                                            headerName: User-Agent
+                                            headerValue:
+                                              exact: Mozilla
+                                              prefix: Mozilla-
+                                              regex: Mozilla(.*)
                                     required:
                                       - name
                                       - match
+                                    example:
+                                      name: set-header-1
+                                      match:
+                                        - headerName: User-Agent
+                                          headerValue:
+                                            exact: Mozilla
+                                            prefix: Mozilla-
+                                            regex: Mozilla(.*)
+                                example:
+                                  name: first-step
+                                  setWeight: 20
+                                  setCanaryScale:
+                                    weight: 20
+                                    replicas: 20
+                                    matchTrafficWeight: true
+                                  verification:
+                                    templateNames: *ref_36
+                                  pause:
+                                    duration: 5m
+                                  setHeaderRoute:
+                                    name: set-header-1
+                                    match:
+                                      - headerName: User-Agent
+                                        headerValue:
+                                          exact: Mozilla
+                                          prefix: Mozilla-
+                                          regex: Mozilla(.*)
                           required:
                             - steps
-                        rolling: &ref_34
+                          example: &ref_45
+                            backgroundVerification:
+                              templateNames:
+                                - verification-template-name
+                            steps:
+                              - name: first-step
+                                setWeight: 20
+                                setCanaryScale:
+                                  weight: 20
+                                  replicas: 20
+                                  matchTrafficWeight: true
+                                verification:
+                                  templateNames: *ref_36
+                                pause:
+                                  duration: 5m
+                                setHeaderRoute:
+                                  name: set-header-1
+                                  match:
+                                    - headerName: User-Agent
+                                      headerValue:
+                                        exact: Mozilla
+                                        prefix: Mozilla-
+                                        regex: Mozilla(.*)
+                        rolling: &ref_44
                           type: object
                           title: Ocean CD Strategy Rolling Update
                           description: |
@@ -1470,20 +2123,61 @@ paths:
                                     type: string
                                     description: The name of a step
                                     example: first-step
-                                  verification: *ref_29
-                                  pause: *ref_30
+                                  verification: *ref_37
+                                  pause: *ref_38
+                                example:
+                                  name: first-step
+                                  verification: *ref_39
+                                  pause: *ref_40
                           required:
                             - steps
+                          example: &ref_46
+                            steps:
+                              - name: first-step
+                                verification: *ref_39
+                                pause: *ref_40
                       required:
                         - name
+                      example:
+                        name: service-strategy
+                        canary:
+                          backgroundVerification:
+                            templateNames:
+                              - verification-template-name
+                          steps:
+                            - name: first-step
+                              setWeight: 20
+                              setCanaryScale:
+                                weight: 20
+                                replicas: 20
+                                matchTrafficWeight: true
+                              verification:
+                                templateNames: *ref_36
+                              pause:
+                                duration: 5m
+                              setHeaderRoute:
+                                name: set-header-1
+                                match:
+                                  - headerName: User-Agent
+                                    headerValue:
+                                      exact: Mozilla
+                                      prefix: Mozilla-
+                                      regex: Mozilla(.*)
+                        rolling:
+                          steps:
+                            - name: first-step
+                              verification:
+                                templateNames: *ref_36
+                              pause:
+                                duration: 5m
       responses:
-        '200': &ref_32
+        '200': &ref_42
           description: Ocean CD Strategy Response
           content:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_2
                   - type: object
                     properties:
                       response:
@@ -1494,8 +2188,8 @@ paths:
                             type: array
                             items:
                               allOf:
-                                - *ref_31
-                                - *ref_23
+                                - *ref_41
+                                - *ref_27
         '400':
           description: Bad Request
     get:
@@ -1506,7 +2200,7 @@ paths:
       tags:
         - Ocean CD
       responses:
-        '200': *ref_32
+        '200': *ref_42
         '400':
           description: Bad Request
   /ocean/cd/strategy/{strategyName}:
@@ -1528,7 +2222,7 @@ paths:
           description: |
             The identifier name of the Ocean CD Strategy
       responses:
-        '200': *ref_32
+        '200': *ref_42
         '400':
           description: Bad Request
     put:
@@ -1564,8 +2258,11 @@ paths:
                       description: |
                         Ocean CD strategy. Use in RolloutSpec to decide what strategy to use when applying `SpotDeployment`
                       properties:
-                        canary: *ref_33
-                        rolling: *ref_34
+                        canary: *ref_43
+                        rolling: *ref_44
+                      example:
+                        canary: *ref_45
+                        rolling: *ref_46
       responses:
         '200':
           description: Ok
@@ -1603,8 +2300,11 @@ paths:
                       description: |
                         Ocean CD strategy. Use in RolloutSpec to decide what strategy to use when applying `SpotDeployment`
                       properties:
-                        canary: *ref_33
-                        rolling: *ref_34
+                        canary: *ref_43
+                        rolling: *ref_44
+                      example:
+                        canary: *ref_45
+                        rolling: *ref_46
       responses:
         '200':
           description: Ok
@@ -1651,7 +2351,7 @@ paths:
                   description: |
                     Ocean CD Rollout Spec request entity.
                   properties:
-                    rolloutSpec: &ref_36
+                    rolloutSpec: &ref_50
                       type: object
                       title: Ocean CD Rollout Spec
                       description: |
@@ -1661,7 +2361,7 @@ paths:
                           type: string
                           description: The identifier name for Ocean CD Rollout Spec. Must be unique
                           example: my-rolloutspec
-                        spotDeployment: &ref_35
+                        spotDeployment: &ref_47
                           type: object
                           title: Ocean CD Spot Deployment Selector
                           description: Represents the SpotDeployment selector
@@ -1678,11 +2378,15 @@ paths:
                               type: string
                               description: The name of the `SpotDeployment` resource
                               example: us-app
+                          example: &ref_55
+                            clusterId: aws-cluster
+                            namespace: us-region
+                            name: us-app
                         spotDeployments:
                           type: array
                           description: You must specify either `spotDeployment` OR `spotDeployments` but not both. Every SpotDeployment has to be unique. If more than one `SpotDeployment` has been configured, no `traffic` managers can be set as part of the RolloutSpec. For such case ensure that each of the chosen SpotDeployments are being exposed with different Kubernetes services
-                          items: *ref_35
-                        strategy: &ref_38
+                          items: *ref_47
+                        strategy: &ref_52
                           type: object
                           title: Ocean CD Rollout Spec Strategy
                           description: |
@@ -1729,11 +2433,30 @@ paths:
                                             example: metadata.labels['app']
                                         required:
                                           - fieldPath
+                                        example:
+                                          fieldPath: metadata.labels['app']
+                                    example:
+                                      fieldRef:
+                                        fieldPath: metadata.labels['app']
                                 required:
                                   - name
+                                example:
+                                  name: app
+                                  value: my-application
+                                  valueFrom:
+                                    fieldRef:
+                                      fieldPath: metadata.labels['app']
                           required:
                             - name
-                        traffic: &ref_39
+                          example: &ref_56
+                            name: canary-strategy
+                            args:
+                              - name: app
+                                value: my-application
+                                valueFrom:
+                                  fieldRef:
+                                    fieldPath: metadata.labels['app']
+                        traffic: &ref_53
                           type: object
                           title: Ocean CD Rollout Spec Traffic
                           description: |
@@ -1771,7 +2494,7 @@ paths:
                                         type: array
                                         items:
                                           type: string
-                                        example:
+                                        example: &ref_49
                                           - http-primary
                                       tlsRoutes:
                                         type: array
@@ -1791,10 +2514,19 @@ paths:
                                               type: array
                                               items:
                                                 type: string
-                                              example:
+                                              example: &ref_48
                                                 - spot.io
+                                          example:
+                                            port: 443
+                                            sniHosts: *ref_48
                                     required:
                                       - name
+                                    example:
+                                      name: service
+                                      routes: *ref_49
+                                      tlsRoutes:
+                                        - port: 443
+                                          sniHosts: *ref_48
                                 destinationRule:
                                   type: object
                                   title: Ocean CD Rollout Spec Traffic Istio Destination rule
@@ -1817,8 +2549,23 @@ paths:
                                       type: string
                                       example: stable-subset
                                       description: The subset name to modify labels with the stable version
+                                  example:
+                                    name: rollout-destrule
+                                    canarySubsetName: canary-subset
+                                    stableSubsetName: stable-subset
                               required:
                                 - virtualServices
+                              example:
+                                virtualServices:
+                                  - name: service
+                                    routes: *ref_49
+                                    tlsRoutes:
+                                      - port: 443
+                                        sniHosts: *ref_48
+                                destinationRule:
+                                  name: rollout-destrule
+                                  canarySubsetName: canary-subset
+                                  stableSubsetName: stable-subset
                             nginx:
                               type: object
                               title: Ocean CD Rollout Spec Traffic Nginx
@@ -1845,8 +2592,17 @@ paths:
                                       type: string
                                       example: value1
                                       description: Any of supported annotations
+                                  example:
+                                    canary-by-header: X-Canary
+                                    key1: value1
                               required:
                                 - stableIngress
+                              example:
+                                annotationPrefix: customingress.nginx.ingress.kubernetes.io
+                                stableIngress: rollouts-demo-ingress-nginx
+                                additionalIngressAnnotations:
+                                  canary-by-header: X-Canary
+                                  key1: value1
                             alb:
                               type: object
                               title: Ocean CD Rollout Spec Traffic ALB
@@ -1879,6 +2635,9 @@ paths:
                                       type: integer
                                       description: Defines how long the load balancer should consistently route the user's request to the same target
                                       example: 3600
+                                  example:
+                                    enabled: true
+                                    durationSeconds: 3600
                                 annotationPrefix:
                                   type: string
                                   example: custom.alb.ingress.kubernetes.io
@@ -1887,6 +2646,14 @@ paths:
                                 - ingress
                                 - servicePort
                                 - rootService
+                              example:
+                                ingress: rollouts-demo-ingress
+                                servicePort: 80
+                                rootService: rollouts-demo-root
+                                stickinessConfig:
+                                  enabled: true
+                                  durationSeconds: 3600
+                                annotationPrefix: custom.alb.ingress.kubernetes.io
                             smi:
                               type: object
                               title: Ocean CD Rollout Spec Traffic SMI
@@ -1901,6 +2668,9 @@ paths:
                                   type: string
                                   example: rollout-example-traffic-split
                                   description: Holds the name of the TrafficSplit
+                              example:
+                                rootService: rollouts-demo-root
+                                trafficSplitName: rollout-example-traffic-split
                             ambassador:
                               type: object
                               title: Ocean CD Rollout Spec Traffic Ambassador
@@ -1916,6 +2686,9 @@ paths:
                                     example: stable-mapping
                               required:
                                 - mappings
+                              example:
+                                mappings:
+                                  - stable-mapping
                             pingPong:
                               type: object
                               title: Ocean CD Rollout Spec Traffic PingPong
@@ -1933,7 +2706,47 @@ paths:
                               required:
                                 - pingService
                                 - pongService
-                        failurePolicy: &ref_40
+                              example:
+                                pingService: rollouts-demo-canary
+                                pongService: rollouts-demo-stable
+                          example: &ref_57
+                            canaryService: canary-service
+                            stableService: stable-service
+                            istio:
+                              virtualServices:
+                                - name: service
+                                  routes: *ref_49
+                                  tlsRoutes:
+                                    - port: 443
+                                      sniHosts: *ref_48
+                              destinationRule:
+                                name: rollout-destrule
+                                canarySubsetName: canary-subset
+                                stableSubsetName: stable-subset
+                            nginx:
+                              annotationPrefix: customingress.nginx.ingress.kubernetes.io
+                              stableIngress: rollouts-demo-ingress-nginx
+                              additionalIngressAnnotations:
+                                canary-by-header: X-Canary
+                                key1: value1
+                            alb:
+                              ingress: rollouts-demo-ingress
+                              servicePort: 80
+                              rootService: rollouts-demo-root
+                              stickinessConfig:
+                                enabled: true
+                                durationSeconds: 3600
+                              annotationPrefix: custom.alb.ingress.kubernetes.io
+                            smi:
+                              rootService: rollouts-demo-root
+                              trafficSplitName: rollout-example-traffic-split
+                            ambassador:
+                              mappings:
+                                - stable-mapping
+                            pingPong:
+                              pingService: rollouts-demo-canary
+                              pongService: rollouts-demo-stable
+                        failurePolicy: &ref_54
                           type: object
                           title: Ocean CD Rollout Spec Failure Policy
                           description: |
@@ -1949,19 +2762,78 @@ paths:
                               example: abort
                           required:
                             - action
+                          example: &ref_58
+                            action: abort
                       required:
                         - name
                         - strategy
+                      example:
+                        name: my-rolloutspec
+                        spotDeployment:
+                          clusterId: aws-cluster
+                          namespace: us-region
+                          name: us-app
+                        spotDeployments:
+                          - clusterId: aws-cluster
+                            namespace: us-region
+                            name: us-app
+                        strategy:
+                          name: canary-strategy
+                          args:
+                            - name: app
+                              value: my-application
+                              valueFrom:
+                                fieldRef:
+                                  fieldPath: metadata.labels['app']
+                        traffic:
+                          canaryService: canary-service
+                          stableService: stable-service
+                          istio:
+                            virtualServices:
+                              - name: service
+                                routes: *ref_49
+                                tlsRoutes:
+                                  - port: 443
+                                    sniHosts: *ref_48
+                            destinationRule:
+                              name: rollout-destrule
+                              canarySubsetName: canary-subset
+                              stableSubsetName: stable-subset
+                          nginx:
+                            annotationPrefix: customingress.nginx.ingress.kubernetes.io
+                            stableIngress: rollouts-demo-ingress-nginx
+                            additionalIngressAnnotations:
+                              canary-by-header: X-Canary
+                              key1: value1
+                          alb:
+                            ingress: rollouts-demo-ingress
+                            servicePort: 80
+                            rootService: rollouts-demo-root
+                            stickinessConfig:
+                              enabled: true
+                              durationSeconds: 3600
+                            annotationPrefix: custom.alb.ingress.kubernetes.io
+                          smi:
+                            rootService: rollouts-demo-root
+                            trafficSplitName: rollout-example-traffic-split
+                          ambassador:
+                            mappings:
+                              - stable-mapping
+                          pingPong:
+                            pingService: rollouts-demo-canary
+                            pongService: rollouts-demo-stable
+                        failurePolicy:
+                          action: abort
                   required:
                     - rolloutSpec
       responses:
-        '200': &ref_37
+        '200': &ref_51
           description: Ocean CD Rollout Spec Response
           content:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_2
                   - type: object
                     properties:
                       response:
@@ -1972,8 +2844,8 @@ paths:
                             type: array
                             items:
                               allOf:
-                                - *ref_36
-                                - *ref_23
+                                - *ref_50
+                                - *ref_27
         '400':
           description: Bad Request
     get:
@@ -1984,7 +2856,7 @@ paths:
       tags:
         - Ocean CD
       responses:
-        '200': *ref_37
+        '200': *ref_51
         '400':
           description: Bad Request
   /ocean/cd/rolloutSpec/{rolloutSpecName}:
@@ -2005,7 +2877,7 @@ paths:
           example: app-rolloutspec
           description: The identifier name of the Ocean CD Rollout Spec
       responses:
-        '200': *ref_37
+        '200': *ref_51
         '400':
           description: Bad Request
     put:
@@ -2042,16 +2914,23 @@ paths:
                       description: |
                         Ocean CD rollout spec entity
                       properties:
-                        spotDeployment: *ref_35
+                        spotDeployment: *ref_47
                         spotDeployments:
                           type: array
                           description: You must specify either `SpotDeployment` OR `SpotDeployments` but not both. Every SpotDeployment has to be unique. If more than one `SpotDeployment` has been configured, no `traffic` managers can be set as part of the RolloutSpec. For such case ensure that each of the chosen SpotDeployments are being exposed with different Kubernetes services
-                          items: *ref_35
-                        strategy: *ref_38
-                        traffic: *ref_39
-                        failurePolicy: *ref_40
+                          items: *ref_47
+                        strategy: *ref_52
+                        traffic: *ref_53
+                        failurePolicy: *ref_54
                       required:
                         - strategy
+                      example:
+                        spotDeployment: *ref_55
+                        spotDeployments:
+                          - *ref_55
+                        strategy: *ref_56
+                        traffic: *ref_57
+                        failurePolicy: *ref_58
                   required:
                     - rolloutSpec
       responses:
@@ -2092,16 +2971,23 @@ paths:
                       description: |
                         Ocean CD rollout spec entity
                       properties:
-                        spotDeployment: *ref_35
+                        spotDeployment: *ref_47
                         spotDeployments:
                           type: array
                           description: You must specify either `SpotDeployment` OR `SpotDeployments` but not both. Every SpotDeployment has to be unique. If more than one `SpotDeployment` has been configured, no `traffic` managers can be set as part of the RolloutSpec. For such case ensure that each of the chosen SpotDeployments are being exposed with different Kubernetes services
-                          items: *ref_35
-                        strategy: *ref_38
-                        traffic: *ref_39
-                        failurePolicy: *ref_40
+                          items: *ref_47
+                        strategy: *ref_52
+                        traffic: *ref_53
+                        failurePolicy: *ref_54
                       required:
                         - strategy
+                      example:
+                        spotDeployment: *ref_55
+                        spotDeployments:
+                          - *ref_55
+                        strategy: *ref_56
+                        traffic: *ref_57
+                        failurePolicy: *ref_58
                   required:
                     - rolloutSpec
       responses:
@@ -2148,13 +3034,13 @@ paths:
           description: |
             The identifier name of the Ocean CD rollout
       responses:
-        '200': &ref_41
+        '200': &ref_59
           description: Ocean CD Rollout List Response
           content:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_2
                   - type: object
                     properties:
                       response:
@@ -2196,22 +3082,31 @@ paths:
                                           example: '2018-11-05T12:55:50.000Z'
                                           description: |
                                             Time stamp of when the SpotDeployment the rollout belongs to was deleted.
-                                        oldVersion: &ref_49
+                                        oldVersion: &ref_71
                                           type: string
                                           description: The image version of the previous SpotDeployment revision
                                           example: nginx:1.10
-                                        newVersion: &ref_50
+                                        newVersion: &ref_72
                                           type: string
                                           description: The image version of the desired SpotDeployment revision
                                           example: nginx:1.11
-                                        oldManifest: &ref_51
+                                        oldManifest: &ref_73
                                           type: string
                                           description: The string JSON representation of the desired SpotDeployment's revision
                                           example: '{"kind":"SpotDeployment","apiVersion":"spot.io/v1beta1","metadata"...'
-                                        newManifest: &ref_52
+                                        newManifest: &ref_74
                                           type: string
                                           description: The string JSON representation of the previous SpotDeployment's revision
                                           example: '{"kind":"SpotDeployment","apiVersion":"spot.io/v1beta1","metadata"...'
+                                      example:
+                                        name: example-12345
+                                        isLiveApplied: false
+                                        revision: 3
+                                        spotDeploymentDeletedAt: '2018-11-05T12:55:50.000Z'
+                                        oldVersion: nginx:1.10
+                                        newVersion: nginx:1.11
+                                        oldManifest: '{"kind":"SpotDeployment","apiVersion":"spot.io/v1beta1","metadata"...'
+                                        newManifest: '{"kind":"SpotDeployment","apiVersion":"spot.io/v1beta1","metadata"...'
                                     namespace:
                                       type: string
                                       description: The Kubernetes namespace in which the rollout is running
@@ -2236,7 +3131,7 @@ paths:
                                       type: string
                                       description: An identifier name of the associated Ocean CD Strategy
                                       example: 4-steps-verification
-                                    status: &ref_42
+                                    status: &ref_60
                                       type: string
                                       description: The current status of the rollout indicating its state
                                       example: finished
@@ -2342,7 +3237,7 @@ paths:
           description: |
             The timestamp indicating the starting point from which only rollouts initiated thereafter will be listed
       responses:
-        '200': *ref_41
+        '200': *ref_59
         '400':
           description: Bad Request
   /ocean/cd/rollout/{rolloutId}/status:
@@ -2370,7 +3265,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_2
                   - type: object
                     properties:
                       response:
@@ -2381,7 +3276,7 @@ paths:
                             type: array
                             items:
                               allOf:
-                                - &ref_44
+                                - &ref_62
                                   type: object
                                   title: Ocean CD Rollout Detailed
                                   description: Contains detailed info about a rollout
@@ -2390,7 +3285,7 @@ paths:
                                       type: string
                                       description: The identifier name of the rollout
                                       example: rol-56789000
-                                    status: *ref_42
+                                    status: *ref_60
                                     spotDeployment:
                                       type: string
                                       description: The identifier name of the associated SpotDeployment
@@ -2431,7 +3326,7 @@ paths:
                                       type: string
                                       description: An error text describing its cause
                                       example: Triggering failure policy. Phase 2 failed due to Metric assessed
-                                    newVersionStatus: &ref_43
+                                    newVersionStatus: &ref_61
                                       type: object
                                       title: Ocean CD Rollout Detailed Version Status
                                       description: Contains information about a version
@@ -2469,7 +3364,21 @@ paths:
                                               type: integer
                                               description: Number of replicas that are failed
                                               example: 1
-                                    stableVersionStatus: *ref_43
+                                          example:
+                                            desired: 4
+                                            ready: 2
+                                            inProgress: 1
+                                            failed: 1
+                                      example:
+                                        version: nginx:1.10
+                                        k8sService: service-example
+                                        trafficPercentage: 80
+                                        replicas:
+                                          desired: 4
+                                          ready: 2
+                                          inProgress: 1
+                                          failed: 1
+                                    stableVersionStatus: *ref_61
         '400':
           description: Bad Request
   /ocean/cd/rollout/latest:
@@ -2516,7 +3425,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_2
                   - type: object
                     properties:
                       response:
@@ -2527,7 +3436,7 @@ paths:
                             type: array
                             items:
                               allOf:
-                                - *ref_44
+                                - *ref_62
         '400':
           description: Bad Request
   /ocean/cd/rollout/ongoing:
@@ -2545,7 +3454,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_2
                   - type: object
                     properties:
                       response:
@@ -2560,6 +3469,8 @@ paths:
                                   format: int64
                                   example: 1
                                   description: The number of ongoing rollouts
+                              example:
+                                rollouts: 1
         '400':
           description: Bad Request
   /ocean/cd/rollout/{rolloutId}/verification:
@@ -2587,7 +3498,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_2
                   - type: object
                     properties:
                       response:
@@ -2598,7 +3509,7 @@ paths:
                             type: array
                             items:
                               allOf:
-                                - &ref_53
+                                - &ref_75
                                   type: object
                                   title: Ocean CD Rollout Verification Result
                                   description: |
@@ -2675,6 +3586,11 @@ paths:
                                             type: string
                                             example: failure message
                                             description: The message of the dataPoint
+                                        example: &ref_64
+                                          timestamp: '2018-11-05T12:55:50.000Z'
+                                          value: '[11.374236757]'
+                                          status: Successful
+                                          message: failure message
                                     provider:
                                       type: string
                                       description: The name of the chosen monitoring tool for the metric
@@ -2723,19 +3639,60 @@ paths:
                                               properties:
                                                 prometheus:
                                                   type: object
-                                                  required: *ref_15
+                                                  required: *ref_19
                                                   title: Ocean CD Verification Prometheus Metric
-                                                  properties: *ref_16
+                                                  properties: *ref_20
+                                                  example:
+                                                    query: http_requests_total{status!~"5.."}"
                                                 newRelic:
                                                   type: object
                                                   title: Ocean CD Verification NewRelic Metric
-                                                  required: *ref_17
-                                                  properties: *ref_18
+                                                  required: *ref_21
+                                                  properties: *ref_22
+                                                  example:
+                                                    profile: account-12345678
+                                                    query: FROM Metric SELECT count(*)
                                                 datadog:
                                                   type: object
                                                   title: Ocean CD Verification Datadog Metric
-                                                  required: *ref_19
-                                                  properties: *ref_20
+                                                  required: *ref_23
+                                                  properties: *ref_24
+                                                  example:
+                                                    duration: 1m
+                                                    query: avg:kubernetes.cpu.user.total{*}
+                                              example:
+                                                prometheus:
+                                                  query: http_requests_total{status!~"5.."}"
+                                                newRelic:
+                                                  profile: account-12345678
+                                                  query: FROM Metric SELECT count(*)
+                                                datadog:
+                                                  duration: 1m
+                                                  query: avg:kubernetes.cpu.user.total{*}
+                                          example:
+                                            threshold: <
+                                            provider:
+                                              prometheus:
+                                                query: http_requests_total{status!~"5.."}"
+                                              newRelic:
+                                                profile: account-12345678
+                                                query: FROM Metric SELECT count(*)
+                                              datadog:
+                                                duration: 1m
+                                                query: avg:kubernetes.cpu.user.total{*}
+                                      example: &ref_65
+                                        baselineResult: 2.453
+                                        metric:
+                                          threshold: <
+                                          provider:
+                                            prometheus:
+                                              query: http_requests_total{status!~"5.."}"
+                                            newRelic:
+                                              profile: account-12345678
+                                              query: FROM Metric SELECT count(*)
+                                            datadog:
+                                              duration: 1m
+                                              query: avg:kubernetes.cpu.user.total{*}
                                     providerDetails:
                                       type: object
                                       description: The chosen for the metric monitoring tool's details
@@ -2758,7 +3715,7 @@ paths:
                                                   command:
                                                     type: array
                                                     description: The entry point of a container
-                                                    example:
+                                                    example: &ref_63
                                                       - sh
                                                       - '-c'
                                                       - echo
@@ -2769,6 +3726,38 @@ paths:
                                                     type: string
                                                     description: The image name of a container
                                                     example: nginx:1.21
+                                                example:
+                                                  name: hello
+                                                  command: *ref_63
+                                                  image: nginx:1.21
+                                          example:
+                                            containers:
+                                              - name: hello
+                                                command: *ref_63
+                                                image: nginx:1.21
+                                      example: &ref_66
+                                        job:
+                                          containers:
+                                            - name: hello
+                                              command: *ref_63
+                                              image: nginx:1.21
+                                  example:
+                                    metricName: prometheus-metric
+                                    startTime: '2018-11-05T12:55:50.000Z'
+                                    status: successful
+                                    message: Failed to get data
+                                    failureCondition: result[0] >= 1000000
+                                    successCondition: result[0] < 1000000
+                                    query: sum(container_cpu_usage_seconds_total{namespace="analysis-namespace", endpoint="https-metrics"})
+                                    failureLimit: 1
+                                    interval: 5s
+                                    count: 3
+                                    dataPoints:
+                                      - *ref_64
+                                    provider: prometheus
+                                    step: '1'
+                                    baseline: *ref_65
+                                    providerDetails: *ref_66
         '400':
           description: Bad Request
   /ocean/cd/rollout/{rolloutId}/definition:
@@ -2794,7 +3783,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_2
                   - type: object
                     properties:
                       response:
@@ -2806,8 +3795,8 @@ paths:
                             properties:
                               rolloutSpec:
                                 allOf:
-                                  - *ref_36
-                                  - *ref_23
+                                  - *ref_50
+                                  - *ref_27
                               strategy:
                                 allOf:
                                   - type: object
@@ -2815,17 +3804,17 @@ paths:
                                     description: |
                                       Ocean CD strategy. Use in RolloutSpec to decide what strategy to use when applying `SpotDeployment`
                                     properties:
-                                      canary: *ref_33
+                                      canary: *ref_43
                                     required:
                                       - name
                                       - canary
-                                  - *ref_23
+                                  - *ref_27
                               phaseVerifications:
                                 type: array
                                 description: A list of phase verifications associated with the rollout
                                 items:
                                   allOf:
-                                    - &ref_47
+                                    - &ref_69
                                       type: object
                                       title: Ocean CD Rollout Phase Verification
                                       description: The object specifying a set of metrics that need to be analyzed during the phase
@@ -2859,28 +3848,60 @@ paths:
                                                         type: string
                                                         description: Path to the wanted field in the SpotDeployment manifest
                                                         example: metadata.labels['env']
+                                                    example:
+                                                      fieldPath: metadata.labels['env']
                                                   secretKeyRef:
                                                     type: object
                                                     title: Ocean CD Verification Template Secret Key Ref
                                                     description: Secret key to use
-                                                    required: *ref_45
-                                                    properties: *ref_46
+                                                    required: *ref_67
+                                                    properties: *ref_68
+                                                    example:
+                                                      name: root-password-secret
+                                                      key: root-password
+                                                example:
+                                                  fieldRef:
+                                                    fieldPath: metadata.labels['env']
+                                                  secretKeyRef:
+                                                    name: root-password-secret
+                                                    key: root-password
+                                            example:
+                                              name: root-password
+                                              value: 12345678
+                                              valueFrom:
+                                                fieldRef:
+                                                  fieldPath: metadata.labels['env']
+                                                secretKeyRef:
+                                                  name: root-password-secret
+                                                  key: root-password
                                         metrics:
                                           type: array
                                           description: List of verification metrics
                                           items:
                                             type: object
-                                            required: *ref_27
+                                            required: *ref_32
                                             title: Ocean CD Verification Metric
-                                            properties: *ref_28
-                                    - *ref_23
+                                            properties: *ref_33
+                                            example:
+                                              name: 5xx-errors
+                                              dryRun: false
+                                              interval: 5m
+                                              initialDelay: 1m
+                                              count: 10
+                                              successCondition: result[0] <= 0.95
+                                              failureCondition: result[0] >= 1.2
+                                              failureLimit: 2
+                                              consecutiveErrorLimit: 4
+                                              provider: *ref_34
+                                              baseline: *ref_35
+                                    - *ref_27
                               backgroundVerifications:
                                 type: array
                                 description: A list of background verifications associated with the rollout
                                 items:
                                   allOf:
-                                    - *ref_47
-                                    - *ref_23
+                                    - *ref_69
+                                    - *ref_27
         '400':
           description: Bad Request
   /ocean/cd/rollout/{rolloutId}/resource:
@@ -2906,7 +3927,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_2
                   - type: object
                     properties:
                       response:
@@ -2944,6 +3965,12 @@ paths:
                                         type: string
                                         description: The message of the event
                                         example: Created container rollout-demo-prod-xxxxx
+                                    example:
+                                      lastTimestamp: '2018-06-20T11:35:01.745Z'
+                                      type: Normal
+                                      reason: Created
+                                      object: Pod/rollout-demo-prod-xxxxx
+                                      message: Created container rollout-demo-prod-xxxxx
                                 replicaSets:
                                   type: object
                                   description: A list of ReplicaSets associated with the rollout
@@ -2953,7 +3980,7 @@ paths:
                                       type: object
                                       description: The stable ReplicaSet
                                       title: Ocean CD Rollout ReplicaSet
-                                      properties: &ref_48
+                                      properties: &ref_70
                                         name:
                                           type: string
                                           description: The name of the ReplicaSet
@@ -2970,11 +3997,32 @@ paths:
                                           type: integer
                                           description: The number of ready replicas
                                           example: 2
+                                      example:
+                                        name: '2018-06-20T11:35:01.745Z'
+                                        desired: 4
+                                        current: 2
+                                        ready: 2
                                     latest:
                                       type: object
                                       description: The latest ReplicaSet
                                       title: Ocean CD Rollout ReplicaSet
-                                      properties: *ref_48
+                                      properties: *ref_70
+                                      example:
+                                        name: '2018-06-20T11:35:01.745Z'
+                                        desired: 4
+                                        current: 2
+                                        ready: 2
+                                  example:
+                                    stable:
+                                      name: '2018-06-20T11:35:01.745Z'
+                                      desired: 4
+                                      current: 2
+                                      ready: 2
+                                    latest:
+                                      name: '2018-06-20T11:35:01.745Z'
+                                      desired: 4
+                                      current: 2
+                                      ready: 2
                                 pods:
                                   type: array
                                   description: A list of Pods associated with the rollout
@@ -3010,6 +4058,13 @@ paths:
                                           - stable
                                           - latest
                                         example: stable
+                                    example:
+                                      name: rollout-pod
+                                      containersReadiness: 1/1
+                                      ready: true
+                                      status: ready
+                                      restarts: 0
+                                      version: stable
                                 services:
                                   type: array
                                   description: A list of services associated with the rollout
@@ -3048,14 +4103,65 @@ paths:
                                           - stable
                                           - latest
                                         example: stable
+                                    example:
+                                      name: stable-service
+                                      type: ClusterIP
+                                      clusterIp: 172.12.207.19
+                                      externalIp: 192.12.207.10
+                                      ports:
+                                        - 80
+                                      version: stable
                                 spotDeployment:
                                   type: object
                                   description: Describes the SpotDeployment associated with the rollout
                                   properties:
-                                    oldVersion: *ref_49
-                                    newVersion: *ref_50
-                                    oldManifest: *ref_51
-                                    newManifest: *ref_52
+                                    oldVersion: *ref_71
+                                    newVersion: *ref_72
+                                    oldManifest: *ref_73
+                                    newManifest: *ref_74
+                                  example:
+                                    oldVersion: nginx:1.10
+                                    newVersion: nginx:1.11
+                                    oldManifest: '{"kind":"SpotDeployment","apiVersion":"spot.io/v1beta1","metadata"...'
+                                    newManifest: '{"kind":"SpotDeployment","apiVersion":"spot.io/v1beta1","metadata"...'
+                              example:
+                                events:
+                                  - lastTimestamp: '2018-06-20T11:35:01.745Z'
+                                    type: Normal
+                                    reason: Created
+                                    object: Pod/rollout-demo-prod-xxxxx
+                                    message: Created container rollout-demo-prod-xxxxx
+                                replicaSets:
+                                  stable:
+                                    name: '2018-06-20T11:35:01.745Z'
+                                    desired: 4
+                                    current: 2
+                                    ready: 2
+                                  latest:
+                                    name: '2018-06-20T11:35:01.745Z'
+                                    desired: 4
+                                    current: 2
+                                    ready: 2
+                                pods:
+                                  - name: rollout-pod
+                                    containersReadiness: 1/1
+                                    ready: true
+                                    status: ready
+                                    restarts: 0
+                                    version: stable
+                                services:
+                                  - name: stable-service
+                                    type: ClusterIP
+                                    clusterIp: 172.12.207.19
+                                    externalIp: 192.12.207.10
+                                    ports:
+                                      - 80
+                                    version: stable
+                                spotDeployment:
+                                  oldVersion: nginx:1.10
+                                  newVersion: nginx:1.11
+                                  oldManifest: '{"kind":"SpotDeployment","apiVersion":"spot.io/v1beta1","metadata"...'
+                                  newManifest: '{"kind":"SpotDeployment","apiVersion":"spot.io/v1beta1","metadata"...'
         '400':
           description: Bad Request
   /ocean/cd/rollout/{rolloutId}/phase:
@@ -3082,7 +4188,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_2
                   - type: object
                     properties:
                       response:
@@ -3127,7 +4233,58 @@ paths:
                                 verifications:
                                   type: array
                                   description: Contains details info about verifications to run
-                                  items: *ref_53
+                                  items: *ref_75
+                              example:
+                                name: phase-01
+                                status: finished
+                                startTime: '2018-06-20T11:35:01.745Z'
+                                pausedAt: '2018-06-20T11:35:01.745Z'
+                                verifiedAt: '2018-06-20T11:35:01.745Z'
+                                endTime: '2018-06-20T11:35:01.745Z'
+                                trafficPercentage: 80
+                                verifications:
+                                  - metricName: prometheus-metric
+                                    startTime: '2018-11-05T12:55:50.000Z'
+                                    status: successful
+                                    message: Failed to get data
+                                    failureCondition: result[0] >= 1000000
+                                    successCondition: result[0] < 1000000
+                                    query: sum(container_cpu_usage_seconds_total{namespace="analysis-namespace", endpoint="https-metrics"})
+                                    failureLimit: 1
+                                    interval: 5s
+                                    count: 3
+                                    dataPoints:
+                                      - *ref_64
+                                    provider: prometheus
+                                    step: '1'
+                                    baseline: *ref_65
+                                    providerDetails: *ref_66
+                        example:
+                          items:
+                            - name: phase-01
+                              status: finished
+                              startTime: '2018-06-20T11:35:01.745Z'
+                              pausedAt: '2018-06-20T11:35:01.745Z'
+                              verifiedAt: '2018-06-20T11:35:01.745Z'
+                              endTime: '2018-06-20T11:35:01.745Z'
+                              trafficPercentage: 80
+                              verifications:
+                                - metricName: prometheus-metric
+                                  startTime: '2018-11-05T12:55:50.000Z'
+                                  status: successful
+                                  message: Failed to get data
+                                  failureCondition: result[0] >= 1000000
+                                  successCondition: result[0] < 1000000
+                                  query: sum(container_cpu_usage_seconds_total{namespace="analysis-namespace", endpoint="https-metrics"})
+                                  failureLimit: 1
+                                  interval: 5s
+                                  count: 3
+                                  dataPoints:
+                                    - *ref_64
+                                  provider: prometheus
+                                  step: '1'
+                                  baseline: *ref_65
+                                  providerDetails: *ref_66
         '400':
           description: Bad Request
   /ocean/cd/rollout/{rolloutId}/strategyOverride:
@@ -3153,7 +4310,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_2
                   - type: object
                     properties:
                       response:
@@ -3209,6 +4366,10 @@ paths:
                                           type: string
                                           example: us-app
                                           description: The name of the SpotDeployment resource
+                                      example:
+                                        clusterId: aws-cluster
+                                        namespace: us-region
+                                        name: us-app
         '400':
           description: Bad Request
   /ocean/cd/workload:
@@ -3226,7 +4387,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_2
                   - type: object
                     properties:
                       response:
@@ -3287,7 +4448,7 @@ paths:
       operationId: OceanCDWorkloadActiveOperation
       tags:
         - Ocean CD
-      parameters: &ref_54
+      parameters: &ref_76
         - in: path
           name: workloadName
           schema:
@@ -3323,7 +4484,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_2
                   - type: object
                     properties:
                       response:
@@ -3368,7 +4529,7 @@ paths:
       operationId: OceanCDWorkloadRevision
       tags:
         - Ocean CD
-      parameters: *ref_54
+      parameters: *ref_76
       responses:
         '200':
           description: Ocean CD Workload Revision Response
@@ -3376,7 +4537,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_2
                   - type: object
                     properties:
                       response:
@@ -3421,7 +4582,7 @@ paths:
       operationId: OceanCDWorkloadRestart
       tags:
         - Ocean CD
-      parameters: *ref_54
+      parameters: *ref_76
       responses:
         '200':
           description: Ok
@@ -3531,7 +4692,7 @@ paths:
       operationId: OceanCDWorkloadGraph
       tags:
         - Ocean CD
-      parameters: *ref_54
+      parameters: *ref_76
       responses:
         '200':
           description: Ocean CD Workload Graph Response
@@ -3539,7 +4700,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_2
                   - type: object
                     properties:
                       response:
@@ -3568,7 +4729,7 @@ paths:
                                       type: string
                                       description: The identifier name of Ocean CD cluster within which the workload exists
                                       example: prod-cluster
-                                    status: *ref_42
+                                    status: *ref_60
                                     failureReasonType:
                                       type: string
                                       description: The failure reason type

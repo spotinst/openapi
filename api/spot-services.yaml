@@ -115,6 +115,9 @@ paths:
                             example: GET
                             description: |
                               The HTTP **METHOD** used for the request
+                        example:
+                          url: /aws/ec2/group/sig-12345/suspension
+                          method: GET
                       response:
                         type: object
                         description: |
@@ -133,6 +136,13 @@ paths:
                                 example: OK
                                 description: |
                                   HTTP status message for the respective status code
+                            example:
+                              code: 200
+                              message: OK
+                        example:
+                          status:
+                            code: 200
+                            message: OK
                   - type: object
                     properties:
                       response:
@@ -167,16 +177,33 @@ paths:
                                     example: 5
                                   instanceTypes:
                                     type: string
-                                    example:
+                                    example: &ref_0
                                       - c4.4xlarge
                                   potentialSavings:
                                     type: integer
                                     example: 2700
+                                example:
+                                  resourceType: Auto Scaling Group
+                                  name: Prod_ASG
+                                  region: us-west-1
+                                  instances: 5
+                                  instanceTypes: *ref_0
+                                  potentialSavings: 2700
                           count:
                             type: integer
                             example: 1
                             description: |
                               Size of the data object array
+                        example:
+                          kind: spotinst:cs:aws:potentialSavings
+                          items:
+                            - - resourceType: Auto Scaling Group
+                                name: Prod_ASG
+                                region: us-west-1
+                                instances: 5
+                                instanceTypes: *ref_0
+                                potentialSavings: 2700
+                          count: 1
         '400':
           description: Bad Request
   /aws/instancePotentialSavings:
@@ -187,7 +214,7 @@ paths:
       tags:
         - Insights Service
       parameters:
-        - &ref_0
+        - &ref_3
           in: query
           name: accountId
           example: act-123456789
@@ -246,6 +273,11 @@ paths:
                             example: '2015-06-29T13:01:55.060Z'
                             description: |
                               When the request was received by Spot
+                        example:
+                          id: ff3e1e5b-91b8-42fa-8267-b988efc7f662
+                          url: /aws/instancePotentialSavings?instanceIds=i-08674ba9a6ddb73f4%2Ci-0973dc7a755d34894®ion=us-west-2
+                          method: GET
+                          timestamp: '2015-06-29T13:01:55.060Z'
                       response:
                         type: object
                         description: |
@@ -264,6 +296,13 @@ paths:
                                 example: OK
                                 description: |
                                   HTTP status message for the respective status code
+                            example:
+                              code: 200
+                              message: OK
+                        example:
+                          status:
+                            code: 200
+                            message: OK
                   - type: object
                     properties:
                       response:
@@ -287,7 +326,7 @@ paths:
                                   items:
                                     type: object
                                   description: New Spot Requests
-                                  example:
+                                  example: &ref_1
                                     - resourceType: EC2Instance
                                       name: i-12345abcde12345
                                       instances: 1
@@ -300,11 +339,18 @@ paths:
                                       instanceTypes:
                                         - m4.large
                                       potentialSavings: 60
+                              example:
+                                newSpotRequests: *ref_1
                           count:
                             type: integer
                             example: 2
                             description: |
                               Size of the data object array
+                        example:
+                          kind: spotinst:cs:aws:potentialSavings
+                          items:
+                            - newSpotRequests: *ref_1
+                          count: 2
         '400':
           description: Bad Request
   /aws/costs:
@@ -383,6 +429,11 @@ paths:
                             example: '2018-01-07T07:30:58.622Z'
                             description: |
                               When the request was received by Spot
+                        example:
+                          id: 67582d0c-108b-4ef7-9fdc-d39678a30844
+                          url: /aws/costs
+                          method: GET
+                          timestamp: '2018-01-07T07:30:58.622Z'
                       response:
                         type: object
                         description: |
@@ -401,6 +452,13 @@ paths:
                                 example: OK
                                 description: |
                                   HTTP status message for the respective status code
+                            example:
+                              code: 200
+                              message: OK
+                        example:
+                          status:
+                            code: 200
+                            message: OK
                   - type: object
                     properties:
                       response:
@@ -444,11 +502,33 @@ paths:
                                         type: number
                                         format: float
                                         example: 71.64
+                                    example:
+                                      runningHours: 1470.8
+                                      actualCosts: 107.3
+                                      potentialCosts: 378.41
+                                      savingsPercentage: 71.64
+                                example:
+                                  timestamp: '2020-03-06T00:00:00.000Z'
+                                  spot:
+                                    runningHours: 1470.8
+                                    actualCosts: 107.3
+                                    potentialCosts: 378.41
+                                    savingsPercentage: 71.64
                           count:
                             type: integer
                             example: 1
                             description: |
                               Size of the data object array
+                        example:
+                          kind: spotinst:aws:costs
+                          items:
+                            - - timestamp: '2020-03-06T00:00:00.000Z'
+                                spot:
+                                  runningHours: 1470.8
+                                  actualCosts: 107.3
+                                  potentialCosts: 378.41
+                                  savingsPercentage: 71.64
+                          count: 1
         '400':
           description: Bad Request
   /aws/ec2/instanceTypeRecommendation:
@@ -502,6 +582,9 @@ paths:
                               type: integer
                               description: Maximum amount of VCpu
                               example: 4
+                          example:
+                            minimum: 2
+                            maximum: 4
                         requiredMemoryGib:
                           type: object
                           description: Set required Memory (in Gib) resources by min / max
@@ -514,6 +597,18 @@ paths:
                               type: integer
                               description: Maximum amount of Gib
                               example: 64
+                          example:
+                            minimum: 16
+                            maximum: 64
+                      example:
+                        region: us-east-1
+                        baselineInstanceType: m5.large
+                        requiredVCpu:
+                          minimum: 2
+                          maximum: 4
+                        requiredMemoryGib:
+                          minimum: 16
+                          maximum: 64
       responses:
         '200':
           description: Suggested Instance Type Response
@@ -548,6 +643,11 @@ paths:
                             example: '2016-06-19T08:41:57.516Z'
                             description: |
                               When the request was received by Spot
+                        example:
+                          id: 0bb5db74-2457-4a34-b8f3-174e6bf5578e
+                          url: /aws/ec2/instanceTypeRecommendation
+                          method: POST
+                          timestamp: '2016-06-19T08:41:57.516Z'
                       response:
                         type: object
                         description: |
@@ -566,6 +666,13 @@ paths:
                                 example: OK
                                 description: |
                                   HTTP status message for the respective status code
+                            example:
+                              code: 200
+                              message: OK
+                        example:
+                          status:
+                            code: 200
+                            message: OK
                   - type: object
                     properties:
                       response:
@@ -582,7 +689,7 @@ paths:
                               Array of data objects
                             items:
                               type: object
-                              example:
+                              example: &ref_2
                                 - instanceType: m4.large
                                 - instanceType: m5.large
                           count:
@@ -590,6 +697,11 @@ paths:
                             example: 2
                             description: |
                               Size of the data object array
+                        example:
+                          kind: spotinst:aws:ec2:instanceTypeRecommendation
+                          items:
+                            - *ref_2
+                          count: 2
         '400':
           description: Bad Request
   /azure/costs:
@@ -601,7 +713,7 @@ paths:
       tags:
         - Elastigroup Azure Scale Set VMs
       parameters:
-        - *ref_0
+        - *ref_3
         - in: query
           name: fromDate
           required: true
@@ -641,6 +753,11 @@ paths:
                           timestamp:
                             type: string
                             example: '2018-01-07T07:30:58.622Z'
+                        example:
+                          id: 67582d0c-108b-4ef7-9fdc-d39678a30844
+                          url: /azure/costs
+                          method: GET
+                          timestamp: '2018-01-07T07:30:58.622Z'
                       response:
                         type: object
                         properties:
@@ -672,9 +789,29 @@ paths:
                                       type: number
                                       format: number
                                       example: 71.64
+                                  example:
+                                    runningHours: 1470.8
+                                    actualCosts: 107.3
+                                    potentialCosts: 378.41
+                                    savingsPercentage: 71.64
+                              example:
+                                lowPriority:
+                                  runningHours: 1470.8
+                                  actualCosts: 107.3
+                                  potentialCosts: 378.41
+                                  savingsPercentage: 71.64
                           count:
                             type: integer
                             example: 1
+                        example:
+                          kind: spotinst:azure:costs
+                          items:
+                            - lowPriority:
+                                runningHours: 1470.8
+                                actualCosts: 107.3
+                                potentialCosts: 378.41
+                                savingsPercentage: 71.64
+                          count: 1
         '400':
           description: Bad Request
   /gcp/gce/costs:
@@ -737,6 +874,11 @@ paths:
                           timestamp:
                             type: string
                             example: '2016-01-10T01:00:00.000Z'
+                        example:
+                          id: 67582d0c-108b-4ef7-9fdc-d39678a30844
+                          url: /gcp/gce/costs
+                          method: GET
+                          timestamp: '2016-01-10T01:00:00.000Z'
                       response:
                         type: object
                         properties:
@@ -772,9 +914,29 @@ paths:
                                       type: number
                                       format: number
                                       example: 71.64
+                                  example:
+                                    runningHours: 1470.8
+                                    actualCosts: 107.3
+                                    potentialCosts: 378.41
+                                    savingsPercentage: 71.64
+                              example:
+                                preemptible:
+                                  runningHours: 1470.8
+                                  actualCosts: 107.3
+                                  potentialCosts: 378.41
+                                  savingsPercentage: 71.64
                           count:
                             type: integer
                             example: 1
+                        example:
+                          kind: spotinst:gcp:costs
+                          items:
+                            - preemptible:
+                                runningHours: 1470.8
+                                actualCosts: 107.3
+                                potentialCosts: 378.41
+                                savingsPercentage: 71.64
+                          count: 1
         '400':
           description: Bad Request
   /audit/events:
@@ -830,10 +992,10 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - &ref_1
+                  - &ref_6
                     type: object
                     allOf:
-                      - &ref_3
+                      - &ref_8
                         type: object
                         properties:
                           request:
@@ -859,6 +1021,9 @@ paths:
                                 example: '2018-06-20T11:35:01.745Z'
                                 description: |
                                   When the request was received by Spot.
+                            example: &ref_4
+                              id: e593ff58-067d-4340-92f9-8b1c0bad70d7
+                              timestamp: '2018-06-20T11:35:01.745Z'
                           response:
                             type: object
                             description: |
@@ -877,6 +1042,16 @@ paths:
                                     example: OK
                                     description: |
                                       HTTP status message for the respective status code.
+                                example:
+                                  code: 200
+                                  message: OK
+                            example: &ref_5
+                              status:
+                                code: 200
+                                message: OK
+                        example:
+                          request: *ref_4
+                          response: *ref_5
                       - type: object
                         properties:
                           response:
@@ -891,6 +1066,8 @@ paths:
                                 type: string
                                 description: |
                                   The data type of each item in the response.
+                            example:
+                              count: 1
                   - type: object
                     properties:
                       response:
@@ -931,8 +1108,32 @@ paths:
                                 responseStatus:
                                   type: integer
                                   example: 200
+                              example:
+                                user: test@spot.io
+                                namespace: GENERAL
+                                actionType: Sign in with SSO
+                                resourceType: User
+                                resourceId: 21126
+                                createdAt: '2020-06-01T12:17:51.000Z'
+                                context: '{"body":{"email":"test@spot.io","isMarketplaceCustomer":false},"url":"/signIn/sso","query":{}}'
+                                source: UI
+                                agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.9.1667.012 Safari/537.36
+                                responseStatus: 200
                           kind:
                             example: spotinst:audit
+                        example:
+                          items:
+                            - user: test@spot.io
+                              namespace: GENERAL
+                              actionType: Sign in with SSO
+                              resourceType: User
+                              resourceId: 21126
+                              createdAt: '2020-06-01T12:17:51.000Z'
+                              context: '{"body":{"email":"test@spot.io","isMarketplaceCustomer":false},"url":"/signIn/sso","query":{}}'
+                              source: UI
+                              agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.9.1667.012 Safari/537.36
+                              responseStatus: 200
+                          kind: spotinst:audit
         '400':
           description: Bad Request
   /healthCheck:
@@ -1035,14 +1236,35 @@ paths:
                                 The amount of time (in seconds) to wait when receiving a response from the health check
                               type: integer
                               example: 60
+                          example:
+                            protocol: http
+                            port: 80
+                            endpoint: index.html
+                            unhealthyThreshold: 2
+                            healthyThreshold: 2
+                            interval: 30
+                            timeout: 60
+                      example:
+                        resourceId: sig-12345
+                        name: Service-1-healthCheck
+                        proxyAddress: 51.22.125.47
+                        proxyPort: 80
+                        check:
+                          protocol: http
+                          port: 80
+                          endpoint: index.html
+                          unhealthyThreshold: 2
+                          healthyThreshold: 2
+                          interval: 30
+                          timeout: 60
       responses:
-        '200': &ref_2
+        '200': &ref_7
           description: Response
           content:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_6
                   - type: object
                     properties:
                       response:
@@ -1092,8 +1314,46 @@ paths:
                                     timeout:
                                       type: integer
                                       example: 60
+                                  example:
+                                    protocol: http
+                                    port: 80
+                                    endpoint: index.html
+                                    unhealthyThreshold: 2
+                                    healthyThreshold: 2
+                                    interval: 30
+                                    timeout: 60
+                              example:
+                                id: 1
+                                resourceId: sig-12345
+                                name: Service-1-healthCheck
+                                proxyAddress: 51.22.125.47
+                                proxyPort: 80
+                                check:
+                                  protocol: http
+                                  port: 80
+                                  endpoint: index.html
+                                  unhealthyThreshold: 2
+                                  healthyThreshold: 2
+                                  interval: 30
+                                  timeout: 60
                           kind:
                             example: spotinst:healthCheck
+                        example:
+                          items:
+                            - id: 1
+                              resourceId: sig-12345
+                              name: Service-1-healthCheck
+                              proxyAddress: 51.22.125.47
+                              proxyPort: 80
+                              check:
+                                protocol: http
+                                port: 80
+                                endpoint: index.html
+                                unhealthyThreshold: 2
+                                healthyThreshold: 2
+                                interval: 30
+                                timeout: 60
+                          kind: spotinst:healthCheck
         '400':
           description: Bad Request
     get:
@@ -1113,7 +1373,7 @@ paths:
             type: string
           required: false
       responses:
-        '200': *ref_2
+        '200': *ref_7
         '400':
           description: Bad Request
   /healthCheck/{HEALTHCHECK_ID}:
@@ -1208,12 +1468,32 @@ paths:
                                 The amount of time (in seconds) to wait when receiving a response from the health check
                               type: integer
                               example: 60
+                          example:
+                            protocol: http
+                            port: 80
+                            endpoint: index.html
+                            unhealthyThreshold: 2
+                            healthyThreshold: 2
+                            interval: 30
+                            timeout: 60
+                      example:
+                        name: Service-1-healthCheck
+                        proxyAddress: 51.22.125.47
+                        proxyPort: 80
+                        check:
+                          protocol: http
+                          port: 80
+                          endpoint: index.html
+                          unhealthyThreshold: 2
+                          healthyThreshold: 2
+                          interval: 30
+                          timeout: 60
       responses:
-        '200': &ref_4
+        '200': &ref_9
           description: Spot Response
           content:
             application/json:
-              schema: *ref_3
+              schema: *ref_8
         '400':
           description: Bad Request
     get:
@@ -1241,7 +1521,7 @@ paths:
             type: string
           required: true
       responses:
-        '200': *ref_2
+        '200': *ref_7
         '400':
           description: Bad Request
     delete:
@@ -1252,7 +1532,7 @@ paths:
       tags:
         - Health Check Service
       parameters:
-        - *ref_0
+        - *ref_3
         - in: path
           name: HEALTHCHECK_ID
           example: hcs-123
@@ -1262,7 +1542,7 @@ paths:
             type: string
           required: true
       responses:
-        '200': *ref_4
+        '200': *ref_9
         '400':
           description: Bad Request
   /events/notification/accountPolicy:
@@ -1276,14 +1556,14 @@ paths:
       tags:
         - Notification Subscription Service
       parameters:
-        - *ref_0
+        - *ref_3
       requestBody:
         required: false
         content:
           application/json:
             schema:
               allOf:
-                - &ref_5
+                - &ref_11
                   type: object
                   properties:
                     accountPolicy:
@@ -1327,6 +1607,8 @@ paths:
                                           example: sig-1234
                                           description: |
                                             Set resource ID
+                                      example:
+                                        id: sig-1234
                                   deniedResources:
                                     type: array
                                     items:
@@ -1337,6 +1619,27 @@ paths:
                                           example: sig-9999
                                           description: |
                                             List of denied resources for the statement settings
+                                      example:
+                                        id: sig-9999
+                                example:
+                                  category: Elastigroup Errors
+                                  subCategory: Launch instances failures
+                                  isEnabled: true
+                                  applyOnFutureResources: true
+                                  allowedResources:
+                                    - id: sig-1234
+                                  deniedResources:
+                                    - id: sig-9999
+                          example:
+                            statements:
+                              - category: Elastigroup Errors
+                                subCategory: Launch instances failures
+                                isEnabled: true
+                                applyOnFutureResources: true
+                                allowedResources:
+                                  - id: sig-1234
+                                deniedResources:
+                                  - id: sig-9999
                         slackPolicy:
                           type: object
                           properties:
@@ -1375,6 +1678,8 @@ paths:
                                           example: sig-1234
                                           description: |
                                             Set resource ID
+                                      example:
+                                        id: sig-1234
                                   deniedResources:
                                     type: array
                                     items:
@@ -1385,8 +1690,52 @@ paths:
                                           example: sig-9999
                                           description: |
                                             List of denied resources for the statement settings
+                                      example:
+                                        id: sig-9999
+                                example:
+                                  category: Elastigroup Errors
+                                  subCategory: Launch instances failures
+                                  isEnabled: true
+                                  applyOnFutureResources: true
+                                  allowedResources:
+                                    - id: sig-1234
+                                  deniedResources:
+                                    - id: sig-9999
+                          example:
+                            statements:
+                              - category: Elastigroup Errors
+                                subCategory: Launch instances failures
+                                isEnabled: true
+                                applyOnFutureResources: true
+                                allowedResources:
+                                  - id: sig-1234
+                                deniedResources:
+                                  - id: sig-9999
+                      example: &ref_10
+                        emailPolicy:
+                          statements:
+                            - category: Elastigroup Errors
+                              subCategory: Launch instances failures
+                              isEnabled: true
+                              applyOnFutureResources: true
+                              allowedResources:
+                                - id: sig-1234
+                              deniedResources:
+                                - id: sig-9999
+                        slackPolicy:
+                          statements:
+                            - category: Elastigroup Errors
+                              subCategory: Launch instances failures
+                              isEnabled: true
+                              applyOnFutureResources: true
+                              allowedResources:
+                                - id: sig-1234
+                              deniedResources:
+                                - id: sig-9999
+                  example:
+                    accountPolicy: *ref_10
       responses:
-        '200': *ref_4
+        '200': *ref_9
         '400':
           description: Bad Request
     get:
@@ -1399,7 +1748,7 @@ paths:
       tags:
         - Notification Subscription Service
       parameters:
-        - *ref_0
+        - *ref_3
       responses:
         '200':
           description: Response
@@ -1407,7 +1756,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_6
                   - type: object
                     properties:
                       response:
@@ -1415,7 +1764,10 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: *ref_5
+                            items: *ref_11
+                        example:
+                          items:
+                            - accountPolicy: *ref_10
         '400':
           description: Bad Request
   /notificationCenter/policy:
@@ -1427,14 +1779,14 @@ paths:
       tags:
         - Notification Center Service
       parameters:
-        - *ref_0
+        - *ref_3
       requestBody:
         required: true
         content:
           application/json:
             schema:
               allOf:
-                - &ref_6
+                - &ref_14
                   type: object
                   required:
                     - computePolicyConfig
@@ -1455,7 +1807,7 @@ paths:
                         - public
                         - private
                       example: public
-                    subscriptions: &ref_7
+                    subscriptions: &ref_16
                       type: array
                       description: For public policies, you can decide how the notifications are delivered. For example, by email, webhook, slack, sns.
                       items:
@@ -1473,7 +1825,10 @@ paths:
                             description: Target endpoint [max limit 500 characters]
                             type: string
                             example: endpoint@example.com
-                    registeredUsers: &ref_8
+                        example: &ref_19
+                          type: email
+                          endpoint: endpoint@example.com
+                    registeredUsers: &ref_17
                       type: array
                       items:
                         type: object
@@ -1489,13 +1844,17 @@ paths:
                               enum:
                                 - email
                                 - console
-                              example:
+                              example: &ref_12
                                 - email
                                 - console
+                        example: &ref_20
+                          userEmail: user@example.com
+                          subscriptionTypes:
+                            - *ref_12
                     isActive:
                       type: boolean
                       example: true
-                    computePolicyConfig: &ref_9
+                    computePolicyConfig: &ref_18
                       type: object
                       description: |
                         You can only use one resource type. For example: All resources (use "shouldIncludeAllResources": true), Rule Based Resources (use at least one dynamicRules), OR Individual Resources (use a least one resourceIds).
@@ -1517,6 +1876,9 @@ paths:
                                   - WARN
                                   - ERROR
                                 example: INFO
+                            example:
+                              event: Event Name
+                              type: INFO
                         shouldIncludeAllResources:
                           type: boolean
                           example: false
@@ -1524,7 +1886,7 @@ paths:
                           type: array
                           description: |
                             Manually specified resource IDs to include in the policy. Must be resources related to the account.
-                          example:
+                          example: &ref_13
                             - act-123456789
                             - act-987654321
                           items:
@@ -1564,6 +1926,26 @@ paths:
                                     expression:
                                       type: string
                                       example: value
+                                  example:
+                                    identifier: resource_name
+                                    operator: equals
+                                    expression: value
+                            example:
+                              filterConditions:
+                                - identifier: resource_name
+                                  operator: equals
+                                  expression: value
+                      example:
+                        events:
+                          - event: Event Name
+                            type: INFO
+                        shouldIncludeAllResources: false
+                        resourceIds: *ref_13
+                        dynamicRules:
+                          - filterConditions:
+                              - identifier: resource_name
+                                operator: equals
+                                expression: value
       responses:
         '200':
           description: Notification Policy Create Response
@@ -1571,7 +1953,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_6
                   - type: object
                     properties:
                       request:
@@ -1581,6 +1963,9 @@ paths:
                             example: /notificationCenter/policy/accountId=act-123456789
                           method:
                             example: POST
+                        example:
+                          url: /notificationCenter/policy/accountId=act-123456789
+                          method: POST
                       response:
                         type: object
                         properties:
@@ -1594,9 +1979,11 @@ paths:
                                       type: string
                                       description: The unique identifier of the notification policy.
                                       example: snp-1a2b3c4d
-                                - *ref_6
+                                - *ref_14
                           kind:
                             example: spotinst:notificationPolicy
+                        example:
+                          kind: spotinst:notificationPolicy
         '400':
           description: Bad Request
     get:
@@ -1613,7 +2000,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_6
                   - type: object
                     properties:
                       request:
@@ -1623,6 +2010,9 @@ paths:
                             example: /notificationCenter/policy
                           method:
                             example: GET
+                        example:
+                          url: /notificationCenter/policy
+                          method: GET
                       response:
                         type: object
                         properties:
@@ -1674,11 +2064,37 @@ paths:
                                   description: The notification methods used for the policy.
                                   items:
                                     type: string
-                                    example:
+                                    example: &ref_15
                                       - email
                                       - console
+                              example:
+                                policyId: snp-12345
+                                type: compute
+                                name: Test Notification Policy
+                                description: A description of the notification policy.
+                                owner: user@example.com
+                                registeredUsersCount: 2
+                                isActive: true
+                                isRegistered: true
+                                accountId: act-123456789
+                                notificationMethod:
+                                  - *ref_15
                           kind:
                             example: spotinst:notification:userNotificationPolicy
+                        example:
+                          items:
+                            - policyId: snp-12345
+                              type: compute
+                              name: Test Notification Policy
+                              description: A description of the notification policy.
+                              owner: user@example.com
+                              registeredUsersCount: 2
+                              isActive: true
+                              isRegistered: true
+                              accountId: act-123456789
+                              notificationMethod:
+                                - *ref_15
+                          kind: spotinst:notification:userNotificationPolicy
         '400':
           description: Bad Request
   /notificationCenter/policy/{policyId}:
@@ -1690,7 +2106,7 @@ paths:
       tags:
         - Notification Center Service
       parameters:
-        - &ref_10
+        - &ref_21
           in: path
           name: policyId
           example: snp-1a2b3c4d
@@ -1706,7 +2122,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_6
                   - type: object
                     properties:
                       request:
@@ -1716,6 +2132,9 @@ paths:
                             example: /notificationCenter/policy/{policyId}
                           method:
                             example: GET
+                        example:
+                          url: /notificationCenter/policy/{policyId}
+                          method: GET
                       response:
                         type: object
                         properties:
@@ -1751,8 +2170,8 @@ paths:
                                     - public
                                     - private
                                   example: public
-                                subscriptions: *ref_7
-                                registeredUsers: *ref_8
+                                subscriptions: *ref_16
+                                registeredUsers: *ref_17
                                 isActive:
                                   type: boolean
                                   example: true
@@ -1765,15 +2184,41 @@ paths:
                                   type: array
                                   items:
                                     allOf:
-                                      - *ref_9
+                                      - *ref_18
                                       - type: object
                                         properties:
                                           accountId:
                                             type: string
                                             description: The unique identifier of the account.
                                             example: acc-123456789
+                              example:
+                                id: snp-12345
+                                name: Test Notification Policy
+                                description: A description of the notification policy.
+                                owner: user@example.com
+                                privacyLevel: public
+                                subscriptions:
+                                  - *ref_19
+                                registeredUsers:
+                                  - *ref_20
+                                isActive: true
+                                type: compute
                           kind:
                             example: spotinst:notificationPolicy
+                        example:
+                          items:
+                            - id: snp-12345
+                              name: Test Notification Policy
+                              description: A description of the notification policy.
+                              owner: user@example.com
+                              privacyLevel: public
+                              subscriptions:
+                                - *ref_19
+                              registeredUsers:
+                                - *ref_20
+                              isActive: true
+                              type: compute
+                          kind: spotinst:notificationPolicy
         '400':
           description: Bad Request
     put:
@@ -1784,7 +2229,7 @@ paths:
       tags:
         - Notification Center Service
       parameters:
-        - *ref_10
+        - *ref_21
       requestBody:
         required: true
         content:
@@ -1801,12 +2246,12 @@ paths:
                       type: string
                       description: A brief description of the notification policy. Can be null or not empty.
                       example: A description of the notification policy.
-                    subscriptions: *ref_7
-                    registeredUsers: *ref_8
+                    subscriptions: *ref_16
+                    registeredUsers: *ref_17
                     isActive:
                       type: boolean
                       example: true
-                    computePolicyConfig: *ref_9
+                    computePolicyConfig: *ref_18
       responses:
         '200':
           description: Ok
@@ -1820,7 +2265,7 @@ paths:
       tags:
         - Notification Center Service
       parameters:
-        - *ref_10
+        - *ref_21
       responses:
         '200':
           description: Notification Policy Delete Response
@@ -1828,7 +2273,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_3
+                  - *ref_8
                   - type: object
                     properties:
                       request:
@@ -1838,6 +2283,9 @@ paths:
                             example: /notificationCenter/policy/snp-a1b2c3d4
                           method:
                             example: DELETE
+                        example:
+                          url: /notificationCenter/policy/snp-a1b2c3d4
+                          method: DELETE
         '400':
           description: Bad Request
   /notificationCenter/compute/resource:
@@ -1849,7 +2297,7 @@ paths:
       tags:
         - Notification Center Service
       parameters:
-        - *ref_0
+        - *ref_3
       responses:
         '200':
           description: Account Resource List Response
@@ -1857,7 +2305,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_6
                   - type: object
                     properties:
                       request:
@@ -1867,6 +2315,9 @@ paths:
                             example: /notificationCenter/compute/resource/act-123456789
                           method:
                             example: GET
+                        example:
+                          url: /notificationCenter/compute/resource/act-123456789
+                          method: GET
                       response:
                         type: object
                         properties:
@@ -1889,8 +2340,18 @@ paths:
                                   type: string
                                   description: The type of the resource.
                                   example: ocean
+                              example:
+                                Id: act-123456789
+                                name: Example for account name
+                                type: ocean
                           kind:
                             example: spotinst:notification:compute:accountResource
+                        example:
+                          items:
+                            - Id: act-123456789
+                              name: Example for account name
+                              type: ocean
+                          kind: spotinst:notification:compute:accountResource
         '400':
           description: Bad Request
   /notificationCenter/compute/event:
@@ -1902,7 +2363,7 @@ paths:
       tags:
         - Notification Center Service
       parameters:
-        - *ref_0
+        - *ref_3
       responses:
         '200':
           description: Event Type List Response
@@ -1910,7 +2371,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_6
                   - type: object
                     properties:
                       request:
@@ -1920,6 +2381,9 @@ paths:
                             example: /notificationCenter/compute/event/act-123456789
                           method:
                             example: GET
+                        example:
+                          url: /notificationCenter/compute/event/act-123456789
+                          method: GET
                       response:
                         type: object
                         properties:
@@ -1938,8 +2402,16 @@ paths:
                                   type: string
                                   description: The severity level of the event.
                                   example: error
+                              example:
+                                event: Missing configuration
+                                type: error
                           kind:
                             example: spotinst:notification:compute:event
+                        example:
+                          items:
+                            - event: Missing configuration
+                              type: error
+                          kind: spotinst:notification:compute:event
         '400':
           description: Bad Request
   /events/subscription:
@@ -2066,6 +2538,23 @@ paths:
                               type: string
                               description: Allow to use custom text in messages
                               example: My content is set here
+                          example:
+                            event: '%event%'
+                            resourceId: '%resource-id%'
+                            resourceName: '%resource-name%'
+                            instanceId: '%instance-id%'
+                            myCustomKey: My content is set here
+                      example:
+                        resourceId: sig-1234abcd
+                        protocol: email
+                        endpoint: YOUR@EMAIL.COM
+                        eventType: AWS_EC2_INSTANCE_TERMINATE
+                        eventFormat:
+                          event: '%event%'
+                          resourceId: '%resource-id%'
+                          resourceName: '%resource-name%'
+                          instanceId: '%instance-id%'
+                          myCustomKey: My content is set here
                 - type: object
                   title: Ocean event
                   required:
@@ -2200,14 +2689,39 @@ paths:
                               type: string
                               description: Allow to use custom text in messages
                               example: My content is set here
+                          example:
+                            event: '%event%'
+                            resourceId: '%resource-id%'
+                            resourceName: '%resource-name%'
+                            instanceId: '%instance-id%'
+                            launchSpecId: '%launchSpec-id%'
+                            launchSpecName: '%launchSpec-name%'
+                            nodeName: '%node-name%'
+                            runningPodsOnNode: '%running-pods-on-node%'
+                            myCustomKey: My content is set here
+                      example:
+                        resourceId: o-1234abcd
+                        protocol: email
+                        endpoint: YOUR@EMAIL.COM
+                        eventType: OCEAN_K8S_NODE_REMOVED
+                        eventFormat:
+                          event: '%event%'
+                          resourceId: '%resource-id%'
+                          resourceName: '%resource-name%'
+                          instanceId: '%instance-id%'
+                          launchSpecId: '%launchSpec-id%'
+                          launchSpecName: '%launchSpec-name%'
+                          nodeName: '%node-name%'
+                          runningPodsOnNode: '%running-pods-on-node%'
+                          myCustomKey: My content is set here
       responses:
-        '200': &ref_11
+        '200': &ref_22
           description: Subscription Response
           content:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_6
                   - type: object
                     properties:
                       request:
@@ -2217,6 +2731,9 @@ paths:
                             example: /events/subscription
                           method:
                             example: POST
+                        example:
+                          url: /events/subscription
+                          method: POST
                       response:
                         type: object
                         properties:
@@ -2277,14 +2794,52 @@ paths:
                                       type: string
                                       description: Allow to use custom text in messages
                                       example: My content is set here
+                                  example:
+                                    event: '%event%'
+                                    resourceId: '%resource-id%'
+                                    resourceName: '%resource-name%'
+                                    instanceId: '%instance-id%'
+                                    myCustomKey: My content is set here
                                 updatedAt:
                                   type: string
                                   example: '2015-08-04T12:31:26.000Z'
                                 createdAt:
                                   type: string
                                   example: '2015-08-04T12:31:26.000Z'
+                              example:
+                                id: sis-1234abcd
+                                resourceId: sig-1234abcd
+                                resourceName: myGroup
+                                protocol: email
+                                endpoint: YOUR@EMAIL.COM
+                                eventType: AWS_EC2_INSTANCE_TERMINATE
+                                eventFormat:
+                                  event: '%event%'
+                                  resourceId: '%resource-id%'
+                                  resourceName: '%resource-name%'
+                                  instanceId: '%instance-id%'
+                                  myCustomKey: My content is set here
+                                updatedAt: '2015-08-04T12:31:26.000Z'
+                                createdAt: '2015-08-04T12:31:26.000Z'
                           kind:
                             example: spotinst:subscription
+                        example:
+                          items:
+                            - id: sis-1234abcd
+                              resourceId: sig-1234abcd
+                              resourceName: myGroup
+                              protocol: email
+                              endpoint: YOUR@EMAIL.COM
+                              eventType: AWS_EC2_INSTANCE_TERMINATE
+                              eventFormat:
+                                event: '%event%'
+                                resourceId: '%resource-id%'
+                                resourceName: '%resource-name%'
+                                instanceId: '%instance-id%'
+                                myCustomKey: My content is set here
+                              updatedAt: '2015-08-04T12:31:26.000Z'
+                              createdAt: '2015-08-04T12:31:26.000Z'
+                          kind: spotinst:subscription
         '400':
           description: Bad Request
     get:
@@ -2306,7 +2861,7 @@ paths:
             type: string
           required: false
       responses:
-        '200': *ref_11
+        '200': *ref_22
         '400':
           description: Bad Request
   /events/subscription/{subscriptionId}:
@@ -2328,7 +2883,7 @@ paths:
           schema:
             type: string
           required: false
-        - &ref_12
+        - &ref_23
           in: path
           name: subscriptionId
           example: sis-1234abcd
@@ -2338,7 +2893,7 @@ paths:
             type: string
           required: true
       responses:
-        '200': *ref_4
+        '200': *ref_9
         '400':
           description: Bad Request
     get:
@@ -2359,9 +2914,9 @@ paths:
           schema:
             type: string
           required: false
-        - *ref_12
+        - *ref_23
       responses:
-        '200': *ref_11
+        '200': *ref_22
         '400':
           description: Bad Request
     put:
@@ -2382,7 +2937,7 @@ paths:
           schema:
             type: string
           required: false
-        - *ref_12
+        - *ref_23
       requestBody:
         required: false
         content:
@@ -2401,6 +2956,8 @@ paths:
                           type: string
                           description: The endpoint the notification will be sent to. url in case of http/https/web, email address in case of email/email-json and sns-topic-arn in case of aws-sns
                           example: SNS_TOPIC_ARN
+                      example:
+                        endpoint: SNS_TOPIC_ARN
       responses:
         '200':
           description: Update Subscription Response
@@ -2435,6 +2992,11 @@ paths:
                             example: '2018-11-19T13:49:11.911Z'
                             description: |
                               When the request was received by Spot
+                        example:
+                          id: 46642c7d-bc29-417d-8ce4-79626f00c63c
+                          url: /events/subscription/sis-56879d5c?accountId=act-123abc
+                          method: PUT
+                          timestamp: '2018-11-19T13:49:11.911Z'
                       response:
                         type: object
                         description: |
@@ -2453,9 +3015,17 @@ paths:
                                 example: OK
                                 description: |
                                   HTTP status message for the respective status code
+                            example:
+                              code: 200
+                              message: OK
                           affectedRows:
                             type: integer
                             example: 1
+                        example:
+                          status:
+                            code: 200
+                            message: OK
+                          affectedRows: 1
         '400':
           description: Bad Request
   /insights/dataIntegration:
@@ -2467,7 +3037,7 @@ paths:
       tags:
         - Insights Service
       parameters:
-        - *ref_0
+        - *ref_3
       requestBody:
         content:
           application/json:
@@ -2494,7 +3064,7 @@ paths:
                     config:
                       description: The config of this data integration. Depends on the value of `vendor`.
                       oneOf:
-                        - &ref_13
+                        - &ref_24
                           type: object
                           title: S3
                           required:
@@ -2512,7 +3082,7 @@ paths:
                                 **Can't be null or contain '/'**.
                               type: string
                               example: dev
-                        - &ref_14
+                        - &ref_25
                           type: object
                           title: Azure Blob
                           required:
@@ -2529,6 +3099,11 @@ paths:
                                 The container in which your files will be stored within the storage account.
                               type: string
                               example: dev
+                  example:
+                    name: my-s3-integration
+              example:
+                dataIntegration:
+                  name: my-s3-integration
       responses:
         '200':
           description: Create Data Integration Response
@@ -2536,7 +3111,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_6
                   - type: object
                     properties:
                       request:
@@ -2546,12 +3121,15 @@ paths:
                             example: /insights/dataIntegration
                           method:
                             example: POST
+                        example:
+                          url: /insights/dataIntegration
+                          method: POST
                       response:
                         type: object
                         properties:
                           items:
                             type: array
-                            items: &ref_15
+                            items: &ref_26
                               type: object
                               required:
                                 - vendor
@@ -2597,10 +3175,26 @@ paths:
                                 config:
                                   description: The config of this data integration. Depends on the value of `vendor`.
                                   oneOf:
-                                    - *ref_13
-                                    - *ref_14
+                                    - *ref_24
+                                    - *ref_25
+                              example: &ref_27
+                                id: di-123
+                                name: my-s3-integration
+                                health: valid
+                                code: 200
+                                message: ok
+                                lastHealthCheck: '2021-08-1T10:00:00.000Z'
                           kind:
                             example: spotinst:dataIntegration
+                        example:
+                          items:
+                            - id: di-123
+                              name: my-s3-integration
+                              health: valid
+                              code: 200
+                              message: ok
+                              lastHealthCheck: '2021-08-1T10:00:00.000Z'
+                          kind: spotinst:dataIntegration
         '400':
           description: Bad Request
     get:
@@ -2611,7 +3205,7 @@ paths:
       tags:
         - Insights Service
       parameters:
-        - *ref_0
+        - *ref_3
         - in: query
           name: vendor
           description: The vendor of the data integrations to list.
@@ -2653,7 +3247,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_6
                   - type: object
                     properties:
                       request:
@@ -2663,14 +3257,21 @@ paths:
                             example: /insights/dataIntegration
                           method:
                             example: GET
+                        example:
+                          url: /insights/dataIntegration
+                          method: GET
                       response:
                         type: object
                         properties:
                           items:
                             type: array
-                            items: *ref_15
+                            items: *ref_26
                           kind:
                             example: spotinst:dataIntegration
+                        example:
+                          items:
+                            - *ref_27
+                          kind: spotinst:dataIntegration
         '400':
           description: Bad Request
   /insights/dataIntegration/{dataIntegrationId}:
@@ -2682,8 +3283,8 @@ paths:
       tags:
         - Insights Service
       parameters:
-        - *ref_0
-        - &ref_16
+        - *ref_3
+        - &ref_28
           in: path
           name: dataIntegrationId
           example: di-123abc
@@ -2752,6 +3353,11 @@ paths:
                                 The container in which your files will be stored within the storage account.
                               type: string
                               example: dev
+                  example:
+                    name: my-s3-integration
+              example:
+                dataIntegration:
+                  name: my-s3-integration
       responses:
         '200':
           description: Update Data Integration Response
@@ -2759,7 +3365,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_6
                   - type: object
                     properties:
                       request:
@@ -2769,14 +3375,21 @@ paths:
                             example: /insights/dataIntegration/di-123
                           method:
                             example: PUT
+                        example:
+                          url: /insights/dataIntegration/di-123
+                          method: PUT
                       response:
                         type: object
                         properties:
                           items:
                             type: array
-                            items: *ref_15
+                            items: *ref_26
                           kind:
                             example: spotinst:dataIntegration
+                        example:
+                          items:
+                            - *ref_27
+                          kind: spotinst:dataIntegration
         '400':
           description: Bad Request
     get:
@@ -2787,8 +3400,8 @@ paths:
       tags:
         - Insights Service
       parameters:
-        - *ref_0
-        - *ref_16
+        - *ref_3
+        - *ref_28
       responses:
         '200':
           description: Get Data Integration Response
@@ -2796,7 +3409,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_1
+                  - *ref_6
                   - type: object
                     properties:
                       request:
@@ -2806,14 +3419,21 @@ paths:
                             example: /insights/dataIntegration/di-123
                           method:
                             example: GET
+                        example:
+                          url: /insights/dataIntegration/di-123
+                          method: GET
                       response:
                         type: object
                         properties:
                           items:
                             type: array
-                            items: *ref_15
+                            items: *ref_26
                           kind:
                             example: spotinst:dataIntegration
+                        example:
+                          items:
+                            - *ref_27
+                          kind: spotinst:dataIntegration
         '400':
           description: Bad Request
     delete:
@@ -2824,8 +3444,8 @@ paths:
       tags:
         - Insights Service
       parameters:
-        - *ref_0
-        - *ref_16
+        - *ref_3
+        - *ref_28
       responses:
         '200':
           description: Delete Data Integration Response
@@ -2833,7 +3453,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_3
+                  - *ref_8
                   - type: object
                     properties:
                       request:
@@ -2843,6 +3463,9 @@ paths:
                             example: /insights/dataIntegration/di-123
                           method:
                             example: DELETE
+                        example:
+                          url: /insights/dataIntegration/di-123
+                          method: DELETE
         '400':
           description: Bad Request
   /insights/savings:
@@ -2915,6 +3538,11 @@ paths:
                             example: '2022-01-10T00:00:00.000Z'
                             description: |
                               When the request was received by Spot
+                        example:
+                          id: 67582d0c-108b-4ef7-9fdc-d39678a30844
+                          url: /insights/savings
+                          method: GET
+                          timestamp: '2022-01-10T00:00:00.000Z'
                       response:
                         type: object
                         description: |
@@ -2933,6 +3561,13 @@ paths:
                                 example: OK
                                 description: |
                                   HTTP status message for the respective status code
+                            example:
+                              code: 200
+                              message: OK
+                        example:
+                          status:
+                            code: 200
+                            message: OK
                   - type: object
                     properties:
                       response:
@@ -3040,10 +3675,30 @@ paths:
                                       type: number
                                       format: float
                                       example: 1306.77
+                                  example:
+                                    runningHours: 117.3
+                                    actualCosts: 207.3
+                                    potentialCosts: 11378.41
+                                    amountSaved: 1306.77
+                              example:
+                                summary:
+                                  runningHours: 117.3
+                                  actualCosts: 207.3
+                                  potentialCosts: 11378.41
+                                  amountSaved: 1306.77
                           count:
                             type: integer
                             example: 1
                             description: |
                               Size of the data object array
+                        example:
+                          kind: savings:extended:resource
+                          items:
+                            - summary:
+                                runningHours: 117.3
+                                actualCosts: 207.3
+                                potentialCosts: 11378.41
+                                amountSaved: 1306.77
+                          count: 1
         '400':
           description: Bad Request

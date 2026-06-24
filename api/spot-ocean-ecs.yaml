@@ -73,7 +73,7 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - &ref_0
+        - &ref_14
           in: query
           name: accountId
           example: act-123456789
@@ -83,16 +83,16 @@ paths:
             type: string
           required: true
       responses:
-        '200': &ref_9
+        '200': &ref_33
           description: Ocean ECS Response
           content:
             application/json:
               schema:
                 allOf:
-                  - &ref_13
+                  - &ref_37
                     type: object
                     allOf:
-                      - &ref_12
+                      - &ref_36
                         type: object
                         properties:
                           request:
@@ -118,6 +118,9 @@ paths:
                                 example: '2018-06-20T11:35:01.745Z'
                                 description: |
                                   When the request was received by Spot.
+                            example: &ref_0
+                              id: e593ff58-067d-4340-92f9-8b1c0bad70d7
+                              timestamp: '2018-06-20T11:35:01.745Z'
                           response:
                             type: object
                             description: |
@@ -136,6 +139,16 @@ paths:
                                     example: OK
                                     description: |
                                       HTTP status message for the respective status code.
+                                example:
+                                  code: 200
+                                  message: OK
+                            example: &ref_1
+                              status:
+                                code: 200
+                                message: OK
+                        example:
+                          request: *ref_0
+                          response: *ref_1
                       - type: object
                         properties:
                           response:
@@ -150,6 +163,8 @@ paths:
                                 type: string
                                 description: |
                                   The data type of each item in the response.
+                            example:
+                              count: 1
                   - type: object
                     properties:
                       response:
@@ -157,7 +172,7 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: &ref_11
+                            items: &ref_35
                               type: object
                               required:
                                 - cluster
@@ -182,7 +197,7 @@ paths:
                                       example: my-ECS-cluster-name
                                       description: |
                                         ECS cluster name.
-                                    autoScaler: &ref_1
+                                    autoScaler: &ref_15
                                       type: object
                                       title: Ocean Autoscaler
                                       description: |
@@ -213,6 +228,9 @@ paths:
                                               description: |
                                                 The maximum CPU in vCPU units that can be allocated to the cluster. Minimum value: 1.
                                               example: 1
+                                          example:
+                                            maxMemoryGib: 1
+                                            maxVCpu: 1
                                         down:
                                           type: object
                                           description: |
@@ -228,6 +246,9 @@ paths:
                                                 Example: If there are 10 nodes to scale down and the parameter is 50%, then only 5 nodes will be scaled down at once.
                                                 The other 5 nodes will be scaled down in the next autoscaling iteration.
                                               example: 20
+                                          example:
+                                            evaluationPeriods: 4
+                                            maxScaleDownPercentage: 20
                                         headroom:
                                           type: object
                                           description: |
@@ -248,6 +269,10 @@ paths:
                                               description: |
                                                 The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.
                                               example: 2
+                                          example:
+                                            cpuPerUnit: 2048
+                                            memoryPerUnit: 3
+                                            numOfUnits: 2
                                         isAutoConfig:
                                           type: boolean
                                           description: |
@@ -269,7 +294,24 @@ paths:
                                           description: |
                                             When set to true, both automatic and per custom Virtual Node Group manual headroom to be saved concurrently and independently in the cluster. prerequisite: isAutoConfig must be true
                                           example: false
-                                    capacity: &ref_2
+                                      example: &ref_28
+                                        isEnabled: true
+                                        cooldown: 300
+                                        resourceLimits:
+                                          maxMemoryGib: 1
+                                          maxVCpu: 1
+                                        down:
+                                          evaluationPeriods: 4
+                                          maxScaleDownPercentage: 20
+                                        headroom:
+                                          cpuPerUnit: 2048
+                                          memoryPerUnit: 3
+                                          numOfUnits: 2
+                                        isAutoConfig: false
+                                        autoHeadroomPercentage: 20
+                                        shouldScaleDownNonServiceTasks: true
+                                        enableAutomaticAndManualHeadroom: false
+                                    capacity: &ref_16
                                       type: object
                                       title: Capacity Units
                                       description: |
@@ -291,7 +333,11 @@ paths:
                                           example: 5
                                           description: |
                                             Number of instances to launch and maintain in cluster.h
-                                    strategy: &ref_3
+                                      example: &ref_29
+                                        minimum: 1
+                                        maximum: 10
+                                        target: 5
+                                    strategy: &ref_17
                                       type: object
                                       title: Ocean Strategy
                                       description: |
@@ -336,6 +382,16 @@ paths:
                                                 - cheapest
                                               example: balanced
                                               default: balanced
+                                          example:
+                                            availabilityVsCost: balanced
+                                      example: &ref_30
+                                        utilizeReservedInstances: true
+                                        fallbackToOd: true
+                                        spotPercentage: 100
+                                        drainingTimeout: 200
+                                        utilizeCommitments: false
+                                        clusterOrientation:
+                                          availabilityVsCost: balanced
                                     compute:
                                       type: object
                                       title: Ocean Compute
@@ -351,7 +407,7 @@ paths:
                                           type: object
                                           description: The type of instances that may or may not be a part of the Ocean cluster.
                                           properties:
-                                            filters: &ref_4
+                                            filters: &ref_18
                                               type: object
                                               description: |
                                                 List of filters. The Instance types that match with all filters compose the Ocean's whitelist parameter.  Cannot be configured together with whitelist/blacklist.
@@ -401,7 +457,7 @@ paths:
                                                     Types belonging to a family from the IncludeFamilies will be available for scaling (asterisk wildcard is also supported). For example, C* will include instance types from these families: c5, c4, c4a, etc.
                                                   items:
                                                     type: string
-                                                  example:
+                                                  example: &ref_2
                                                     - c5*
                                                     - g5
                                                 excludeFamilies:
@@ -410,7 +466,7 @@ paths:
                                                     Types belonging to a family from the ExcludeFamilies will not be available for scaling (asterisk wildcard is also supported). For example, C* will exclude instance types from these families: c5, c4, c4a, etc.
                                                   items:
                                                     type: string
-                                                  example:
+                                                  example: &ref_3
                                                     - t2
                                                     - R4*
                                                 excludeMetal:
@@ -434,7 +490,7 @@ paths:
                                                       - i386
                                                       - x86_64
                                                       - arm64
-                                                  example:
+                                                  example: &ref_4
                                                     - i386
                                                     - x86_64
                                                 virtualizationTypes:
@@ -446,7 +502,7 @@ paths:
                                                     enum:
                                                       - hvm
                                                       - paravirtual
-                                                  example:
+                                                  example: &ref_5
                                                     - hvm
                                                 categories:
                                                   type: array
@@ -460,7 +516,7 @@ paths:
                                                       - General_purpose
                                                       - Memory_optimized
                                                       - Storage_optimized
-                                                  example:
+                                                  example: &ref_6
                                                     - Accelerated_computing
                                                     - Compute_optimized
                                                 minEnis:
@@ -480,7 +536,7 @@ paths:
                                                       - EBS
                                                       - SSD
                                                       - HDD
-                                                  example:
+                                                  example: &ref_7
                                                     - NVMe
                                                     - EBS
                                                 hypervisor:
@@ -492,7 +548,7 @@ paths:
                                                     enum:
                                                       - nitro
                                                       - xen
-                                                  example:
+                                                  example: &ref_8
                                                     - nitro
                                                 rootDeviceTypes:
                                                   type: array
@@ -503,7 +559,7 @@ paths:
                                                     enum:
                                                       - ebs
                                                       - instance-store
-                                                  example:
+                                                  example: &ref_9
                                                     - ebs
                                                 minNetworkPerformance:
                                                   type: integer
@@ -538,7 +594,7 @@ paths:
                                                     Types belonging to a Generation from the IncludeGenerations will be available for scaling.
                                                   items:
                                                     type: string
-                                                  example:
+                                                  example: &ref_10
                                                     - '6'
                                                     - '7'
                                                 excludeGenerations:
@@ -547,7 +603,7 @@ paths:
                                                     Types Not belonging to a Generation from the ExcludeGenerations will be available for scaling.
                                                   items:
                                                     type: string
-                                                  example:
+                                                  example: &ref_11
                                                     - '1'
                                                     - '2'
                                                 encryptionInTransitSupported:
@@ -555,13 +611,38 @@ paths:
                                                   description: |
                                                     encryptionInTransitSupported is supported or not.
                                                   example: true
+                                              example: &ref_19
+                                                minVcpu: 2
+                                                maxVcpu: 16
+                                                minMemoryGiB: 8
+                                                maxMemoryGiB: 16
+                                                minGpu: 0
+                                                maxGpu: 4
+                                                includeFamilies: *ref_2
+                                                excludeFamilies: *ref_3
+                                                excludeMetal: true
+                                                isEnaSupported: true
+                                                architectures: *ref_4
+                                                virtualizationTypes: *ref_5
+                                                categories: *ref_6
+                                                minEnis: 2
+                                                diskTypes: *ref_7
+                                                hypervisor: *ref_8
+                                                rootDeviceTypes: *ref_9
+                                                minNetworkPerformance: 2
+                                                maxNetworkPerformance: 20
+                                                minInstancePrice: 2
+                                                maxInstancePrice: 20
+                                                includeGenerations: *ref_10
+                                                excludeGenerations: *ref_11
+                                                encryptionInTransitSupported: true
                                             whitelist:
                                               type: array
                                               description: |
                                                 Instance types allowed in the Ocean cluster. Cannot be configured if a deny list is configured.
                                               items:
                                                 type: string
-                                              example:
+                                              example: &ref_12
                                                 - c4.xlarge
                                                 - c4.2xlarge
                                                 - c4.4xlarge
@@ -572,9 +653,37 @@ paths:
                                                 Instance types to avoid launching in the Ocean cluster. Cannot be configured if a permit list is configured.
                                               items:
                                                 type: string
-                                              example:
+                                              example: &ref_13
                                                 - r5.large
                                                 - r5.xlarge
+                                          example:
+                                            filters:
+                                              minVcpu: 2
+                                              maxVcpu: 16
+                                              minMemoryGiB: 8
+                                              maxMemoryGiB: 16
+                                              minGpu: 0
+                                              maxGpu: 4
+                                              includeFamilies: *ref_2
+                                              excludeFamilies: *ref_3
+                                              excludeMetal: true
+                                              isEnaSupported: true
+                                              architectures: *ref_4
+                                              virtualizationTypes: *ref_5
+                                              categories: *ref_6
+                                              minEnis: 2
+                                              diskTypes: *ref_7
+                                              hypervisor: *ref_8
+                                              rootDeviceTypes: *ref_9
+                                              minNetworkPerformance: 2
+                                              maxNetworkPerformance: 20
+                                              minInstancePrice: 2
+                                              maxInstancePrice: 20
+                                              includeGenerations: *ref_10
+                                              excludeGenerations: *ref_11
+                                              encryptionInTransitSupported: true
+                                            whitelist: *ref_12
+                                            blacklist: *ref_13
                                         launchSpecification:
                                           type: object
                                           description: |
@@ -610,7 +719,9 @@ paths:
                                                   description: |
                                                     The iamRole ARN.
                                                   example: my-arn
-                                            blockDeviceMappings: &ref_5
+                                              example:
+                                                arn: my-arn
+                                            blockDeviceMappings: &ref_22
                                               type: array
                                               description: |
                                                 Block devices that are exposed to the instance. You can specify virtual devices and EBS volumes.\
@@ -686,7 +797,37 @@ paths:
                                                             description: |
                                                               Additional size per resource unit (in GB). For example, if baseSize=50, and sizePerResourceUnit=20, and an instance with 2 CPU is launched, its disk size will be 90 GB.
                                                             example: 20
-                                            instanceMetadataOptions: &ref_6
+                                                        example:
+                                                          baseSize: 50
+                                                          resource: CPU
+                                                          sizePerResourceUnit: 20
+                                                    example:
+                                                      throughput: 125
+                                                      deleteOnTermination: false
+                                                      encrypted: false
+                                                      iops: 1
+                                                      kmsKeyId: alias/aws/ebs
+                                                      snapshotId: snap-abcdefghi111110
+                                                      volumeType: gp2
+                                                      dynamicVolumeSize:
+                                                        baseSize: 50
+                                                        resource: CPU
+                                                        sizePerResourceUnit: 20
+                                                example: &ref_24
+                                                  deviceName: /dev/xvda
+                                                  ebs:
+                                                    throughput: 125
+                                                    deleteOnTermination: false
+                                                    encrypted: false
+                                                    iops: 1
+                                                    kmsKeyId: alias/aws/ebs
+                                                    snapshotId: snap-abcdefghi111110
+                                                    volumeType: gp2
+                                                    dynamicVolumeSize:
+                                                      baseSize: 50
+                                                      resource: CPU
+                                                      sizePerResourceUnit: 20
+                                            instanceMetadataOptions: &ref_23
                                               type: object
                                               title: instanceMetadataOptions
                                               required:
@@ -727,6 +868,11 @@ paths:
                                                     Indicates whether access to instance tags from the instance metadata is enabled or disabled.
                                                     Can’t be null.
                                                   example: Enabled
+                                              example: &ref_25
+                                                httpTokens: optional
+                                                httpPutResponseHopLimit: 12
+                                                httpEndpoint: disabled
+                                                instanceMetadataTags: Enabled
                                             userData:
                                               type: string
                                               format: byte
@@ -762,6 +908,42 @@ paths:
                                                     description: |
                                                       Set the tag value.
                                                     example: John Doe
+                                                example:
+                                                  tagKey: Creator
+                                                  tagValue: John Doe
+                                          example:
+                                            associatePublicIpAddress: false
+                                            associateIpv6Address: false
+                                            imageId: ami-123456789abcdefgh
+                                            securityGroupIds:
+                                              - sg-abcdefgh123456789
+                                            iamInstanceProfile:
+                                              arn: my-arn
+                                            blockDeviceMappings:
+                                              - deviceName: /dev/xvda
+                                                ebs:
+                                                  throughput: 125
+                                                  deleteOnTermination: false
+                                                  encrypted: false
+                                                  iops: 1
+                                                  kmsKeyId: alias/aws/ebs
+                                                  snapshotId: snap-abcdefghi111110
+                                                  volumeType: gp2
+                                                  dynamicVolumeSize:
+                                                    baseSize: 50
+                                                    resource: CPU
+                                                    sizePerResourceUnit: 20
+                                            instanceMetadataOptions:
+                                              httpTokens: optional
+                                              httpPutResponseHopLimit: 12
+                                              httpEndpoint: disabled
+                                              instanceMetadataTags: Enabled
+                                            userData: Q29udGVudC1UeXBlOiBtdWx0aXBhcnQvbWl4ZWQ7IGJvdW5kYXJ5PSI9PT09PT09PT09PT09PT01MTg5MDY1Mzc3MjIyODk4NDA3PT0iCk1JTUUtVmVyc2lvbjogMS4wCgotLT09PT09PT09PT09PT09PTUxODkwNjUzNzcyMjI4OTg0MDc9PQp
+                                            monitoring: false
+                                            ebsOptimized: false
+                                            tags:
+                                              - tagKey: Creator
+                                                tagValue: John Doe
                                         optimizeImages:
                                           type: object
                                           properties:
@@ -779,7 +961,81 @@ paths:
                                                 Restrict to time window regex.
                                               items:
                                                 example: '[''Sun:02:00-Sun:12:00'', ''Wed:01:01-Fri:02:03'']'
-                                    scheduling: &ref_7
+                                          example:
+                                            shouldOptimizeEcsAmi: 'true'
+                                            performAt: never
+                                            timeWindows:
+                                              - '[''Sun:02:00-Sun:12:00'', ''Wed:01:01-Fri:02:03'']'
+                                      example:
+                                        subnetIds:
+                                          - subnet-1234abcd
+                                        instanceTypes:
+                                          filters:
+                                            minVcpu: 2
+                                            maxVcpu: 16
+                                            minMemoryGiB: 8
+                                            maxMemoryGiB: 16
+                                            minGpu: 0
+                                            maxGpu: 4
+                                            includeFamilies: *ref_2
+                                            excludeFamilies: *ref_3
+                                            excludeMetal: true
+                                            isEnaSupported: true
+                                            architectures: *ref_4
+                                            virtualizationTypes: *ref_5
+                                            categories: *ref_6
+                                            minEnis: 2
+                                            diskTypes: *ref_7
+                                            hypervisor: *ref_8
+                                            rootDeviceTypes: *ref_9
+                                            minNetworkPerformance: 2
+                                            maxNetworkPerformance: 20
+                                            minInstancePrice: 2
+                                            maxInstancePrice: 20
+                                            includeGenerations: *ref_10
+                                            excludeGenerations: *ref_11
+                                            encryptionInTransitSupported: true
+                                          whitelist: *ref_12
+                                          blacklist: *ref_13
+                                        launchSpecification:
+                                          associatePublicIpAddress: false
+                                          associateIpv6Address: false
+                                          imageId: ami-123456789abcdefgh
+                                          securityGroupIds:
+                                            - sg-abcdefgh123456789
+                                          iamInstanceProfile:
+                                            arn: my-arn
+                                          blockDeviceMappings:
+                                            - deviceName: /dev/xvda
+                                              ebs:
+                                                throughput: 125
+                                                deleteOnTermination: false
+                                                encrypted: false
+                                                iops: 1
+                                                kmsKeyId: alias/aws/ebs
+                                                snapshotId: snap-abcdefghi111110
+                                                volumeType: gp2
+                                                dynamicVolumeSize:
+                                                  baseSize: 50
+                                                  resource: CPU
+                                                  sizePerResourceUnit: 20
+                                          instanceMetadataOptions:
+                                            httpTokens: optional
+                                            httpPutResponseHopLimit: 12
+                                            httpEndpoint: disabled
+                                            instanceMetadataTags: Enabled
+                                          userData: Q29udGVudC1UeXBlOiBtdWx0aXBhcnQvbWl4ZWQ7IGJvdW5kYXJ5PSI9PT09PT09PT09PT09PT01MTg5MDY1Mzc3MjIyODk4NDA3PT0iCk1JTUUtVmVyc2lvbjogMS4wCgotLT09PT09PT09PT09PT09PTUxODkwNjUzNzcyMjI4OTg0MDc9PQp
+                                          monitoring: false
+                                          ebsOptimized: false
+                                          tags:
+                                            - tagKey: Creator
+                                              tagValue: John Doe
+                                        optimizeImages:
+                                          shouldOptimizeEcsAmi: 'true'
+                                          performAt: never
+                                          timeWindows:
+                                            - '[''Sun:02:00-Sun:12:00'', ''Wed:01:01-Fri:02:03'']'
+                                    scheduling: &ref_26
                                       type: object
                                       title: Ocean Scheduling
                                       description: |
@@ -838,6 +1094,23 @@ paths:
                                                         example: 100
                                                         description: |
                                                           Indicates the threshold of minimum healthy instances in single batch. If the amount of healthy instances in single batch is under the threshold, the cluster roll will fail. If exists, the parameter value will be in range of 1-100. In case of null as value, the default value in the backend will be 50%. Value of param should represent the number in percentage (%) of the batch.
+                                                    example:
+                                                      batchSizePercentage: 20
+                                                      comment: This is why I deployed my cluster.
+                                                      batchMinHealthyPercentage: 100
+                                                example:
+                                                  clusterRoll:
+                                                    batchSizePercentage: 20
+                                                    comment: This is why I deployed my cluster.
+                                                    batchMinHealthyPercentage: 100
+                                            example:
+                                              isEnabled: false
+                                              taskType: clusterRoll
+                                              parameters:
+                                                clusterRoll:
+                                                  batchSizePercentage: 20
+                                                  comment: This is why I deployed my cluster.
+                                                  batchMinHealthyPercentage: 100
                                         shutdownHours:
                                           type: object
                                           title: Shutdown Hours
@@ -854,7 +1127,24 @@ paths:
                                               example: true
                                               description: |
                                                 Flag to enable / disable the shutdown hours mechanism. When turned to false, the mechanism is deactivated and the cluster remains in its current state.
-                                    logging: &ref_8
+                                          example:
+                                            timeWindows:
+                                              - Sat:08:00-Sun:08:00
+                                            isEnabled: true
+                                      example: &ref_31
+                                        tasks:
+                                          - isEnabled: false
+                                            taskType: clusterRoll
+                                            parameters:
+                                              clusterRoll:
+                                                batchSizePercentage: 20
+                                                comment: This is why I deployed my cluster.
+                                                batchMinHealthyPercentage: 100
+                                        shutdownHours:
+                                          timeWindows:
+                                            - Sat:08:00-Sun:08:00
+                                          isEnabled: true
+                                    logging: &ref_27
                                       type: object
                                       title: Logging configuration
                                       properties:
@@ -877,6 +1167,15 @@ paths:
                                                   type: string
                                                   description: The identifier of The S3 data integration to export the logs to.
                                                   example: di-123
+                                              example:
+                                                id: di-123
+                                          example:
+                                            s3:
+                                              id: di-123
+                                      example: &ref_32
+                                        export:
+                                          s3:
+                                            id: di-123
                                     createdAt:
                                       type: string
                                       readOnly: true
@@ -891,8 +1190,375 @@ paths:
                                       example: '2019-06-10T15:06:13.000Z'
                                       description: |
                                         A timestamp of the latest Ocean update.
+                                  example:
+                                    id: o-12345abc
+                                    name: Ocean::my-elastigroup-name
+                                    clusterName: my-ECS-cluster-name
+                                    autoScaler:
+                                      isEnabled: true
+                                      cooldown: 300
+                                      resourceLimits:
+                                        maxMemoryGib: 1
+                                        maxVCpu: 1
+                                      down:
+                                        evaluationPeriods: 4
+                                        maxScaleDownPercentage: 20
+                                      headroom:
+                                        cpuPerUnit: 2048
+                                        memoryPerUnit: 3
+                                        numOfUnits: 2
+                                      isAutoConfig: false
+                                      autoHeadroomPercentage: 20
+                                      shouldScaleDownNonServiceTasks: true
+                                      enableAutomaticAndManualHeadroom: false
+                                    capacity:
+                                      minimum: 1
+                                      maximum: 10
+                                      target: 5
+                                    strategy:
+                                      utilizeReservedInstances: true
+                                      fallbackToOd: true
+                                      spotPercentage: 100
+                                      drainingTimeout: 200
+                                      utilizeCommitments: false
+                                      clusterOrientation:
+                                        availabilityVsCost: balanced
+                                    compute:
+                                      subnetIds:
+                                        - subnet-1234abcd
+                                      instanceTypes:
+                                        filters:
+                                          minVcpu: 2
+                                          maxVcpu: 16
+                                          minMemoryGiB: 8
+                                          maxMemoryGiB: 16
+                                          minGpu: 0
+                                          maxGpu: 4
+                                          includeFamilies: *ref_2
+                                          excludeFamilies: *ref_3
+                                          excludeMetal: true
+                                          isEnaSupported: true
+                                          architectures: *ref_4
+                                          virtualizationTypes: *ref_5
+                                          categories: *ref_6
+                                          minEnis: 2
+                                          diskTypes: *ref_7
+                                          hypervisor: *ref_8
+                                          rootDeviceTypes: *ref_9
+                                          minNetworkPerformance: 2
+                                          maxNetworkPerformance: 20
+                                          minInstancePrice: 2
+                                          maxInstancePrice: 20
+                                          includeGenerations: *ref_10
+                                          excludeGenerations: *ref_11
+                                          encryptionInTransitSupported: true
+                                        whitelist: *ref_12
+                                        blacklist: *ref_13
+                                      launchSpecification:
+                                        associatePublicIpAddress: false
+                                        associateIpv6Address: false
+                                        imageId: ami-123456789abcdefgh
+                                        securityGroupIds:
+                                          - sg-abcdefgh123456789
+                                        iamInstanceProfile:
+                                          arn: my-arn
+                                        blockDeviceMappings:
+                                          - deviceName: /dev/xvda
+                                            ebs:
+                                              throughput: 125
+                                              deleteOnTermination: false
+                                              encrypted: false
+                                              iops: 1
+                                              kmsKeyId: alias/aws/ebs
+                                              snapshotId: snap-abcdefghi111110
+                                              volumeType: gp2
+                                              dynamicVolumeSize:
+                                                baseSize: 50
+                                                resource: CPU
+                                                sizePerResourceUnit: 20
+                                        instanceMetadataOptions:
+                                          httpTokens: optional
+                                          httpPutResponseHopLimit: 12
+                                          httpEndpoint: disabled
+                                          instanceMetadataTags: Enabled
+                                        userData: Q29udGVudC1UeXBlOiBtdWx0aXBhcnQvbWl4ZWQ7IGJvdW5kYXJ5PSI9PT09PT09PT09PT09PT01MTg5MDY1Mzc3MjIyODk4NDA3PT0iCk1JTUUtVmVyc2lvbjogMS4wCgotLT09PT09PT09PT09PT09PTUxODkwNjUzNzcyMjI4OTg0MDc9PQp
+                                        monitoring: false
+                                        ebsOptimized: false
+                                        tags:
+                                          - tagKey: Creator
+                                            tagValue: John Doe
+                                      optimizeImages:
+                                        shouldOptimizeEcsAmi: 'true'
+                                        performAt: never
+                                        timeWindows:
+                                          - '[''Sun:02:00-Sun:12:00'', ''Wed:01:01-Fri:02:03'']'
+                                    scheduling:
+                                      tasks:
+                                        - isEnabled: false
+                                          taskType: clusterRoll
+                                          parameters:
+                                            clusterRoll:
+                                              batchSizePercentage: 20
+                                              comment: This is why I deployed my cluster.
+                                              batchMinHealthyPercentage: 100
+                                      shutdownHours:
+                                        timeWindows:
+                                          - Sat:08:00-Sun:08:00
+                                        isEnabled: true
+                                    logging:
+                                      export:
+                                        s3:
+                                          id: di-123
+                                    createdAt: '2019-06-03T08:13:08.000Z'
+                                    updatedAt: '2019-06-10T15:06:13.000Z'
+                              example:
+                                cluster:
+                                  id: o-12345abc
+                                  name: Ocean::my-elastigroup-name
+                                  clusterName: my-ECS-cluster-name
+                                  autoScaler:
+                                    isEnabled: true
+                                    cooldown: 300
+                                    resourceLimits:
+                                      maxMemoryGib: 1
+                                      maxVCpu: 1
+                                    down:
+                                      evaluationPeriods: 4
+                                      maxScaleDownPercentage: 20
+                                    headroom:
+                                      cpuPerUnit: 2048
+                                      memoryPerUnit: 3
+                                      numOfUnits: 2
+                                    isAutoConfig: false
+                                    autoHeadroomPercentage: 20
+                                    shouldScaleDownNonServiceTasks: true
+                                    enableAutomaticAndManualHeadroom: false
+                                  capacity:
+                                    minimum: 1
+                                    maximum: 10
+                                    target: 5
+                                  strategy:
+                                    utilizeReservedInstances: true
+                                    fallbackToOd: true
+                                    spotPercentage: 100
+                                    drainingTimeout: 200
+                                    utilizeCommitments: false
+                                    clusterOrientation:
+                                      availabilityVsCost: balanced
+                                  compute:
+                                    subnetIds:
+                                      - subnet-1234abcd
+                                    instanceTypes:
+                                      filters:
+                                        minVcpu: 2
+                                        maxVcpu: 16
+                                        minMemoryGiB: 8
+                                        maxMemoryGiB: 16
+                                        minGpu: 0
+                                        maxGpu: 4
+                                        includeFamilies: *ref_2
+                                        excludeFamilies: *ref_3
+                                        excludeMetal: true
+                                        isEnaSupported: true
+                                        architectures: *ref_4
+                                        virtualizationTypes: *ref_5
+                                        categories: *ref_6
+                                        minEnis: 2
+                                        diskTypes: *ref_7
+                                        hypervisor: *ref_8
+                                        rootDeviceTypes: *ref_9
+                                        minNetworkPerformance: 2
+                                        maxNetworkPerformance: 20
+                                        minInstancePrice: 2
+                                        maxInstancePrice: 20
+                                        includeGenerations: *ref_10
+                                        excludeGenerations: *ref_11
+                                        encryptionInTransitSupported: true
+                                      whitelist: *ref_12
+                                      blacklist: *ref_13
+                                    launchSpecification:
+                                      associatePublicIpAddress: false
+                                      associateIpv6Address: false
+                                      imageId: ami-123456789abcdefgh
+                                      securityGroupIds:
+                                        - sg-abcdefgh123456789
+                                      iamInstanceProfile:
+                                        arn: my-arn
+                                      blockDeviceMappings:
+                                        - deviceName: /dev/xvda
+                                          ebs:
+                                            throughput: 125
+                                            deleteOnTermination: false
+                                            encrypted: false
+                                            iops: 1
+                                            kmsKeyId: alias/aws/ebs
+                                            snapshotId: snap-abcdefghi111110
+                                            volumeType: gp2
+                                            dynamicVolumeSize:
+                                              baseSize: 50
+                                              resource: CPU
+                                              sizePerResourceUnit: 20
+                                      instanceMetadataOptions:
+                                        httpTokens: optional
+                                        httpPutResponseHopLimit: 12
+                                        httpEndpoint: disabled
+                                        instanceMetadataTags: Enabled
+                                      userData: Q29udGVudC1UeXBlOiBtdWx0aXBhcnQvbWl4ZWQ7IGJvdW5kYXJ5PSI9PT09PT09PT09PT09PT01MTg5MDY1Mzc3MjIyODk4NDA3PT0iCk1JTUUtVmVyc2lvbjogMS4wCgotLT09PT09PT09PT09PT09PTUxODkwNjUzNzcyMjI4OTg0MDc9PQp
+                                      monitoring: false
+                                      ebsOptimized: false
+                                      tags:
+                                        - tagKey: Creator
+                                          tagValue: John Doe
+                                    optimizeImages:
+                                      shouldOptimizeEcsAmi: 'true'
+                                      performAt: never
+                                      timeWindows:
+                                        - '[''Sun:02:00-Sun:12:00'', ''Wed:01:01-Fri:02:03'']'
+                                  scheduling:
+                                    tasks:
+                                      - isEnabled: false
+                                        taskType: clusterRoll
+                                        parameters:
+                                          clusterRoll:
+                                            batchSizePercentage: 20
+                                            comment: This is why I deployed my cluster.
+                                            batchMinHealthyPercentage: 100
+                                    shutdownHours:
+                                      timeWindows:
+                                        - Sat:08:00-Sun:08:00
+                                      isEnabled: true
+                                  logging:
+                                    export:
+                                      s3:
+                                        id: di-123
+                                  createdAt: '2019-06-03T08:13:08.000Z'
+                                  updatedAt: '2019-06-10T15:06:13.000Z'
                           kind:
                             example: spotinst:ocean:aws:ecs
+                        example:
+                          items:
+                            - cluster:
+                                id: o-12345abc
+                                name: Ocean::my-elastigroup-name
+                                clusterName: my-ECS-cluster-name
+                                autoScaler:
+                                  isEnabled: true
+                                  cooldown: 300
+                                  resourceLimits:
+                                    maxMemoryGib: 1
+                                    maxVCpu: 1
+                                  down:
+                                    evaluationPeriods: 4
+                                    maxScaleDownPercentage: 20
+                                  headroom:
+                                    cpuPerUnit: 2048
+                                    memoryPerUnit: 3
+                                    numOfUnits: 2
+                                  isAutoConfig: false
+                                  autoHeadroomPercentage: 20
+                                  shouldScaleDownNonServiceTasks: true
+                                  enableAutomaticAndManualHeadroom: false
+                                capacity:
+                                  minimum: 1
+                                  maximum: 10
+                                  target: 5
+                                strategy:
+                                  utilizeReservedInstances: true
+                                  fallbackToOd: true
+                                  spotPercentage: 100
+                                  drainingTimeout: 200
+                                  utilizeCommitments: false
+                                  clusterOrientation:
+                                    availabilityVsCost: balanced
+                                compute:
+                                  subnetIds:
+                                    - subnet-1234abcd
+                                  instanceTypes:
+                                    filters:
+                                      minVcpu: 2
+                                      maxVcpu: 16
+                                      minMemoryGiB: 8
+                                      maxMemoryGiB: 16
+                                      minGpu: 0
+                                      maxGpu: 4
+                                      includeFamilies: *ref_2
+                                      excludeFamilies: *ref_3
+                                      excludeMetal: true
+                                      isEnaSupported: true
+                                      architectures: *ref_4
+                                      virtualizationTypes: *ref_5
+                                      categories: *ref_6
+                                      minEnis: 2
+                                      diskTypes: *ref_7
+                                      hypervisor: *ref_8
+                                      rootDeviceTypes: *ref_9
+                                      minNetworkPerformance: 2
+                                      maxNetworkPerformance: 20
+                                      minInstancePrice: 2
+                                      maxInstancePrice: 20
+                                      includeGenerations: *ref_10
+                                      excludeGenerations: *ref_11
+                                      encryptionInTransitSupported: true
+                                    whitelist: *ref_12
+                                    blacklist: *ref_13
+                                  launchSpecification:
+                                    associatePublicIpAddress: false
+                                    associateIpv6Address: false
+                                    imageId: ami-123456789abcdefgh
+                                    securityGroupIds:
+                                      - sg-abcdefgh123456789
+                                    iamInstanceProfile:
+                                      arn: my-arn
+                                    blockDeviceMappings:
+                                      - deviceName: /dev/xvda
+                                        ebs:
+                                          throughput: 125
+                                          deleteOnTermination: false
+                                          encrypted: false
+                                          iops: 1
+                                          kmsKeyId: alias/aws/ebs
+                                          snapshotId: snap-abcdefghi111110
+                                          volumeType: gp2
+                                          dynamicVolumeSize:
+                                            baseSize: 50
+                                            resource: CPU
+                                            sizePerResourceUnit: 20
+                                    instanceMetadataOptions:
+                                      httpTokens: optional
+                                      httpPutResponseHopLimit: 12
+                                      httpEndpoint: disabled
+                                      instanceMetadataTags: Enabled
+                                    userData: Q29udGVudC1UeXBlOiBtdWx0aXBhcnQvbWl4ZWQ7IGJvdW5kYXJ5PSI9PT09PT09PT09PT09PT01MTg5MDY1Mzc3MjIyODk4NDA3PT0iCk1JTUUtVmVyc2lvbjogMS4wCgotLT09PT09PT09PT09PT09PTUxODkwNjUzNzcyMjI4OTg0MDc9PQp
+                                    monitoring: false
+                                    ebsOptimized: false
+                                    tags:
+                                      - tagKey: Creator
+                                        tagValue: John Doe
+                                  optimizeImages:
+                                    shouldOptimizeEcsAmi: 'true'
+                                    performAt: never
+                                    timeWindows:
+                                      - '[''Sun:02:00-Sun:12:00'', ''Wed:01:01-Fri:02:03'']'
+                                scheduling:
+                                  tasks:
+                                    - isEnabled: false
+                                      taskType: clusterRoll
+                                      parameters:
+                                        clusterRoll:
+                                          batchSizePercentage: 20
+                                          comment: This is why I deployed my cluster.
+                                          batchMinHealthyPercentage: 100
+                                  shutdownHours:
+                                    timeWindows:
+                                      - Sat:08:00-Sun:08:00
+                                    isEnabled: true
+                                logging:
+                                  export:
+                                    s3:
+                                      id: di-123
+                                createdAt: '2019-06-03T08:13:08.000Z'
+                                updatedAt: '2019-06-10T15:06:13.000Z'
+                          kind: spotinst:ocean:aws:ecs
         '400':
           description: Bad Request
     post:
@@ -903,7 +1569,7 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - *ref_0
+        - *ref_14
       requestBody:
         required: true
         content:
@@ -938,15 +1604,15 @@ paths:
                           example: my-ECS-cluster-name
                           description: |
                             ECS cluster name.
-                        autoScaler: *ref_1
+                        autoScaler: *ref_15
                         region:
                           type: string
                           example: us-east-1
                           description: |
                             Select the region for the Ocean cluster to run in.
-                        capacity: *ref_2
-                        strategy: *ref_3
-                        compute: &ref_32
+                        capacity: *ref_16
+                        strategy: *ref_17
+                        compute: &ref_70
                           type: object
                           title: Ocean Compute
                           required:
@@ -964,14 +1630,14 @@ paths:
                               type: object
                               description: The type of instances that may or may not be a part of the Ocean cluster.
                               properties:
-                                filters: *ref_4
+                                filters: *ref_18
                                 whitelist:
                                   type: array
                                   description: |
                                     Instance types allowed in the Ocean cluster. Cannot be configured if a deny list is configured.
                                   items:
                                     type: string
-                                  example:
+                                  example: &ref_20
                                     - c4.xlarge
                                     - c4.2xlarge
                                     - c4.4xlarge
@@ -982,9 +1648,13 @@ paths:
                                     Instance types to avoid launching in the Ocean cluster. Cannot be configured if a permit list is configured.
                                   items:
                                     type: string
-                                  example:
+                                  example: &ref_21
                                     - r5.large
                                     - r5.xlarge
+                              example:
+                                filters: *ref_19
+                                whitelist: *ref_20
+                                blacklist: *ref_21
                             launchSpecification:
                               type: object
                               description: |
@@ -1023,8 +1693,10 @@ paths:
                                       description: |
                                         The iamRole ARN.
                                       example: my-arn
-                                blockDeviceMappings: *ref_5
-                                instanceMetadataOptions: *ref_6
+                                  example:
+                                    arn: my-arn
+                                blockDeviceMappings: *ref_22
+                                instanceMetadataOptions: *ref_23
                                 userData:
                                   type: string
                                   format: byte
@@ -1060,6 +1732,26 @@ paths:
                                         description: |
                                           Set the tag value.
                                         example: John Doe
+                                    example:
+                                      tagKey: Creator
+                                      tagValue: John Doe
+                              example:
+                                associatePublicIpAddress: false
+                                associateIpv6Address: false
+                                imageId: ami-123456789abcdefgh
+                                securityGroupIds:
+                                  - sg-abcdefgh123456789
+                                iamInstanceProfile:
+                                  arn: my-arn
+                                blockDeviceMappings:
+                                  - *ref_24
+                                instanceMetadataOptions: *ref_25
+                                userData: Q29udGVudC1UeXBlOiBtdWx0aXBhcnQvbWl4ZWQ7IGJvdW5kYXJ5PSI9PT09PT09PT09PT09PT01MTg5MDY1Mzc3MjIyODk4NDA3PT0iCk1JTUUtVmVyc2lvbjogMS4wCgotLT09PT09PT09PT09PT09PTUxODkwNjUzNzcyMjI4OTg0MDc9PQp
+                                monitoring: false
+                                ebsOptimized: false
+                                tags:
+                                  - tagKey: Creator
+                                    tagValue: John Doe
                             optimizeImages:
                               type: object
                               required:
@@ -1079,8 +1771,42 @@ paths:
                                     Restrict to time window regex.
                                   items:
                                     example: '[''Sun:02:00-Sun:12:00'', ''Wed:01:01-Fri:02:03'']'
-                        scheduling: *ref_7
-                        logging: *ref_8
+                              example:
+                                shouldOptimizeEcsAmi: 'true'
+                                performAt: never
+                                timeWindows:
+                                  - '[''Sun:02:00-Sun:12:00'', ''Wed:01:01-Fri:02:03'']'
+                          example: &ref_71
+                            subnetIds:
+                              - subnet-1234abcd
+                            instanceTypes:
+                              filters: *ref_19
+                              whitelist: *ref_20
+                              blacklist: *ref_21
+                            launchSpecification:
+                              associatePublicIpAddress: false
+                              associateIpv6Address: false
+                              imageId: ami-123456789abcdefgh
+                              securityGroupIds:
+                                - sg-abcdefgh123456789
+                              iamInstanceProfile:
+                                arn: my-arn
+                              blockDeviceMappings:
+                                - *ref_24
+                              instanceMetadataOptions: *ref_25
+                              userData: Q29udGVudC1UeXBlOiBtdWx0aXBhcnQvbWl4ZWQ7IGJvdW5kYXJ5PSI9PT09PT09PT09PT09PT01MTg5MDY1Mzc3MjIyODk4NDA3PT0iCk1JTUUtVmVyc2lvbjogMS4wCgotLT09PT09PT09PT09PT09PTUxODkwNjUzNzcyMjI4OTg0MDc9PQp
+                              monitoring: false
+                              ebsOptimized: false
+                              tags:
+                                - tagKey: Creator
+                                  tagValue: John Doe
+                            optimizeImages:
+                              shouldOptimizeEcsAmi: 'true'
+                              performAt: never
+                              timeWindows:
+                                - '[''Sun:02:00-Sun:12:00'', ''Wed:01:01-Fri:02:03'']'
+                        scheduling: *ref_26
+                        logging: *ref_27
                         createdAt:
                           type: string
                           readOnly: true
@@ -1095,8 +1821,49 @@ paths:
                           example: '2019-06-10T15:06:13.000Z'
                           description: |
                             A timestamp of the latest Ocean update.
+                      example:
+                        id: o-12345abc
+                        name: Ocean::my-elastigroup-name
+                        clusterName: my-ECS-cluster-name
+                        autoScaler: *ref_28
+                        region: us-east-1
+                        capacity: *ref_29
+                        strategy: *ref_30
+                        compute:
+                          subnetIds:
+                            - subnet-1234abcd
+                          instanceTypes:
+                            filters: *ref_19
+                            whitelist: *ref_20
+                            blacklist: *ref_21
+                          launchSpecification:
+                            associatePublicIpAddress: false
+                            associateIpv6Address: false
+                            imageId: ami-123456789abcdefgh
+                            securityGroupIds:
+                              - sg-abcdefgh123456789
+                            iamInstanceProfile:
+                              arn: my-arn
+                            blockDeviceMappings:
+                              - *ref_24
+                            instanceMetadataOptions: *ref_25
+                            userData: Q29udGVudC1UeXBlOiBtdWx0aXBhcnQvbWl4ZWQ7IGJvdW5kYXJ5PSI9PT09PT09PT09PT09PT01MTg5MDY1Mzc3MjIyODk4NDA3PT0iCk1JTUUtVmVyc2lvbjogMS4wCgotLT09PT09PT09PT09PT09PTUxODkwNjUzNzcyMjI4OTg0MDc9PQp
+                            monitoring: false
+                            ebsOptimized: false
+                            tags:
+                              - tagKey: Creator
+                                tagValue: John Doe
+                          optimizeImages:
+                            shouldOptimizeEcsAmi: 'true'
+                            performAt: never
+                            timeWindows:
+                              - '[''Sun:02:00-Sun:12:00'', ''Wed:01:01-Fri:02:03'']'
+                        scheduling: *ref_31
+                        logging: *ref_32
+                        createdAt: '2019-06-03T08:13:08.000Z'
+                        updatedAt: '2019-06-10T15:06:13.000Z'
       responses:
-        '200': *ref_9
+        '200': *ref_33
         '400':
           description: Bad Request
   /ocean/aws/ecs/cluster/{oceanClusterId}:
@@ -1108,8 +1875,8 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - *ref_0
-        - &ref_10
+        - *ref_14
+        - &ref_34
           in: path
           name: oceanClusterId
           example: o-12345abc
@@ -1119,7 +1886,7 @@ paths:
             type: string
           required: true
       responses:
-        '200': *ref_9
+        '200': *ref_33
         '400':
           description: Bad Request
     put:
@@ -1130,9 +1897,9 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - *ref_10
-        - *ref_0
-        - &ref_26
+        - *ref_34
+        - *ref_14
+        - &ref_56
           in: query
           name: autoApplyTags
           description: |
@@ -1147,9 +1914,9 @@ paths:
           application/json:
             schema:
               allOf:
-                - *ref_11
+                - *ref_35
       responses:
-        '200': *ref_9
+        '200': *ref_33
         '400':
           description: Bad Request
     delete:
@@ -1160,14 +1927,14 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - *ref_0
-        - *ref_10
+        - *ref_14
+        - *ref_34
       responses:
         '200':
           description: Spot Response
           content:
             application/json:
-              schema: *ref_12
+              schema: *ref_36
         '400':
           description: Bad Request
   /ocean/aws/ecs/cluster/{EcsClusterName}/import:
@@ -1179,7 +1946,7 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - *ref_0
+        - *ref_14
         - in: path
           name: EcsClusterName
           example: ecsName
@@ -1220,7 +1987,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_13
+                  - *ref_37
                   - type: object
                     properties:
                       request:
@@ -1230,6 +1997,9 @@ paths:
                             example: /ocean/aws/ecs/cluster/my-ECS-cluster-name/import
                           method:
                             example: POST
+                        example:
+                          url: /ocean/aws/ecs/cluster/my-ECS-cluster-name/import
+                          method: POST
                       response:
                         type: object
                         properties:
@@ -1301,6 +2071,8 @@ paths:
                                                   description: |
                                                     The iamRole arn.
                                                   example: my-arn
+                                              example:
+                                                arn: my-arn
                                             tags:
                                               type: object
                                               description: |
@@ -1312,9 +2084,100 @@ paths:
                                                 tagValue:
                                                   type: string
                                                   example: dev
-                                            instanceMetadataOptions: *ref_6
+                                              example:
+                                                tagKey: env
+                                                tagValue: dev
+                                            instanceMetadataOptions: *ref_23
+                                          example:
+                                            imageId: ami-123456789abcdefgh
+                                            securityGroupIds:
+                                              - sg-abcdefgh123456789
+                                            keyPair: dev-keypair
+                                            userData: userData
+                                            iamInstanceProfile:
+                                              arn: my-arn
+                                            tags:
+                                              tagKey: env
+                                              tagValue: dev
+                                            instanceMetadataOptions: *ref_25
+                                      example:
+                                        subnetIds:
+                                          - subnet-1234abcd
+                                        launchSpecification:
+                                          imageId: ami-123456789abcdefgh
+                                          securityGroupIds:
+                                            - sg-abcdefgh123456789
+                                          keyPair: dev-keypair
+                                          userData: userData
+                                          iamInstanceProfile:
+                                            arn: my-arn
+                                          tags:
+                                            tagKey: env
+                                            tagValue: dev
+                                          instanceMetadataOptions: *ref_25
+                                  example:
+                                    name: my-Ocean-ECS-cluster
+                                    clusterName: my-ECS-cluster-name
+                                    region: us-east-1
+                                    compute:
+                                      subnetIds:
+                                        - subnet-1234abcd
+                                      launchSpecification:
+                                        imageId: ami-123456789abcdefgh
+                                        securityGroupIds:
+                                          - sg-abcdefgh123456789
+                                        keyPair: dev-keypair
+                                        userData: userData
+                                        iamInstanceProfile:
+                                          arn: my-arn
+                                        tags:
+                                          tagKey: env
+                                          tagValue: dev
+                                        instanceMetadataOptions: *ref_25
+                              example:
+                                cluster:
+                                  name: my-Ocean-ECS-cluster
+                                  clusterName: my-ECS-cluster-name
+                                  region: us-east-1
+                                  compute:
+                                    subnetIds:
+                                      - subnet-1234abcd
+                                    launchSpecification:
+                                      imageId: ami-123456789abcdefgh
+                                      securityGroupIds:
+                                        - sg-abcdefgh123456789
+                                      keyPair: dev-keypair
+                                      userData: userData
+                                      iamInstanceProfile:
+                                        arn: my-arn
+                                      tags:
+                                        tagKey: env
+                                        tagValue: dev
+                                      instanceMetadataOptions: *ref_25
                           kind:
                             example: spotinst:ocean:aws:ecs
+                        example:
+                          items:
+                            - cluster:
+                                name: my-Ocean-ECS-cluster
+                                clusterName: my-ECS-cluster-name
+                                region: us-east-1
+                                compute:
+                                  subnetIds:
+                                    - subnet-1234abcd
+                                  launchSpecification:
+                                    imageId: ami-123456789abcdefgh
+                                    securityGroupIds:
+                                      - sg-abcdefgh123456789
+                                    keyPair: dev-keypair
+                                    userData: userData
+                                    iamInstanceProfile:
+                                      arn: my-arn
+                                    tags:
+                                      tagKey: env
+                                      tagValue: dev
+                                    instanceMetadataOptions: *ref_25
+                          kind: spotinst:ocean:aws:ecs
         '400':
           description: Bad Request
   /ocean/aws/ecs/cluster/{oceanClusterId}/log:
@@ -1327,7 +2190,7 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - &ref_23
+        - &ref_51
           in: path
           name: oceanClusterId
           schema:
@@ -1336,8 +2199,8 @@ paths:
           example: o-abcd1234
           description: |
             Identifier of the Ocean cluster.
-        - *ref_0
-        - &ref_34
+        - *ref_14
+        - &ref_75
           in: query
           name: fromDate
           schema:
@@ -1345,7 +2208,7 @@ paths:
           required: true
           description: |
             Beginning date value using either the date format "yyyy-mm-dd; 2016-11-20" or ms "1494751821472".
-        - &ref_33
+        - &ref_74
           in: query
           name: toDate
           schema:
@@ -1419,6 +2282,11 @@ paths:
                         example: '2020-10-05T16:20:38.579Z'
                         description: |
                           When the request was received by Spot.
+                    example:
+                      id: 3213f42e-455e-4801-a185-cd3eb65fac5f
+                      url: /ocean/aws/ecs/cluster/o-e0a2bd7c/log?fromDate=2020-10-06&toDate=2020-10-08&severity=ALL&limit=500
+                      method: GET
+                      timestamp: '2020-10-05T16:20:38.579Z'
                   response:
                     type: object
                     description: |
@@ -1437,6 +2305,9 @@ paths:
                             example: OK
                             description: |
                               HTTP status message for the respective status code.
+                        example:
+                          code: '200'
+                          message: OK
                       kind:
                         type: string
                         example: spotinst:ocean:cluster:log
@@ -1453,7 +2324,7 @@ paths:
                               type: string
                             createdAt:
                               type: string
-                        example:
+                        example: &ref_38
                           - message: 'Instances Terminated - ECS Autoscaler ,Terminated 1, List of instances: [i-0914721d46ebbabb2]'
                             severity: INFO
                             createdAt: '2020-10-07T09:51:12.000Z'
@@ -1463,6 +2334,26 @@ paths:
                       count:
                         type: integer
                         example: '2'
+                    example:
+                      status:
+                        code: '200'
+                        message: OK
+                      kind: spotinst:ocean:cluster:log
+                      items: *ref_38
+                      count: '2'
+                example:
+                  request:
+                    id: 3213f42e-455e-4801-a185-cd3eb65fac5f
+                    url: /ocean/aws/ecs/cluster/o-e0a2bd7c/log?fromDate=2020-10-06&toDate=2020-10-08&severity=ALL&limit=500
+                    method: GET
+                    timestamp: '2020-10-05T16:20:38.579Z'
+                  response:
+                    status:
+                      code: '200'
+                      message: OK
+                    kind: spotinst:ocean:cluster:log
+                    items: *ref_38
+                    count: '2'
         '400':
           description: Bad Request
   /ocean/aws/ecs/cluster/{oceanClusterId}/rightSizing/suggestion:
@@ -1474,8 +2365,8 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - *ref_0
-        - *ref_10
+        - *ref_14
+        - *ref_34
       responses:
         '200':
           description: Ocean ECS Right Sizing Response
@@ -1483,7 +2374,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_13
+                  - *ref_37
                   - type: object
                     properties:
                       response:
@@ -1510,8 +2401,22 @@ paths:
                                 requestedCpu:
                                   type: integer
                                   example: 128
+                              example:
+                                suggestedMemory: 2
+                                requestedMemory: 100
+                                serviceName: sg-test
+                                suggestedCpu: 0
+                                requestedCpu: 128
                           kind:
                             example: spotinst:ocean:aws:ecs:cluster:rightSizing:resourceSuggestion
+                        example:
+                          items:
+                            - suggestedMemory: 2
+                              requestedMemory: 100
+                              serviceName: sg-test
+                              suggestedCpu: 0
+                              requestedCpu: 128
+                          kind: spotinst:ocean:aws:ecs:cluster:rightSizing:resourceSuggestion
         '400':
           description: Bad Request
   /ocean/aws/ecs/cluster/{oceanClusterId}/instanceTypeFiltersSimulation:
@@ -1523,8 +2428,8 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - *ref_10
-        - *ref_0
+        - *ref_34
+        - *ref_14
       requestBody:
         required: false
         content:
@@ -1535,7 +2440,7 @@ paths:
                   required:
                     - filters
                   properties:
-                    filters: *ref_4
+                    filters: *ref_18
       responses:
         '200':
           description: Ocean Instance Types Filters Simulation Response
@@ -1543,7 +2448,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_13
+                  - *ref_37
                   - type: object
                     properties:
                       request:
@@ -1553,6 +2458,9 @@ paths:
                             example: /ocean/aws/ecs/cluster/o-abcd1234/instanceTypeFiltersSimulation
                           method:
                             example: POST
+                        example:
+                          url: /ocean/aws/ecs/cluster/o-abcd1234/instanceTypeFiltersSimulation
+                          method: POST
                       response:
                         type: object
                         properties:
@@ -1567,14 +2475,20 @@ paths:
                                     The simulated instance types.
                                   items:
                                     type: string
-                                  example:
+                                  example: &ref_39
                                     - g5.xlarge
                                     - c5.2xlarge
                                     - c5ad.2xlarge
                                     - c5d.2xlarge
                                     - c5a.2xlarge
+                              example:
+                                filteredInstanceTypes: *ref_39
                           kind:
                             example: spotinst:ocean:aws:ecs:instanceTypesFilters:simulation
+                        example:
+                          items:
+                            - filteredInstanceTypes: *ref_39
+                          kind: spotinst:ocean:aws:ecs:instanceTypesFilters:simulation
         '400':
           description: Bad Request
   /ocean/aws/ecs/cluster/{oceanClusterId}/allowedInstanceTypes:
@@ -1586,8 +2500,8 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - *ref_10
-        - *ref_0
+        - *ref_34
+        - *ref_14
       responses:
         '200':
           description: Ocean Allowed Instance Types Response
@@ -1595,7 +2509,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_13
+                  - *ref_37
                   - type: object
                     properties:
                       request:
@@ -1605,6 +2519,9 @@ paths:
                             example: /ocean/aws/ecs/cluster/0-12345abc/allowedInstanceTypes
                           method:
                             example: GET
+                        example:
+                          url: /ocean/aws/ecs/cluster/0-12345abc/allowedInstanceTypes
+                          method: GET
                       response:
                         type: object
                         properties:
@@ -1619,11 +2536,17 @@ paths:
                                     The allowed Ocean cluster instance types.
                                   items:
                                     type: string
-                                  example:
+                                  example: &ref_40
                                     - c3.large
                                     - c5.large
+                              example:
+                                instanceTypes: *ref_40
                           kind:
                             example: spotinst:ocean:aws:ecs:allowedInstanceTypes
+                        example:
+                          items:
+                            - instanceTypes: *ref_40
+                          kind: spotinst:ocean:aws:ecs:allowedInstanceTypes
         '400':
           description: Bad Request
   /ocean/aws/ecs/cluster/import:
@@ -1635,7 +2558,7 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - *ref_0
+        - *ref_14
         - in: query
           name: groupId
           example: sig-1234abcd
@@ -1645,7 +2568,7 @@ paths:
           description: |
             The identifier of the Elastigroup to upgrade.
       responses:
-        '200': *ref_9
+        '200': *ref_33
         '400':
           description: Bad Request
   /ocean/aws/ecs/cluster/{oceanClusterId}/roll:
@@ -1657,8 +2580,8 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - *ref_0
-        - *ref_10
+        - *ref_14
+        - *ref_34
       requestBody:
         required: true
         content:
@@ -1670,7 +2593,7 @@ paths:
                   properties:
                     roll:
                       allOf:
-                        - &ref_14
+                        - &ref_41
                           type: object
                           properties:
                             batchSizePercentage:
@@ -1678,7 +2601,7 @@ paths:
                               description: |
                                 Value (in percent) to set size of batch in roll. Valid values are 0-100.
                               example: 20
-                        - &ref_15
+                        - &ref_42
                           type: object
                           properties:
                             comment:
@@ -1686,7 +2609,7 @@ paths:
                               description: |
                                 Add a brief description for the roll. The comment is limited to 256 chars.
                               example: This is why I rolled my cluster.
-                        - &ref_16
+                        - &ref_43
                           type: object
                           properties:
                             batchMinHealthyPercentage:
@@ -1700,10 +2623,10 @@ paths:
                   properties:
                     roll:
                       allOf:
-                        - *ref_14
-                        - *ref_15
-                        - *ref_16
-                        - &ref_17
+                        - *ref_41
+                        - *ref_42
+                        - *ref_43
+                        - &ref_45
                           type: object
                           properties:
                             instanceIds:
@@ -1720,10 +2643,10 @@ paths:
                   properties:
                     roll:
                       allOf:
-                        - *ref_14
-                        - *ref_15
-                        - *ref_16
-                        - &ref_20
+                        - *ref_41
+                        - *ref_42
+                        - *ref_43
+                        - &ref_48
                           type: object
                           properties:
                             launchSpecIds:
@@ -1736,13 +2659,13 @@ paths:
                                 - ols-76694a7d
                                 - ols-56694a76
       responses:
-        '200': &ref_21
+        '200': &ref_49
           description: Ocean ECS Roll Response
           content:
             application/json:
               schema:
                 allOf:
-                  - *ref_13
+                  - *ref_37
                   - type: object
                     properties:
                       response:
@@ -1753,7 +2676,7 @@ paths:
                             items:
                               oneOf:
                                 - allOf:
-                                    - &ref_18
+                                    - &ref_46
                                       type: object
                                       properties:
                                         id:
@@ -1803,13 +2726,20 @@ paths:
                                                         type: string
                                                       status:
                                                         type: string
-                                                  example:
+                                                  example: &ref_44
                                                     - instanceId: i-003a0281a24c01a20
                                                       status: REPLACED
                                                     - instanceId: i-003a0281a24c01a21
                                                       status: TO_BE_REPLACED
                                                     - instanceId: i-003a0281a24c01a22
                                                       status: COULD_NOT_BE_REPLACED
+                                              example:
+                                                oldInstances: *ref_44
+                                          example:
+                                            unit: percentage
+                                            value: 10
+                                            detailedStatus:
+                                              oldInstances: *ref_44
                                         oceanId:
                                           type: string
                                           example: o-abcd1234
@@ -1830,7 +2760,7 @@ paths:
                                           example: '2019-06-10T15:06:13.000Z'
                                           description: |
                                             The timestamp of the latest roll update.
-                                    - &ref_19
+                                    - &ref_47
                                       type: object
                                       properties:
                                         status:
@@ -1843,17 +2773,19 @@ paths:
                                             - COMPLETED
                                             - FAILED
                                             - STOPPED
-                                    - *ref_15
-                                    - *ref_16
-                                    - *ref_17
+                                    - *ref_42
+                                    - *ref_43
+                                    - *ref_45
                                 - allOf:
-                                    - *ref_18
-                                    - *ref_19
-                                    - *ref_15
-                                    - *ref_16
-                                    - *ref_20
+                                    - *ref_46
+                                    - *ref_47
+                                    - *ref_42
+                                    - *ref_43
+                                    - *ref_48
                           kind:
                             example: spotinst:ocean:aws:ecs:cluster:roll
+                        example:
+                          kind: spotinst:ocean:aws:ecs:cluster:roll
         '400':
           description: Bad Request
     get:
@@ -1864,10 +2796,10 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - *ref_0
-        - *ref_10
+        - *ref_14
+        - *ref_34
       responses:
-        '200': *ref_21
+        '200': *ref_49
         '400':
           description: Bad Request
   /ocean/aws/ecs/cluster/{oceanClusterId}/roll/{ROLL_ID}:
@@ -1879,9 +2811,9 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - *ref_0
-        - *ref_10
-        - &ref_22
+        - *ref_14
+        - *ref_34
+        - &ref_50
           in: path
           name: ROLL_ID
           example: scr-12345abc
@@ -1912,8 +2844,10 @@ paths:
                           description: |
                             Set status of a roll. Valid values: "STOPPED"
                           example: STOPPED
+                      example:
+                        status: STOPPED
       responses:
-        '200': *ref_21
+        '200': *ref_49
         '400':
           description: Bad Request
     get:
@@ -1924,11 +2858,11 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - *ref_0
-        - *ref_10
-        - *ref_22
+        - *ref_14
+        - *ref_34
+        - *ref_50
       responses:
-        '200': *ref_21
+        '200': *ref_49
         '400':
           description: Bad Request
   /ocean/aws/ecs/cluster/{oceanClusterId}/containerInstances:
@@ -1940,8 +2874,8 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - *ref_0
-        - *ref_10
+        - *ref_14
+        - *ref_34
         - in: query
           name: launchSpecId
           example: ols-123abc
@@ -1962,7 +2896,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_13
+                  - *ref_37
                   - type: object
                     properties:
                       request:
@@ -1972,6 +2906,9 @@ paths:
                             example: /ocean/aws/ecs/cluster/o-12345abc/containerInstances
                           method:
                             example: GET
+                        example:
+                          url: /ocean/aws/ecs/cluster/o-12345abc/containerInstances
+                          method: GET
                       response:
                         type: object
                         properties:
@@ -2086,8 +3023,50 @@ paths:
                                   example: '2021-10-1T05:51:06.000Z'
                                   description: |
                                     When was this container instance's EC2 instance was created at.
+                              example:
+                                instanceId: i-123
+                                instanceType: c3.large
+                                availabilityZone: us-west-2b
+                                launchSpecId: ols-123
+                                launchSpecName: dev-launchSpec
+                                lifeCycle: Spot
+                                publicIp: 1.2.3.4
+                                workloadRequestedCpuUnit: 1320
+                                workloadRequestedMemoryInMiB: 500
+                                workloadRequestedGpu: 1
+                                headroomRequestedCpuUnit: 1320
+                                headroomRequestedMemoryInMiB: 512
+                                headroomRequestedGpu: 1
+                                registeredCpuUnit: 2000
+                                registeredMemoryInMiB: 3646.1
+                                registeredGpu: 1
+                                containerInstanceId: abcdefg
+                                registrationStatus: Registered
+                                createdAt: '2021-10-1T05:51:06.000Z'
                           kind:
                             example: spotinst:ocean:aws:ecs:containerInstances
+                        example:
+                          items:
+                            - instanceId: i-123
+                              instanceType: c3.large
+                              availabilityZone: us-west-2b
+                              launchSpecId: ols-123
+                              launchSpecName: dev-launchSpec
+                              lifeCycle: Spot
+                              publicIp: 1.2.3.4
+                              workloadRequestedCpuUnit: 1320
+                              workloadRequestedMemoryInMiB: 500
+                              workloadRequestedGpu: 1
+                              headroomRequestedCpuUnit: 1320
+                              headroomRequestedMemoryInMiB: 512
+                              headroomRequestedGpu: 1
+                              registeredCpuUnit: 2000
+                              registeredMemoryInMiB: 3646.1
+                              registeredGpu: 1
+                              containerInstanceId: abcdefg
+                              registrationStatus: Registered
+                              createdAt: '2021-10-1T05:51:06.000Z'
+                          kind: spotinst:ocean:aws:ecs:containerInstances
         '400':
           description: Bad Request
   /ocean/aws/ecs/cluster/{oceanClusterId}/detachInstances:
@@ -2099,8 +3078,8 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - *ref_0
-        - *ref_23
+        - *ref_14
+        - *ref_51
       requestBody:
         required: true
         content:
@@ -2137,7 +3116,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_12
+                  - *ref_36
                   - type: object
                     properties:
                       request:
@@ -2147,6 +3126,9 @@ paths:
                             example: /ocean/aws/ecs/cluster/o-abcd1234/detachInstances
                           method:
                             example: PUT
+                        example:
+                          url: /ocean/aws/ecs/cluster/o-abcd1234/detachInstances
+                          method: PUT
         '400':
           description: Bad Request
   /ocean/aws/ecs/launchSpec:
@@ -2158,7 +3140,7 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - *ref_0
+        - *ref_14
       requestBody:
         required: true
         content:
@@ -2169,7 +3151,7 @@ paths:
                   required:
                     - launchSpec
                   properties:
-                    launchSpec: &ref_24
+                    launchSpec: &ref_53
                       type: object
                       description: |
                         AWS Cluster Virtual Node Group (VNG).
@@ -2203,7 +3185,7 @@ paths:
                             * You can configure VNG with either the imageId or images objects, but not both simultaneously.
                             * For each architecture type (amd64, arm64) only one AMI is allowed.
                             * Valid values: null, or an array with at least one element
-                          items: &ref_27
+                          items: &ref_57
                             type: object
                             title: Image object, containing the id of the image used to launch instances.
                             required:
@@ -2214,6 +3196,8 @@ paths:
                                 description: |
                                   Identifier of the image in AWS. Valid values: any string which is not empty or null.
                                 example: ami-ID
+                            example: &ref_61
+                              id: ami-ID
                         userData:
                           type: string
                           format: byte
@@ -2240,7 +3224,7 @@ paths:
                             When Ocean scales up instances, it takes your preferred types into consideration while maintaining a variety of machine types running for optimized distribution. [Learn More](https://docs.flexera.com/spot/ocean/features/vngs/attributes-and-actions-per-vng?id=preferred-spot-instance-types-per-vng)
                           items:
                             type: string
-                          example:
+                          example: &ref_52
                             - c3.2xlarge
                             - c4.2xlarge
                         subnetIds:
@@ -2286,6 +3270,9 @@ paths:
                                   Set the value of the attribute.
                                 type: string
                                 example: value1
+                            example:
+                              key: key1
+                              value: value1
                         autoScale:
                           type: object
                           properties:
@@ -2313,6 +3300,15 @@ paths:
                                       The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.
                                     type: integer
                                     example: 2
+                                example:
+                                  cpuPerUnit: 1024
+                                  memoryPerUnit: 512
+                                  numOfUnits: 2
+                          example:
+                            headrooms:
+                              - cpuPerUnit: 1024
+                                memoryPerUnit: 512
+                                numOfUnits: 2
                         tags:
                           description: |
                             List of kay-value pairs of tags.
@@ -2330,7 +3326,10 @@ paths:
                                 description: |
                                   Set the tag value.
                                 example: John Doe
-                        blockDeviceMappings: &ref_28
+                            example:
+                              tagKey: Creator
+                              tagValue: John Doe
+                        blockDeviceMappings: &ref_58
                           type: array
                           description: |
                             Block devices that are exposed to the instance. You can specify virtual devices and EBS volumes. This parameter and rootVolumeSize cannot be in the configuration at the same time. This parameter can be null, but if not null, it must contain at least one block device.
@@ -2404,12 +3403,42 @@ paths:
                                         description: |
                                           Additional size per resource unit (in GB). For example: if baseSize=50, and sizePerResourceUnit=20, and an instance with 2 CPU is launched, its disk size will be: 90 GB.
                                         example: 20
+                                    example:
+                                      baseSize: 50
+                                      resource: CPU
+                                      sizePerResourceUnit: 20
+                                example:
+                                  throughput: 125
+                                  deleteOnTermination: false
+                                  encrypted: false
+                                  iops: 1
+                                  kmsKeyId: alias/aws/ebs
+                                  snapshotId: snap-abcdefghi111110
+                                  volumeType: gp2
+                                  dynamicVolumeSize:
+                                    baseSize: 50
+                                    resource: CPU
+                                    sizePerResourceUnit: 20
+                            example: &ref_63
+                              deviceName: /dev/xvda
+                              ebs:
+                                throughput: 125
+                                deleteOnTermination: false
+                                encrypted: false
+                                iops: 1
+                                kmsKeyId: alias/aws/ebs
+                                snapshotId: snap-abcdefghi111110
+                                volumeType: gp2
+                                dynamicVolumeSize:
+                                  baseSize: 50
+                                  resource: CPU
+                                  sizePerResourceUnit: 20
                         restrictScaleDown:
                           type: boolean
                           description: |
                             When set to True, the VNG container instances will be treated as if all tasks running have the [restrict-scale-down label](https://docs.flexera.com/spot/ocean/features/labels-and-taints). Therefore, Ocean will not scale down container instances unless they are empty.
                           example: false
-                        instanceMetadataOptions: &ref_29
+                        instanceMetadataOptions: &ref_59
                           type: object
                           title: instanceMetadataOptions
                           required:
@@ -2432,7 +3461,10 @@ paths:
                                 The desired HTTP PUT response hop limit for instance metadata requests.
                                 The larger the number, the further the instance metadata requests can travel.
                               example: 12
-                        scheduling: &ref_30
+                          example: &ref_64
+                            httpTokens: optional
+                            httpPutResponseHopLimit: 12
+                        scheduling: &ref_60
                           type: object
                           description: |
                             An object used to define scheduled tasks such as a manual headroom update.
@@ -2496,6 +3528,15 @@ paths:
                                               - cpuPerUnit: 1024
                                                 memoryPerUnit: 512
                                                 numOfUnits: 2
+                                example:
+                                  isEnabled: true
+                                  cronExpression: 0 1 * * *
+                                  taskType: manualHeadroomUpdate
+                          example: &ref_65
+                            tasks:
+                              - isEnabled: true
+                                cronExpression: 0 1 * * *
+                                taskType: manualHeadroomUpdate
                         strategy:
                           type: object
                           description: |
@@ -2510,6 +3551,8 @@ paths:
                               maximum: 100
                               example: 70
                               default: 100
+                          example:
+                            spotPercentage: 70
                         createdAt:
                           type: string
                           readOnly: true
@@ -2520,6 +3563,59 @@ paths:
                           readOnly: true
                           format: date-time
                           example: '2019-06-10T15:06:13.000Z'
+                      example: &ref_54
+                        id: ols-1234abcd
+                        oceanId: o-1234abcd
+                        name: mySpecLauncher
+                        imageId: img2
+                        images:
+                          - id: ami-ID
+                        userData: dXNlcmJhc2g2NGVuY29kZWQ=
+                        securityGroupIds:
+                          - sg1, sg3
+                        instanceTypes:
+                          - c3.2xlarge, c4.2xlarge
+                        preferredSpotTypes: *ref_52
+                        subnetIds:
+                          - subnet-01234566789abcdef, subnet-9876543210ghijkl
+                        attributes:
+                          - key: key1
+                            value: value1
+                        autoScale:
+                          headrooms:
+                            - cpuPerUnit: 1024
+                              memoryPerUnit: 512
+                              numOfUnits: 2
+                        tags:
+                          - tagKey: Creator
+                            tagValue: John Doe
+                        blockDeviceMappings:
+                          - deviceName: /dev/xvda
+                            ebs:
+                              throughput: 125
+                              deleteOnTermination: false
+                              encrypted: false
+                              iops: 1
+                              kmsKeyId: alias/aws/ebs
+                              snapshotId: snap-abcdefghi111110
+                              volumeType: gp2
+                              dynamicVolumeSize:
+                                baseSize: 50
+                                resource: CPU
+                                sizePerResourceUnit: 20
+                        restrictScaleDown: false
+                        instanceMetadataOptions:
+                          httpTokens: optional
+                          httpPutResponseHopLimit: 12
+                        scheduling:
+                          tasks:
+                            - isEnabled: true
+                              cronExpression: 0 1 * * *
+                              taskType: manualHeadroomUpdate
+                        strategy:
+                          spotPercentage: 70
+                        createdAt: '2019-06-03T08:13:08.000Z'
+                        updatedAt: '2019-06-10T15:06:13.000Z'
       responses:
         '200':
           description: Ocean Virtual Node Group Response
@@ -2527,7 +3623,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_13
+                  - *ref_37
                   - type: object
                     properties:
                       request:
@@ -2537,14 +3633,21 @@ paths:
                             example: /ocean/aws/ecs/launchSpec
                           method:
                             example: POST
+                        example:
+                          url: /ocean/aws/ecs/launchSpec
+                          method: POST
                       response:
                         type: object
                         properties:
                           items:
                             type: array
-                            items: *ref_24
+                            items: *ref_53
                           kind:
                             example: spotinst:ocean:aws:ecs:launchSpec
+                        example:
+                          items:
+                            - *ref_54
+                          kind: spotinst:ocean:aws:ecs:launchSpec
         '400':
           description: Bad Request
     get:
@@ -2555,7 +3658,7 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - *ref_0
+        - *ref_14
         - in: query
           name: oceanId
           schema:
@@ -2570,7 +3673,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_13
+                  - *ref_37
                   - type: object
                     properties:
                       request:
@@ -2580,14 +3683,21 @@ paths:
                             example: /ocean/aws/ecs/launchSpec
                           method:
                             example: GET
+                        example:
+                          url: /ocean/aws/ecs/launchSpec
+                          method: GET
                       response:
                         type: object
                         properties:
                           items:
                             type: array
-                            items: *ref_24
+                            items: *ref_53
                           kind:
                             example: spotinst:ocean:aws:ecs:launchSpec
+                        example:
+                          items:
+                            - *ref_54
+                          kind: spotinst:ocean:aws:ecs:launchSpec
         '400':
           description: Bad Request
   /ocean/aws/ecs/launchSpec/{launchSpecId}:
@@ -2599,8 +3709,8 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - *ref_0
-        - &ref_25
+        - *ref_14
+        - &ref_55
           in: path
           name: launchSpecId
           description: |
@@ -2615,7 +3725,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_13
+                  - *ref_37
                   - type: object
                     properties:
                       request:
@@ -2625,14 +3735,21 @@ paths:
                             example: /ocean/aws/ecs/launchSpec/ols-12345abc
                           method:
                             example: GET
+                        example:
+                          url: /ocean/aws/ecs/launchSpec/ols-12345abc
+                          method: GET
                       response:
                         type: object
                         properties:
                           items:
                             type: array
-                            items: *ref_24
+                            items: *ref_53
                           kind:
                             example: spotinst:ocean:aws:ecs:launchSpec
+                        example:
+                          items:
+                            - *ref_54
+                          kind: spotinst:ocean:aws:ecs:launchSpec
         '400':
           description: Bad Request
     delete:
@@ -2643,8 +3760,8 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - *ref_0
-        - *ref_25
+        - *ref_14
+        - *ref_55
         - in: query
           name: deleteContainerInstances
           schema:
@@ -2660,7 +3777,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_12
+                  - *ref_36
                   - type: object
                     properties:
                       request:
@@ -2670,6 +3787,9 @@ paths:
                             example: /ocean/aws/ecs/launchSpec/ols-12345abc
                           method:
                             example: DELETE
+                        example:
+                          url: /ocean/aws/ecs/launchSpec/ols-12345abc
+                          method: DELETE
         '400':
           description: Bad Request
     put:
@@ -2680,9 +3800,9 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - *ref_0
-        - *ref_25
-        - *ref_26
+        - *ref_14
+        - *ref_55
+        - *ref_56
       requestBody:
         content:
           application/json:
@@ -2691,7 +3811,7 @@ paths:
               required:
                 - launchSpec
               properties:
-                launchSpec: &ref_31
+                launchSpec: &ref_66
                   type: object
                   description: |
                     AWS Cluster Virtual Node Group (VNG).
@@ -2717,7 +3837,7 @@ paths:
                         * You can configure VNG with either the imageId or images objects, but not both simultaneously.
                         * For each architecture type (amd64, arm64) only one AMI is allowed.
                         * Valid values: null, or an array with at least one element
-                      items: *ref_27
+                      items: *ref_57
                     userData:
                       type: string
                       format: byte
@@ -2744,7 +3864,7 @@ paths:
                         When Ocean scales up instances, it takes your preferred types into consideration while maintaining a variety of machine types running for optimized distribution. [Learn More](https://docs.flexera.com/spot/ocean/features/vngs/attributes-and-actions-per-vng?id=preferred-spot-instance-types-per-vng)
                       items:
                         type: string
-                      example:
+                      example: &ref_62
                         - c3.2xlarge
                         - c4.2xlarge
                     subnetIds:
@@ -2790,6 +3910,9 @@ paths:
                               Set the value of the attribute.
                             type: string
                             example: value1
+                        example:
+                          key: key1
+                          value: value1
                     autoScale:
                       type: object
                       properties:
@@ -2817,6 +3940,15 @@ paths:
                                   The number of units to retain as headroom, where each unit has the defined headroom CPU and memory.
                                 type: integer
                                 example: 2
+                            example:
+                              cpuPerUnit: 1024
+                              memoryPerUnit: 512
+                              numOfUnits: 2
+                      example:
+                        headrooms:
+                          - cpuPerUnit: 1024
+                            memoryPerUnit: 512
+                            numOfUnits: 2
                     tags:
                       description: |
                         List of kay-value pairs of tags.
@@ -2834,14 +3966,17 @@ paths:
                             description: |
                               Set the tag value.
                             example: John Doe
-                    blockDeviceMappings: *ref_28
+                        example:
+                          tagKey: Creator
+                          tagValue: John Doe
+                    blockDeviceMappings: *ref_58
                     restrictScaleDown:
                       type: boolean
                       description: |
                         When set to True, the VNG container instances will be treated as if all tasks running have the [restrict-scale-down label](https://docs.flexera.com/spot/ocean/features/labels-and-taints). Therefore, Ocean will not scale down container instances unless they are empty.
                       example: false
-                    instanceMetadataOptions: *ref_29
-                    scheduling: *ref_30
+                    instanceMetadataOptions: *ref_59
+                    scheduling: *ref_60
                     strategy:
                       type: object
                       description: |
@@ -2856,6 +3991,8 @@ paths:
                           maximum: 100
                           example: 70
                           default: 100
+                      example:
+                        spotPercentage: 70
                     createdAt:
                       type: string
                       readOnly: true
@@ -2866,6 +4003,75 @@ paths:
                       readOnly: true
                       format: date-time
                       example: '2019-06-10T15:06:13.000Z'
+                  example: &ref_67
+                    id: ols-1234abcd
+                    name: mySpecLauncher
+                    imageId: img2
+                    images:
+                      - *ref_61
+                    userData: dXNlcmJhc2g2NGVuY29kZWQ=
+                    securityGroupIds:
+                      - sg1, sg3
+                    instanceTypes:
+                      - c3.2xlarge, c4.2xlarge
+                    preferredSpotTypes: *ref_62
+                    subnetIds:
+                      - subnet-01234566789abcdef, subnet-9876543210ghijkl
+                    attributes:
+                      - key: key1
+                        value: value1
+                    autoScale:
+                      headrooms:
+                        - cpuPerUnit: 1024
+                          memoryPerUnit: 512
+                          numOfUnits: 2
+                    tags:
+                      - tagKey: Creator
+                        tagValue: John Doe
+                    blockDeviceMappings:
+                      - *ref_63
+                    restrictScaleDown: false
+                    instanceMetadataOptions: *ref_64
+                    scheduling: *ref_65
+                    strategy:
+                      spotPercentage: 70
+                    createdAt: '2019-06-03T08:13:08.000Z'
+                    updatedAt: '2019-06-10T15:06:13.000Z'
+              example:
+                launchSpec:
+                  id: ols-1234abcd
+                  name: mySpecLauncher
+                  imageId: img2
+                  images:
+                    - *ref_61
+                  userData: dXNlcmJhc2g2NGVuY29kZWQ=
+                  securityGroupIds:
+                    - sg1, sg3
+                  instanceTypes:
+                    - c3.2xlarge, c4.2xlarge
+                  preferredSpotTypes: *ref_62
+                  subnetIds:
+                    - subnet-01234566789abcdef, subnet-9876543210ghijkl
+                  attributes:
+                    - key: key1
+                      value: value1
+                  autoScale:
+                    headrooms:
+                      - cpuPerUnit: 1024
+                        memoryPerUnit: 512
+                        numOfUnits: 2
+                  tags:
+                    - tagKey: Creator
+                      tagValue: John Doe
+                  blockDeviceMappings:
+                    - *ref_63
+                  restrictScaleDown: false
+                  instanceMetadataOptions: *ref_64
+                  scheduling: *ref_65
+                  strategy:
+                    spotPercentage: 70
+                  createdAt: '2019-06-03T08:13:08.000Z'
+                  updatedAt: '2019-06-10T15:06:13.000Z'
       responses:
         '200':
           description: Ocean Virtual Node Group Response
@@ -2873,7 +4079,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_13
+                  - *ref_37
                   - type: object
                     properties:
                       request:
@@ -2883,14 +4089,21 @@ paths:
                             example: /ocean/aws/ecs/launchSpec/ols-12345abc
                           method:
                             example: PUT
+                        example:
+                          url: /ocean/aws/ecs/launchSpec/ols-12345abc
+                          method: PUT
                       response:
                         type: object
                         properties:
                           items:
                             type: array
-                            items: *ref_31
+                            items: *ref_66
                           kind:
                             example: spotinst:ocean:aws:ecs:launchSpec
+                        example:
+                          items:
+                            - *ref_67
+                          kind: spotinst:ocean:aws:ecs:launchSpec
         '400':
           description: Bad Request
   /ocean/aws/ecs/cluster/{oceanClusterId}/fargateMigration:
@@ -2904,8 +4117,8 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - *ref_0
-        - *ref_10
+        - *ref_14
+        - *ref_34
       requestBody:
         required: true
         content:
@@ -2937,7 +4150,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_13
+                  - *ref_37
                   - type: object
                     properties:
                       response:
@@ -2966,15 +4179,32 @@ paths:
                                         List of Fargate services by their names. Must contain at least one service.
                                       items:
                                         type: string
-                                      example:
+                                      example: &ref_68
                                         - service_1
                                         - service_2
+                                  example:
+                                    services: *ref_68
                                 simpleNewServiceNames:
                                   type: boolean
                                   description: |
                                     Flag to align imported service names in the following format: sfm_
                                   example: false
                                   default: false
+                              example:
+                                id: efm-d235b4d8
+                                oceanId: o-fgdfgdf
+                                state: STARTING
+                                config:
+                                  services: *ref_68
+                                simpleNewServiceNames: false
+                        example:
+                          items:
+                            - id: efm-d235b4d8
+                              oceanId: o-fgdfgdf
+                              state: STARTING
+                              config:
+                                services: *ref_68
+                              simpleNewServiceNames: false
         '400':
           description: Bad Request
   /ocean/aws/ecs/cluster/{oceanClusterId}/fargateMigration/serviceDiscovery:
@@ -2986,8 +4216,8 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - *ref_0
-        - *ref_10
+        - *ref_14
+        - *ref_34
       responses:
         '200':
           description: Ocean ECS Fargate Response
@@ -2995,7 +4225,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_13
+                  - *ref_37
                   - type: object
                     properties:
                       response:
@@ -3016,12 +4246,24 @@ paths:
                                   type: array
                                   items:
                                     type: string
-                                    example:
+                                    example: &ref_69
                                       - test_with_1
                                       - test_without
+                              example:
+                                ecsClusterName: EcsTestCluster
+                                ecsClusterRegion: us-east-2
+                                serviceNames:
+                                  - *ref_69
                           kind:
                             type: string
                             example: spotinst:ocean:aws:ecs:fargateMigration:serviceDiscovery
+                        example:
+                          items:
+                            - ecsClusterName: EcsTestCluster
+                              ecsClusterRegion: us-east-2
+                              serviceNames:
+                                - *ref_69
+                          kind: spotinst:ocean:aws:ecs:fargateMigration:serviceDiscovery
         '400':
           description: Bad Request
   /ocean/aws/ecs/cluster/{oceanClusterId}/fargateMigration/status:
@@ -3033,8 +4275,8 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - *ref_0
-        - *ref_10
+        - *ref_14
+        - *ref_34
       responses:
         '200':
           description: Ocean ECS Fargate Response
@@ -3042,7 +4284,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_13
+                  - *ref_37
                   - type: object
                     properties:
                       response:
@@ -3067,9 +4309,23 @@ paths:
                                   items:
                                     type: string
                                     example: test_with_1
+                              example:
+                                ecsClusterName: EcsTestCluster
+                                ecsClusterRegion: us-east-2
+                                state: FINISHED
+                                importedServices:
+                                  - test_with_1
                           kind:
                             type: string
                             example: spotinst:ocean:aws:ecs:fargateMigration:status
+                        example:
+                          items:
+                            - ecsClusterName: EcsTestCluster
+                              ecsClusterRegion: us-east-2
+                              state: FINISHED
+                              importedServices:
+                                - test_with_1
+                          kind: spotinst:ocean:aws:ecs:fargateMigration:status
         '400':
           description: Bad Request
   /ocean/aws/ecs/cluster/fargate/import:
@@ -3094,7 +4350,7 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - *ref_0
+        - *ref_14
       requestBody:
         required: true
         content:
@@ -3149,6 +4405,9 @@ paths:
                             type: string
                             description: The tag's name.
                             example: prod
+                        example:
+                          tagKey: env
+                          tagValue: prod
       responses:
         '200':
           description: Ocean ECS Import Response
@@ -3156,7 +4415,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_13
+                  - *ref_37
                   - type: object
                     properties:
                       response:
@@ -3183,18 +4442,49 @@ paths:
                                       example: my-ECS-cluster-name
                                       description: |
                                         ECS cluster name.
-                                    autoScaler: *ref_1
+                                    autoScaler: *ref_15
                                     region:
                                       type: string
                                       example: us-east-1
                                       description: |
                                         Select the region for the Ocean cluster to run in.
-                                    capacity: *ref_2
-                                    strategy: *ref_3
-                                    compute: *ref_32
-                                    scheduling: *ref_7
+                                    capacity: *ref_16
+                                    strategy: *ref_17
+                                    compute: *ref_70
+                                    scheduling: *ref_26
+                                  example:
+                                    name: Ocean::my-elastigroup-name
+                                    clusterName: my-ECS-cluster-name
+                                    autoScaler: *ref_28
+                                    region: us-east-1
+                                    capacity: *ref_29
+                                    strategy: *ref_30
+                                    compute: *ref_71
+                                    scheduling: *ref_31
+                              example:
+                                cluster:
+                                  name: Ocean::my-elastigroup-name
+                                  clusterName: my-ECS-cluster-name
+                                  autoScaler: *ref_28
+                                  region: us-east-1
+                                  capacity: *ref_29
+                                  strategy: *ref_30
+                                  compute: *ref_71
+                                  scheduling: *ref_31
                           kind:
                             example: spotinst:ocean:aws:ecs
+                        example:
+                          items:
+                            - cluster:
+                                name: Ocean::my-elastigroup-name
+                                clusterName: my-ECS-cluster-name
+                                autoScaler: *ref_28
+                                region: us-east-1
+                                capacity: *ref_29
+                                strategy: *ref_30
+                                compute: *ref_71
+                                scheduling: *ref_31
+                          kind: spotinst:ocean:aws:ecs
         '400':
           description: Bad Request
   /ocean/aws/ecs/cluster/{oceanClusterId}/aggregatedCosts:
@@ -3214,8 +4504,8 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - *ref_23
-        - *ref_0
+        - *ref_51
+        - *ref_14
       requestBody:
         required: true
         content:
@@ -3292,7 +4582,16 @@ paths:
                                           description: |
                                             Required whenever the operator is "equals" or "notEquals".
                                           example: dev
-                              example:
+                                      example:
+                                        key: env
+                                        operator: equals
+                                        value: dev
+                                example:
+                                  allMatch:
+                                    - key: env
+                                      operator: equals
+                                      value: dev
+                              example: &ref_72
                                 - allMatch:
                                     - key: env
                                       operator: equals
@@ -3302,6 +4601,11 @@ paths:
                                 - allMatch:
                                     - key: team
                                       operator: exists
+                          example:
+                            anyMatch: *ref_72
+                      example:
+                        conditions:
+                          anyMatch: *ref_72
       responses:
         '200':
           description: Ocean ECS Cluster Aggregated Detailed Costs Response
@@ -3309,7 +4613,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_13
+                  - *ref_37
                   - type: object
                     properties:
                       request:
@@ -3319,6 +4623,9 @@ paths:
                             example: /ocean/aws/ecs/cluster/o-abcd1234/aggregatedCosts
                           method:
                             example: POST
+                        example:
+                          url: /ocean/aws/ecs/cluster/o-abcd1234/aggregatedCosts
+                          method: POST
                       response:
                         type: object
                         properties:
@@ -3360,6 +4667,12 @@ paths:
                                                 total:
                                                   type: number
                                                   example: 12000
+                                              example:
+                                                total: 12000
+                                          example:
+                                            total: 12000
+                                            services:
+                                              total: 12000
                                         storage:
                                           type: object
                                           properties:
@@ -3379,12 +4692,22 @@ paths:
                                                     total:
                                                       type: number
                                                       example: 4000
+                                                  example:
+                                                    total: 4000
                                                 nonPv:
                                                   type: object
                                                   properties:
                                                     total:
                                                       type: number
                                                       example: 2000
+                                                  example:
+                                                    total: 2000
+                                              example:
+                                                total: 6000
+                                                ebsPv:
+                                                  total: 4000
+                                                nonPv:
+                                                  total: 2000
                                             file:
                                               type: object
                                               properties:
@@ -3397,6 +4720,42 @@ paths:
                                                     total:
                                                       type: number
                                                       example: 2000
+                                                  example:
+                                                    total: 2000
+                                              example:
+                                                total: 2000
+                                                efsPv:
+                                                  total: 2000
+                                          example:
+                                            total: 8000
+                                            block:
+                                              total: 6000
+                                              ebsPv:
+                                                total: 4000
+                                              nonPv:
+                                                total: 2000
+                                            file:
+                                              total: 2000
+                                              efsPv:
+                                                total: 2000
+                                      example:
+                                        total: 20000
+                                        compute:
+                                          total: 12000
+                                          services:
+                                            total: 12000
+                                        storage:
+                                          total: 8000
+                                          block:
+                                            total: 6000
+                                            ebsPv:
+                                              total: 4000
+                                            nonPv:
+                                              total: 2000
+                                          file:
+                                            total: 2000
+                                            efsPv:
+                                              total: 2000
                                     detailedCostsByTime:
                                       type: array
                                       items:
@@ -3549,7 +4908,14 @@ paths:
                                                                 properties:
                                                                   total:
                                                                     type: number
-                                      example:
+                                                    example:
+                                                      name: k8s-events
+                                              example:
+                                                services:
+                                                  - name: k8s-events
+                                        example:
+                                          groupedBy: env
+                                      example: &ref_73
                                         - startTime: '2023-02-01T12:00:00.745Z'
                                           endTime: '2023-02-01T01:00:00.745Z'
                                           summary:
@@ -3726,8 +5092,78 @@ paths:
                                                       total: 500
                                                       efsPv:
                                                         total: 500
+                                  example:
+                                    startTime: '2023-02-01T12:00:00.745Z'
+                                    endTime: '2023-02-01T02:00:00.745Z'
+                                    summary:
+                                      total: 20000
+                                      compute:
+                                        total: 12000
+                                        services:
+                                          total: 12000
+                                      storage:
+                                        total: 8000
+                                        block:
+                                          total: 6000
+                                          ebsPv:
+                                            total: 4000
+                                          nonPv:
+                                            total: 2000
+                                        file:
+                                          total: 2000
+                                          efsPv:
+                                            total: 2000
+                                    detailedCostsByTime: *ref_73
+                              example:
+                                totalForDuration:
+                                  startTime: '2023-02-01T12:00:00.745Z'
+                                  endTime: '2023-02-01T02:00:00.745Z'
+                                  summary:
+                                    total: 20000
+                                    compute:
+                                      total: 12000
+                                      services:
+                                        total: 12000
+                                    storage:
+                                      total: 8000
+                                      block:
+                                        total: 6000
+                                        ebsPv:
+                                          total: 4000
+                                        nonPv:
+                                          total: 2000
+                                      file:
+                                        total: 2000
+                                        efsPv:
+                                          total: 2000
+                                  detailedCostsByTime: *ref_73
                           kind:
                             example: ocean:ecs:cluster:aggregatedCosts:detailed
+                        example:
+                          items:
+                            - totalForDuration:
+                                startTime: '2023-02-01T12:00:00.745Z'
+                                endTime: '2023-02-01T02:00:00.745Z'
+                                summary:
+                                  total: 20000
+                                  compute:
+                                    total: 12000
+                                    services:
+                                      total: 12000
+                                  storage:
+                                    total: 8000
+                                    block:
+                                      total: 6000
+                                      ebsPv:
+                                        total: 4000
+                                      nonPv:
+                                        total: 2000
+                                    file:
+                                      total: 2000
+                                      efsPv:
+                                        total: 2000
+                                detailedCostsByTime: *ref_73
+                          kind: ocean:ecs:cluster:aggregatedCosts:detailed
         '400':
           description: Bad Request
   /mcs/ecs/cluster/{clusterName}/costs:
@@ -3743,9 +5179,9 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - *ref_0
-        - *ref_33
-        - *ref_34
+        - *ref_14
+        - *ref_74
+        - *ref_75
         - in: query
           name: region
           example: us-east-1
@@ -3769,7 +5205,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_13
+                  - *ref_37
                   - type: object
                     properties:
                       request:
@@ -3779,6 +5215,9 @@ paths:
                             example: /mcs/ecs/cluster/my-cluster-identifier/costs
                           method:
                             example: GET
+                        example:
+                          url: /mcs/ecs/cluster/my-cluster-identifier/costs
+                          method: GET
                       response:
                         type: object
                         properties:
@@ -3819,6 +5258,27 @@ paths:
                                           - HEADROOM
                                           - STAND_ALONE
                                           - IDLE
+                                    example:
+                                      name: default
+                                      cost: 18.00862
+                                      type: SERVICE
+                              example:
+                                totalCost: 279.9907
+                                headroomCost: 279.9907
+                                standAloneTasksCost: 0
+                                ecsGroups:
+                                  - name: default
+                                    cost: 18.00862
+                                    type: SERVICE
+                        example:
+                          items:
+                            - totalCost: 279.9907
+                              headroomCost: 279.9907
+                              standAloneTasksCost: 0
+                              ecsGroups:
+                                - name: default
+                                  cost: 18.00862
+                                  type: SERVICE
         '400':
           description: Bad Request
   /ocean/aws/ecs/launchSpec/{launchSpecId}/launchContainerInstances:
@@ -3830,8 +5290,8 @@ paths:
       tags:
         - Ocean ECS
       parameters:
-        - *ref_0
-        - *ref_25
+        - *ref_14
+        - *ref_55
       requestBody:
         required: true
         content:
@@ -3852,6 +5312,11 @@ paths:
                         The number of container instances to launch.
                       type: integer
                       example: 5
+                  example:
+                    amount: 5
+              example:
+                launchRequest:
+                  amount: 5
       responses:
         '200':
           description: Ocean VNG Launch Response
@@ -3859,7 +5324,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_13
+                  - *ref_37
                   - type: object
                     properties:
                       request:
@@ -3869,6 +5334,9 @@ paths:
                             example: /ocean/aws/ecs/launchSpec/ols-12345abc/launchContainerInstances
                           method:
                             example: PUT
+                        example:
+                          url: /ocean/aws/ecs/launchSpec/ols-12345abc/launchContainerInstances
+                          method: PUT
                       response:
                         type: object
                         properties:
@@ -3905,7 +5373,27 @@ paths:
                                         example: spot
                                         description: |
                                           Spot or on-demand.
+                                    example:
+                                      instanceId: i-08d53d2a1dcede08f
+                                      availabilityZone: us-west-2b
+                                      instanceType: c3.xlarge
+                                      lifeCycle: spot
+                              example:
+                                newInstances:
+                                  - instanceId: i-08d53d2a1dcede08f
+                                    availabilityZone: us-west-2b
+                                    instanceType: c3.xlarge
+                                    lifeCycle: spot
                           kind:
                             example: spotinst:ocean:aws:ecs:launchSpec:launchContainerInstances
+                        example:
+                          launchSpecId: ols-f73821bc
+                          items:
+                            - newInstances:
+                                - instanceId: i-08d53d2a1dcede08f
+                                  availabilityZone: us-west-2b
+                                  instanceType: c3.xlarge
+                                  lifeCycle: spot
+                          kind: spotinst:ocean:aws:ecs:launchSpec:launchContainerInstances
         '400':
           description: Bad Request

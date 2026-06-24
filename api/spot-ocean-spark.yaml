@@ -77,7 +77,7 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - &ref_10
+        - &ref_13
           in: query
           name: accountId
           example: act-123456789
@@ -108,11 +108,11 @@ paths:
                           description: |
                             The description of an Ocean Spark cluster
                           properties:
-                            oceanClusterId: &ref_0
+                            oceanClusterId: &ref_3
                               type: string
                               example: o-d3a2908e
                               description: A unique identifier for the Ocean cluster
-                            config: &ref_1
+                            config: &ref_4
                               type: object
                               description: |
                                 The object specifying the configuration of the Ocean Spark cluster.
@@ -131,7 +131,7 @@ paths:
                                         Annotations to add to the ingress load balancer service. This is useful to configure properties of the managed load balancer, 
                                         like the nature of the load balancer (e.g. ELB, NLB, ALB on AWS), 
                                         the security groups, or various timeouts.
-                                      example:
+                                      example: &ref_1
                                         service.beta.kubernetes.io/aws-load-balancer-security-groups: sg-03ba056e31f183482
                                     controller:
                                       type: object
@@ -144,6 +144,8 @@ paths:
                                           example: true
                                           description: |
                                             Should an ingress controller managed by Ocean for Apache Spark be installed on the cluster.
+                                      example:
+                                        managed: true
                                     loadBalancer:
                                       type: object
                                       description: |
@@ -171,8 +173,12 @@ paths:
                                             Annotations to add to the ingress controller load balancer service. This is useful to configure properties 
                                             of the managed load balancer, like the nature of the load balancer (e.g. ELB, NLB, ALB on AWS), 
                                             the security groups, or various timeouts.
-                                          example:
+                                          example: &ref_0
                                             service.beta.kubernetes.io/aws-load-balancer-security-groups: sg-XXXXXXXXXXXXXXXXX
+                                      example:
+                                        managed: true
+                                        targetGroupArn: arn:aws:elasticloadbalancing:us-east-1:XXXXXXXXXXXX:targetgroup/my-spark-cluster-tg/XXXXXXXXXXXXXXXX
+                                        serviceAnnotations: *ref_0
                                     customEndpoint:
                                       type: object
                                       description: |
@@ -190,6 +196,9 @@ paths:
                                           description: |
                                             The address the Ocean for Apache Spark control plane will use when addressing the cluster.
                                           example: my-spark-cluster-nlb-8cbb8da7XXXXXXXX.elb.us-east-1.amazonaws.com
+                                      example:
+                                        enabled: false
+                                        address: my-spark-cluster-nlb-8cbb8da7XXXXXXXX.elb.us-east-1.amazonaws.com
                                     privateLink:
                                       type: object
                                       description: |
@@ -206,6 +215,23 @@ paths:
                                           description: |
                                             The name of the VPC Endpoint Service the Ocean for Apache Spark control plane should bind to.
                                           example: com.amazonaws.vpce.eu-north-1.vpce-svc-XXXXXXXXXXXXXXXXX
+                                      example:
+                                        enabled: false
+                                        vpcEndpointService: com.amazonaws.vpce.eu-north-1.vpce-svc-XXXXXXXXXXXXXXXXX
+                                  example:
+                                    serviceAnnotations: *ref_1
+                                    controller:
+                                      managed: true
+                                    loadBalancer:
+                                      managed: true
+                                      targetGroupArn: arn:aws:elasticloadbalancing:us-east-1:XXXXXXXXXXXX:targetgroup/my-spark-cluster-tg/XXXXXXXXXXXXXXXX
+                                      serviceAnnotations: *ref_0
+                                    customEndpoint:
+                                      enabled: false
+                                      address: my-spark-cluster-nlb-8cbb8da7XXXXXXXX.elb.us-east-1.amazonaws.com
+                                    privateLink:
+                                      enabled: false
+                                      vpcEndpointService: com.amazonaws.vpce.eu-north-1.vpce-svc-XXXXXXXXXXXXXXXXX
                                 webhook:
                                   type: object
                                   description: |
@@ -225,6 +251,10 @@ paths:
                                         example: 1234
                                       description: |
                                         List of ports allowed to use on the host network - if empty default is **25554**
+                                  example:
+                                    useHostNetwork: true
+                                    hostNetworkPorts:
+                                      - 1234
                                 compute:
                                   type: object
                                   description: |
@@ -243,6 +273,9 @@ paths:
                                       example: false
                                       description: |
                                         Enable/Disable creating **ocean-spark** VNGs
+                                  example:
+                                    useTaints: false
+                                    createVngs: false
                                 logCollection:
                                   type: object
                                   description: |
@@ -261,6 +294,8 @@ paths:
                                       description: |
                                         Enable/Disable collecting driver and executor logs. When enabled, logs are stored by Flexera and can be downloaded from 
                                         the Spot console web interface. The logs are deleted after 30 days.
+                                  example:
+                                    collectDriverLogs: false
                                 spark:
                                   type: object
                                   description: |
@@ -270,12 +305,14 @@ paths:
                                       type: array
                                       items:
                                         type: string
-                                      example:
+                                      example: &ref_2
                                         - spark-apps
                                         - spark-apps-extra-ns-1
                                         - spark-apps-extra-ns-2
                                       description: |
                                         List of Kubernetes namespaces that Spark applications can run in. The default namespace `spark-apps` is always included in the list.
+                                  example:
+                                    appNamespaces: *ref_2
                                 workspaces:
                                   type: object
                                   description: |
@@ -283,13 +320,39 @@ paths:
                                   properties:
                                     storageClassOverride:
                                       allOf:
-                                        - &ref_14
+                                        - &ref_17
                                           type: string
                                           pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                                         - example: my-custom-storage-class
                                           description: |
                                             The storage class to use for Ocean Spark workspaces. If not set, the cluster's default storage class will 
                                             be used.
+                              example:
+                                ingress:
+                                  serviceAnnotations: *ref_1
+                                  controller:
+                                    managed: true
+                                  loadBalancer:
+                                    managed: true
+                                    targetGroupArn: arn:aws:elasticloadbalancing:us-east-1:XXXXXXXXXXXX:targetgroup/my-spark-cluster-tg/XXXXXXXXXXXXXXXX
+                                    serviceAnnotations: *ref_0
+                                  customEndpoint:
+                                    enabled: false
+                                    address: my-spark-cluster-nlb-8cbb8da7XXXXXXXX.elb.us-east-1.amazonaws.com
+                                  privateLink:
+                                    enabled: false
+                                    vpcEndpointService: com.amazonaws.vpce.eu-north-1.vpce-svc-XXXXXXXXXXXXXXXXX
+                                webhook:
+                                  useHostNetwork: true
+                                  hostNetworkPorts:
+                                    - 1234
+                                compute:
+                                  useTaints: false
+                                  createVngs: false
+                                logCollection:
+                                  collectDriverLogs: false
+                                spark:
+                                  appNamespaces: *ref_2
                 - type: object
                   properties:
                     cluster:
@@ -303,7 +366,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - &ref_4
+                  - &ref_7
                     type: object
                     allOf:
                       - type: object
@@ -331,6 +394,9 @@ paths:
                                 example: '2018-06-20T11:35:01.745Z'
                                 description: |
                                   When the request was received by Spot.
+                            example:
+                              id: e593ff58-067d-4340-92f9-8b1c0bad70d7
+                              timestamp: '2018-06-20T11:35:01.745Z'
                           response:
                             type: object
                             description: |
@@ -349,6 +415,13 @@ paths:
                                     example: OK
                                     description: |
                                       HTTP status message for the respective status code.
+                                example:
+                                  code: 200
+                                  message: OK
+                            example:
+                              status:
+                                code: 200
+                                message: OK
                       - type: object
                         properties:
                           response:
@@ -363,6 +436,8 @@ paths:
                                 type: string
                                 description: |
                                   The data type of each item in the response.
+                            example:
+                              count: 1
                   - type: object
                     properties:
                       request:
@@ -372,12 +447,15 @@ paths:
                             example: /ocean/spark/cluster
                           method:
                             example: POST
+                        example:
+                          url: /ocean/spark/cluster
+                          method: POST
                       response:
                         type: object
                         properties:
                           items:
                             type: array
-                            items: &ref_5
+                            items: &ref_8
                               type: object
                               description: |
                                 The object specifying the Ocean Spark cluster.
@@ -390,18 +468,18 @@ paths:
                                   description: |
                                     The description of an Ocean Spark cluster
                                   properties:
-                                    id: &ref_7
+                                    id: &ref_10
                                       type: string
                                       example: osc-20fac3f1
                                       description: |
                                         A unique identifier for the Ocean Spark cluster
-                                    controllerClusterId: &ref_3
+                                    controllerClusterId: &ref_6
                                       type: string
                                       example: my-ocean-cluster
                                       description: |
                                         The reporting identifier of the Ocean controller in the Ocean cluster
-                                    oceanClusterId: *ref_0
-                                    state: &ref_2
+                                    oceanClusterId: *ref_3
+                                    state: &ref_5
                                       description: |
                                         The current state of the Ocean Spark cluster.
                                         * `PROGRESSING`: The cluster resources are being created.
@@ -420,7 +498,7 @@ paths:
                                         - UNKNOWN
                                         - UNREACHABLE
                                         - DELETING
-                                    config: *ref_1
+                                    config: *ref_4
                                     region:
                                       type: string
                                       example: us-west-2
@@ -441,7 +519,7 @@ paths:
                                       format: date-time
                                       description: The last heartbeat received from the Ocean Spark operator running in the Ocean Spark cluster
                                       example: '2021-11-20T13:29:30.000Z'
-                                - &ref_17
+                                - &ref_20
                                   type: object
                                   title: createdAt & updatedAt object
                                   properties:
@@ -455,6 +533,8 @@ paths:
                                       example: 2018-11-01T10:50:29.000+0000
                           kind:
                             example: spotinst:ocean:spark:cluster
+                        example:
+                          kind: spotinst:ocean:spark:cluster
         '400':
           description: Bad Request
     get:
@@ -465,7 +545,7 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - &ref_6
+        - &ref_9
           in: query
           name: accountId
           example: act-123456789
@@ -493,21 +573,21 @@ paths:
           name: state
           required: false
           description: Optionally filter on the current state of the Ocean Spark cluster
-          schema: *ref_2
+          schema: *ref_5
         - in: query
           name: controllerClusterId
           required: false
-          schema: *ref_3
+          schema: *ref_6
           description: |
             Optionally filter on the reporting identifier of the Ocean controller in the Ocean cluster (controllerClusterId)
       responses:
-        '200': &ref_8
+        '200': &ref_11
           description: A list of Ocean Spark clusters (can be a single cluster)
           content:
             application/json:
               schema:
                 allOf:
-                  - *ref_4
+                  - *ref_7
                   - type: object
                     properties:
                       response:
@@ -517,7 +597,7 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: *ref_5
+                            items: *ref_8
         '400':
           description: Bad Request
   /ocean/spark/cluster/{clusterId}:
@@ -530,14 +610,14 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_6
-        - &ref_9
+        - *ref_9
+        - &ref_12
           in: path
           name: clusterId
           required: true
-          schema: *ref_7
+          schema: *ref_10
       responses:
-        '200': *ref_8
+        '200': *ref_11
         '400':
           description: Bad Request
     delete:
@@ -552,8 +632,8 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_6
         - *ref_9
+        - *ref_12
       responses:
         '200':
           description: Ok
@@ -567,8 +647,8 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_9
-        - *ref_10
+        - *ref_12
+        - *ref_13
       requestBody:
         required: true
         content:
@@ -591,7 +671,7 @@ paths:
                           required:
                             - config
                           properties:
-                            config: *ref_1
+                            config: *ref_4
       responses:
         '200':
           description: Ok
@@ -607,13 +687,13 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_6
+        - *ref_9
         - name: clusterId
           in: query
           required: false
           schema:
             type: array
-            items: *ref_7
+            items: *ref_10
         - in: query
           name: period
           required: false
@@ -630,7 +710,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_4
+                  - *ref_7
                   - type: object
                     properties:
                       response:
@@ -648,12 +728,19 @@ paths:
                               description: |
                                 Object that holds a pair of Ocean Spark Cluster ID and core hours that this cluster has consumed.
                               properties:
-                                id: *ref_7
+                                id: *ref_10
                                 coreHours:
                                   type: number
                                   description: |
                                     Number of core hours that the cluster has consumed.
                                   example: 99
+                              example:
+                                id: osc-20fac3f1
+                                coreHours: 99
+                        example:
+                          items:
+                            - id: osc-20fac3f1
+                              coreHours: 99
         '400':
           description: Bad Request
   /ocean/spark/cluster/{clusterId}/appCompletionTrend:
@@ -666,9 +753,9 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_6
         - *ref_9
-        - &ref_11
+        - *ref_12
+        - &ref_14
           in: query
           name: since
           required: true
@@ -686,7 +773,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_4
+                  - *ref_7
                   - type: object
                     properties:
                       response:
@@ -736,6 +823,13 @@ paths:
                                   type: number
                                   description: |
                                     The number of apps that timed-out between >= start and < end
+                              example:
+                                start: '2021-11-18T17:09:37+00:00'
+                                end: '2021-11-18T17:09:37+00:00'
+                        example:
+                          items:
+                            - start: '2021-11-18T17:09:37+00:00'
+                              end: '2021-11-18T17:09:37+00:00'
         '400':
           description: Bad Request
   /ocean/spark/cluster/{clusterId}/appLoadHistory:
@@ -748,9 +842,9 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_6
         - *ref_9
-        - *ref_11
+        - *ref_12
+        - *ref_14
       responses:
         '200':
           description: Number of pending or running apps, within time buckets.
@@ -758,7 +852,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_4
+                  - *ref_7
                   - type: object
                     properties:
                       response:
@@ -793,6 +887,15 @@ paths:
                                   description: |
                                     Number of applications that were running at the polling time. 
                                   example: 0
+                              example:
+                                time: '2021-11-18T17:09:37+00:00'
+                                pending: 0
+                                running: 0
+                        example:
+                          items:
+                            - time: '2021-11-18T17:09:37+00:00'
+                              pending: 0
+                              running: 0
         '400':
           description: Bad Request
   /ocean/spark/cluster/{clusterId}/statistics:
@@ -805,9 +908,9 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_6
         - *ref_9
-        - *ref_11
+        - *ref_12
+        - *ref_14
       responses:
         '200':
           description: Runtime statistics for a given cluster.
@@ -815,7 +918,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_4
+                  - *ref_7
                   - type: object
                     properties:
                       response:
@@ -834,8 +937,8 @@ paths:
                               description: |
                                 Summary of a cluster's usage statistics.
                               properties:
-                                id: *ref_7
-                                metrics: &ref_23
+                                id: *ref_10
+                                metrics: &ref_26
                                   type: object
                                   description: Computed statistics about the performance and cost of Spark applications
                                   required:
@@ -850,12 +953,12 @@ paths:
                                         - createdAt
                                         - updatedAt
                                       properties:
-                                        createdAt: &ref_12
+                                        createdAt: &ref_15
                                           type: string
                                           format: date-time
                                           example: 2018-10-10T10:50:29.000+0000
                                           description: The field on which to sort. For now, we only support filtering on CREATED_AT.
-                                        updatedAt: &ref_13
+                                        updatedAt: &ref_16
                                           type: string
                                           format: date-time
                                           example: 2018-10-10T10:50:29.000+0000
@@ -864,6 +967,10 @@ paths:
                                           type: integer
                                           description: The total cost of the Spark application in USD cents
                                           example: 0
+                                      example:
+                                        createdAt: 2018-10-10T10:50:29.000+0000
+                                        updatedAt: 2018-10-10T10:50:29.000+0000
+                                        total: 0
                                     spark:
                                       type: object
                                       description: Computed statistics about the performance of the Spark application
@@ -875,8 +982,8 @@ paths:
                                         - createdAt
                                         - updatedAt
                                       properties:
-                                        createdAt: *ref_12
-                                        updatedAt: *ref_13
+                                        createdAt: *ref_15
+                                        updatedAt: *ref_16
                                         sparkCoresDurationSeconds:
                                           format: time-delta
                                           type: number
@@ -896,6 +1003,38 @@ paths:
                                             The fraction of the time that Spark executor cores are running Spark tasks.
                                         availability:
                                           type: string
+                                      example:
+                                        createdAt: 2018-10-10T10:50:29.000+0000
+                                        updatedAt: 2018-10-10T10:50:29.000+0000
+                                  example:
+                                    cost:
+                                      createdAt: 2018-10-10T10:50:29.000+0000
+                                      updatedAt: 2018-10-10T10:50:29.000+0000
+                                      total: 0
+                                    spark:
+                                      createdAt: 2018-10-10T10:50:29.000+0000
+                                      updatedAt: 2018-10-10T10:50:29.000+0000
+                              example:
+                                id: osc-20fac3f1
+                                metrics:
+                                  cost:
+                                    createdAt: 2018-10-10T10:50:29.000+0000
+                                    updatedAt: 2018-10-10T10:50:29.000+0000
+                                    total: 0
+                                  spark:
+                                    createdAt: 2018-10-10T10:50:29.000+0000
+                                    updatedAt: 2018-10-10T10:50:29.000+0000
+                        example:
+                          items:
+                            - id: osc-20fac3f1
+                              metrics:
+                                cost:
+                                  createdAt: 2018-10-10T10:50:29.000+0000
+                                  updatedAt: 2018-10-10T10:50:29.000+0000
+                                  total: 0
+                                spark:
+                                  createdAt: 2018-10-10T10:50:29.000+0000
+                                  updatedAt: 2018-10-10T10:50:29.000+0000
         '400':
           description: Bad Request
   /ocean/spark/app:
@@ -908,44 +1047,44 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_6
+        - *ref_9
         - in: query
           name: clusterId
           required: false
           description: |
             Optionally filter on the Ocean Spark cluster ID
-          schema: *ref_7
+          schema: *ref_10
         - in: query
           name: jobId
           required: false
           description: |
             Optionally filter on the job ID
-          schema: &ref_22
+          schema: &ref_25
             allOf:
-              - *ref_14
+              - *ref_17
               - description: |
                   A unique identifier for an Ocean Spark job.
                 example: daily-reporting
-        - &ref_24
+        - &ref_27
           in: query
           name: submissionSource
           required: false
           description: |
             Optionally filter on the submission source of the Spark application
-          schema: &ref_20
+          schema: &ref_23
             description: The source that initiated the application submission
             example: public-api
             type: string
             enum:
               - public-api
               - jupyter-enterprise-gateway
-        - &ref_25
+        - &ref_28
           in: query
           name: appType
           required: false
           description: |
             Optionally filter on the type of the Spark application
-          schema: &ref_21
+          schema: &ref_24
             description: The type of Spark application
             example: notebook
             type: string
@@ -955,13 +1094,13 @@ paths:
               - spark-connect
               - hive-thrift-server
               - spark-connect-and-hive-thrift-server
-        - &ref_26
+        - &ref_29
           in: query
           name: state
           required: false
           description: |
             Optionally filter on the state of the Spark application
-          schema: &ref_19
+          schema: &ref_22
             description: |
               The current state of the Spark application.
 
@@ -989,7 +1128,7 @@ paths:
           required: false
           description: |
             Optionally filter on the user who created the Spark application
-          schema: &ref_18
+          schema: &ref_21
             type: integer
             description: The identifier of the user who created the application
             example: 59438
@@ -1032,7 +1171,7 @@ paths:
           schema:
             format: date-time
             type: string
-        - &ref_27
+        - &ref_30
           in: query
           name: pageSize
           required: false
@@ -1040,27 +1179,27 @@ paths:
           schema:
             type: integer
             default: 20
-        - &ref_28
+        - &ref_31
           in: query
           name: after
           required: false
-          schema: &ref_15
+          schema: &ref_18
             type: string
             description: the cursor to the next page of items in the collection
             example: MjAyMS0xMS0xOFQwOTo1MjowNS43Mzg4NjArMDA6MDB8NWM3NGY2MDYtZDYxNy00MzcxLWE5ZDktNjc2ZDkxMzRlNWFk
           description: |
             If specified, the page returned in the response contains the items right after this cursor in the ordering
-        - &ref_29
+        - &ref_32
           in: query
           name: before
           required: false
-          schema: &ref_16
+          schema: &ref_19
             type: string
             description: the cursor to the previous page of items in the collection
             example: MjAyMS0xMS0xOFQwOTo1MjowNS43Mzg4NjArMDA6MDB8NWM3NGY2MDYtZDYxNy00MzcxLWE5ZDktNjc2ZDkxMzRlNWFk
           description: |
             If specified, the page returned in the response contains the items right before this cursor in the ordering
-        - &ref_30
+        - &ref_33
           in: query
           name: order
           required: false
@@ -1071,7 +1210,7 @@ paths:
               - ASC
               - DESC
             default: DESC
-        - &ref_31
+        - &ref_34
           in: query
           name: orderBy
           required: false
@@ -1084,13 +1223,13 @@ paths:
               - DURATION
             default: CREATED_AT
       responses:
-        '200': &ref_32
+        '200': &ref_35
           description: A paginated list of Spark application
           content:
             application/json:
               schema:
                 allOf:
-                  - *ref_4
+                  - *ref_7
                   - type: object
                     properties:
                       response:
@@ -1102,7 +1241,7 @@ paths:
                             type: array
                             items:
                               allOf:
-                                - &ref_154
+                                - &ref_159
                                   type: object
                                   required:
                                     - page
@@ -1118,8 +1257,8 @@ paths:
                                         type: object
                                       description: The items of the current page
                                       example: []
-                                    after: *ref_15
-                                    before: *ref_16
+                                    after: *ref_18
+                                    before: *ref_19
                                 - type: object
                                   properties:
                                     page:
@@ -1139,34 +1278,34 @@ paths:
                                           - createdAt
                                           - updatedAt
                                         allOf:
-                                          - *ref_17
+                                          - *ref_20
                                           - type: object
                                             description: |
                                               The description of a Spark application
                                             properties:
-                                              id: &ref_33
+                                              id: &ref_36
                                                 allOf:
-                                                  - *ref_14
+                                                  - *ref_17
                                                   - description: A unique identifier for the Spark application, set by the user or auto-generated from the job ID
                                                     example: daily-reporting-2021-08-18
-                                              displayName: &ref_140
+                                              displayName: &ref_145
                                                 type: string
                                                 description: A non-unique free-form name for the Spark application used in the Spot console. Defaults to the application ID.
                                                 example: Daily Reporting 2021-08-18
-                                              accountId: &ref_141
+                                              accountId: &ref_146
                                                 type: string
                                                 example: act-123456789
                                                 description: The ID of the account where the entity lives
-                                              organizationId: &ref_142
+                                              organizationId: &ref_147
                                                 type: integer
                                                 example: 606012341234
                                                 description: The ID of the organization
-                                              userId: *ref_18
-                                              clusterId: *ref_7
-                                              controllerClusterId: *ref_3
-                                              appState: *ref_19
-                                              submissionSource: *ref_20
-                                              appType: *ref_21
+                                              userId: *ref_21
+                                              clusterId: *ref_10
+                                              controllerClusterId: *ref_6
+                                              appState: *ref_22
+                                              submissionSource: *ref_23
+                                              appType: *ref_24
                                               job:
                                                 type: object
                                                 description: |
@@ -1175,12 +1314,14 @@ paths:
                                                   - id
                                                   - displayName
                                                 properties:
-                                                  id: *ref_22
-                                                  displayName: &ref_143
+                                                  id: *ref_25
+                                                  displayName: &ref_148
                                                     type: string
                                                     description: |
                                                       A non-unique free-form name for the job used in the Spot console. Defaults to the job ID.
                                                     example: Daily Reporting
+                                                example:
+                                                  displayName: Daily Reporting
                                               startedAt:
                                                 type: string
                                                 format: date-time
@@ -1193,7 +1334,7 @@ paths:
                                                 description: |
                                                   The time when the Spark application terminated.
                                                 example: '2021-11-18T17:09:37+00:00'
-                                              killRequestedAt: &ref_145
+                                              killRequestedAt: &ref_150
                                                 type: string
                                                 format: date-time
                                                 description: |
@@ -1213,8 +1354,11 @@ paths:
                                                     format: uri
                                                     description: URL of the endpoint serving a stream of Kubernetes events
                                                     example: /ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/kubeEvents/live
-                                              metrics: *ref_23
-                                              cores: &ref_38
+                                                example:
+                                                  logsStreamUrl: /ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/logs/live
+                                                  kubeEventsStreamUrl: /ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/kubeEvents/live
+                                              metrics: *ref_26
+                                              cores: &ref_41
                                                 type: number
                                                 description: |
                                                   The number of cores allocated to the Spark application. It is 0 if the application is completed.
@@ -1231,18 +1375,18 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_6
         - *ref_9
-        - *ref_24
-        - *ref_25
-        - *ref_26
+        - *ref_12
         - *ref_27
         - *ref_28
         - *ref_29
         - *ref_30
         - *ref_31
+        - *ref_32
+        - *ref_33
+        - *ref_34
       responses:
-        '200': *ref_32
+        '200': *ref_35
         '400':
           description: Bad Request
     post:
@@ -1253,8 +1397,8 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_6
         - *ref_9
+        - *ref_12
       requestBody:
         required: true
         content:
@@ -1264,17 +1408,17 @@ paths:
               required:
                 - jobId
               properties:
-                appId: *ref_33
+                appId: *ref_36
                 jobId:
                   description: |
                     The ID of the job to which the Spark application belongs. If a job with this ID does not exist yet, it will be created.
                   allOf:
-                    - *ref_22
+                    - *ref_25
                 configOverrides:
                   description: |
                     Configurations for the Spark application supplied in the request. Prefer using a config template for configurations that are stable across runs. Configurations in `configOverrides` have precedence over those in the config template.
                   allOf:
-                    - &ref_144
+                    - &ref_149
                       type: object
                       description: A configuration for a Spark application
                       additionalProperties: false
@@ -1284,7 +1428,7 @@ paths:
                             type: string
                           title: Arguments
                           type: array
-                        deps: &ref_79
+                        deps: &ref_82
                           description: Dependencies of the Spark application
                           properties:
                             files:
@@ -1319,27 +1463,27 @@ paths:
                               type: array
                           title: Dependencies
                           type: object
-                        driver: &ref_82
+                        driver: &ref_85
                           additionalProperties: false
                           description: A configuration for a Spark driver (no required field)
                           properties:
-                            affinity: &ref_53
+                            affinity: &ref_56
                               properties:
                                 nodeAffinity:
                                   allOf:
-                                    - &ref_98
+                                    - &ref_101
                                       properties:
                                         preferredDuringSchedulingIgnoredDuringExecution:
                                           description: The scheduler will prefer to schedule pods to nodes that satisfy the affinity expressions specified by this field, but it may choose a node that violates one or more of the expressions. The node that is most preferred is the one with the greatest sum of weights, i.e. for each node that meets all of the scheduling requirements (resource request, requiredDuringScheduling affinity expressions, etc.), compute a sum by iterating through the elements of this field and adding "weight" to the sum if the node matches the corresponding matchExpressions; the node(s) with the highest sum are the most preferred.
-                                          items: &ref_109
+                                          items: &ref_112
                                             properties:
                                               preference:
                                                 allOf:
-                                                  - &ref_35
+                                                  - &ref_38
                                                     properties:
                                                       matchExpressions:
                                                         description: A list of node selector requirements by node's labels.
-                                                        items: &ref_34
+                                                        items: &ref_37
                                                           properties:
                                                             key:
                                                               description: The label key that the selector applies to.
@@ -1364,7 +1508,7 @@ paths:
                                                         type: array
                                                       matchFields:
                                                         description: A list of node selector requirements by node's fields.
-                                                        items: *ref_34
+                                                        items: *ref_37
                                                         title: Matchfields
                                                         type: array
                                                     title: NodeSelectorTerm
@@ -1384,11 +1528,11 @@ paths:
                                           type: array
                                         requiredDuringSchedulingIgnoredDuringExecution:
                                           allOf:
-                                            - &ref_99
+                                            - &ref_102
                                               properties:
                                                 nodeSelectorTerms:
                                                   description: Required. A list of node selector terms. The terms are ORed.
-                                                  items: *ref_35
+                                                  items: *ref_38
                                                   title: Nodeselectorterms
                                                   type: array
                                               required:
@@ -1403,23 +1547,23 @@ paths:
                                   title: Nodeaffinity
                                 podAffinity:
                                   allOf:
-                                    - &ref_105
+                                    - &ref_108
                                       properties:
                                         preferredDuringSchedulingIgnoredDuringExecution:
                                           description: The scheduler will prefer to schedule pods to nodes that satisfy the affinity expressions specified by this field, but it may choose a node that violates one or more of the expressions. The node that is most preferred is the one with the greatest sum of weights, i.e. for each node that meets all of the scheduling requirements (resource request, requiredDuringScheduling affinity expressions, etc.), compute a sum by iterating through the elements of this field and adding "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the node(s) with the highest sum are the most preferred.
-                                          items: &ref_37
+                                          items: &ref_40
                                             properties:
                                               podAffinityTerm:
                                                 allOf:
-                                                  - &ref_36
+                                                  - &ref_39
                                                     properties:
                                                       labelSelector:
                                                         allOf:
-                                                          - &ref_94
+                                                          - &ref_97
                                                             properties:
                                                               matchExpressions:
                                                                 description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
-                                                                items: &ref_95
+                                                                items: &ref_98
                                                                   properties:
                                                                     key:
                                                                       description: key is the label key that the selector applies to.
@@ -1481,7 +1625,7 @@ paths:
                                           type: array
                                         requiredDuringSchedulingIgnoredDuringExecution:
                                           description: If the affinity requirements specified by this field are not met at scheduling time, the pod will not be scheduled onto the node. If the affinity requirements specified by this field cease to be met at some point during pod execution (e.g. due to a pod label update), the system may or may not try to eventually evict the pod from its node. When there are multiple elements, the lists of nodes corresponding to each podAffinityTerm are intersected, i.e. all terms must be satisfied.
-                                          items: *ref_36
+                                          items: *ref_39
                                           title: Requiredduringschedulingignoredduringexecution
                                           type: array
                                       title: PodAffinity
@@ -1490,16 +1634,16 @@ paths:
                                   title: Podaffinity
                                 podAntiAffinity:
                                   allOf:
-                                    - &ref_106
+                                    - &ref_109
                                       properties:
                                         preferredDuringSchedulingIgnoredDuringExecution:
                                           description: The scheduler will prefer to schedule pods to nodes that satisfy the anti-affinity expressions specified by this field, but it may choose a node that violates one or more of the expressions. The node that is most preferred is the one with the greatest sum of weights, i.e. for each node that meets all of the scheduling requirements (resource request, requiredDuringScheduling anti-affinity expressions, etc.), compute a sum by iterating through the elements of this field and adding "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the node(s) with the highest sum are the most preferred.
-                                          items: *ref_37
+                                          items: *ref_40
                                           title: Preferredduringschedulingignoredduringexecution
                                           type: array
                                         requiredDuringSchedulingIgnoredDuringExecution:
                                           description: If the anti-affinity requirements specified by this field are not met at scheduling time, the pod will not be scheduled onto the node. If the anti-affinity requirements specified by this field cease to be met at some point during pod execution (e.g. due to a pod label update), the system may or may not try to eventually evict the pod from its node. When there are multiple elements, the lists of nodes corresponding to each podAffinityTerm are intersected, i.e. all terms must be satisfied.
-                                          items: *ref_36
+                                          items: *ref_39
                                           title: Requiredduringschedulingignoredduringexecution
                                           type: array
                                       title: PodAntiAffinity
@@ -1514,7 +1658,7 @@ paths:
                               title: Annotations
                               type: object
                             configMaps:
-                              items: &ref_54
+                              items: &ref_57
                                 description: A pair of a name and a path to which the named objects should be mounted to
                                 properties:
                                   name:
@@ -1536,8 +1680,8 @@ paths:
                             coreRequest:
                               title: Corerequest
                               type: string
-                            cores: *ref_38
-                            dnsConfig: &ref_55
+                            cores: *ref_41
+                            dnsConfig: &ref_58
                               title: PodDNSConfig
                               type: object
                               properties:
@@ -1551,7 +1695,7 @@ paths:
                                   title: Options
                                   description: A list of DNS resolver options. This will be merged with the base options generated from DNSPolicy. Duplicated entries will be removed. Resolution options given in Options will override those that appear in the base DNSPolicy.
                                   type: array
-                                  items: &ref_107
+                                  items: &ref_110
                                     title: PodDNSConfigOption
                                     type: object
                                     properties:
@@ -1568,10 +1712,10 @@ paths:
                                   type: array
                                   items:
                                     type: string
-                            env: &ref_41
+                            env: &ref_44
                               title: Env
                               type: array
-                              items: &ref_126
+                              items: &ref_129
                                 title: EnvVar
                                 required:
                                   - name
@@ -1588,14 +1732,14 @@ paths:
                                   valueFrom:
                                     title: Valuefrom
                                     allOf:
-                                      - &ref_127
+                                      - &ref_130
                                         title: EnvVarSource
                                         type: object
                                         properties:
                                           configMapKeyRef:
                                             title: Configmapkeyref
                                             allOf:
-                                              - &ref_130
+                                              - &ref_133
                                                 title: ConfigMapKeySelector
                                                 required:
                                                   - key
@@ -1617,7 +1761,7 @@ paths:
                                           fieldRef:
                                             title: Fieldref
                                             allOf:
-                                              - &ref_66
+                                              - &ref_69
                                                 properties:
                                                   apiVersion:
                                                     description: Version of the schema the FieldPath is written in terms of, defaults to "v1".
@@ -1635,7 +1779,7 @@ paths:
                                           resourceFieldRef:
                                             title: Resourcefieldref
                                             allOf:
-                                              - &ref_67
+                                              - &ref_70
                                                 properties:
                                                   containerName:
                                                     description: 'Container name: required for volumes, optional for env vars'
@@ -1643,7 +1787,7 @@ paths:
                                                     type: string
                                                   divisor:
                                                     allOf:
-                                                      - &ref_47
+                                                      - &ref_50
                                                         anyOf:
                                                           - type: string
                                                           - type: number
@@ -1662,7 +1806,7 @@ paths:
                                           secretKeyRef:
                                             title: Secretkeyref
                                             allOf:
-                                              - &ref_131
+                                              - &ref_134
                                                 title: SecretKeySelector
                                                 required:
                                                   - key
@@ -1683,8 +1827,8 @@ paths:
                                             description: Selects a key of a secret in the pod's namespace
                                     description: Source for the environment variable's value. Cannot be used if value is not empty.
                               description: List of environment variables to set in the container.
-                            envSecretKeyRefs: &ref_56
-                              additionalProperties: &ref_97
+                            envSecretKeyRefs: &ref_59
+                              additionalProperties: &ref_100
                                 description: The name and key of a SecretKeyRef
                                 properties:
                                   key:
@@ -1701,14 +1845,14 @@ paths:
                               title: EnvSecretKeyRefs
                               type: object
                               description: DEPRECATED use `env` instead
-                            envVars: &ref_57
+                            envVars: &ref_60
                               additionalProperties:
                                 type: string
                               title: EnvVars
                               type: object
                               description: DEPRECATED use `env` instead
                             hostAliases:
-                              items: &ref_58
+                              items: &ref_61
                                 properties:
                                   hostnames:
                                     description: Hostnames for the above IP address.
@@ -1727,11 +1871,11 @@ paths:
                             image:
                               title: Image
                               type: string
-                            instanceSelector: &ref_59
+                            instanceSelector: &ref_62
                               title: InstanceSelector
                               description: DEPRECATED use `instanceAllowList` instead
                               type: string
-                            instanceAllowList: &ref_60
+                            instanceAllowList: &ref_63
                               title: InstanceAllowList
                               description: |
                                 Restricts what instances can by used by pods:
@@ -1750,21 +1894,21 @@ paths:
                             lifecycle:
                               title: Lifecycle
                               allOf:
-                                - &ref_42
+                                - &ref_45
                                   title: Lifecycle
                                   type: object
                                   properties:
                                     postStart:
                                       title: Poststart
                                       allOf:
-                                        - &ref_40
+                                        - &ref_43
                                           title: Handler
                                           type: object
                                           properties:
                                             exec:
                                               title: Exec
                                               allOf:
-                                                - &ref_43
+                                                - &ref_46
                                                   title: ExecAction
                                                   type: object
                                                   properties:
@@ -1778,7 +1922,7 @@ paths:
                                             httpGet:
                                               title: Httpget
                                               allOf:
-                                                - &ref_44
+                                                - &ref_47
                                                   title: HTTPGetAction
                                                   required:
                                                     - port
@@ -1791,7 +1935,7 @@ paths:
                                                     httpHeaders:
                                                       title: Httpheaders
                                                       type: array
-                                                      items: &ref_128
+                                                      items: &ref_131
                                                         title: HTTPHeader
                                                         required:
                                                           - name
@@ -1814,7 +1958,7 @@ paths:
                                                     port:
                                                       title: Port
                                                       allOf:
-                                                        - &ref_39
+                                                        - &ref_42
                                                           title: IntOrString
                                                           anyOf:
                                                             - type: string
@@ -1828,7 +1972,7 @@ paths:
                                             tcpSocket:
                                               title: Tcpsocket
                                               allOf:
-                                                - &ref_45
+                                                - &ref_48
                                                   title: TCPSocketAction
                                                   required:
                                                     - port
@@ -1841,20 +1985,20 @@ paths:
                                                     port:
                                                       title: Port
                                                       allOf:
-                                                        - *ref_39
+                                                        - *ref_42
                                                       description: Number or name of the port to access on the container. Number must be in the range 1 to 65535. Name must be an IANA_SVC_NAME.
                                               description: TCPSocket specifies an action involving a TCP port. TCP hooks not yet supported
                                       description: 'PostStart is called immediately after a container is created. If the handler fails, the container is terminated and restarted according to its restart policy. Other management of the container blocks until the hook completes. More info: https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#container-hooks'
                                     preStop:
                                       title: Prestop
                                       allOf:
-                                        - *ref_40
+                                        - *ref_43
                                       description: 'PreStop is called immediately before a container is terminated due to an API request or management event such as liveness probe failure, preemption, resource contention, etc. The handler is not called if the container crashes or exits. The reason for termination is passed to the handler. The Pod''s termination grace period countdown begins before the PreStop hooked is executed. Regardless of the outcome of the handler, the container will eventually terminate within the Pod''s termination grace period. Other management of the container blocks until the hook completes or until the termination grace period is reached. More info: https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#container-hooks'
                               description: Optional lifecycle hooks to add to the driver pod
                             sidecars:
                               title: Sidecars
                               type: array
-                              items: &ref_48
+                              items: &ref_51
                                 title: Container
                                 required:
                                   - name
@@ -1872,18 +2016,18 @@ paths:
                                     items:
                                       type: string
                                     description: 'Entrypoint array. Not executed within a shell. The docker image''s ENTRYPOINT is used if this is not provided. Variable references $(VAR_NAME) are expanded using the container''s environment. If a variable cannot be resolved, the reference in the input string will be unchanged. The $(VAR_NAME) syntax can be escaped with a double $$, ie: $$(VAR_NAME). Escaped references will never be expanded, regardless of whether the variable exists or not. Cannot be updated. More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell'
-                                  env: *ref_41
+                                  env: *ref_44
                                   envFrom:
                                     title: Envfrom
                                     type: array
-                                    items: &ref_132
+                                    items: &ref_135
                                       title: EnvFromSource
                                       type: object
                                       properties:
                                         configMapRef:
                                           title: Configmapref
                                           allOf:
-                                            - &ref_133
+                                            - &ref_136
                                               title: ConfigMapEnvSource
                                               type: object
                                               properties:
@@ -1903,7 +2047,7 @@ paths:
                                         secretRef:
                                           title: Secretref
                                           allOf:
-                                            - &ref_134
+                                            - &ref_137
                                               title: SecretEnvSource
                                               type: object
                                               properties:
@@ -1928,19 +2072,19 @@ paths:
                                   lifecycle:
                                     title: Lifecycle
                                     allOf:
-                                      - *ref_42
+                                      - *ref_45
                                     description: Actions that the management system should take in response to container lifecycle events. Cannot be updated.
                                   livenessProbe:
                                     title: Livenessprobe
                                     allOf:
-                                      - &ref_46
+                                      - &ref_49
                                         title: Probe
                                         type: object
                                         properties:
                                           exec:
                                             title: Exec
                                             allOf:
-                                              - *ref_43
+                                              - *ref_46
                                             description: One and only one of the following should be specified. Exec specifies the action to take.
                                           failureThreshold:
                                             title: Failurethreshold
@@ -1949,7 +2093,7 @@ paths:
                                           httpGet:
                                             title: Httpget
                                             allOf:
-                                              - *ref_44
+                                              - *ref_47
                                             description: HTTPGet specifies the http request to perform.
                                           initialDelaySeconds:
                                             title: Initialdelayseconds
@@ -1966,7 +2110,7 @@ paths:
                                           tcpSocket:
                                             title: Tcpsocket
                                             allOf:
-                                              - *ref_45
+                                              - *ref_48
                                             description: TCPSocket specifies an action involving a TCP port. TCP hooks not yet supported
                                           timeoutSeconds:
                                             title: Timeoutseconds
@@ -1980,7 +2124,7 @@ paths:
                                   ports:
                                     title: Ports
                                     type: array
-                                    items: &ref_135
+                                    items: &ref_138
                                       title: ContainerPort
                                       required:
                                         - containerPort
@@ -2010,30 +2154,30 @@ paths:
                                   readinessProbe:
                                     title: Readinessprobe
                                     allOf:
-                                      - *ref_46
+                                      - *ref_49
                                     description: 'Periodic probe of container service readiness. Container will be removed from service endpoints if the probe fails. Cannot be updated. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
                                   resources:
                                     title: Resources
                                     allOf:
-                                      - &ref_129
+                                      - &ref_132
                                         title: ResourceRequirements
                                         type: object
                                         properties:
                                           limits:
                                             title: Limits
                                             type: object
-                                            additionalProperties: *ref_47
+                                            additionalProperties: *ref_50
                                             description: 'Limits describes the maximum amount of compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
                                           requests:
                                             title: Requests
                                             type: object
-                                            additionalProperties: *ref_47
+                                            additionalProperties: *ref_50
                                             description: 'Requests describes the minimum amount of compute resources required. If Requests is omitted for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
                                     description: 'Compute Resources required by this container. Cannot be updated. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
                                   securityContext:
                                     title: Securitycontext
                                     allOf:
-                                      - &ref_51
+                                      - &ref_54
                                         properties:
                                           allowPrivilegeEscalation:
                                             description: 'AllowPrivilegeEscalation controls whether a process can gain more privileges than its parent process. This bool directly controls if the no_new_privs flag will be set on the container process. AllowPrivilegeEscalation is true always when the container is: 1) run as Privileged 2) has CAP_SYS_ADMIN'
@@ -2041,7 +2185,7 @@ paths:
                                             type: boolean
                                           capabilities:
                                             allOf:
-                                              - &ref_74
+                                              - &ref_77
                                                 properties:
                                                   add:
                                                     description: Added capabilities
@@ -2085,7 +2229,7 @@ paths:
                                             type: integer
                                           seLinuxOptions:
                                             allOf:
-                                              - &ref_49
+                                              - &ref_52
                                                 properties:
                                                   level:
                                                     description: Level is SELinux level label that applies to the container.
@@ -2109,7 +2253,7 @@ paths:
                                             title: Selinuxoptions
                                           windowsOptions:
                                             allOf:
-                                              - &ref_50
+                                              - &ref_53
                                                 properties:
                                                   gmsaCredentialSpec:
                                                     description: GMSACredentialSpec is where the GMSA admission webhook (https://github.com/kubernetes-sigs/windows-gmsa) inlines the contents of the GMSA credential spec named by the GMSACredentialSpecName field. This field is alpha-level and is only honored by servers that enable the WindowsGMSA feature flag.
@@ -2149,7 +2293,7 @@ paths:
                                   volumeDevices:
                                     title: Volumedevices
                                     type: array
-                                    items: &ref_136
+                                    items: &ref_139
                                       title: VolumeDevice
                                       required:
                                         - devicePath
@@ -2168,7 +2312,7 @@ paths:
                                   volumeMounts:
                                     title: Volumemounts
                                     type: array
-                                    items: &ref_52
+                                    items: &ref_55
                                       properties:
                                         mountPath:
                                           description: Path within the container at which the volume should be mounted.  Must not contain ':'.
@@ -2207,7 +2351,7 @@ paths:
                             initContainers:
                               title: Initcontainers
                               type: array
-                              items: *ref_48
+                              items: *ref_51
                             labels:
                               additionalProperties:
                                 type: string
@@ -2219,11 +2363,11 @@ paths:
                             memoryOverhead:
                               title: Memoryoverhead
                               type: string
-                            podName: &ref_93
+                            podName: &ref_96
                               pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                               title: K8sName
                               type: string
-                            podSecurityContext: &ref_61
+                            podSecurityContext: &ref_64
                               properties:
                                 fsGroup:
                                   description: |-
@@ -2248,7 +2392,7 @@ paths:
                                   type: integer
                                 seLinuxOptions:
                                   allOf:
-                                    - *ref_49
+                                    - *ref_52
                                   description: The SELinux context to be applied to all containers. If unspecified, the container runtime will allocate a random SELinux context for each container.  May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container.
                                   title: Selinuxoptions
                                 supplementalGroups:
@@ -2259,7 +2403,7 @@ paths:
                                   type: array
                                 sysctls:
                                   description: Sysctls hold a list of namespaced sysctls used for the pod. Pods with unsupported sysctls (by the container runtime) might fail to launch.
-                                  items: &ref_122
+                                  items: &ref_125
                                     properties:
                                       name:
                                         description: Name of a property to set
@@ -2278,13 +2422,13 @@ paths:
                                   type: array
                                 windowsOptions:
                                   allOf:
-                                    - *ref_50
+                                    - *ref_53
                                   description: Windows security options.
                                   title: Windowsoptions
                               title: PodSecurityContext
                               type: object
                             secrets:
-                              items: &ref_62
+                              items: &ref_65
                                 description: The information of a secret
                                 properties:
                                   name:
@@ -2293,7 +2437,7 @@ paths:
                                   path:
                                     title: Path
                                     type: string
-                                  secretType: &ref_116
+                                  secretType: &ref_119
                                     description: An enumeration.
                                     enum:
                                       - GCPServiceAccount
@@ -2309,12 +2453,12 @@ paths:
                                 type: object
                               title: Secrets
                               type: array
-                            securityContext: *ref_51
+                            securityContext: *ref_54
                             spot:
                               title: Spot
                               type: boolean
                             tolerations:
-                              items: &ref_63
+                              items: &ref_66
                                 properties:
                                   effect:
                                     description: Effect indicates the taint effect to match. Empty means match all taint effects. When specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.
@@ -2340,29 +2484,31 @@ paths:
                                 type: object
                               title: Tolerations
                               type: array
-                            vngIds: &ref_64
+                            vngIds: &ref_67
                               items:
                                 type: string
                               title: Vngids
                               description: An optional list of Virtual Node Group identifiers (like ["ols-d1d766b9"]) on which the pod can be run. If omitted, the pod can be run on any VNG.
                             volumeMounts:
-                              items: *ref_52
+                              items: *ref_55
                               title: Volumemounts
                               type: array
                           title: DriverSpec
                           type: object
-                        executor: &ref_84
+                          example: &ref_143
+                            cores: 1
+                        executor: &ref_87
                           additionalProperties: false
                           description: A configuration for a Spark executor (no required field)
                           properties:
-                            affinity: *ref_53
+                            affinity: *ref_56
                             annotations:
                               additionalProperties:
                                 type: string
                               title: Annotations
                               type: object
                             configMaps:
-                              items: *ref_54
+                              items: *ref_57
                               title: Configmaps
                               type: array
                             coreLimit:
@@ -2371,28 +2517,28 @@ paths:
                             coreRequest:
                               title: Corerequest
                               type: string
-                            cores: *ref_38
-                            dnsConfig: *ref_55
-                            env: *ref_41
-                            envSecretKeyRefs: *ref_56
-                            envVars: *ref_57
+                            cores: *ref_41
+                            dnsConfig: *ref_58
+                            env: *ref_44
+                            envSecretKeyRefs: *ref_59
+                            envVars: *ref_60
                             hostAliases:
-                              items: *ref_58
+                              items: *ref_61
                               title: Hostaliases
                               type: array
                             image:
                               title: Image
                               type: string
-                            instanceSelector: *ref_59
-                            instanceAllowList: *ref_60
+                            instanceSelector: *ref_62
+                            instanceAllowList: *ref_63
                             sidecars:
                               title: Sidecars
                               type: array
-                              items: *ref_48
+                              items: *ref_51
                             initContainers:
                               title: Initcontainers
                               type: array
-                              items: *ref_48
+                              items: *ref_51
                             instances:
                               title: Instances
                               type: integer
@@ -2406,11 +2552,11 @@ paths:
                               type: object
                             memory:
                               oneOf:
-                                - &ref_100
+                                - &ref_103
                                   title: StaticMemoryString
                                   description: static memory
                                   type: string
-                                - &ref_101
+                                - &ref_104
                                   description: Memory allocation strategy that automatically increments the memory when a previous app failed with an OOM
                                   properties:
                                     strategy:
@@ -2429,7 +2575,7 @@ paths:
                                       type: string
                                   required:
                                     - strategy
-                                - &ref_102
+                                - &ref_105
                                   description: Memory allocation strategy that automatically increments the memory when a previous app failed with an OOM, and decreases it based on past applications' memory usage
                                   properties:
                                     strategy:
@@ -2459,26 +2605,28 @@ paths:
                             memoryOverhead:
                               title: Memoryoverhead
                               type: string
-                            podSecurityContext: *ref_61
+                            podSecurityContext: *ref_64
                             secrets:
-                              items: *ref_62
+                              items: *ref_65
                               title: Secrets
                               type: array
-                            securityContext: *ref_51
+                            securityContext: *ref_54
                             spot:
                               title: Spot
                               type: boolean
                             tolerations:
-                              items: *ref_63
+                              items: *ref_66
                               title: Tolerations
                               type: array
-                            vngIds: *ref_64
+                            vngIds: *ref_67
                             volumeMounts:
-                              items: *ref_52
+                              items: *ref_55
                               title: Volumemounts
                               type: array
                           title: ExecutorSpec
                           type: object
+                          example: &ref_144
+                            cores: 1
                         hadoopConf:
                           additionalProperties:
                             type: string
@@ -2538,7 +2686,7 @@ paths:
                           type: string
                           example: low
                           description: The priority of the Spark application.
-                        pythonVersion: &ref_111
+                        pythonVersion: &ref_114
                           description: An enumeration.
                           enum:
                             - '2'
@@ -2547,7 +2695,7 @@ paths:
                           example: '3'
                           title: PythonVersion
                           type: string
-                        shuffle: &ref_120
+                        shuffle: &ref_123
                           description: External Shuffle storage configuration. This is used to configure the external shuffle storage plugin in Spark allowing the shuffle data to be stored on an external storage system. This is useful to handle spot kill more gracefully and allow for executor scaledown when the shuffle data is stored externally.
                           properties:
                             enabled:
@@ -2586,7 +2734,7 @@ paths:
                             - type: string
                               enum:
                                 - DISABLED
-                            - &ref_138
+                            - &ref_141
                               title: TimeoutSpec
                               required:
                                 - minutes
@@ -2597,7 +2745,7 @@ paths:
                                   title: Minutes
                                   exclusiveMinimum: true
                                   type: integer
-                                policy: &ref_139
+                                policy: &ref_142
                                   title: TimeoutPolicy
                                   type: string
                                   description: |-
@@ -2610,7 +2758,7 @@ paths:
                         timeToLiveSeconds:
                           title: Timetoliveseconds
                           type: integer
-                        type: &ref_119
+                        type: &ref_122
                           description: An enumeration.
                           enum:
                             - Java
@@ -2619,11 +2767,11 @@ paths:
                           title: SparkApplicationType
                           type: string
                         volumes:
-                          items: &ref_123
+                          items: &ref_126
                             properties:
                               awsElasticBlockStore:
                                 allOf:
-                                  - &ref_70
+                                  - &ref_73
                                     properties:
                                       fsType:
                                         description: 'Filesystem type of the volume that you want to mount. Tip: Ensure that the filesystem type is supported by the host operating system. Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified. More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore'
@@ -2649,7 +2797,7 @@ paths:
                                 title: Awselasticblockstore
                               azureDisk:
                                 allOf:
-                                  - &ref_71
+                                  - &ref_74
                                     properties:
                                       cachingMode:
                                         description: 'Host Caching mode: None, Read Only, Read Write.'
@@ -2684,7 +2832,7 @@ paths:
                                 title: Azuredisk
                               azureFile:
                                 allOf:
-                                  - &ref_72
+                                  - &ref_75
                                     properties:
                                       readOnly:
                                         description: Defaults to false (read/write). ReadOnly here will force the ReadOnly setting in VolumeMounts.
@@ -2707,7 +2855,7 @@ paths:
                                 title: Azurefile
                               cephfs:
                                 allOf:
-                                  - &ref_75
+                                  - &ref_78
                                     properties:
                                       monitors:
                                         description: 'Required: Monitors is a collection of Ceph monitors More info: https://releases.k8s.io/HEAD/examples/volumes/cephfs/README.md#how-to-use-it'
@@ -2729,7 +2877,7 @@ paths:
                                         type: string
                                       secretRef:
                                         allOf:
-                                          - &ref_65
+                                          - &ref_68
                                             properties:
                                               name:
                                                 description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
@@ -2751,7 +2899,7 @@ paths:
                                 title: Cephfs
                               cinder:
                                 allOf:
-                                  - &ref_76
+                                  - &ref_79
                                     properties:
                                       fsType:
                                         description: 'Filesystem type to mount. Must be a filesystem type supported by the host operating system. Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified. More info: https://releases.k8s.io/HEAD/examples/mysql-cinder-pd/README.md'
@@ -2763,7 +2911,7 @@ paths:
                                         type: boolean
                                       secretRef:
                                         allOf:
-                                          - *ref_65
+                                          - *ref_68
                                         description: 'Optional: points to a secret object containing parameters used to connect to OpenStack.'
                                         title: Secretref
                                       volumeID:
@@ -2778,7 +2926,7 @@ paths:
                                 title: Cinder
                               configMap:
                                 allOf:
-                                  - &ref_78
+                                  - &ref_81
                                     properties:
                                       defaultMode:
                                         description: 'Optional: mode bits to use on created files by default. Must be a value between 0 and 0777. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
@@ -2786,7 +2934,7 @@ paths:
                                         type: integer
                                       items:
                                         description: If unspecified, each key-value pair in the Data field of the referenced ConfigMap will be projected into the volume as a file whose name is the key and content is the value. If specified, the listed keys will be projected into the specified paths, and unlisted keys will not be present. If a key is specified which is not present in the ConfigMap, the volume setup will error unless it is marked optional. Paths must be relative and may not contain the '..' path or start with '..'.
-                                        items: &ref_68
+                                        items: &ref_71
                                           properties:
                                             key:
                                               description: The key to project.
@@ -2821,7 +2969,7 @@ paths:
                                 title: Configmap
                               csi:
                                 allOf:
-                                  - &ref_73
+                                  - &ref_76
                                     properties:
                                       driver:
                                         description: Driver is the name of the CSI driver that handles this volume. Consult with your admin for the correct name as registered in the cluster.
@@ -2833,7 +2981,7 @@ paths:
                                         type: string
                                       nodePublishSecretRef:
                                         allOf:
-                                          - *ref_65
+                                          - *ref_68
                                         description: NodePublishSecretRef is a reference to the secret object containing sensitive information to pass to the CSI driver to complete the CSI NodePublishVolume and NodeUnpublishVolume calls. This field is optional, and  may be empty if no secret is required. If the secret object contains more than one secret, all secret references are passed.
                                         title: Nodepublishsecretref
                                       readOnly:
@@ -2854,7 +3002,7 @@ paths:
                                 title: Csi
                               downwardAPI:
                                 allOf:
-                                  - &ref_81
+                                  - &ref_84
                                     properties:
                                       defaultMode:
                                         description: 'Optional: mode bits to use on created files by default. Must be a value between 0 and 0777. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
@@ -2862,11 +3010,11 @@ paths:
                                         type: integer
                                       items:
                                         description: Items is a list of downward API volume file
-                                        items: &ref_69
+                                        items: &ref_72
                                           properties:
                                             fieldRef:
                                               allOf:
-                                                - *ref_66
+                                                - *ref_69
                                               description: 'Required: Selects a field of the pod: only annotations, labels, name and namespace are supported.'
                                               title: Fieldref
                                             mode:
@@ -2879,7 +3027,7 @@ paths:
                                               type: string
                                             resourceFieldRef:
                                               allOf:
-                                                - *ref_67
+                                                - *ref_70
                                               description: 'Selects a resource of the container: only resources limits and requests (limits.cpu, limits.memory, requests.cpu and requests.memory) are currently supported.'
                                               title: Resourcefieldref
                                           required:
@@ -2894,7 +3042,7 @@ paths:
                                 title: Downwardapi
                               emptyDir:
                                 allOf:
-                                  - &ref_83
+                                  - &ref_86
                                     properties:
                                       medium:
                                         description: 'What type of storage medium should back this directory. The default is "" which means to use the node''s default medium. Must be an empty string (default) or Memory. More info: https://kubernetes.io/docs/concepts/storage/volumes#emptydir'
@@ -2902,7 +3050,7 @@ paths:
                                         type: string
                                       sizeLimit:
                                         allOf:
-                                          - *ref_47
+                                          - *ref_50
                                         description: 'Total amount of local storage required for this EmptyDir volume. The size limit is also applicable for memory medium. The maximum usage on memory medium EmptyDir would be the minimum value between the SizeLimit specified here and the sum of memory limits of all containers in a pod. The default is nil which means that the limit is undefined. More info: http://kubernetes.io/docs/user-guide/volumes#emptydir'
                                         title: Sizelimit
                                     title: EmptyDirVolumeSource
@@ -2911,7 +3059,7 @@ paths:
                                 title: Emptydir
                               fc:
                                 allOf:
-                                  - &ref_85
+                                  - &ref_88
                                     properties:
                                       fsType:
                                         description: Filesystem type to mount. Must be a filesystem type supported by the host operating system. Ex. "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
@@ -2943,7 +3091,7 @@ paths:
                                 title: Fc
                               flexVolume:
                                 allOf:
-                                  - &ref_86
+                                  - &ref_89
                                     properties:
                                       driver:
                                         description: Driver is the name of the driver to use for this volume.
@@ -2965,7 +3113,7 @@ paths:
                                         type: boolean
                                       secretRef:
                                         allOf:
-                                          - *ref_65
+                                          - *ref_68
                                         description: 'Optional: SecretRef is reference to the secret object containing sensitive information to pass to the plugin scripts. This may be empty if no secret object is specified. If the secret object contains more than one secret, all secrets are passed to the plugin scripts.'
                                         title: Secretref
                                     required:
@@ -2976,7 +3124,7 @@ paths:
                                 title: Flexvolume
                               flocker:
                                 allOf:
-                                  - &ref_87
+                                  - &ref_90
                                     properties:
                                       datasetName:
                                         description: Name of the dataset stored as metadata -> name on the dataset for Flocker should be considered as deprecated
@@ -2992,7 +3140,7 @@ paths:
                                 title: Flocker
                               gcePersistentDisk:
                                 allOf:
-                                  - &ref_88
+                                  - &ref_91
                                     properties:
                                       fsType:
                                         description: 'Filesystem type of the volume that you want to mount. Tip: Ensure that the filesystem type is supported by the host operating system. Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified. More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk'
@@ -3018,7 +3166,7 @@ paths:
                                 title: Gcepersistentdisk
                               gitRepo:
                                 allOf:
-                                  - &ref_89
+                                  - &ref_92
                                     properties:
                                       directory:
                                         description: Target directory name. Must not contain or start with '..'.  If '.' is supplied, the volume directory will be the git repository.  Otherwise, if specified, the volume will contain the git repository in the subdirectory with the given name.
@@ -3040,7 +3188,7 @@ paths:
                                 title: Gitrepo
                               glusterfs:
                                 allOf:
-                                  - &ref_90
+                                  - &ref_93
                                     properties:
                                       endpoints:
                                         description: 'EndpointsName is the endpoint name that details Glusterfs topology. More info: https://releases.k8s.io/HEAD/examples/volumes/glusterfs/README.md#create-a-pod'
@@ -3063,7 +3211,7 @@ paths:
                                 title: Glusterfs
                               hostPath:
                                 allOf:
-                                  - &ref_91
+                                  - &ref_94
                                     properties:
                                       path:
                                         description: 'Path of the directory on the host. If the path is a symlink, it will follow the link to the real path. More info: https://kubernetes.io/docs/concepts/storage/volumes#hostpath'
@@ -3081,7 +3229,7 @@ paths:
                                 title: Hostpath
                               iscsi:
                                 allOf:
-                                  - &ref_92
+                                  - &ref_95
                                     properties:
                                       chapAuthDiscovery:
                                         description: whether support iSCSI Discovery CHAP authentication
@@ -3123,7 +3271,7 @@ paths:
                                         type: boolean
                                       secretRef:
                                         allOf:
-                                          - *ref_65
+                                          - *ref_68
                                         description: CHAP Secret for iSCSI target and initiator authentication
                                         title: Secretref
                                       targetPortal:
@@ -3144,7 +3292,7 @@ paths:
                                 type: string
                               nfs:
                                 allOf:
-                                  - &ref_96
+                                  - &ref_99
                                     properties:
                                       path:
                                         description: 'Path that is exported by the NFS server. More info: https://kubernetes.io/docs/concepts/storage/volumes#nfs'
@@ -3167,7 +3315,7 @@ paths:
                                 title: Nfs
                               persistentVolumeClaim:
                                 allOf:
-                                  - &ref_103
+                                  - &ref_106
                                     properties:
                                       claimName:
                                         description: 'ClaimName is the name of a PersistentVolumeClaim in the same namespace as the pod using this volume. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims'
@@ -3185,7 +3333,7 @@ paths:
                                 title: Persistentvolumeclaim
                               photonPersistentDisk:
                                 allOf:
-                                  - &ref_104
+                                  - &ref_107
                                     properties:
                                       fsType:
                                         description: Filesystem type to mount. Must be a filesystem type supported by the host operating system. Ex. "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
@@ -3203,7 +3351,7 @@ paths:
                                 title: Photonpersistentdisk
                               portworxVolume:
                                 allOf:
-                                  - &ref_108
+                                  - &ref_111
                                     properties:
                                       fsType:
                                         description: FSType represents the filesystem type to mount Must be a filesystem type supported by the host operating system. Ex. "ext4", "xfs". Implicitly inferred to be "ext4" if unspecified.
@@ -3225,7 +3373,7 @@ paths:
                                 title: Portworxvolume
                               projected:
                                 allOf:
-                                  - &ref_110
+                                  - &ref_113
                                     properties:
                                       defaultMode:
                                         description: Mode bits to use on created files by default. Must be a value between 0 and 0777. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.
@@ -3233,15 +3381,15 @@ paths:
                                         type: integer
                                       sources:
                                         description: list of volume projections
-                                        items: &ref_124
+                                        items: &ref_127
                                           properties:
                                             configMap:
                                               allOf:
-                                                - &ref_77
+                                                - &ref_80
                                                   properties:
                                                     items:
                                                       description: If unspecified, each key-value pair in the Data field of the referenced ConfigMap will be projected into the volume as a file whose name is the key and content is the value. If specified, the listed keys will be projected into the specified paths, and unlisted keys will not be present. If a key is specified which is not present in the ConfigMap, the volume setup will error unless it is marked optional. Paths must be relative and may not contain the '..' path or start with '..'.
-                                                      items: *ref_68
+                                                      items: *ref_71
                                                       title: Items
                                                       type: array
                                                     name:
@@ -3258,11 +3406,11 @@ paths:
                                               title: Configmap
                                             downwardAPI:
                                               allOf:
-                                                - &ref_80
+                                                - &ref_83
                                                   properties:
                                                     items:
                                                       description: Items is a list of DownwardAPIVolume file
-                                                      items: *ref_69
+                                                      items: *ref_72
                                                       title: Items
                                                       type: array
                                                   title: DownwardAPIProjection
@@ -3271,11 +3419,11 @@ paths:
                                               title: Downwardapi
                                             secret:
                                               allOf:
-                                                - &ref_115
+                                                - &ref_118
                                                   properties:
                                                     items:
                                                       description: If unspecified, each key-value pair in the Data field of the referenced Secret will be projected into the volume as a file whose name is the key and content is the value. If specified, the listed keys will be projected into the specified paths, and unlisted keys will not be present. If a key is specified which is not present in the Secret, the volume setup will error unless it is marked optional. Paths must be relative and may not contain the '..' path or start with '..'.
-                                                      items: *ref_68
+                                                      items: *ref_71
                                                       title: Items
                                                       type: array
                                                     name:
@@ -3292,7 +3440,7 @@ paths:
                                               title: Secret
                                             serviceAccountToken:
                                               allOf:
-                                                - &ref_118
+                                                - &ref_121
                                                   properties:
                                                     audience:
                                                       description: Audience is the intended audience of the token. A recipient of a token must identify itself with an identifier specified in the audience of the token, and otherwise should reject the token. The audience defaults to the identifier of the apiserver.
@@ -3324,7 +3472,7 @@ paths:
                                 title: Projected
                               quobyte:
                                 allOf:
-                                  - &ref_112
+                                  - &ref_115
                                     properties:
                                       group:
                                         description: Group to map volume access to Default is no group
@@ -3359,7 +3507,7 @@ paths:
                                 title: Quobyte
                               rbd:
                                 allOf:
-                                  - &ref_113
+                                  - &ref_116
                                     properties:
                                       fsType:
                                         description: 'Filesystem type of the volume that you want to mount. Tip: Ensure that the filesystem type is supported by the host operating system. Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified. More info: https://kubernetes.io/docs/concepts/storage/volumes#rbd'
@@ -3389,7 +3537,7 @@ paths:
                                         type: boolean
                                       secretRef:
                                         allOf:
-                                          - *ref_65
+                                          - *ref_68
                                         description: 'SecretRef is name of the authentication secret for RBDUser. If provided overrides keyring. Default is nil. More info: https://releases.k8s.io/HEAD/examples/volumes/rbd/README.md#how-to-use-it'
                                         title: Secretref
                                       user:
@@ -3405,7 +3553,7 @@ paths:
                                 title: Rbd
                               scaleIO:
                                 allOf:
-                                  - &ref_114
+                                  - &ref_117
                                     properties:
                                       fsType:
                                         description: Filesystem type to mount. Must be a filesystem type supported by the host operating system. Ex. "ext4", "xfs", "ntfs". Default is "xfs".
@@ -3425,7 +3573,7 @@ paths:
                                         type: boolean
                                       secretRef:
                                         allOf:
-                                          - *ref_65
+                                          - *ref_68
                                         description: SecretRef references to the secret for ScaleIO user and other sensitive information. If this is not provided, Login operation will fail.
                                         title: Secretref
                                       sslEnabled:
@@ -3458,7 +3606,7 @@ paths:
                                 title: Scaleio
                               secret:
                                 allOf:
-                                  - &ref_117
+                                  - &ref_120
                                     properties:
                                       defaultMode:
                                         description: 'Optional: mode bits to use on created files by default. Must be a value between 0 and 0777. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.'
@@ -3466,7 +3614,7 @@ paths:
                                         type: integer
                                       items:
                                         description: If unspecified, each key-value pair in the Data field of the referenced Secret will be projected into the volume as a file whose name is the key and content is the value. If specified, the listed keys will be projected into the specified paths, and unlisted keys will not be present. If a key is specified which is not present in the Secret, the volume setup will error unless it is marked optional. Paths must be relative and may not contain the '..' path or start with '..'.
-                                        items: *ref_68
+                                        items: *ref_71
                                         title: Items
                                         type: array
                                       optional:
@@ -3483,7 +3631,7 @@ paths:
                                 title: Secret
                               storageos:
                                 allOf:
-                                  - &ref_121
+                                  - &ref_124
                                     properties:
                                       fsType:
                                         description: Filesystem type to mount. Must be a filesystem type supported by the host operating system. Ex. "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
@@ -3495,7 +3643,7 @@ paths:
                                         type: boolean
                                       secretRef:
                                         allOf:
-                                          - *ref_65
+                                          - *ref_68
                                         description: SecretRef specifies the secret to use for obtaining the StorageOS API credentials.  If not specified, default values will be attempted.
                                         title: Secretref
                                       volumeName:
@@ -3512,7 +3660,7 @@ paths:
                                 title: Storageos
                               vsphereVolume:
                                 allOf:
-                                  - &ref_125
+                                  - &ref_128
                                     properties:
                                       fsType:
                                         description: Filesystem type to mount. Must be a filesystem type supported by the host operating system. Ex. "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
@@ -3552,97 +3700,97 @@ paths:
                           description: The Kubernetes service account to assign to the Spark application pods If empty Ocean Spark will use the default `spark-driver` service account
                       components:
                         schemas:
-                          AWSElasticBlockStoreVolumeSource: *ref_70
-                          Affinity: *ref_53
-                          AzureDiskVolumeSource: *ref_71
-                          AzureFileVolumeSource: *ref_72
-                          CSIVolumeSource: *ref_73
-                          Capabilities: *ref_74
-                          CephFSVolumeSource: *ref_75
-                          CinderVolumeSource: *ref_76
-                          ConfigMapProjection: *ref_77
-                          ConfigMapVolumeSource: *ref_78
-                          Dependencies: *ref_79
-                          DownwardAPIProjection: *ref_80
-                          DownwardAPIVolumeFile: *ref_69
-                          DownwardAPIVolumeSource: *ref_81
-                          DriverSpec: *ref_82
-                          EmptyDirVolumeSource: *ref_83
-                          Env: *ref_41
-                          EnvSecretKeyRefs: *ref_56
-                          EnvVars: *ref_57
-                          ExecutorSpec: *ref_84
-                          FCVolumeSource: *ref_85
-                          FlexVolumeSource: *ref_86
-                          FlockerVolumeSource: *ref_87
-                          GCEPersistentDiskVolumeSource: *ref_88
-                          GitRepoVolumeSource: *ref_89
-                          GlusterfsVolumeSource: *ref_90
-                          HostAlias: *ref_58
-                          HostPathVolumeSource: *ref_91
-                          InstanceSelector: *ref_59
-                          InstanceAllowList: *ref_60
-                          ISCSIVolumeSource: *ref_92
-                          K8sName: *ref_93
-                          KeyToPath: *ref_68
-                          LabelSelector: *ref_94
-                          LabelSelectorRequirement: *ref_95
-                          LocalObjectReference: *ref_65
-                          NFSVolumeSource: *ref_96
-                          NameKey: *ref_97
-                          NamePath: *ref_54
-                          NodeAffinity: *ref_98
-                          NodeSelector: *ref_99
-                          NodeSelectorRequirement: *ref_34
-                          NodeSelectorTerm: *ref_35
-                          ObjectFieldSelector: *ref_66
-                          StaticMemoryString: *ref_100
-                          OOMRecoveryStrategy: *ref_101
-                          MemoryAutotuningStrategy: *ref_102
-                          PersistentVolumeClaimVolumeSource: *ref_103
-                          PhotonPersistentDiskVolumeSource: *ref_104
-                          PodAffinity: *ref_105
-                          PodAffinityTerm: *ref_36
-                          PodAntiAffinity: *ref_106
-                          PodDNSConfigOption: *ref_107
-                          PodDNSConfig: *ref_55
-                          PodSecurityContext: *ref_61
-                          PortworxVolumeSource: *ref_108
-                          PreferredSchedulingTerm: *ref_109
-                          ProjectedVolumeSource: *ref_110
-                          PythonVersion: *ref_111
-                          Quantity: *ref_47
-                          QuobyteVolumeSource: *ref_112
-                          RBDVolumeSource: *ref_113
-                          ResourceFieldSelector: *ref_67
-                          SELinuxOptions: *ref_49
-                          ScaleIOVolumeSource: *ref_114
-                          SecretInfo: *ref_62
-                          SecretProjection: *ref_115
-                          SecretType: *ref_116
-                          SecretVolumeSource: *ref_117
-                          SecurityContext: *ref_51
-                          ServiceAccountTokenProjection: *ref_118
-                          SparkApplicationType: *ref_119
-                          Shuffle: *ref_120
-                          StorageOSVolumeSource: *ref_121
-                          Sysctl: *ref_122
-                          Toleration: *ref_63
-                          VngIds: *ref_64
-                          Volume: *ref_123
-                          VolumeMount: *ref_52
-                          VolumeProjection: *ref_124
-                          VsphereVirtualDiskVolumeSource: *ref_125
-                          WeightedPodAffinityTerm: *ref_37
-                          WindowsSecurityContextOptions: *ref_50
-                          Container: *ref_48
-                          EnvVar: *ref_126
-                          EnvVarSource: *ref_127
-                          Lifecycle: *ref_42
-                          Handler: *ref_40
-                          ExecAction: *ref_43
-                          HTTPGetAction: *ref_44
-                          HTTPHeader: *ref_128
+                          AWSElasticBlockStoreVolumeSource: *ref_73
+                          Affinity: *ref_56
+                          AzureDiskVolumeSource: *ref_74
+                          AzureFileVolumeSource: *ref_75
+                          CSIVolumeSource: *ref_76
+                          Capabilities: *ref_77
+                          CephFSVolumeSource: *ref_78
+                          CinderVolumeSource: *ref_79
+                          ConfigMapProjection: *ref_80
+                          ConfigMapVolumeSource: *ref_81
+                          Dependencies: *ref_82
+                          DownwardAPIProjection: *ref_83
+                          DownwardAPIVolumeFile: *ref_72
+                          DownwardAPIVolumeSource: *ref_84
+                          DriverSpec: *ref_85
+                          EmptyDirVolumeSource: *ref_86
+                          Env: *ref_44
+                          EnvSecretKeyRefs: *ref_59
+                          EnvVars: *ref_60
+                          ExecutorSpec: *ref_87
+                          FCVolumeSource: *ref_88
+                          FlexVolumeSource: *ref_89
+                          FlockerVolumeSource: *ref_90
+                          GCEPersistentDiskVolumeSource: *ref_91
+                          GitRepoVolumeSource: *ref_92
+                          GlusterfsVolumeSource: *ref_93
+                          HostAlias: *ref_61
+                          HostPathVolumeSource: *ref_94
+                          InstanceSelector: *ref_62
+                          InstanceAllowList: *ref_63
+                          ISCSIVolumeSource: *ref_95
+                          K8sName: *ref_96
+                          KeyToPath: *ref_71
+                          LabelSelector: *ref_97
+                          LabelSelectorRequirement: *ref_98
+                          LocalObjectReference: *ref_68
+                          NFSVolumeSource: *ref_99
+                          NameKey: *ref_100
+                          NamePath: *ref_57
+                          NodeAffinity: *ref_101
+                          NodeSelector: *ref_102
+                          NodeSelectorRequirement: *ref_37
+                          NodeSelectorTerm: *ref_38
+                          ObjectFieldSelector: *ref_69
+                          StaticMemoryString: *ref_103
+                          OOMRecoveryStrategy: *ref_104
+                          MemoryAutotuningStrategy: *ref_105
+                          PersistentVolumeClaimVolumeSource: *ref_106
+                          PhotonPersistentDiskVolumeSource: *ref_107
+                          PodAffinity: *ref_108
+                          PodAffinityTerm: *ref_39
+                          PodAntiAffinity: *ref_109
+                          PodDNSConfigOption: *ref_110
+                          PodDNSConfig: *ref_58
+                          PodSecurityContext: *ref_64
+                          PortworxVolumeSource: *ref_111
+                          PreferredSchedulingTerm: *ref_112
+                          ProjectedVolumeSource: *ref_113
+                          PythonVersion: *ref_114
+                          Quantity: *ref_50
+                          QuobyteVolumeSource: *ref_115
+                          RBDVolumeSource: *ref_116
+                          ResourceFieldSelector: *ref_70
+                          SELinuxOptions: *ref_52
+                          ScaleIOVolumeSource: *ref_117
+                          SecretInfo: *ref_65
+                          SecretProjection: *ref_118
+                          SecretType: *ref_119
+                          SecretVolumeSource: *ref_120
+                          SecurityContext: *ref_54
+                          ServiceAccountTokenProjection: *ref_121
+                          SparkApplicationType: *ref_122
+                          Shuffle: *ref_123
+                          StorageOSVolumeSource: *ref_124
+                          Sysctl: *ref_125
+                          Toleration: *ref_66
+                          VngIds: *ref_67
+                          Volume: *ref_126
+                          VolumeMount: *ref_55
+                          VolumeProjection: *ref_127
+                          VsphereVirtualDiskVolumeSource: *ref_128
+                          WeightedPodAffinityTerm: *ref_40
+                          WindowsSecurityContextOptions: *ref_53
+                          Container: *ref_51
+                          EnvVar: *ref_129
+                          EnvVarSource: *ref_130
+                          Lifecycle: *ref_45
+                          Handler: *ref_43
+                          ExecAction: *ref_46
+                          HTTPGetAction: *ref_47
+                          HTTPHeader: *ref_131
                           HTTPValidationError:
                             title: HTTPValidationError
                             type: object
@@ -3650,7 +3798,7 @@ paths:
                               detail:
                                 title: Detail
                                 type: array
-                                items: &ref_137
+                                items: &ref_140
                                   title: ValidationError
                                   required:
                                     - loc
@@ -3669,26 +3817,33 @@ paths:
                                     type:
                                       title: Error Type
                                       type: string
-                          Probe: *ref_46
-                          ResourceRequirements: *ref_129
-                          ConfigMapKeySelector: *ref_130
-                          SecretKeySelector: *ref_131
-                          EnvFromSource: *ref_132
-                          ConfigMapEnvSource: *ref_133
-                          SecretEnvSource: *ref_134
-                          IntOrString: *ref_39
-                          TCPSocketAction: *ref_45
-                          ContainerPort: *ref_135
-                          VolumeDevice: *ref_136
-                          ValidationError: *ref_137
-                          TimeoutSpec: *ref_138
-                          TimeoutPolicy: *ref_139
-                configTemplateId: &ref_150
+                          Probe: *ref_49
+                          ResourceRequirements: *ref_132
+                          ConfigMapKeySelector: *ref_133
+                          SecretKeySelector: *ref_134
+                          EnvFromSource: *ref_135
+                          ConfigMapEnvSource: *ref_136
+                          SecretEnvSource: *ref_137
+                          IntOrString: *ref_42
+                          TCPSocketAction: *ref_48
+                          ContainerPort: *ref_138
+                          VolumeDevice: *ref_139
+                          ValidationError: *ref_140
+                          TimeoutSpec: *ref_141
+                          TimeoutPolicy: *ref_142
+                      example: &ref_160
+                        driver: *ref_143
+                        executor: *ref_144
+                        priority: low
+                        pythonVersion: '3'
+                configTemplateId: &ref_155
                   allOf:
-                    - *ref_14
+                    - *ref_17
                     - description: A unique identifier for a configuration template, set by the user.
                       example: large-app
-                submissionSource: *ref_20
+                submissionSource: *ref_23
+              example:
+                submissionSource: public-api
       responses:
         '200':
           description: A Spark application just submitted
@@ -3696,7 +3851,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_4
+                  - *ref_7
                   - type: object
                     properties:
                       response:
@@ -3721,21 +3876,21 @@ paths:
                                 - createdAt
                                 - updatedAt
                               allOf:
-                                - *ref_17
+                                - *ref_20
                                 - type: object
                                   description: |
                                     The description of a Spark application
                                   properties:
-                                    id: *ref_33
-                                    displayName: *ref_140
-                                    accountId: *ref_141
-                                    organizationId: *ref_142
-                                    userId: *ref_18
-                                    clusterId: *ref_7
-                                    controllerClusterId: *ref_3
-                                    appState: *ref_19
-                                    submissionSource: *ref_20
-                                    appType: *ref_21
+                                    id: *ref_36
+                                    displayName: *ref_145
+                                    accountId: *ref_146
+                                    organizationId: *ref_147
+                                    userId: *ref_21
+                                    clusterId: *ref_10
+                                    controllerClusterId: *ref_6
+                                    appState: *ref_22
+                                    submissionSource: *ref_23
+                                    appType: *ref_24
                                     job:
                                       type: object
                                       description: |
@@ -3744,9 +3899,11 @@ paths:
                                         - id
                                         - displayName
                                       properties:
-                                        id: *ref_22
-                                        displayName: *ref_143
-                                    config: *ref_144
+                                        id: *ref_25
+                                        displayName: *ref_148
+                                      example:
+                                        displayName: Daily Reporting
+                                    config: *ref_149
                                     startedAt:
                                       type: string
                                       format: date-time
@@ -3759,7 +3916,7 @@ paths:
                                       description: |
                                         The time when the Spark application terminated.
                                       example: '2021-11-18T17:09:37+00:00'
-                                    killRequestedAt: *ref_145
+                                    killRequestedAt: *ref_150
                                     liveLog:
                                       type: object
                                       description: API pointers to endpoints serving logs and events related to the Spark application
@@ -3774,7 +3931,10 @@ paths:
                                           format: uri
                                           description: URL of the endpoint serving a stream of Kubernetes events
                                           example: /ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/kubeEvents/live
-                                    sparkEventLog: &ref_146
+                                      example:
+                                        logsStreamUrl: /ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/logs/live
+                                        kubeEventsStreamUrl: /ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/kubeEvents/live
+                                    sparkEventLog: &ref_151
                                       type: object
                                       properties:
                                         createdAt:
@@ -3794,7 +3954,11 @@ paths:
                                           description: |
                                             The availability of the Spark event log.
                                           example: COMPLETE
-                                    configurationTemplate: &ref_147
+                                      example:
+                                        createdAt: '2019-08-24T14:15:22Z'
+                                        updatedAt: '2019-08-24T14:15:22Z'
+                                        availability: COMPLETE
+                                    configurationTemplate: &ref_152
                                       type: object
                                       description: |
                                         The configuration template used to create the Spark application.
@@ -3809,7 +3973,10 @@ paths:
                                           description: |
                                             The display name of the configuration template.
                                           example: string
-                                    cores: *ref_38
+                                      example:
+                                        id: string
+                                        displayName: string
+                                    cores: *ref_41
         '400':
           description: Bad Request
   /ocean/spark/cluster/{clusterId}/app/{applicationId}:
@@ -3822,13 +3989,13 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_6
         - *ref_9
-        - &ref_149
+        - *ref_12
+        - &ref_154
           in: path
           name: applicationId
           required: true
-          schema: *ref_33
+          schema: *ref_36
       responses:
         '200':
           description: A Spark application
@@ -3836,7 +4003,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_4
+                  - *ref_7
                   - type: object
                     properties:
                       response:
@@ -3861,20 +4028,20 @@ paths:
                                 - createdAt
                                 - updatedAt
                               allOf:
-                                - *ref_17
+                                - *ref_20
                                 - type: object
                                   description: |
                                     The description of a Spark application
                                   properties:
-                                    id: *ref_33
-                                    displayName: *ref_140
-                                    accountId: *ref_141
-                                    organizationId: *ref_142
-                                    userId: *ref_18
-                                    clusterId: *ref_7
-                                    controllerClusterId: *ref_3
-                                    appState: *ref_19
-                                    submissionSource: *ref_20
+                                    id: *ref_36
+                                    displayName: *ref_145
+                                    accountId: *ref_146
+                                    organizationId: *ref_147
+                                    userId: *ref_21
+                                    clusterId: *ref_10
+                                    controllerClusterId: *ref_6
+                                    appState: *ref_22
+                                    submissionSource: *ref_23
                                     job:
                                       type: object
                                       description: |
@@ -3883,9 +4050,11 @@ paths:
                                         - id
                                         - displayName
                                       properties:
-                                        id: *ref_22
-                                        displayName: *ref_143
-                                    config: *ref_144
+                                        id: *ref_25
+                                        displayName: *ref_148
+                                      example:
+                                        displayName: Daily Reporting
+                                    config: *ref_149
                                     startedAt:
                                       type: string
                                       format: date-time
@@ -3898,7 +4067,7 @@ paths:
                                       description: |
                                         The time when the Spark application terminated.
                                       example: '2021-11-18T17:09:37+00:00'
-                                    killRequestedAt: *ref_145
+                                    killRequestedAt: *ref_150
                                     liveLog:
                                       type: object
                                       description: API pointers to endpoints serving logs and events related to the Spark application
@@ -3913,11 +4082,14 @@ paths:
                                           format: uri
                                           description: URL of the endpoint serving a stream of Kubernetes events
                                           example: /ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/kubeEvents/live
-                                    metrics: *ref_23
-                                    sparkEventLog: *ref_146
-                                    configurationTemplate: *ref_147
-                                    cores: *ref_38
-                                    archiveLog: &ref_148
+                                      example:
+                                        logsStreamUrl: /ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/logs/live
+                                        kubeEventsStreamUrl: /ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/kubeEvents/live
+                                    metrics: *ref_26
+                                    sparkEventLog: *ref_151
+                                    configurationTemplate: *ref_152
+                                    cores: *ref_41
+                                    archiveLog: &ref_153
                                       type: object
                                       description: |
                                         The archive log of the Spark application.
@@ -3933,7 +4105,10 @@ paths:
                                           description: |
                                             The availability of the archive log of the Spark application.
                                           example: PENDING
-                                    executorLogs: *ref_148
+                                      example:
+                                        logsArchiveUrl: string
+                                        availability: PENDING
+                                    executorLogs: *ref_153
         '400':
           description: Bad Request
     delete:
@@ -3944,9 +4119,9 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_6
         - *ref_9
-        - *ref_149
+        - *ref_12
+        - *ref_154
       responses:
         '200':
           description: A killed Spark application
@@ -3954,7 +4129,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_4
+                  - *ref_7
                   - type: object
                     properties:
                       response:
@@ -3979,21 +4154,21 @@ paths:
                                 - createdAt
                                 - updatedAt
                               allOf:
-                                - *ref_17
+                                - *ref_20
                                 - type: object
                                   description: |
                                     The description of a Spark application
                                   properties:
-                                    id: *ref_33
-                                    displayName: *ref_140
-                                    accountId: *ref_141
-                                    organizationId: *ref_142
-                                    userId: *ref_18
-                                    clusterId: *ref_7
-                                    controllerClusterId: *ref_3
-                                    appState: *ref_19
-                                    submissionSource: *ref_20
-                                    appType: *ref_21
+                                    id: *ref_36
+                                    displayName: *ref_145
+                                    accountId: *ref_146
+                                    organizationId: *ref_147
+                                    userId: *ref_21
+                                    clusterId: *ref_10
+                                    controllerClusterId: *ref_6
+                                    appState: *ref_22
+                                    submissionSource: *ref_23
+                                    appType: *ref_24
                                     startedAt:
                                       type: string
                                       format: date-time
@@ -4006,7 +4181,7 @@ paths:
                                       description: |
                                         The time when the Spark application terminated.
                                       example: '2021-11-18T17:09:37+00:00'
-                                    killRequestedAt: *ref_145
+                                    killRequestedAt: *ref_150
                                     liveLog:
                                       type: object
                                       description: API pointers to endpoints serving logs and events related to the Spark application
@@ -4021,7 +4196,10 @@ paths:
                                           format: uri
                                           description: URL of the endpoint serving a stream of Kubernetes events
                                           example: /ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/kubeEvents/live
-                                    cores: *ref_38
+                                      example:
+                                        logsStreamUrl: /ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/logs/live
+                                        kubeEventsStreamUrl: /ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/kubeEvents/live
+                                    cores: *ref_41
         '400':
           description: Bad Request
   /ocean/spark/cluster/{clusterId}/app/{applicationId}/issues:
@@ -4034,9 +4212,9 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_6
         - *ref_9
-        - *ref_149
+        - *ref_12
+        - *ref_154
       responses:
         '200':
           description: |
@@ -4045,7 +4223,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_4
+                  - *ref_7
                   - type: object
                     properties:
                       response:
@@ -4090,9 +4268,9 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_6
         - *ref_9
-        - *ref_149
+        - *ref_12
+        - *ref_154
       responses:
         '200':
           description: A live stream of the driver log
@@ -4114,9 +4292,9 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_6
         - *ref_9
-        - *ref_149
+        - *ref_12
+        - *ref_154
       responses:
         '200':
           description: A file download of the driver's log archive
@@ -4137,9 +4315,9 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_6
         - *ref_9
-        - *ref_149
+        - *ref_12
+        - *ref_154
       responses:
         '200':
           description: A file download of the executors log archive
@@ -4160,9 +4338,9 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_6
         - *ref_9
-        - *ref_149
+        - *ref_12
+        - *ref_154
       responses:
         '200':
           description: A live stream of the Kubernetes events
@@ -4184,15 +4362,15 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_6
+        - *ref_9
       responses:
-        '200': &ref_151
+        '200': &ref_156
           description: A list of config templates (can be a single one)
           content:
             application/json:
               schema:
                 allOf:
-                  - *ref_4
+                  - *ref_7
                   - type: object
                     properties:
                       response:
@@ -4212,20 +4390,20 @@ paths:
                                 - clusterId
                                 - config
                               allOf:
-                                - *ref_17
+                                - *ref_20
                                 - type: object
                                   description: |
                                     The description of a configuration template
                                   properties:
-                                    id: *ref_150
-                                    displayName: &ref_152
+                                    id: *ref_155
+                                    displayName: &ref_157
                                       type: string
                                       description: |
                                         A non-unique free-form name for the config template used in the Spot console. Defaults to the config template ID.
                                       example: Large application
-                                    clusterId: *ref_7
-                                    controllerClusterId: *ref_3
-                                    config: *ref_144
+                                    clusterId: *ref_10
+                                    controllerClusterId: *ref_6
+                                    config: *ref_149
         '400':
           description: Bad Request
   /ocean/spark/cluster/{clusterId}/configTemplate:
@@ -4238,10 +4416,10 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_6
         - *ref_9
+        - *ref_12
       responses:
-        '200': *ref_151
+        '200': *ref_156
         '400':
           description: Bad Request
     post:
@@ -4252,8 +4430,8 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_6
         - *ref_9
+        - *ref_12
       requestBody:
         required: true
         content:
@@ -4264,15 +4442,17 @@ paths:
                 - id
                 - config
               properties:
-                id: *ref_150
-                displayName: *ref_152
+                id: *ref_155
+                displayName: *ref_157
                 config:
                   description: |
                     The piece of configuration contained in the config template.
                   allOf:
-                    - *ref_144
+                    - *ref_149
+              example:
+                displayName: Large application
       responses:
-        '200': *ref_151
+        '200': *ref_156
         '400':
           description: Bad Request
   /ocean/spark/cluster/{clusterId}/configTemplate/{configTemplateId}:
@@ -4285,15 +4465,15 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_6
         - *ref_9
-        - &ref_153
+        - *ref_12
+        - &ref_158
           in: path
           name: configTemplateId
           required: true
-          schema: *ref_150
+          schema: *ref_155
       responses:
-        '200': *ref_151
+        '200': *ref_156
         '400':
           description: Bad Request
     put:
@@ -4304,9 +4484,9 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_6
         - *ref_9
-        - *ref_153
+        - *ref_12
+        - *ref_158
       requestBody:
         required: true
         content:
@@ -4314,14 +4494,16 @@ paths:
             schema:
               type: object
               properties:
-                displayName: *ref_152
+                displayName: *ref_157
                 config:
                   description: |
                     The piece of configuration that will replace the existing configuration
                   allOf:
-                    - *ref_144
+                    - *ref_149
+              example:
+                displayName: Large application
       responses:
-        '200': *ref_151
+        '200': *ref_156
         '400':
           description: Bad Request
     delete:
@@ -4332,9 +4514,9 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_6
         - *ref_9
-        - *ref_153
+        - *ref_12
+        - *ref_158
       responses:
         '204':
           description: Config Template Deleted
@@ -4350,15 +4532,15 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_6
+        - *ref_9
       responses:
-        '200': &ref_155
+        '200': &ref_161
           description: A paginated list of Ocean Spark jobs
           content:
             application/json:
               schema:
                 allOf:
-                  - *ref_4
+                  - *ref_7
                   - type: object
                     properties:
                       response:
@@ -4370,7 +4552,7 @@ paths:
                             type: array
                             items:
                               allOf:
-                                - *ref_154
+                                - *ref_159
                                 - type: object
                                   properties:
                                     page:
@@ -4389,15 +4571,15 @@ paths:
                                         description: |
                                           The description of an Ocean Spark job
                                         properties:
-                                          id: *ref_22
-                                          displayName: *ref_143
-                                          controllerClusterId: *ref_3
-                                          clusterId: *ref_7
-                                          organizationId: *ref_142
-                                          accountId: *ref_141
-                                          createdAt: *ref_12
-                                          updatedAt: *ref_13
-                                          lastApp: &ref_156
+                                          id: *ref_25
+                                          displayName: *ref_148
+                                          controllerClusterId: *ref_6
+                                          clusterId: *ref_10
+                                          organizationId: *ref_147
+                                          accountId: *ref_146
+                                          createdAt: *ref_15
+                                          updatedAt: *ref_16
+                                          lastApp: &ref_162
                                             type: object
                                             required:
                                               - id
@@ -4412,21 +4594,21 @@ paths:
                                               - createdAt
                                               - updatedAt
                                             allOf:
-                                              - *ref_17
+                                              - *ref_20
                                               - type: object
                                                 description: |
                                                   The description of a Spark application
                                                 properties:
-                                                  id: *ref_33
-                                                  displayName: *ref_140
-                                                  accountId: *ref_141
-                                                  organizationId: *ref_142
-                                                  userId: *ref_18
-                                                  clusterId: *ref_7
-                                                  controllerClusterId: *ref_3
-                                                  appState: *ref_19
-                                                  submissionSource: *ref_20
-                                                  appType: *ref_21
+                                                  id: *ref_36
+                                                  displayName: *ref_145
+                                                  accountId: *ref_146
+                                                  organizationId: *ref_147
+                                                  userId: *ref_21
+                                                  clusterId: *ref_10
+                                                  controllerClusterId: *ref_6
+                                                  appState: *ref_22
+                                                  submissionSource: *ref_23
+                                                  appType: *ref_24
                                                   startedAt:
                                                     type: string
                                                     format: date-time
@@ -4439,7 +4621,7 @@ paths:
                                                     description: |
                                                       The time when the Spark application terminated.
                                                     example: '2021-11-18T17:09:37+00:00'
-                                                  killRequestedAt: *ref_145
+                                                  killRequestedAt: *ref_150
                                                   liveLog:
                                                     type: object
                                                     description: API pointers to endpoints serving logs and events related to the Spark application
@@ -4454,9 +4636,21 @@ paths:
                                                         format: uri
                                                         description: URL of the endpoint serving a stream of Kubernetes events
                                                         example: /ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/kubeEvents/live
-                                                  metrics: *ref_23
-                                                  cores: *ref_38
-                                          config: *ref_144
+                                                    example:
+                                                      logsStreamUrl: /ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/logs/live
+                                                      kubeEventsStreamUrl: /ocean/spark/cluster/osc-20fac3f1/app/daily-reporting-2021-08-18/kubeEvents/live
+                                                  metrics: *ref_26
+                                                  cores: *ref_41
+                                          config: *ref_149
+                                        example:
+                                          displayName: Daily Reporting
+                                          controllerClusterId: my-ocean-cluster
+                                          clusterId: osc-20fac3f1
+                                          organizationId: 606012341234
+                                          accountId: act-123456789
+                                          createdAt: 2018-10-10T10:50:29.000+0000
+                                          updatedAt: 2018-10-10T10:50:29.000+0000
+                                          config: *ref_160
         '400':
           description: Bad Request
   /ocean/spark/cluster/{clusterId}/job:
@@ -4469,10 +4663,10 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_6
         - *ref_9
+        - *ref_12
       responses:
-        '200': *ref_155
+        '200': *ref_161
         '400':
           description: Bad Request
   /ocean/spark/cluster/{clusterId}/job/{jobId}:
@@ -4485,13 +4679,13 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_6
         - *ref_9
-        - &ref_157
+        - *ref_12
+        - &ref_163
           in: path
           name: jobId
           required: true
-          schema: *ref_22
+          schema: *ref_25
         - in: query
           name: minCreatedAt
           required: false
@@ -4515,7 +4709,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_4
+                  - *ref_7
                   - type: object
                     properties:
                       response:
@@ -4539,20 +4733,39 @@ paths:
                               description: |
                                 The description of an Ocean Spark job with config
                               properties:
-                                id: *ref_22
-                                displayName: *ref_143
-                                organizationId: *ref_142
-                                accountId: *ref_141
-                                controllerClusterId: *ref_3
-                                clusterId: *ref_7
-                                createdAt: *ref_12
-                                updatedAt: *ref_13
-                                lastApp: *ref_156
+                                id: *ref_25
+                                displayName: *ref_148
+                                organizationId: *ref_147
+                                accountId: *ref_146
+                                controllerClusterId: *ref_6
+                                clusterId: *ref_10
+                                createdAt: *ref_15
+                                updatedAt: *ref_16
+                                lastApp: *ref_162
                                 history:
                                   description: The most recent Spark applications in this job.
                                   type: array
-                                  items: *ref_156
-                                config: *ref_144
+                                  items: *ref_162
+                                config: *ref_149
+                              example:
+                                displayName: Daily Reporting
+                                organizationId: 606012341234
+                                accountId: act-123456789
+                                controllerClusterId: my-ocean-cluster
+                                clusterId: osc-20fac3f1
+                                createdAt: 2018-10-10T10:50:29.000+0000
+                                updatedAt: 2018-10-10T10:50:29.000+0000
+                                config: *ref_160
+                        example:
+                          items:
+                            - displayName: Daily Reporting
+                              organizationId: 606012341234
+                              accountId: act-123456789
+                              controllerClusterId: my-ocean-cluster
+                              clusterId: osc-20fac3f1
+                              createdAt: 2018-10-10T10:50:29.000+0000
+                              updatedAt: 2018-10-10T10:50:29.000+0000
+                              config: *ref_160
         '400':
           description: Bad Request
   /ocean/spark/cluster/{clusterId}/job/{jobId}/config:
@@ -4564,9 +4777,9 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_6
         - *ref_9
-        - *ref_157
+        - *ref_12
+        - *ref_163
       requestBody:
         required: false
         content:
@@ -4578,7 +4791,7 @@ paths:
                   description: |
                     The piece of configuration that will replace the existing configuration, if empty then the job configuration will be removed
                   allOf:
-                    - *ref_144
+                    - *ref_149
       responses:
         '200':
           description: An Ocean Spark job
@@ -4586,7 +4799,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_4
+                  - *ref_7
                   - type: object
                     properties:
                       response:
@@ -4617,13 +4830,30 @@ paths:
                                     An internal ID describing the entity. As a user of Ocean Spark, you will never need this ID.
 
                                     Please use the `id` to interact with the API.
-                                id: *ref_22
-                                displayName: *ref_143
-                                controllerClusterId: *ref_3
-                                clusterId: *ref_7
-                                createdAt: *ref_12
-                                updatedAt: *ref_13
-                                config: *ref_144
+                                id: *ref_25
+                                displayName: *ref_148
+                                controllerClusterId: *ref_6
+                                clusterId: *ref_10
+                                createdAt: *ref_15
+                                updatedAt: *ref_16
+                                config: *ref_149
+                              example:
+                                internalId: fa61bb92-4bb7-49aa-87d3-7823bd263d1e
+                                displayName: Daily Reporting
+                                controllerClusterId: my-ocean-cluster
+                                clusterId: osc-20fac3f1
+                                createdAt: 2018-10-10T10:50:29.000+0000
+                                updatedAt: 2018-10-10T10:50:29.000+0000
+                                config: *ref_160
+                        example:
+                          items:
+                            - internalId: fa61bb92-4bb7-49aa-87d3-7823bd263d1e
+                              displayName: Daily Reporting
+                              controllerClusterId: my-ocean-cluster
+                              clusterId: osc-20fac3f1
+                              createdAt: 2018-10-10T10:50:29.000+0000
+                              updatedAt: 2018-10-10T10:50:29.000+0000
+                              config: *ref_160
         '400':
           description: Bad Request
   /ocean/spark/cluster/{clusterId}/virtualNodeGroup:
@@ -4636,8 +4866,8 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_9
-        - *ref_10
+        - *ref_12
+        - *ref_13
       requestBody:
         required: true
         content:
@@ -4672,7 +4902,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_4
+                  - *ref_7
                   - type: object
                     properties:
                       request:
@@ -4682,6 +4912,9 @@ paths:
                             example: /ocean/spark/osc-20fac3f1/virtualNodeGroup
                           method:
                             example: POST
+                        example:
+                          url: /ocean/spark/osc-20fac3f1/virtualNodeGroup
+                          method: POST
                       response:
                         type: object
                         properties:
@@ -4701,8 +4934,8 @@ paths:
                                   description: |
                                     The description of an Ocean Spark VNG
                                   properties:
-                                    oceanClusterId: *ref_0
-                                    oceanSparkClusterId: *ref_7
+                                    oceanClusterId: *ref_3
+                                    oceanSparkClusterId: *ref_10
                                     vngId:
                                       type: string
                                       example: ols-e3ea5883
@@ -4710,6 +4943,8 @@ paths:
                                         A unique identifier for the Ocean Virtual Node Group
                           kind:
                             example: spotinst:ocean:spark:vng
+                        example:
+                          kind: spotinst:ocean:spark:vng
         '400':
           description: Bad Request
     delete:
@@ -4720,8 +4955,8 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_6
         - *ref_9
+        - *ref_12
       responses:
         '200':
           description: Ok
@@ -4737,8 +4972,8 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_10
-        - *ref_9
+        - *ref_13
+        - *ref_12
       requestBody:
         required: false
         content:
@@ -4760,13 +4995,13 @@ paths:
                       description: The name of the workspace.
                       example: cosmos
       responses:
-        '200': &ref_158
+        '200': &ref_164
           description: A list of Ocean Spark workspace (can be a single workspace)
           content:
             application/json:
               schema:
                 allOf:
-                  - *ref_4
+                  - *ref_7
                   - type: object
                     properties:
                       response:
@@ -4793,7 +5028,7 @@ paths:
                                   description: |
                                     The description of an Ocean Spark workspace
                                   properties:
-                                    id: &ref_159
+                                    id: &ref_165
                                       type: string
                                       example: wksp-170654-1bc9c7a0
                                       description: |
@@ -4833,7 +5068,7 @@ paths:
                                       description: |
                                         The URL of the Ocean Spark workspace
                                       example: /api/ocean/spark/cluster/osc-93f1ae79/workspace/wksp-163018-b1ff5921/proxy
-                                - *ref_17
+                                - *ref_20
         '400':
           description: Bad Request
     get:
@@ -4844,10 +5079,10 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_10
-        - *ref_9
+        - *ref_13
+        - *ref_12
       responses:
-        '200': *ref_158
+        '200': *ref_164
         '400':
           description: Bad Request
   /ocean/spark/cluster/{clusterId}/workspace/{workspaceId}:
@@ -4860,15 +5095,15 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_10
-        - *ref_9
-        - &ref_160
+        - *ref_13
+        - *ref_12
+        - &ref_166
           in: path
           name: workspaceId
           required: true
-          schema: *ref_159
+          schema: *ref_165
       responses:
-        '200': *ref_158
+        '200': *ref_164
         '400':
           description: Bad Request
     delete:
@@ -4879,9 +5114,9 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_10
-        - *ref_9
-        - *ref_160
+        - *ref_13
+        - *ref_12
+        - *ref_166
       responses:
         '200':
           description: Ok
@@ -4897,11 +5132,11 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_10
-        - *ref_9
-        - *ref_160
+        - *ref_13
+        - *ref_12
+        - *ref_166
       responses:
-        '200': *ref_158
+        '200': *ref_164
         '400':
           description: Bad Request
   /ocean/spark/cluster/{clusterId}/workspace/{workspaceId}/stop:
@@ -4914,10 +5149,10 @@ paths:
       tags:
         - Ocean Spark
       parameters:
-        - *ref_10
-        - *ref_9
-        - *ref_160
+        - *ref_13
+        - *ref_12
+        - *ref_166
       responses:
-        '200': *ref_158
+        '200': *ref_164
         '400':
           description: Bad Request
