@@ -345,7 +345,7 @@ paths:
                                               - vng-123456
                                             items:
                                               type: string
-                                      - &ref_101
+                                      - &ref_99
                                         type: object
                                         description: |
                                           The Configuration for scheduling automatic upgrades of your cluster to ensure it stays updated with the latest version.
@@ -1959,7 +1959,7 @@ paths:
         - Ocean AKS
       parameters:
         - *ref_33
-        - &ref_99
+        - &ref_97
           in: query
           name: resourceGroupName
           example: test-clust_group
@@ -1968,7 +1968,7 @@ paths:
           schema:
             type: string
           required: true
-        - &ref_100
+        - &ref_98
           in: query
           name: aksClusterName
           example: test-cluster
@@ -4525,191 +4525,6 @@ paths:
                           kind: spotinst:azure:ocean:workloadMigration
         '400':
           description: Bad Request
-  /ocean/azure/np/cluster/{oceanClusterId}/rightSizing/suggestion:
-    post:
-      summary: Fetch Right Sizing Recommendations
-      description: |
-        Get right-sizing recommendations for an Ocean cluster and filter them according to namespace or label.
-      operationId: oceanAKSFilterRightSizingWithFilter
-      tags:
-        - Ocean AKS
-      parameters:
-        - *ref_37
-        - *ref_33
-      requestBody:
-        required: false
-        content:
-          application/json:
-            schema:
-              allOf:
-                - type: object
-                  properties:
-                    filter:
-                      type: object
-                      description: |
-                        Optional - may be null.
-                      properties:
-                        namespaces:
-                          type: array
-                          description: |
-                            Optional - may be null. If exists - should contain at least 1 item.
-                          items:
-                            type: string
-                          example: &ref_96
-                            - sparkSpace
-                            - kube-system
-                        attribute:
-                          type: object
-                          description: |
-                            Optional - may be null.
-                          required:
-                            - type
-                            - key
-                          properties:
-                            type:
-                              type: string
-                              enum:
-                                - label
-                                - annotation
-                              example: label
-                            key:
-                              type: string
-                              description: |
-                                May be any string, but shouldn't be empty.
-                              example: app
-                            operator:
-                              type: string
-                              description: |
-                                Optional - may be null.
-                              enum:
-                                - Equals
-                                - notEquals
-                                - exists
-                                - doesNotExist
-                              default: Equals
-                              example: Equals
-                            value:
-                              type: string
-                              description: |
-                                Required whenever the operator is "equals" or "notEquals". |
-                                If exists, may be any string.
-                              example: redis
-                          example:
-                            type: label
-                            key: app
-                            operator: Equals
-                            value: redis
-                      example:
-                        namespaces: *ref_96
-                        attribute:
-                          type: label
-                          key: app
-                          operator: Equals
-                          value: redis
-      responses:
-        '200':
-          description: Ocean RightSizing Recommendation Response
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - *ref_34
-                  - type: object
-                    properties:
-                      request:
-                        type: object
-                        properties:
-                          url:
-                            example: /ocean/azure/np/cluster/o-abcd1234/rightSizing/suggestion
-                          method:
-                            example: POST
-                        example:
-                          url: /ocean/azure/np/cluster/o-abcd1234/rightSizing/suggestion
-                          method: POST
-                      response:
-                        type: object
-                        properties:
-                          items:
-                            type: array
-                            items:
-                              type: object
-                              properties:
-                                resourceName:
-                                  type: string
-                                resourceType:
-                                  type: string
-                                namespace:
-                                  type: string
-                                suggestedCPU:
-                                  type: integer
-                                suggestedMemory:
-                                  type: integer
-                                requestedCPU:
-                                  type: integer
-                                requestedMemory:
-                                  type: integer
-                                containers:
-                                  type: array
-                                  items:
-                                    type: object
-                                    properties:
-                                      name:
-                                        type: string
-                                      requestedCPU:
-                                        type: integer
-                                      suggestedCPU:
-                                        type: integer
-                                      requestedMemory:
-                                        type: integer
-                                      suggestedMemory:
-                                        type: integer
-                            example: &ref_97
-                              - resourceName: redis-controller
-                                resourceType: deployment
-                                namespace: kube-system
-                                suggestedCPU: 4
-                                suggestedMemory: 19
-                                requestedCPU: 50
-                                requestedMemory: 50
-                                containers:
-                                  - name: dnsmasq
-                                    requestedCPU: 10
-                                    suggestedCPU: 2
-                                    requestedMemory: 40
-                                    suggestedMemory: 15
-                                  - name: sidecar
-                                    requestedCPU: 40
-                                    suggestedCPU: 2
-                                    requestedMemory: 10
-                                    suggestedMemory: 4
-                              - resourceName: test-redis
-                                resourceType: deployment
-                                namespace: sparkSpace
-                                suggestedCPU: 2
-                                suggestedMemory: 20
-                                requestedCPU: 50
-                                requestedMemory: 30
-                                containers:
-                                  - name: dns-controller
-                                    requestedCPU: 20
-                                    suggestedCPU: 1
-                                    requestedMemory: 20
-                                    suggestedMemory: 15
-                                  - name: kubedns
-                                    requestedCPU: 30
-                                    suggestedCPU: 1
-                                    requestedMemory: 10
-                                    suggestedMemory: 5
-                          count:
-                            example: 2
-                          kind:
-                            example: spotinst:ocean:azure:k8s:cluster:rightSizing:suggestion
-                        example:
-                          items: *ref_97
-                          count: 2
-                          kind: spotinst:ocean:azure:k8s:cluster:rightSizing:suggestion
-        '400':
-          description: Bad Request
   /ocean/azure/np/cluster/{oceanClusterId}/log:
     summary: Ocean for AKS
     get:
@@ -4844,7 +4659,7 @@ paths:
                               type: string
                             createdAt:
                               type: string
-                        example: &ref_98
+                        example: &ref_96
                           - message: Ocean o-e0a2bd7c successfully created.
                             severity: INFO
                             createdAt: '2020-10-07T09:51:12.000Z'
@@ -4856,7 +4671,7 @@ paths:
                         code: '200'
                         message: OK
                       kind: spotinst:ocean:azure:k8s:cluster:logs
-                      items: *ref_98
+                      items: *ref_96
                       count: '1'
                 example:
                   request:
@@ -4869,7 +4684,7 @@ paths:
                       code: '200'
                       message: OK
                     kind: spotinst:ocean:azure:k8s:cluster:logs
-                    items: *ref_98
+                    items: *ref_96
                     count: '1'
         '400':
           description: Bad Request
@@ -4892,7 +4707,7 @@ paths:
             application/json:
               schema:
                 type: array
-                items: &ref_102
+                items: &ref_100
                   type: object
                   properties:
                     oceanId:
@@ -4972,8 +4787,8 @@ paths:
       parameters:
         - *ref_33
         - *ref_79
-        - *ref_99
-        - *ref_100
+        - *ref_97
+        - *ref_98
       requestBody:
         required: true
         content:
@@ -4984,7 +4799,7 @@ paths:
                   required:
                     - upgradeConfig
                   properties:
-                    upgradeConfig: *ref_101
+                    upgradeConfig: *ref_99
       responses:
         '200':
           description: Ocean AKS Create Auto Upgrade
@@ -5012,7 +4827,7 @@ paths:
                             type: array
                             items:
                               allOf:
-                                - *ref_102
+                                - *ref_100
                           kind:
                             example: spotinst:ocean:azure:np:autoUpgrade
                         example:
@@ -5057,7 +4872,7 @@ paths:
                   description: List of system node pool names to be upgraded.
                   items:
                     type: string
-                    example: &ref_103
+                    example: &ref_101
                       - np1
                       - np2
                   minItems: 1
@@ -5065,9 +4880,9 @@ paths:
                 oceanId: o-12345abc
                 scope: PATCH
                 systemNodePoolNames:
-                  - *ref_103
+                  - *ref_101
       responses:
-        '200': &ref_107
+        '200': &ref_105
           description: Ocean AKS System Node Pool Upgrade Response
           content:
             application/json:
@@ -5105,7 +4920,7 @@ paths:
                                     List of system node pool names that were successfully upgraded.
                                   items:
                                     type: string
-                                  example: &ref_104
+                                  example: &ref_102
                                     - np1
                                     - np2
                                 inProgressNodePoolNames:
@@ -5114,7 +4929,7 @@ paths:
                                     List of system node pool names that are currently in progress of being upgraded.
                                   items:
                                     type: string
-                                  example: &ref_105
+                                  example: &ref_103
                                     - np3
                                 failedNodePoolNames:
                                   type: array
@@ -5122,7 +4937,7 @@ paths:
                                     List of system node pool names that failed to upgrade.
                                   items:
                                     type: string
-                                  example: &ref_106
+                                  example: &ref_104
                                     - np4
                                 newVersion:
                                   type: string
@@ -5131,18 +4946,18 @@ paths:
                                   example: 1.28.3
                               example:
                                 operationId: op-12345abc
-                                upgradedNodePoolNames: *ref_104
-                                inProgressNodePoolNames: *ref_105
-                                failedNodePoolNames: *ref_106
+                                upgradedNodePoolNames: *ref_102
+                                inProgressNodePoolNames: *ref_103
+                                failedNodePoolNames: *ref_104
                                 newVersion: 1.28.3
                           kind:
                             example: spotinst:ocean:azure:np:systemNodePoolUpgrade
                         example:
                           items:
                             - operationId: op-12345abc
-                              upgradedNodePoolNames: *ref_104
-                              inProgressNodePoolNames: *ref_105
-                              failedNodePoolNames: *ref_106
+                              upgradedNodePoolNames: *ref_102
+                              inProgressNodePoolNames: *ref_103
+                              failedNodePoolNames: *ref_104
                               newVersion: 1.28.3
                           kind: spotinst:ocean:azure:np:systemNodePoolUpgrade
         '400':
@@ -5168,7 +4983,7 @@ paths:
           description: |
             System node pools operation identifier.
       responses:
-        '200': *ref_107
+        '200': *ref_105
         '400':
           description: Bad Request
   /ocean/azure/k8s/cluster/{oceanClusterId}/aggregatedCosts:
@@ -5290,7 +5105,7 @@ paths:
                                   allMatch:
                                     - key: env
                                       value: prod
-                              example: &ref_108
+                              example: &ref_106
                                 - allMatch:
                                     - type: label
                                       key: env
@@ -5304,10 +5119,10 @@ paths:
                                       key: meta.data
                                       operator: exists
                           example:
-                            anyMatch: *ref_108
+                            anyMatch: *ref_106
                       example:
                         conditions:
-                          anyMatch: *ref_108
+                          anyMatch: *ref_106
       responses:
         '200':
           description: Ocean Cluster Aggregated Detailed Costs Response
@@ -6292,7 +6107,7 @@ paths:
                                   allMatch:
                                     - key: env
                                       value: prod
-                              example: &ref_109
+                              example: &ref_107
                                 - allMatch:
                                     - type: label
                                       key: env
@@ -6306,10 +6121,10 @@ paths:
                                       key: meta.data
                                       operator: exists
                           example:
-                            anyMatch: *ref_109
+                            anyMatch: *ref_107
                       example:
                         conditions:
-                          anyMatch: *ref_109
+                          anyMatch: *ref_107
       responses:
         '200':
           description: Ocean Cluster Aggregated Summary Costs Response
@@ -7113,7 +6928,7 @@ paths:
                                     type: string
                                   description: |
                                     Kubernetes labels assigned to this node.
-                                  example: &ref_110
+                                  example: &ref_108
                                     pool-type: default-pool
                                     kubernetes.io/hostname: node-abc123def456
                                 taints:
@@ -7122,7 +6937,7 @@ paths:
                                     type: string
                                   description: |
                                     Kubernetes taints assigned to this node.
-                                  example: &ref_111
+                                  example: &ref_109
                                     - CriticalAddonsOnly=true:NO_SCHEDULE
                                 workloadRequestedMilliCpu:
                                   type: number
@@ -7186,8 +7001,8 @@ paths:
                                 nodeStatus: 'TRUE'
                                 registrationStatus: Registered
                                 createdAt: '2026-01-15T10:30:45.000Z'
-                                labels: *ref_110
-                                taints: *ref_111
+                                labels: *ref_108
+                                taints: *ref_109
                                 workloadRequestedMilliCpu: 0
                                 workloadRequestedMemoryInMiB: 0
                                 workloadRequestedGpu: 0
@@ -7221,8 +7036,8 @@ paths:
                               nodeStatus: 'TRUE'
                               registrationStatus: Registered
                               createdAt: '2026-01-15T10:30:45.000Z'
-                              labels: *ref_110
-                              taints: *ref_111
+                              labels: *ref_108
+                              taints: *ref_109
                               workloadRequestedMilliCpu: 0
                               workloadRequestedMemoryInMiB: 0
                               workloadRequestedGpu: 0
