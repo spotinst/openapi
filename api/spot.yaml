@@ -189,23 +189,76 @@ tags:
 
   - name: Insights Service
 
+  - name: Organizations
+    description: Manage your Spot organizations.
+    externalDocs:
+      description: Organizations Documentation
+      url: https://docs.flexera.com/spot/administration/
+
+  - name: Accounts
+    description: Manage your Spot accounts.
+    externalDocs:
+      description: Accounts Documentation
+      url: https://docs.flexera.com/spot/administration/
+
 x-tagGroups:
   - name: Administration
+    x-folders:
+      - administration/
+      - beci/
     tags:
       - Organizations
       - Accounts
-  - name: Ocean
+  - name: Ocean AWS
+    x-folders:
+      - ocean/aws/
+      - ocean/commons/
     tags:
       - Ocean AWS
+  - name: Ocean ECS
+    x-folders:
+      - ocean/ecs/
+    tags:
       - Ocean ECS
+  - name: Ocean GKE
+    x-folders:
+      - ocean/gke/
+    tags:
       - Ocean GKE
+  - name: Ocean AKS
+    x-folders:
+      - ocean/aks/
+      - ocean/aksV2/
+    tags:
       - Ocean AKS
-      #      - Ocean On-Premise
+  #  - name: Ocean On-Premise
+  #    x-folders:
+  #      - ocean/onpremise/
+  #    tags:
+  #      - Ocean On-Premise
+  - name: Ocean Insights
+    x-folders:
+      - ocean/oceanInsights/
+    tags:
       - Ocean Insights
+  - name: Ocean CD
+    x-folders:
+      - ocean/cd/
+    tags:
       - Ocean CD
+  - name: Ocean Spark
+    x-folders:
+      - ocean/spark/
+    tags:
       - Ocean Spark
+  - name: Ocean Automatic Rightsizing
+    x-folders:
+      - ocean/rightsizing/
+    tags:
       - Ocean Automatic Rightsizing
   - name: Elastigroup
+    x-folders:
+      - elastigroup/
     tags:
       - Elastigroup AWS
       - Elastigroup AWS EMR Scaler
@@ -213,9 +266,17 @@ x-tagGroups:
       - Elastigroup Azure Spot VMs
       - Elastigroup Azure Stateful
   - name: Stateful Node
+    x-folders:
+      - managedInstance/
     tags:
       - Stateful Node AWS
   - name: Services
+    x-folders:
+      - notificationCenter/
+      - notificationSubscription/
+      - insights/
+      - healthCheck/
+      - audit/
     tags:
       - Audit Service
       - Health Check Service
@@ -223,6 +284,8 @@ x-tagGroups:
       - Insights Service
       - Notification Subscription Service
   - name: Spot Connect
+    x-folders:
+      - connect/
     tags:
       - Connect Executions
       - Connect Schedules
@@ -231,11 +294,15 @@ x-tagGroups:
       - Connect Workflows
       - Connect Workspaces
   - name: Spot Security
+    x-folders:
+      - security/
     tags:
       - Compliance
       - Misconfiguration
       - Assets
   - name: Flexera Integration
+    x-folders:
+      - ccoUsageExporter/
     tags:
       - Flexera CCO Integration
 
@@ -303,11 +370,11 @@ paths:
   /aws/ec2/group/{groupId}/scale/resumePolicy:
     $ref: services/elastigroup/aws/paths/resume-policy.yaml
   /aws/potentialSavings:
-    $ref: services/elastigroup/aws/paths/potential-savings.yaml
+    $ref: services/insights/paths/potential-savings.yaml
   /aws/instancePotentialSavings:
-    $ref: services/elastigroup/aws/paths/instances-potential-savings.yaml
+    $ref: services/insights/paths/instances-potential-savings.yaml
   /aws/costs:
-    $ref: services/elastigroup/aws/paths/costs.yaml
+    $ref: services/insights/paths/costs.yaml
   /aws/ec2/group/{groupId}/costs:
     $ref: services/elastigroup/aws/paths/elastigroup-costs.yaml
   /aws/ec2/group/{groupId}/costs/detailed:
@@ -327,7 +394,7 @@ paths:
   /aws/ec2/spotType:
     $ref: services/elastigroup/aws/paths/get-instance-by-region.yaml
   /aws/ec2/instanceTypeRecommendation:
-    $ref: services/elastigroup/aws/paths/suggested-instance-type.yaml
+    $ref: services/insights/paths/suggested-instance-type.yaml
   /aws/ec2/instance/interruption:
     $ref: services/elastigroup/aws/paths/instance-interruption.yaml
   /aws/ec2/instance/signal:
@@ -345,7 +412,7 @@ paths:
   /aws/ec2/group/{groupId}/roll/{rollId}/action:
     $ref: services/elastigroup/aws/paths/elastigroup-deployment-action.yaml
   /azure/costs:
-    $ref: services/elastigroup/azure/scaleSetVms/paths/costs.yaml
+    $ref: services/insights/paths/costs-azure.yaml
   /azure/compute/group/{groupId}:
     $ref: services/elastigroup/azure/spotVms/paths/groupVm.yaml
   /azure/compute/group/{groupId}/capacity:
@@ -433,7 +500,7 @@ paths:
   /gcp/gce/group/{groupId}/scale/down:
     $ref: services/elastigroup/gcp/paths/group-scale-down.yaml
   /gcp/gce/costs:
-    $ref: services/elastigroup/gcp/paths/costs.yaml
+    $ref: services/insights/paths/costs-gcp.yaml
   /gcp/gce/group/{groupId}/costs:
     $ref: services/elastigroup/gcp/paths/group-costs.yaml
   /gcp/gce/group/{groupId}/roll:
@@ -509,7 +576,7 @@ paths:
   /ocean/aws/k8s/cluster/{oceanClusterId}:
     $ref: services/ocean/aws/paths/cluster.yaml
   /ocean/k8s/cluster/{oceanClusterId}/controllerHeartbeat:
-    $ref: services/ocean/aws/paths/controllerHeartbeat.yaml
+    $ref: services/ocean/commons/paths/controllerHeartbeat.yaml
   /ocean/aws/k8s/cluster/{clusterIdentifier}/log:
     $ref: services/ocean/aws/paths/clusterFetchElastilog.yaml
   /ocean/aws/k8s/cluster/autoScalingGroup/import:
@@ -587,13 +654,13 @@ paths:
   /aws/ec2/managedInstance/state:
     $ref: services/managedInstance/aws/paths/state/updateManagedInstanceStates.yaml
   /audit/events:
-    $ref: services/administration/general/paths/auditListAll.yaml
+    $ref: services/audit/paths/auditListAll.yaml
   /healthCheck:
-    $ref: services/administration/general/paths/healthCheck.yaml
+    $ref: services/healthCheck/paths/healthCheck.yaml
   /healthCheck/{HEALTHCHECK_ID}:
-    $ref: services/administration/general/paths/healthCheckID.yaml
+    $ref: services/healthCheck/paths/healthCheckID.yaml
   /events/notification/accountPolicy:
-    $ref: services/administration/general/paths/accountPolicy.yaml
+    $ref: services/notificationSubscription/paths/accountPolicy.yaml
   /notificationCenter/policy:
     $ref: services/notificationCenter/paths/notificationCenterPolicies.yaml
   /notificationCenter/policy/{policyId}:
@@ -603,13 +670,13 @@ paths:
   /notificationCenter/compute/event:
     $ref: services/notificationCenter/paths/notificationCenterEventType.yaml
   /events/subscription:
-    $ref: services/administration/general/paths/subscription.yaml
+    $ref: services/notificationSubscription/paths/subscription.yaml
   /events/subscription/{subscriptionId}:
-    $ref: services/administration/general/paths/subscriptionID.yaml
+    $ref: services/notificationSubscription/paths/subscriptionID.yaml
   /insights/dataIntegration:
-    $ref: services/dataIntegration/paths/dataIntegrations.yaml
+    $ref: services/insights/paths/dataIntegrations.yaml
   /insights/dataIntegration/{dataIntegrationId}:
-    $ref: services/dataIntegration/paths/dataIntegration.yaml
+    $ref: services/insights/paths/dataIntegration.yaml
   /setup/account/{accountId}:
     $ref: services/administration/general/paths/updateAccount.yaml
   /setup/user:
@@ -668,6 +735,8 @@ paths:
     $ref: services/administration/general/paths/azure/validateTenantCredentials.yaml
   /ocean/gcp/k8s/cluster:
     $ref: services/ocean/gke/paths/clusters.yaml
+  /ocean/gcp/k8s/cluster/{oceanClusterId}/controllerHeartbeat:
+    $ref: services/ocean/gke/paths/controllerHeartbeat.yaml
   /ocean/gcp/k8s/cluster/{oceanClusterId}:
     $ref: services/ocean/gke/paths/cluster.yaml
   /ocean/gcp/k8s/cluster/{oceanClusterId}/reImport:
