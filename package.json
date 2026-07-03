@@ -12,13 +12,18 @@
     "url": "https://spot.io"
   },
   "scripts": {
-    "serve": "redoc-cli serve --template redoc/template.hbs.html --options='{\"menuToggle\":true,\"expandSingleSchemaField\":true,\"sortPropsAlphabetically\":true,\"generatedPayloadSamplesMaxDepth\":20,\"theme\":{\"colors\":{\"primary\":{\"main\":\"#0086ff\"}}}}' --watch api/spot.yaml",
-    "bundle:redoc": "redoc-cli bundle --template redoc/template.hbs.html --options='{\"menuToggle\":true,\"expandSingleSchemaField\":true,\"sortPropsAlphabetically\":true,\"generatedPayloadSamplesMaxDepth\":20,\"theme\":{\"colors\":{\"primary\":{\"main\":\"#0086ff\"}}}}' --output build/index.html api/spot.yaml",
+    "serve": "yarn build:sections && yarn build:landing && npx http-server build -a 127.0.0.1 -p 8080 -c-1",
+    "build:sections": "node scripts/build-sections.js",
+    "build:landing": "node scripts/build-landing.js",
+    "bundle:redoc": "redoc-cli bundle --template redoc/template.hbs.html --options=redoc/options.json --output build/index.html api/spot.yaml",
     "bundle:swagger": "swagger-cli bundle --outfile build/openapi.json api/spot.yaml",
     "validate": "swagger-cli validate --no-schema api/spot.yaml",
     "clean": "rm -rf build"
   },
   "devDependencies": {
+    "@apidevtools/json-schema-ref-parser": "^15.3.5",
+    "@redocly/cli": "^2.30.5",
+    "js-yaml": "^4.1.0",
     "prettier": "^2.6.2",
     "redoc-cli": "^0.13.21",
     "swagger-cli": "^4.0.4"

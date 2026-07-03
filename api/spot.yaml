@@ -116,16 +116,6 @@ tags:
       
       If you wish to learn more about it reach out to our support team.
 
-  - name: Ocean Spark
-    description: |
-      Ocean for Apache Spark is a managed cloud-native Spark platform that can be deployed in your cloud account.
-
-      Running on top of Ocean, Spot’s serverless infrastructure engine for containers, Ocean Spark makes it easy for your data teams to be successful with Apache Spark on Kubernetes, without dealing with the complexity of managing servers.
-
-    externalDocs:
-      description: Ocean Spark
-      url: https://docs.flexera.com/spot/ocean-spark/
-
   - name: EMR Scaler
     description: AWS EMR Scaler
     externalDocs:
@@ -189,23 +179,76 @@ tags:
 
   - name: Insights Service
 
+  - name: Organizations
+    description: Manage your Spot organizations.
+    externalDocs:
+      description: Organizations Documentation
+      url: https://docs.flexera.com/spot/administration/
+
+  - name: Accounts
+    description: Manage your Spot accounts.
+    externalDocs:
+      description: Accounts Documentation
+      url: https://docs.flexera.com/spot/administration/
+
 x-tagGroups:
   - name: Administration
+    x-folders:
+      - administration/
+      - beci/
     tags:
       - Organizations
       - Accounts
-  - name: Ocean
+  - name: Ocean AWS
+    x-folders:
+      - ocean/aws/
+      - ocean/commons/
     tags:
       - Ocean AWS
+  - name: Ocean ECS
+    x-folders:
+      - ocean/ecs/
+    tags:
       - Ocean ECS
+  - name: Ocean GKE
+    x-folders:
+      - ocean/gke/
+    tags:
       - Ocean GKE
+  - name: Ocean AKS
+    x-folders:
+      - ocean/aks/
+      - ocean/aksV2/
+    tags:
       - Ocean AKS
-      #      - Ocean On-Premise
+  #  - name: Ocean On-Premise
+  #    x-folders:
+  #      - ocean/onpremise/
+  #    tags:
+  #      - Ocean On-Premise
+  - name: Ocean Insights
+    x-folders:
+      - ocean/oceanInsights/
+    tags:
       - Ocean Insights
+  - name: Ocean CD
+    x-folders:
+      - ocean/cd/
+    tags:
       - Ocean CD
+  - name: Ocean Spark
+    x-folders:
+      - ocean/spark/
+    tags:
       - Ocean Spark
+  - name: Ocean Automatic Rightsizing
+    x-folders:
+      - ocean/rightsizing/
+    tags:
       - Ocean Automatic Rightsizing
   - name: Elastigroup
+    x-folders:
+      - elastigroup/
     tags:
       - Elastigroup AWS
       - Elastigroup AWS EMR Scaler
@@ -213,9 +256,17 @@ x-tagGroups:
       - Elastigroup Azure Spot VMs
       - Elastigroup Azure Stateful
   - name: Stateful Node
+    x-folders:
+      - managedInstance/
     tags:
       - Stateful Node AWS
   - name: Services
+    x-folders:
+      - notificationCenter/
+      - notificationSubscription/
+      - insights/
+      - healthCheck/
+      - audit/
     tags:
       - Audit Service
       - Health Check Service
@@ -223,6 +274,8 @@ x-tagGroups:
       - Insights Service
       - Notification Subscription Service
   - name: Spot Connect
+    x-folders:
+      - connect/
     tags:
       - Connect Executions
       - Connect Schedules
@@ -231,11 +284,15 @@ x-tagGroups:
       - Connect Workflows
       - Connect Workspaces
   - name: Spot Security
+    x-folders:
+      - security/
     tags:
       - Compliance
       - Misconfiguration
       - Assets
   - name: Flexera Integration
+    x-folders:
+      - ccoUsageExporter/
     tags:
       - Flexera CCO Integration
 
@@ -303,11 +360,11 @@ paths:
   /aws/ec2/group/{groupId}/scale/resumePolicy:
     $ref: services/elastigroup/aws/paths/resume-policy.yaml
   /aws/potentialSavings:
-    $ref: services/elastigroup/aws/paths/potential-savings.yaml
+    $ref: services/insights/paths/potential-savings.yaml
   /aws/instancePotentialSavings:
-    $ref: services/elastigroup/aws/paths/instances-potential-savings.yaml
+    $ref: services/insights/paths/instances-potential-savings.yaml
   /aws/costs:
-    $ref: services/elastigroup/aws/paths/costs.yaml
+    $ref: services/insights/paths/costs.yaml
   /aws/ec2/group/{groupId}/costs:
     $ref: services/elastigroup/aws/paths/elastigroup-costs.yaml
   /aws/ec2/group/{groupId}/costs/detailed:
@@ -327,7 +384,7 @@ paths:
   /aws/ec2/spotType:
     $ref: services/elastigroup/aws/paths/get-instance-by-region.yaml
   /aws/ec2/instanceTypeRecommendation:
-    $ref: services/elastigroup/aws/paths/suggested-instance-type.yaml
+    $ref: services/insights/paths/suggested-instance-type.yaml
   /aws/ec2/instance/interruption:
     $ref: services/elastigroup/aws/paths/instance-interruption.yaml
   /aws/ec2/instance/signal:
@@ -345,7 +402,7 @@ paths:
   /aws/ec2/group/{groupId}/roll/{rollId}/action:
     $ref: services/elastigroup/aws/paths/elastigroup-deployment-action.yaml
   /azure/costs:
-    $ref: services/elastigroup/azure/scaleSetVms/paths/costs.yaml
+    $ref: services/insights/paths/costs-azure.yaml
   /azure/compute/group/{groupId}:
     $ref: services/elastigroup/azure/spotVms/paths/groupVm.yaml
   /azure/compute/group/{groupId}/capacity:
@@ -433,7 +490,7 @@ paths:
   /gcp/gce/group/{groupId}/scale/down:
     $ref: services/elastigroup/gcp/paths/group-scale-down.yaml
   /gcp/gce/costs:
-    $ref: services/elastigroup/gcp/paths/costs.yaml
+    $ref: services/insights/paths/costs-gcp.yaml
   /gcp/gce/group/{groupId}/costs:
     $ref: services/elastigroup/gcp/paths/group-costs.yaml
   /gcp/gce/group/{groupId}/roll:
@@ -456,8 +513,6 @@ paths:
     $ref: services/ocean/ecs/paths/cluster-import.yaml
   /ocean/aws/ecs/cluster/{oceanClusterId}/log:
     $ref: services/ocean/ecs/paths/clusterFetchElastilog.yaml
-  /ocean/aws/ecs/cluster/{oceanClusterId}/rightSizing/suggestion:
-    $ref: services/ocean/ecs/paths/right-sizing-recommend.yaml
   /ocean/aws/ecs/cluster/{oceanClusterId}/instanceTypeFiltersSimulation:
     $ref: services/ocean/ecs/paths/instanceTypeFiltersSimulation.yaml
   /ocean/aws/ecs/cluster/{oceanClusterId}/allowedInstanceTypes:
@@ -511,13 +566,11 @@ paths:
   /ocean/aws/k8s/cluster/{oceanClusterId}:
     $ref: services/ocean/aws/paths/cluster.yaml
   /ocean/k8s/cluster/{oceanClusterId}/controllerHeartbeat:
-    $ref: services/ocean/aws/paths/controllerHeartbeat.yaml
+    $ref: services/ocean/commons/paths/controllerHeartbeat.yaml
   /ocean/aws/k8s/cluster/{clusterIdentifier}/log:
     $ref: services/ocean/aws/paths/clusterFetchElastilog.yaml
   /ocean/aws/k8s/cluster/autoScalingGroup/import:
     $ref: services/ocean/aws/paths/importASG.yaml
-  /ocean/aws/k8s/cluster/{oceanClusterId}/rightSizing/suggestion:
-    $ref: services/ocean/aws/paths/rightSizing.yaml
   /ocean/aws/k8s/cluster/{oceanClusterId}/instanceTypeFiltersSimulation:
     $ref: services/ocean/aws/paths/instanceTypeFiltersSimulation.yaml
   /ocean/aws/k8s/cluster/{oceanClusterId}/allowedInstanceTypes:
@@ -591,13 +644,13 @@ paths:
   /aws/ec2/managedInstance/state:
     $ref: services/managedInstance/aws/paths/state/updateManagedInstanceStates.yaml
   /audit/events:
-    $ref: services/administration/general/paths/auditListAll.yaml
+    $ref: services/audit/paths/auditListAll.yaml
   /healthCheck:
-    $ref: services/administration/general/paths/healthCheck.yaml
+    $ref: services/healthCheck/paths/healthCheck.yaml
   /healthCheck/{HEALTHCHECK_ID}:
-    $ref: services/administration/general/paths/healthCheckID.yaml
+    $ref: services/healthCheck/paths/healthCheckID.yaml
   /events/notification/accountPolicy:
-    $ref: services/administration/general/paths/accountPolicy.yaml
+    $ref: services/notificationSubscription/paths/accountPolicy.yaml
   /notificationCenter/policy:
     $ref: services/notificationCenter/paths/notificationCenterPolicies.yaml
   /notificationCenter/policy/{policyId}:
@@ -607,13 +660,13 @@ paths:
   /notificationCenter/compute/event:
     $ref: services/notificationCenter/paths/notificationCenterEventType.yaml
   /events/subscription:
-    $ref: services/administration/general/paths/subscription.yaml
+    $ref: services/notificationSubscription/paths/subscription.yaml
   /events/subscription/{subscriptionId}:
-    $ref: services/administration/general/paths/subscriptionID.yaml
+    $ref: services/notificationSubscription/paths/subscriptionID.yaml
   /insights/dataIntegration:
-    $ref: services/dataIntegration/paths/dataIntegrations.yaml
+    $ref: services/insights/paths/dataIntegrations.yaml
   /insights/dataIntegration/{dataIntegrationId}:
-    $ref: services/dataIntegration/paths/dataIntegration.yaml
+    $ref: services/insights/paths/dataIntegration.yaml
   /setup/account/{accountId}:
     $ref: services/administration/general/paths/updateAccount.yaml
   /setup/user:
@@ -672,6 +725,8 @@ paths:
     $ref: services/administration/general/paths/azure/validateTenantCredentials.yaml
   /ocean/gcp/k8s/cluster:
     $ref: services/ocean/gke/paths/clusters.yaml
+  /ocean/gcp/k8s/cluster/{oceanClusterId}/controllerHeartbeat:
+    $ref: services/ocean/gke/paths/controllerHeartbeat.yaml
   /ocean/gcp/k8s/cluster/{oceanClusterId}:
     $ref: services/ocean/gke/paths/cluster.yaml
   /ocean/gcp/k8s/cluster/{oceanClusterId}/reImport:
@@ -680,15 +735,12 @@ paths:
     $ref: services/ocean/gke/paths/detachInstances.yaml
   /ocean/gcp/k8s/cluster/{oceanClusterId}/log:
     $ref: services/ocean/gke/paths/clusterFetchElastilog.yaml
-  /ocean/gcp/k8s/cluster/{oceanId}/rightSizing/suggestion:
-    $ref: services/ocean/gke/paths/rightSizing.yaml
   /ocean/gcp/k8s/cluster/{oceanClusterId}/aggregatedCosts:
     $ref: services/ocean/gke/paths/cluster-aggregated-costs.yaml
   /ocean/gcp/k8s/cluster/{oceanClusterId}/aggregatedCosts/summary:
     $ref: services/ocean/gke/paths/cluster-aggregated-costs-summary.yaml
   /ocean/gcp/k8s/cluster/{oceanClusterId}/instanceTypeFiltersSimulation:
     $ref: services/ocean/gke/paths/instanceTypeFiltersSimulation.yaml
-  #    $ref: services/ocean/gke/paths/rightSizingLegacy.yaml - deprecated
   /ocean/gcp/k8s/launchSpec:
     $ref: services/ocean/gke/paths/clusters-launchSpec.yaml
   /ocean/gcp/k8s/launchSpec/import:
@@ -739,8 +791,6 @@ paths:
     $ref: services/ocean/aks/paths/migration-get.yaml
   /ocean/azure/np/cluster/{oceanClusterId}/migration/{migrationId}/stop:
     $ref: services/ocean/aks/paths/migration-stop.yaml
-  /ocean/azure/np/cluster/{oceanClusterId}/rightSizing/suggestion:
-    $ref: services/ocean/aks/paths/rightSizing.yaml
   /ocean/azure/np/cluster/{oceanClusterId}/log:
     $ref: services/ocean/aks/paths/clusterFetchElastilog.yaml
   /ocean/azure/np/cluster/{oceanClusterId}/autoUpgrade:
@@ -827,58 +877,6 @@ paths:
     $ref: services/ocean/cd/paths/workloadRollback.yaml
   /ocean/cd/workload/{workloadName}/namespace/{namespace}/graph:
     $ref: services/ocean/cd/paths/workloadGraph.yaml
-  /ocean/spark/cluster:
-    $ref: services/ocean/spark/paths/clusters.yaml
-  /ocean/spark/cluster/{clusterId}:
-    $ref: services/ocean/spark/paths/cluster.yaml
-  /ocean/spark/cluster/sparkCoreHours:
-    $ref: services/ocean/spark/paths/clusterSparkCoreHours.yaml
-  /ocean/spark/cluster/{clusterId}/appCompletionTrend:
-    $ref: services/ocean/spark/paths/clusterAppCompletionTrend.yaml
-  /ocean/spark/cluster/{clusterId}/appLoadHistory:
-    $ref: services/ocean/spark/paths/clusterAppLoadHistory.yaml
-  /ocean/spark/cluster/{clusterId}/statistics:
-    $ref: services/ocean/spark/paths/clusterStatistics.yaml
-  /ocean/spark/app:
-    $ref: services/ocean/spark/paths/applications.yaml
-  /ocean/spark/cluster/{clusterId}/app:
-    $ref: services/ocean/spark/paths/clusterApplications.yaml
-  /ocean/spark/cluster/{clusterId}/app/{applicationId}:
-    $ref: services/ocean/spark/paths/clusterApplication.yaml
-  /ocean/spark/cluster/{clusterId}/app/{applicationId}/issues:
-    $ref: services/ocean/spark/paths/clusterApplicationIssues.yaml
-  /ocean/spark/cluster/{clusterId}/app/{applicationId}/log/live:
-    $ref: services/ocean/spark/paths/clusterApplicationLogsLive.yaml
-  /ocean/spark/cluster/{clusterId}/app/{applicationId}/log/archive:
-    $ref: services/ocean/spark/paths/clusterApplicationLogsArchive.yaml
-  /ocean/spark/cluster/{clusterId}/app/{applicationId}/executor-log/archive:
-    $ref: services/ocean/spark/paths/clusterApplicationExecutorLogsArchive.yaml
-  /ocean/spark/cluster/{clusterId}/app/{applicationId}/kubeEvent/live:
-    $ref: services/ocean/spark/paths/clusterApplicationKubeEventsLive.yaml
-  /ocean/spark/configTemplate:
-    $ref: services/ocean/spark/paths/configTemplates.yaml
-  /ocean/spark/cluster/{clusterId}/configTemplate:
-    $ref: services/ocean/spark/paths/clusterConfigTemplates.yaml
-  /ocean/spark/cluster/{clusterId}/configTemplate/{configTemplateId}:
-    $ref: services/ocean/spark/paths/clusterConfigTemplate.yaml
-  /ocean/spark/job:
-    $ref: services/ocean/spark/paths/jobs.yaml
-  /ocean/spark/cluster/{clusterId}/job:
-    $ref: services/ocean/spark/paths/clusterJobs.yaml
-  /ocean/spark/cluster/{clusterId}/job/{jobId}:
-    $ref: services/ocean/spark/paths/clusterJob.yaml
-  /ocean/spark/cluster/{clusterId}/job/{jobId}/config:
-    $ref: services/ocean/spark/paths/jobConfig.yaml
-  /ocean/spark/cluster/{clusterId}/virtualNodeGroup:
-    $ref: services/ocean/spark/paths/virtualNodeGroup.yaml
-  /ocean/spark/cluster/{clusterId}/workspace:
-    $ref: services/ocean/spark/paths/workspaces.yaml
-  /ocean/spark/cluster/{clusterId}/workspace/{workspaceId}:
-    $ref: services/ocean/spark/paths/workspace.yaml
-  /ocean/spark/cluster/{clusterId}/workspace/{workspaceId}/start:
-    $ref: services/ocean/spark/paths/workspaceStart.yaml
-  /ocean/spark/cluster/{clusterId}/workspace/{workspaceId}/stop:
-    $ref: services/ocean/spark/paths/workspaceStop.yaml
   /insights/savings:
     $ref: services/insights/paths/organizationSavings.yaml
   /connect/executions/formatted_execution/{exe_id}:
@@ -1011,4 +1009,3 @@ paths:
 
   /ccoUsageExporter/flexeraIntegration:
     $ref: services/ccoUsageExporter/flexeraIntegration/paths/flexeraIntegration.yaml
-
