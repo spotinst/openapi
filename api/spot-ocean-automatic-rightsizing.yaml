@@ -444,15 +444,21 @@ paths:
                           response:
                             type: object
                             properties:
+                              kind:
+                                type: string
+                                description: |
+                                  The data type of each item in the response.
+                              items:
+                                type: array
+                                description: |
+                                  Array of data objects.
+                                items:
+                                  type: object
                               count:
                                 type: integer
                                 example: 1
                                 description: |
                                   Size of the data object array.
-                              kind:
-                                type: string
-                                description: |
-                                  The data type of each item in the response.
                             example:
                               count: 1
                   - type: object
@@ -1727,3 +1733,201 @@ paths:
                           kind: mcs:ocean:rightSizing:savings
         '400':
           description: Bad Request
+  /ocean/{oceanId}/rightSizing/namespaces/{namespace}/{workloadType}/{workloadName}/recommendation-application-history:
+    get:
+      summary: Get Workload Recommendation Application History
+      description: |
+        Returns a set of recommendation application history records associated with workload.
+      operationId: getWorkloadRecommendationApplicationHistory
+      tags:
+        - Ocean Automatic Rightsizing
+      parameters:
+        - *ref_15
+        - in: path
+          name: namespace
+          schema:
+            type: string
+          required: true
+          example: kube-system
+          description: |
+            Kubernetes namespace.
+        - in: path
+          name: workloadType
+          schema:
+            type: string
+            enum:
+              - deployment
+              - daemonSet
+              - statefulSet
+              - rollout
+          required: true
+          example: deployment
+          description: |
+            Workload type as defined in kubernetes.
+        - in: path
+          name: workloadName
+          schema:
+            type: string
+          required: true
+          example: redis-controller
+          description: |
+            Kubernetes workload name.
+        - *ref_16
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            format: int16
+            default: 0
+            minimum: 0
+            example: 0
+          required: false
+          description: |
+            Number of entries to skip before returning page.
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            format: int16
+            default: 100
+            minimum: 1
+            maximum: 200
+          required: false
+          example: 100
+          description: |
+            Number of entries to return.
+      responses:
+        '200':
+          description: Ocean Rightsizing Recommendation Application History Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_17
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /ocean/o-abcd1234/rightSizing/namespaces/kube-system/deployment/redis-controller/recommendation-application-history
+                          method:
+                            example: GET
+                        example:
+                          url: /ocean/o-abcd1234/rightSizing/namespaces/kube-system/deployment/redis-controller/recommendation-application-history
+                          method: GET
+                      response:
+                        type: object
+                        properties:
+                          kind:
+                            example: mcs:ocean:rightSizing:recommendationApplicationHistory
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              title: Recommendation Application History
+                              description: |
+                                A page of recommendation application history records.
+                              properties:
+                                page:
+                                  type: array
+                                  items:
+                                    type: object
+                                    title: Recommendation Application Item
+                                    description: |
+                                      A single recommendation application history record for a container.
+                                    properties:
+                                      containerName:
+                                        type: string
+                                        description: Name of the container.
+                                        example: my-app-container
+                                      actionType:
+                                        type: string
+                                        description: The type of action that was taken or the reason it was not applied.
+                                        enum:
+                                          - APPLIED
+                                          - CPU_ONLY_APPLIED
+                                          - MEMORY_ONLY_APPLIED
+                                          - OUTSIDE_OF_TIME_WINDOW
+                                          - THRESHOLD_NOT_MET
+                                          - HPA_RESTRICTED
+                                          - UNSUPPORTED_HPA
+                                          - INVALID_HPA
+                                          - PRELIMINARY_RESTRICTED
+                                        example: APPLIED
+                                      currentResources: &ref_31
+                                        type: object
+                                        title: Compute Resource
+                                        description: |
+                                          Represents CPU and memory resource values.
+                                        properties:
+                                          cpu:
+                                            type: integer
+                                            format: int32
+                                            description: CPU resource value in millicores.
+                                            example: 4000
+                                          memory:
+                                            type: integer
+                                            format: int32
+                                            description: Memory resource value in MiB.
+                                            example: 16000
+                                        example:
+                                          cpu: 4000
+                                          memory: 16000
+                                      recommendedResources: *ref_31
+                                      occurredAt:
+                                        type: integer
+                                        format: int64
+                                        description: Timestamp (epoch millis) when the action occurred.
+                                        example: 1776178797289
+                                      ruleName:
+                                        type: string
+                                        description: Name of the rightsizing rule that triggered this action.
+                                        example: my-app-rule
+                                    example:
+                                      containerName: my-app-container
+                                      actionType: APPLIED
+                                      currentResources:
+                                        cpu: 4000
+                                        memory: 16000
+                                      recommendedResources:
+                                        cpu: 4000
+                                        memory: 16000
+                                      occurredAt: 1776178797289
+                                      ruleName: my-app-rule
+                              example:
+                                page:
+                                  - containerName: my-app-container
+                                    actionType: APPLIED
+                                    currentResources:
+                                      cpu: 4000
+                                      memory: 16000
+                                    recommendedResources:
+                                      cpu: 4000
+                                      memory: 16000
+                                    occurredAt: 1776178797289
+                                    ruleName: my-app-rule
+                            example: &ref_32
+                              - page:
+                                  - containerName: my-app-container
+                                    actionType: APPLIED
+                                    currentResources:
+                                      cpu: 4000
+                                      memory: 16000
+                                    recommendedResources:
+                                      cpu: 2000
+                                      memory: 8000
+                                    occurredAt: 1776178797289
+                                    ruleName: my-app-rule
+                          count:
+                            example: 1
+                        example:
+                          kind: mcs:ocean:rightSizing:recommendationApplicationHistory
+                          items: *ref_32
+                          count: 1
+        '400':
+          description: Invalid request provided
+        '404':
+          description: Non existent resource has been queried
+        '422':
+          description: Business rule violated
