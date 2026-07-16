@@ -1572,10 +1572,16 @@ paths:
                   description: |
                     Determines the Ocean right-sizing savings
                   required:
+                    - clusterIdentifier
                     - endTime
                     - startTime
                     - workloads
                   properties:
+                    clusterIdentifier:
+                      type: string
+                      example: my-cluster
+                      description: |
+                        Identifier of the Ocean cluster.
                     startTime:
                       type: string
                       example: '2025-01-20T11:35:02.745Z'
@@ -1599,7 +1605,7 @@ paths:
                             items:
                               type: object
                               properties:
-                                workloadName:
+                                name:
                                   type: string
                                   description: The name of the workload
                                 workloadType:
@@ -1607,14 +1613,14 @@ paths:
                                   description: The type of the workload (e.g., Deployment, DaemonSet, StatefulSet)
                       example:
                         namespaceName1:
-                          - workloadName: workloadName1
+                          - name: workloadName1
                             workloadType: Deployment
-                          - workloadName: workloadName2
+                          - name: workloadName2
                             workloadType: DaemonSet
                         namespaceName2:
-                          - workloadName: workloadName3
+                          - name: workloadName3
                             workloadType: StatefulSet
-                          - workloadName: workloadName4
+                          - name: workloadName4
                             workloadType: Deployment
       responses:
         '200':
@@ -1675,7 +1681,7 @@ paths:
                                   items:
                                     type: object
                                     properties:
-                                      workloadName:
+                                      name:
                                         type: string
                                       workloadType:
                                         type: string
@@ -1691,7 +1697,7 @@ paths:
                                         type: number
                                       savings:
                                         type: number
-                                      isDeleted:
+                                      workloadDeleted:
                                         type: boolean
                             example: &ref_30
                               - totalSavingsSummary:
@@ -1705,7 +1711,7 @@ paths:
                                   - namespace: default
                                     savings: 500
                                 workloadSavings:
-                                  - workloadName: coredns
+                                  - name: coredns
                                     workloadType: Deployment
                                     namespace: kube-system
                                     cpuWithOcean: 25
@@ -1713,8 +1719,8 @@ paths:
                                     memoryWithOcean: 32
                                     memoryWithoutOcean: 64
                                     savings: 250
-                                    isDeleted: true
-                                  - workloadName: aws-node
+                                    workloadDeleted: true
+                                  - name: aws-node
                                     workloadType: DaemonSet
                                     namespace: kube-system
                                     cpuWithOcean: 25
@@ -1722,7 +1728,7 @@ paths:
                                     memoryWithOcean: 32
                                     memoryWithoutOcean: 64
                                     savings: 250
-                                    isDeleted": false
+                                    workloadDeleted: false
                           count:
                             example: 1
                           kind:
