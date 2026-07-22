@@ -1620,13 +1620,13 @@ paths:
           description: Bad Request
   /ocean/{oceanId}/rightSizing/cluster/configuration:
     post:
-      summary: Set Cluster Recommendations Percentile
+      summary: Set Rightsizing Cluster configuration
       description: |
-        Set Recommendations Percentile for the Ocean Cluster.
+        Set Cluster Configuration for the Ocean Cluster.
         <br />
         <br />
         **This action can take a few minutes to complete.**
-      operationId: SetClusterRecommendationsPercentile
+      operationId: SetClusterConfiguration
       tags:
         - Ocean Automatic Rightsizing
       parameters:
@@ -1668,13 +1668,21 @@ paths:
                         downsideOnly:
                           type: boolean
                           description: When set to 'true', only downscale recommendations will be applied.
+                          example: false
+                          default: false
+                        adjustLimitOnDownsize:
+                          type: boolean
+                          description: When set to 'true', the limit will be adjusted when downscale recommendations are applied.
+                          example: true
                           default: false
                       example:
                         recommendationsCpuPercentile: 85
                         recommendationsMemoryPercentile: 85
+                        downsideOnly: false
+                        adjustLimitOnDownsize: true
       responses:
         '200':
-          description: Ocean Cluster Recommendations Percentile Response
+          description: Ocean Cluster configuration Response
           content:
             application/json:
               schema:
@@ -1718,10 +1726,14 @@ paths:
                                     downsideOnly:
                                       type: boolean
                                       example: false
+                                    adjustLimitOnDownsize:
+                                      type: boolean
+                                      example: true
                                   example:
                                     recommendationsCpuPercentile: 85
                                     recommendationsMemoryPercentile: 85
                                     downsideOnly: false
+                                    adjustLimitOnDownsize: true
                               example:
                                 oceanId: o-abcd1234
                                 clusterIdentifier: dev-cluster
@@ -1729,6 +1741,7 @@ paths:
                                   recommendationsCpuPercentile: 85
                                   recommendationsMemoryPercentile: 85
                                   downsideOnly: false
+                                  adjustLimitOnDownsize: true
                           kind:
                             example: mcs:ocean:rightSizing:clusterConfiguration
                         example:
@@ -1739,6 +1752,97 @@ paths:
                                 recommendationsCpuPercentile: 85
                                 recommendationsMemoryPercentile: 85
                                 downsideOnly: false
+                                adjustLimitOnDownsize: true
+                          kind: mcs:ocean:rightSizing:clusterConfiguration
+        '400':
+          description: Bad Request
+    get:
+      summary: Get Rightsizing Cluster configuration
+      description: |
+        Get Cluster Configuration for the Ocean Cluster.
+        <br />
+        <br />
+        **This action can take a few minutes to complete.**
+      operationId: GetClusterConfiguration
+      tags:
+        - Ocean Automatic Rightsizing
+      parameters:
+        - *ref_15
+        - *ref_30
+        - *ref_16
+      responses:
+        '200':
+          description: Ocean Cluster configuration Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_17
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /ocean/{oceanId}/rightSizing/cluster/configuration
+                          method:
+                            example: GET
+                        example:
+                          url: /ocean/{oceanId}/rightSizing/cluster/configuration
+                          method: GET
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                oceanId:
+                                  type: string
+                                  example: o-abcd1234
+                                clusterIdentifier:
+                                  type: string
+                                  example: dev-cluster
+                                config:
+                                  type: object
+                                  properties:
+                                    recommendationsCpuPercentile:
+                                      type: integer
+                                      example: 85
+                                    recommendationsMemoryPercentile:
+                                      type: integer
+                                      example: 85
+                                    downsideOnly:
+                                      type: boolean
+                                      example: false
+                                    adjustLimitOnDownsize:
+                                      type: boolean
+                                      example: true
+                                  example:
+                                    recommendationsCpuPercentile: 85
+                                    recommendationsMemoryPercentile: 85
+                                    downsideOnly: false
+                                    adjustLimitOnDownsize: true
+                              example:
+                                oceanId: o-abcd1234
+                                clusterIdentifier: dev-cluster
+                                config:
+                                  recommendationsCpuPercentile: 85
+                                  recommendationsMemoryPercentile: 85
+                                  downsideOnly: false
+                                  adjustLimitOnDownsize: true
+                          kind:
+                            example: mcs:ocean:rightSizing:clusterConfiguration
+                        example:
+                          items:
+                            - oceanId: o-abcd1234
+                              clusterIdentifier: dev-cluster
+                              config:
+                                recommendationsCpuPercentile: 85
+                                recommendationsMemoryPercentile: 85
+                                downsideOnly: false
+                                adjustLimitOnDownsize: true
                           kind: mcs:ocean:rightSizing:clusterConfiguration
         '400':
           description: Bad Request
