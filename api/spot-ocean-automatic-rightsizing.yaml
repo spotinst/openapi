@@ -385,7 +385,7 @@ paths:
                   - &ref_17
                     type: object
                     allOf:
-                      - &ref_28
+                      - &ref_29
                         type: object
                         properties:
                           request:
@@ -1260,6 +1260,198 @@ paths:
                           kind: mcs:ocean:rightSizing:recommendations
         '400':
           description: Bad Request
+  /ocean/{oceanId}/rightSizing/namespaces/{namespace}/{workloadType}/{workloadName}/recommendation-history:
+    get:
+      summary: Get Ocean Rightsizing Recommendation History
+      description: |
+        Get right-sizing recommendation history for a specific workload in an Ocean cluster.
+      operationId: oceanRightsizingRecommendationHistory
+      tags:
+        - Ocean Automatic Rightsizing
+      parameters:
+        - *ref_15
+        - &ref_32
+          in: path
+          name: namespace
+          schema:
+            type: string
+          required: true
+          example: default
+          description: |
+            Namespace of the workload.
+        - &ref_33
+          in: path
+          name: workloadType
+          schema:
+            type: string
+            enum:
+              - deployment
+              - daemonSet
+              - statefulSet
+              - rollout
+          required: true
+          example: deployment
+          description: |
+            Type of the workload.
+        - &ref_34
+          in: path
+          name: workloadName
+          schema:
+            type: string
+          required: true
+          example: checkout-service
+          description: |
+            Name of the workload.
+        - *ref_16
+        - in: query
+          name: clusterIdentifier
+          schema:
+            type: string
+          required: false
+          example: dev-cluster
+          description: |
+            Identifier of the cluster from which recommendation history should be retrieved.
+        - in: query
+          name: fromDate
+          schema:
+            type: integer
+            format: int64
+          required: true
+          example: 1717200000000
+          description: |
+            Start time filter as Unix epoch timestamp in milliseconds.
+        - in: query
+          name: toDate
+          schema:
+            type: integer
+            format: int64
+          required: false
+          example: 1719800000000
+          description: |
+            End time filter as Unix epoch timestamp in milliseconds.
+        - in: query
+          name: containerNames
+          required: true
+          description: |
+            List of container names to filter by.
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+          example:
+            - app
+            - sidecar
+      responses:
+        '200':
+          description: Ocean Rightsizing Recommendation History Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_17
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /ocean/o-abcd1234/rightSizing/namespaces/default/deployment/checkout-service/recommendation-history?accountId=act-123456789&fromDate=1717200000000&clusterIdentifier=dev-cluster
+                          method:
+                            example: GET
+                        example:
+                          url: /ocean/o-abcd1234/rightSizing/namespaces/default/deployment/checkout-service/recommendation-history?accountId=act-123456789&fromDate=1717200000000&clusterIdentifier=dev-cluster
+                          method: GET
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                recommendations:
+                                  type: array
+                                  items:
+                                    type: object
+                                    title: Ocean Rightsizing Recommendation History Item
+                                    description: |
+                                      Recommendation snapshot for a workload at a specific point in time.
+                                    properties:
+                                      podCount:
+                                        type: integer
+                                        description: Number of pods in the workload at recommendation time.
+                                      cpu:
+                                        type: object
+                                        description: CPU recommendation details.
+                                        properties:
+                                          requested:
+                                            type: number
+                                          recommended:
+                                            type: number
+                                          limit:
+                                            type: number
+                                          p99:
+                                            type: number
+                                          p95:
+                                            type: number
+                                          p90:
+                                            type: number
+                                          p85:
+                                            type: number
+                                      memory:
+                                        type: object
+                                        description: Memory recommendation details.
+                                        properties:
+                                          requested:
+                                            type: number
+                                          recommended:
+                                            type: number
+                                          limit:
+                                            type: number
+                                          p100:
+                                            type: number
+                                          p95:
+                                            type: number
+                                          p90:
+                                            type: number
+                                          p85:
+                                            type: number
+                                      recommendedAt:
+                                        type: integer
+                                        format: int64
+                                        description: Unix epoch timestamp in milliseconds when the recommendation was generated.
+                            example: &ref_28
+                              - recommendations:
+                                  - podCount: 1
+                                    cpu:
+                                      requested: 0.01
+                                      recommended: 0.01
+                                      limit: 0.02
+                                      p99: 0
+                                      p95: 0
+                                      p90: 0
+                                      p85: 0
+                                    memory:
+                                      requested: 32
+                                      recommended: 32
+                                      limit: 64
+                                      p100: 7.59
+                                      p95: 7.56
+                                      p90: 7.56
+                                      p85: 7.53
+                                    recommendedAt: 1783313815984
+                          count:
+                            example: 1
+                          kind:
+                            example: mcs:ocean:rightSizing:clusterResourceRecommendationsHistory
+                        example:
+                          items: *ref_28
+                          count: 1
+                          kind: mcs:ocean:rightSizing:clusterResourceRecommendationsHistory
+        '400':
+          description: Bad Request
   /ocean/{oceanId}/rightSizing/rollbacks:
     get:
       summary: List Ocean Rightsizing Rollbacks
@@ -1377,7 +1569,7 @@ paths:
         - Ocean Automatic Rightsizing
       parameters:
         - *ref_15
-        - &ref_29
+        - &ref_30
           in: query
           name: clusterIdentifier
           schema:
@@ -1423,7 +1615,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_28
+                  - *ref_29
         '400':
           description: Bad Request
   /ocean/{oceanId}/rightSizing/cluster/configuration:
@@ -1439,7 +1631,7 @@ paths:
         - Ocean Automatic Rightsizing
       parameters:
         - *ref_15
-        - *ref_29
+        - *ref_30
         - *ref_16
       requestBody:
         required: true
@@ -1699,7 +1891,7 @@ paths:
                                         type: number
                                       workloadDeleted:
                                         type: boolean
-                            example: &ref_30
+                            example: &ref_31
                               - totalSavingsSummary:
                                   cpuWithOcean: 100,
                                   memoryWithOcean: 128,
@@ -1734,7 +1926,7 @@ paths:
                           kind:
                             example: mcs:ocean:rightSizing:savings
                         example:
-                          items: *ref_30
+                          items: *ref_31
                           count: 1
                           kind: mcs:ocean:rightSizing:savings
         '400':
@@ -1749,35 +1941,9 @@ paths:
         - Ocean Automatic Rightsizing
       parameters:
         - *ref_15
-        - in: path
-          name: namespace
-          schema:
-            type: string
-          required: true
-          example: kube-system
-          description: |
-            Kubernetes namespace.
-        - in: path
-          name: workloadType
-          schema:
-            type: string
-            enum:
-              - deployment
-              - daemonSet
-              - statefulSet
-              - rollout
-          required: true
-          example: deployment
-          description: |
-            Workload type as defined in kubernetes.
-        - in: path
-          name: workloadName
-          schema:
-            type: string
-          required: true
-          example: redis-controller
-          description: |
-            Kubernetes workload name.
+        - *ref_32
+        - *ref_33
+        - *ref_34
         - *ref_16
         - in: query
           name: offset
@@ -1861,7 +2027,7 @@ paths:
                                           - INVALID_HPA
                                           - PRELIMINARY_RESTRICTED
                                         example: APPLIED
-                                      currentResources: &ref_31
+                                      currentResources: &ref_35
                                         type: object
                                         title: Compute Resource
                                         description: |
@@ -1880,7 +2046,7 @@ paths:
                                         example:
                                           cpu: 4000
                                           memory: 16000
-                                      recommendedResources: *ref_31
+                                      recommendedResources: *ref_35
                                       occurredAt:
                                         type: integer
                                         format: int64
@@ -1913,7 +2079,7 @@ paths:
                                       memory: 16000
                                     occurredAt: 1776178797289
                                     ruleName: my-app-rule
-                            example: &ref_32
+                            example: &ref_36
                               - page:
                                   - containerName: my-app-container
                                     actionType: APPLIED
@@ -1929,7 +2095,7 @@ paths:
                             example: 1
                         example:
                           kind: mcs:ocean:rightSizing:recommendationApplicationHistory
-                          items: *ref_32
+                          items: *ref_36
                           count: 1
         '400':
           description: Invalid request provided
