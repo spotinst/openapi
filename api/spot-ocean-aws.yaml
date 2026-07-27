@@ -564,7 +564,7 @@ paths:
                                 timeWindows:
                                   - Sat:08:00-Sun:08:00
                                 isEnabled: true
-                            optimizationWindows: &ref_71
+                            optimizationWindows: &ref_72
                               type: object
                               description: |
                                 An object used to specify time windows during which certain optimization constraints can be eased.
@@ -616,7 +616,7 @@ paths:
                                       cronExpression: 0 0 * * *
                                       duration: 8h
                                       effects: *ref_1
-                              example: &ref_72
+                              example: &ref_73
                                 isEnabled: true
                                 windows:
                                   - cronExpression: 0 0 * * *
@@ -1337,7 +1337,7 @@ paths:
                                     - key: node.cilium.io/agent-not-ready
                                       value: true
                                       effect: NoSchedule
-                                instanceStorePolicy: &ref_73
+                                instanceStorePolicy: &ref_74
                                   type: object
                                   description: Determines the utilization of instance store volumes. If not defined, instance store volumes will not be used.
                                   properties:
@@ -1348,9 +1348,9 @@ paths:
                                       enum:
                                         - RAID0
                                       example: RAID0
-                                  example: &ref_95
+                                  example: &ref_96
                                     type: RAID0
-                                gpu: &ref_74
+                                gpu: &ref_75
                                   type: object
                                   description: GPU configuration
                                   properties:
@@ -2481,7 +2481,7 @@ paths:
         - Ocean AWS
       parameters:
         - *ref_22
-        - &ref_104
+        - &ref_105
           in: query
           name: autoScalingGroupName
           example: myAutoScalingGroup
@@ -2743,7 +2743,7 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: &ref_101
+                            items: &ref_102
                               type: object
                               properties:
                                 filteredInstanceTypes:
@@ -2758,7 +2758,7 @@ paths:
                                     - c5ad.2xlarge
                                     - c5d.2xlarge
                                     - c5a.2xlarge
-                              example: &ref_102
+                              example: &ref_103
                                 filteredInstanceTypes: *ref_44
                           kind:
                             example: spotinst:ocean:aws:k8s:instanceTypesFilters:simulation
@@ -3125,6 +3125,15 @@ paths:
                                 Indicates the threshold of minimum healthy instances in single batch. If the amount of healthy instances in single batch is under the threshold, the cluster roll will fail. If exists, the parameter value will be in range of 1-100. In case of null as value, the default value in the backend will be 50%. Value of param should represent the number in percentage (%) of the batch.
                               example: 100
                               default: 50
+                        - &ref_52
+                          type: object
+                          properties:
+                            reportPartialCompletion:
+                              type: boolean
+                              description: |
+                                When set to true, a roll that ends with a mixed result of successfully and unsuccessfully replaced instances is reported as PARTIALLY_COMPLETED. When set to false, a mixed result is reported as FAILED.
+                              example: true
+                              default: false
                 - type: object
                   title: Roll with instance ids
                   properties:
@@ -3145,6 +3154,7 @@ paths:
                               example:
                                 - i-0003a99ffb566f039
                                 - i-0567a99ffb566f765
+                        - *ref_52
                 - type: object
                   title: Roll with Virtual Node Group ids
                   properties:
@@ -3172,8 +3182,9 @@ paths:
                               description: |
                                 When set to True and virtual node group identifiers are defined to roll, the specified Virtual Node Group(s) will be blocked from scaling up. (Replacements will scale up in other Virtual Node Groups that match the displaced pods instead.) This is meant for different use cases of 'migrating' nodes from one Virtual Node Group to another.
                               example: true
+                        - *ref_52
       responses:
-        '200': &ref_59
+        '200': &ref_60
           description: Cluster Roll Response
           content:
             application/json:
@@ -3197,6 +3208,7 @@ paths:
                     enum:
                       - IN_PROGRESS
                       - COMPLETED
+                      - PARTIALLY_COMPLETED
                       - FAILED
                       - STOPPED
                     example: IN_PROGRESS
@@ -3230,7 +3242,7 @@ paths:
                                   type: string
                                 status:
                                   type: string
-                            example: &ref_52
+                            example: &ref_53
                               - instanceId: i-003a0281a24c01a20
                                 status: REPLACED
                               - instanceId: i-003a0281a24c01a21
@@ -3240,12 +3252,12 @@ paths:
                               - instanceId: i-003a0281a24c01a23
                                 status: NOT_REPLACED_DUE_TO_PDB
                         example:
-                          oldInstances: *ref_52
+                          oldInstances: *ref_53
                     example:
                       unit: percentage
                       value: 0
                       detailedStatus:
-                        oldInstances: *ref_52
+                        oldInstances: *ref_53
                   oceanId:
                     type: string
                     example: o-12e31234
@@ -3253,14 +3265,14 @@ paths:
                     type: array
                     items:
                       type: string
-                    example: &ref_53
+                    example: &ref_54
                       - i-0003a99ffb566f039
                       - i-0567a99ffb566f765
                   launchSpecIds:
                     type: array
                     items:
                       type: string
-                    example: &ref_54
+                    example: &ref_55
                       - ols-76694a7d
                       - ols-56694a76
                   respectPdb:
@@ -3269,6 +3281,9 @@ paths:
                   batchMinHealthyPercentage:
                     type: integer
                     example: 100
+                  reportPartialCompletion:
+                    type: boolean
+                    example: true
                   createdAt:
                     type: string
                     example: '2019-03-24T15:46:09.000Z'
@@ -3286,12 +3301,13 @@ paths:
                     unit: percentage
                     value: 0
                     detailedStatus:
-                      oldInstances: *ref_52
+                      oldInstances: *ref_53
                   oceanId: o-12e31234
-                  instanceIds: *ref_53
-                  launchSpecIds: *ref_54
+                  instanceIds: *ref_54
+                  launchSpecIds: *ref_55
                   respectPdb: true
                   batchMinHealthyPercentage: 100
+                  reportPartialCompletion: true
                   createdAt: '2019-03-24T15:46:09.000Z'
                   updatedAt: '2019-03-24T15:46:09.000Z'
         '400':
@@ -3358,6 +3374,7 @@ paths:
                           enum:
                             - IN_PROGRESS
                             - COMPLETED
+                            - PARTIALLY_COMPLETED
                             - FAILED
                             - STOPPED
                           example: IN_PROGRESS
@@ -3391,7 +3408,7 @@ paths:
                                         type: string
                                       status:
                                         type: string
-                                  example: &ref_55
+                                  example: &ref_56
                                     - instanceId: i-003a0281a24c01a20
                                       status: REPLACED
                                     - instanceId: i-003a0281a24c01a21
@@ -3401,12 +3418,12 @@ paths:
                                     - instanceId: i-003a0281a24c01a23
                                       status: NOT_REPLACED_DUE_TO_PDB
                               example:
-                                oldInstances: *ref_55
+                                oldInstances: *ref_56
                           example:
                             unit: percentage
                             value: 0
                             detailedStatus:
-                              oldInstances: *ref_55
+                              oldInstances: *ref_56
                         oceanId:
                           type: string
                           example: o-12e31234
@@ -3414,14 +3431,14 @@ paths:
                           type: array
                           items:
                             type: string
-                          example: &ref_56
+                          example: &ref_57
                             - i-0003a99ffb566f039
                             - i-0567a99ffb566f765
                         launchSpecIds:
                           type: array
                           items:
                             type: string
-                          example: &ref_57
+                          example: &ref_58
                             - ols-76694a7d
                             - ols-56694a76
                         respectPdb:
@@ -3430,6 +3447,9 @@ paths:
                         batchMinHealthyPercentage:
                           type: integer
                           example: 100
+                        reportPartialCompletion:
+                          type: boolean
+                          example: true
                         createdAt:
                           type: string
                           example: '2019-03-24T15:46:09.000Z'
@@ -3447,12 +3467,13 @@ paths:
                           unit: percentage
                           value: 0
                           detailedStatus:
-                            oldInstances: *ref_55
+                            oldInstances: *ref_56
                         oceanId: o-12e31234
-                        instanceIds: *ref_56
-                        launchSpecIds: *ref_57
+                        instanceIds: *ref_57
+                        launchSpecIds: *ref_58
                         respectPdb: true
                         batchMinHealthyPercentage: 100
+                        reportPartialCompletion: true
                         createdAt: '2019-03-24T15:46:09.000Z'
                         updatedAt: '2019-03-24T15:46:09.000Z'
                 example:
@@ -3471,12 +3492,13 @@ paths:
                         unit: percentage
                         value: 0
                         detailedStatus:
-                          oldInstances: *ref_55
+                          oldInstances: *ref_56
                       oceanId: o-12e31234
-                      instanceIds: *ref_56
-                      launchSpecIds: *ref_57
+                      instanceIds: *ref_57
+                      launchSpecIds: *ref_58
                       respectPdb: true
                       batchMinHealthyPercentage: 100
+                      reportPartialCompletion: true
                       createdAt: '2019-03-24T15:46:09.000Z'
                       updatedAt: '2019-03-24T15:46:09.000Z'
         '400':
@@ -3590,7 +3612,7 @@ paths:
                                   type: string
                                 status:
                                   type: string
-                            example: &ref_58
+                            example: &ref_59
                               - instanceId: i-003a0281a24c01a20
                                 status: REPLACED
                               - instanceId: i-003a0281a24c01a21
@@ -3600,12 +3622,12 @@ paths:
                               - instanceId: i-003a0281a24c01a23
                                 status: NOT_REPLACED_DUE_TO_PDB
                         example:
-                          oldInstances: *ref_58
+                          oldInstances: *ref_59
                     example:
                       unit: percentage
                       value: 0
                       detailedStatus:
-                        oldInstances: *ref_58
+                        oldInstances: *ref_59
                   oceanId:
                     type: string
                     example: o-12e31234
@@ -3631,7 +3653,7 @@ paths:
                     unit: percentage
                     value: 0
                     detailedStatus:
-                      oldInstances: *ref_58
+                      oldInstances: *ref_59
                   oceanId: o-12e31234
                   respectPdb: true
                   batchMinHealthyPercentage: 100
@@ -3665,7 +3687,7 @@ paths:
             type: string
           required: true
       responses:
-        '200': *ref_59
+        '200': *ref_60
         '400':
           description: Bad Request
   /ocean/aws/k8s/cluster/{oceanClusterId}/nodes:
@@ -4053,7 +4075,7 @@ paths:
                                   allMatch:
                                     - key: env
                                       value: prod
-                              example: &ref_60
+                              example: &ref_61
                                 - allMatch:
                                     - type: label
                                       key: env
@@ -4067,10 +4089,10 @@ paths:
                                       key: meta.data
                                       operator: exists
                           example:
-                            anyMatch: *ref_60
+                            anyMatch: *ref_61
                       example:
                         conditions:
-                          anyMatch: *ref_60
+                          anyMatch: *ref_61
       responses:
         '200':
           description: Ocean Cluster Aggregated Detailed Costs Response
@@ -5727,7 +5749,7 @@ paths:
                                   allMatch:
                                     - key: env
                                       value: prod
-                              example: &ref_61
+                              example: &ref_62
                                 - allMatch:
                                     - type: label
                                       key: env
@@ -5741,10 +5763,10 @@ paths:
                                       key: meta.data
                                       operator: exists
                           example:
-                            anyMatch: *ref_61
+                            anyMatch: *ref_62
                       example:
                         conditions:
-                          anyMatch: *ref_61
+                          anyMatch: *ref_62
       responses:
         '200':
           description: Ocean Cluster Aggregated Summary Costs Response
@@ -6688,7 +6710,7 @@ paths:
                   required:
                     - launchSpec
                   properties:
-                    launchSpec: &ref_96
+                    launchSpec: &ref_97
                       allOf:
                         - type: object
                           description: |
@@ -6721,7 +6743,7 @@ paths:
                               example: '2021-03-17T15:06:13.000Z'
                               description: |
                                 A timestamp of the latest VNG update.
-                        - &ref_98
+                        - &ref_99
                           type: object
                           description: |
                             AWS Cluster Virtual Node Group (VNG).
@@ -6754,7 +6776,7 @@ paths:
                                     description: |
                                       Identifier of the image in AWS. Valid values: any string which is not empty or null.
                                     example: ami-ID
-                                example: &ref_75
+                                example: &ref_76
                                   id: ami-ID
                             userData:
                               type: string
@@ -6777,7 +6799,7 @@ paths:
                                   description: |
                                     The iamRole name. If set, do not set launchSpec.iamInstanceProfile.arn
                                   example: EKS-nodes-test
-                              example: &ref_76
+                              example: &ref_77
                                 arn: arn:aws:iam::123456781234:instance-profile/EKS-nodes-test-NodeInstanceProfile-ABCDEFGH123
                                 name: EKS-nodes-test
                             securityGroupIds:
@@ -6786,7 +6808,7 @@ paths:
                                 Set security groups. Each element in the array is a security group identifier.
                               items:
                                 type: string
-                              example: &ref_77
+                              example: &ref_78
                                 - sg-0ded3a2980208c30c
                                 - sg-0ded3a2980208c30d
                             instanceTypes:
@@ -6796,10 +6818,10 @@ paths:
                                 The list overrides the list defined for the Ocean cluster. Can be null.
                               items:
                                 type: string
-                              example: &ref_78
+                              example: &ref_79
                                 - c3.2xlarge
                                 - c4.2xlarge
-                            instanceTypesFilters: &ref_100
+                            instanceTypesFilters: &ref_101
                               type: object
                               description: |
                                 List of instance types filters. The instance types that match with all filters compose the Virtual Node Group's instanceTypes parameter.\
@@ -6849,7 +6871,7 @@ paths:
                                     Types belonging to a family from the IncludeFamilies will be available for scaling (asterisk wildcard is also supported). For example, C* will include instance types from these families: c5, c4, c4a, etc.
                                   items:
                                     type: string
-                                  example: &ref_62
+                                  example: &ref_63
                                     - c5*
                                     - g5
                                 excludeFamilies:
@@ -6858,7 +6880,7 @@ paths:
                                     Types belonging to a family from the ExcludeFamilies will not be available for scaling (asterisk wildcard is also supported). For example, C* will exclude instance types from these families: c5, c4, c4a, etc.
                                   items:
                                     type: string
-                                  example: &ref_63
+                                  example: &ref_64
                                     - t2
                                     - R4*
                                 excludeMetal:
@@ -6881,7 +6903,7 @@ paths:
                                     enum:
                                       - hvm
                                       - paravirtual
-                                  example: &ref_64
+                                  example: &ref_65
                                     - hvm
                                 categories:
                                   type: array
@@ -6895,7 +6917,7 @@ paths:
                                       - General_purpose
                                       - Memory_optimized
                                       - Storage_optimized
-                                  example: &ref_65
+                                  example: &ref_66
                                     - Accelerated_computing
                                     - Compute_optimized
                                 minEnis:
@@ -6915,7 +6937,7 @@ paths:
                                       - EBS
                                       - SSD
                                       - HDD
-                                  example: &ref_66
+                                  example: &ref_67
                                     - NVMe
                                     - EBS
                                 hypervisor:
@@ -6927,7 +6949,7 @@ paths:
                                     enum:
                                       - nitro
                                       - xen
-                                  example: &ref_67
+                                  example: &ref_68
                                     - nitro
                                 rootDeviceTypes:
                                   type: array
@@ -6938,7 +6960,7 @@ paths:
                                     enum:
                                       - ebs
                                       - instance-store
-                                  example: &ref_68
+                                  example: &ref_69
                                     - ebs
                                 minNetworkPerformance:
                                   type: integer
@@ -6973,7 +6995,7 @@ paths:
                                     Types belonging to a Generation from the IncludeGenerations will be available for scaling.
                                   items:
                                     type: string
-                                  example: &ref_69
+                                  example: &ref_70
                                     - '6'
                                     - '7'
                                 excludeGenerations:
@@ -6982,7 +7004,7 @@ paths:
                                     Types Not belonging to a Generation from the ExcludeGenerations will be available for scaling.
                                   items:
                                     type: string
-                                  example: &ref_70
+                                  example: &ref_71
                                     - '1'
                                     - '2'
                                 encryptionInTransitSupported:
@@ -6990,29 +7012,29 @@ paths:
                                   description: |
                                     encryptionInTransitSupported is supported or not.
                                   example: true
-                              example: &ref_79
+                              example: &ref_80
                                 minVcpu: 2
                                 maxVcpu: 16
                                 minMemoryGiB: 8
                                 maxMemoryGiB: 16
                                 minGpu: 0
                                 maxGpu: 4
-                                includeFamilies: *ref_62
-                                excludeFamilies: *ref_63
+                                includeFamilies: *ref_63
+                                excludeFamilies: *ref_64
                                 excludeMetal: true
                                 isEnaSupported: true
-                                virtualizationTypes: *ref_64
-                                categories: *ref_65
+                                virtualizationTypes: *ref_65
+                                categories: *ref_66
                                 minEnis: 2
-                                diskTypes: *ref_66
-                                hypervisor: *ref_67
-                                rootDeviceTypes: *ref_68
+                                diskTypes: *ref_67
+                                hypervisor: *ref_68
+                                rootDeviceTypes: *ref_69
                                 minNetworkPerformance: 2
                                 maxNetworkPerformance: 20
                                 minInstancePrice: 2
                                 maxInstancePrice: 20
-                                includeGenerations: *ref_69
-                                excludeGenerations: *ref_70
+                                includeGenerations: *ref_70
+                                excludeGenerations: *ref_71
                                 encryptionInTransitSupported: true
                             preferredOnDemandTypes:
                               type: array
@@ -7020,7 +7042,7 @@ paths:
                                 When Ocean scales up instances, it takes your preferred types into consideration while maintaining a variety of machine types running for optimized distribution.
                               items:
                                 type: string
-                              example: &ref_80
+                              example: &ref_81
                                 - c3.large
                                 - m4.xlarge
                             preferredSpotTypes:
@@ -7029,7 +7051,7 @@ paths:
                                 When Ocean scales up instances, it takes your preferred types into consideration while maintaining a variety of machine types running for optimized distribution. [Learn More](https://docs.flexera.com/spot/ocean/features/vngs/attributes-and-actions-per-vng?id=preferred-spot-instance-types-per-vng)
                               items:
                                 type: string
-                              example: &ref_81
+                              example: &ref_82
                                 - c3.2xlarge
                                 - c4.2xlarge
                             rootVolumeSize:
@@ -7072,7 +7094,7 @@ paths:
                                     type: string
                                     description: |
                                       Set label value.
-                              example: &ref_82
+                              example: &ref_83
                                 - key: env
                                   value: test
                             taints:
@@ -7094,7 +7116,7 @@ paths:
                                     type: string
                                     description: |
                                       Set taint effect.
-                              example: &ref_83
+                              example: &ref_84
                                 - key: taintKey
                                   value: taintValue
                                   effect: NoSchedule
@@ -7104,7 +7126,7 @@ paths:
                                 Set subnets in Virtual Node Group. Each element in the array is a subnet identifier.
                               items:
                                 type: string
-                              example: &ref_84
+                              example: &ref_85
                                 - subnet-123
                                 - subnet-456
                             elasticIpPool:
@@ -7132,7 +7154,7 @@ paths:
                                   example:
                                     tagKey: color
                                     tagValue: orange
-                              example: &ref_85
+                              example: &ref_86
                                 tagSelector:
                                   tagKey: color
                                   tagValue: orange
@@ -7203,7 +7225,7 @@ paths:
                                           default: false
                                   example:
                                     maxScaleDownPercentage: 30
-                              example: &ref_86
+                              example: &ref_87
                                 headrooms:
                                   - cpuPerUnit: 1024
                                     memoryPerUnit: 512
@@ -7229,7 +7251,7 @@ paths:
                                     description: |
                                       Set the tag value.
                                     example: John Doe
-                                example: &ref_87
+                                example: &ref_88
                                   tagKey: Creator
                                   tagValue: John Doe
                             blockDeviceMappings:
@@ -7373,7 +7395,7 @@ paths:
                                         baseSize: 50
                                         resource: CPU
                                         sizePerResourceUnit: 20
-                                example: &ref_88
+                                example: &ref_89
                                   deviceName: /dev/xvda
                                   ebs:
                                     throughput: 125
@@ -7401,7 +7423,7 @@ paths:
                                     This parameter is used when the ephemeral storage should not utilize the root device.
                                     Provide the device name configured in the VNG's BDM or AMI's BDM that differs from the default root device.
                                   example: /dev/xvdb
-                              example: &ref_89
+                              example: &ref_90
                                 deviceName: /dev/xvdb
                             resourceLimits:
                               type: object
@@ -7418,7 +7440,7 @@ paths:
                                     Can be null. If set, value must be greater than or equal to 0.
                                   type: integer
                                   example: 2
-                              example: &ref_90
+                              example: &ref_91
                                 maxInstanceCount: 5
                                 minInstanceCount: 2
                             strategy:
@@ -7472,7 +7494,7 @@ paths:
                                       default: balanced
                                   example:
                                     availabilityVsCost: balanced
-                              example: &ref_91
+                              example: &ref_92
                                 spotPercentage: 70
                                 utilizeReservedInstances: true
                                 utilizeCommitments: false
@@ -7588,8 +7610,8 @@ paths:
                                     timeWindows:
                                       - Sat:08:00-Sun:08:00
                                     isEnabled: true
-                                optimizationWindows: *ref_71
-                              example: &ref_92
+                                optimizationWindows: *ref_72
+                              example: &ref_93
                                 tasks:
                                   - isEnabled: true
                                     cronExpression: 0 1 * * *
@@ -7598,8 +7620,8 @@ paths:
                                   timeWindows:
                                     - Sat:08:00-Sun:08:00
                                   isEnabled: true
-                                optimizationWindows: *ref_72
-                            instanceMetadataOptions: &ref_107
+                                optimizationWindows: *ref_73
+                            instanceMetadataOptions: &ref_108
                               type: object
                               title: instanceMetadataOptions
                               required:
@@ -7622,7 +7644,7 @@ paths:
                                     The desired HTTP PUT response hop limit for instance metadata requests.
                                     The larger the number, the further instance metadata requests can travel.
                                   example: 12
-                              example: &ref_93
+                              example: &ref_94
                                 httpTokens: optional
                                 httpPutResponseHopLimit: 12
                             startupTaints:
@@ -7646,50 +7668,50 @@ paths:
                                     type: string
                                     description: |
                                       Set startup taint effect.
-                              example: &ref_94
+                              example: &ref_95
                                 - key: node.cilium.io/agent-not-ready
                                   value: true
                                   effect: NoSchedule
-                            instanceStorePolicy: *ref_73
-                            gpu: *ref_74
+                            instanceStorePolicy: *ref_74
+                            gpu: *ref_75
                             loadBalancers:
                               type: array
                               description: |
                                 Configure load balancer settings for the VNG.
                               items: *ref_47
                               example: *ref_16
-                          example: &ref_99
+                          example: &ref_100
                             name: specialty.nodes.spotk8s.com
                             imageId: ami-ID
                             images:
-                              - *ref_75
+                              - *ref_76
                             userData: dsa89d7uosduxq98sau9s8aux9s8aux09q0qu09axsuix0s9qas09xz
-                            iamInstanceProfile: *ref_76
-                            securityGroupIds: *ref_77
-                            instanceTypes: *ref_78
-                            instanceTypesFilters: *ref_79
-                            preferredOnDemandTypes: *ref_80
-                            preferredSpotTypes: *ref_81
+                            iamInstanceProfile: *ref_77
+                            securityGroupIds: *ref_78
+                            instanceTypes: *ref_79
+                            instanceTypesFilters: *ref_80
+                            preferredOnDemandTypes: *ref_81
+                            preferredSpotTypes: *ref_82
                             rootVolumeSize: 8
                             reservedENIs: 1
-                            labels: *ref_82
-                            taints: *ref_83
-                            subnetIds: *ref_84
-                            elasticIpPool: *ref_85
-                            autoScale: *ref_86
+                            labels: *ref_83
+                            taints: *ref_84
+                            subnetIds: *ref_85
+                            elasticIpPool: *ref_86
+                            autoScale: *ref_87
                             tags:
-                              - *ref_87
-                            blockDeviceMappings:
                               - *ref_88
-                            ephemeralStorage: *ref_89
-                            resourceLimits: *ref_90
-                            strategy: *ref_91
+                            blockDeviceMappings:
+                              - *ref_89
+                            ephemeralStorage: *ref_90
+                            resourceLimits: *ref_91
+                            strategy: *ref_92
                             associatePublicIpAddress: false
                             restrictScaleDown: false
-                            scheduling: *ref_92
-                            instanceMetadataOptions: *ref_93
-                            startupTaints: *ref_94
-                            instanceStorePolicy: *ref_95
+                            scheduling: *ref_93
+                            instanceMetadataOptions: *ref_94
+                            startupTaints: *ref_95
+                            instanceStorePolicy: *ref_96
                             gpu: *ref_18
                             loadBalancers: *ref_16
       responses:
@@ -7717,7 +7739,7 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: *ref_96
+                            items: *ref_97
                           kind:
                             example: spotinst:ocean:aws:k8s:launchSpec
                         example:
@@ -7733,7 +7755,7 @@ paths:
         - Ocean AWS
       parameters:
         - *ref_22
-        - &ref_109
+        - &ref_110
           in: query
           name: oceanId
           example: o-12345abc
@@ -7767,7 +7789,7 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: *ref_96
+                            items: *ref_97
                           kind:
                             example: spotinst:ocean:aws:k8s:launchSpec
                         example:
@@ -7784,7 +7806,7 @@ paths:
         - Ocean AWS
       parameters:
         - *ref_22
-        - &ref_97
+        - &ref_98
           in: path
           name: launchSpecId
           description: |
@@ -7839,7 +7861,7 @@ paths:
         - Ocean AWS
       parameters:
         - *ref_22
-        - *ref_97
+        - *ref_98
         - in: query
           name: autoApplyTags
           example: true
@@ -7857,40 +7879,40 @@ paths:
               required:
                 - launchSpec
               properties:
-                launchSpec: *ref_98
+                launchSpec: *ref_99
               example:
                 launchSpec:
                   name: specialty.nodes.spotk8s.com
                   imageId: ami-ID
                   images:
-                    - *ref_75
+                    - *ref_76
                   userData: dsa89d7uosduxq98sau9s8aux9s8aux09q0qu09axsuix0s9qas09xz
-                  iamInstanceProfile: *ref_76
-                  securityGroupIds: *ref_77
-                  instanceTypes: *ref_78
-                  instanceTypesFilters: *ref_79
-                  preferredOnDemandTypes: *ref_80
-                  preferredSpotTypes: *ref_81
+                  iamInstanceProfile: *ref_77
+                  securityGroupIds: *ref_78
+                  instanceTypes: *ref_79
+                  instanceTypesFilters: *ref_80
+                  preferredOnDemandTypes: *ref_81
+                  preferredSpotTypes: *ref_82
                   rootVolumeSize: 8
                   reservedENIs: 1
-                  labels: *ref_82
-                  taints: *ref_83
-                  subnetIds: *ref_84
-                  elasticIpPool: *ref_85
-                  autoScale: *ref_86
+                  labels: *ref_83
+                  taints: *ref_84
+                  subnetIds: *ref_85
+                  elasticIpPool: *ref_86
+                  autoScale: *ref_87
                   tags:
-                    - *ref_87
-                  blockDeviceMappings:
                     - *ref_88
-                  ephemeralStorage: *ref_89
-                  resourceLimits: *ref_90
-                  strategy: *ref_91
+                  blockDeviceMappings:
+                    - *ref_89
+                  ephemeralStorage: *ref_90
+                  resourceLimits: *ref_91
+                  strategy: *ref_92
                   associatePublicIpAddress: false
                   restrictScaleDown: false
-                  scheduling: *ref_92
-                  instanceMetadataOptions: *ref_93
-                  startupTaints: *ref_94
-                  instanceStorePolicy: *ref_95
+                  scheduling: *ref_93
+                  instanceMetadataOptions: *ref_94
+                  startupTaints: *ref_95
+                  instanceStorePolicy: *ref_96
                   gpu: *ref_18
                   loadBalancers: *ref_16
       responses:
@@ -7918,7 +7940,7 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: *ref_96
+                            items: *ref_97
                           kind:
                             example: spotinst:ocean:aws:k8s:launchSpec
                         example:
@@ -7932,7 +7954,7 @@ paths:
         - Ocean AWS
       parameters:
         - *ref_22
-        - *ref_97
+        - *ref_98
       responses:
         '200':
           description: Ocean Virtual Node Group Response
@@ -7958,7 +7980,7 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: *ref_96
+                            items: *ref_97
                           kind:
                             example: spotinst:ocean:aws:k8s:launchSpec
                         example:
@@ -7975,7 +7997,7 @@ paths:
         - Ocean AWS
       parameters:
         - *ref_22
-        - *ref_97
+        - *ref_98
       requestBody:
         required: true
         content:
@@ -8018,12 +8040,12 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: *ref_98
+                            items: *ref_99
                           kind:
                             example: spotinst:ocean:aws:k8s:launchSpec
                         example:
                           items:
-                            - *ref_99
+                            - *ref_100
                           kind: spotinst:ocean:aws:k8s:launchSpec
         '400':
           description: Bad Request
@@ -8037,7 +8059,7 @@ paths:
         - Ocean AWS
       parameters:
         - *ref_22
-        - *ref_97
+        - *ref_98
       requestBody:
         required: true
         content:
@@ -8080,12 +8102,12 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: *ref_98
+                            items: *ref_99
                           kind:
                             example: spotinst:ocean:aws:k8s:launchSpec
                         example:
                           items:
-                            - *ref_99
+                            - *ref_100
                           kind: spotinst:ocean:aws:k8s:launchSpec
         '400':
           description: Bad Request
@@ -8098,7 +8120,7 @@ paths:
       tags:
         - Ocean AWS
       parameters:
-        - *ref_97
+        - *ref_98
         - *ref_22
       requestBody:
         required: false
@@ -8110,7 +8132,7 @@ paths:
                   required:
                     - instanceTypesFilters
                   properties:
-                    instanceTypesFilters: *ref_100
+                    instanceTypesFilters: *ref_101
       responses:
         '200':
           description: Instance Types Filters Simulation For Virtual Node Group Response
@@ -8136,12 +8158,12 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: *ref_101
+                            items: *ref_102
                           kind:
                             example: spotinst:ocean:aws:k8s:launchSpec:instanceTypesFilters:simulation
                         example:
                           items:
-                            - *ref_102
+                            - *ref_103
                           kind: spotinst:ocean:aws:k8s:launchSpec:instanceTypesFilters:simulation
         '400':
           description: Bad Request
@@ -8154,7 +8176,7 @@ paths:
       tags:
         - Ocean AWS
       parameters:
-        - *ref_97
+        - *ref_98
         - *ref_22
       responses:
         '200':
@@ -8190,16 +8212,16 @@ paths:
                                     The allowed Virtual Node Group's instance types when instance types filters is set.
                                   items:
                                     type: string
-                                  example: &ref_103
+                                  example: &ref_104
                                     - c3.large
                                     - c5.large
                               example:
-                                instanceTypes: *ref_103
+                                instanceTypes: *ref_104
                           kind:
                             example: spotinst:ocean:aws:k8s:launchSpec:allowedInstanceTypesByFilters
                         example:
                           items:
-                            - instanceTypes: *ref_103
+                            - instanceTypes: *ref_104
                           kind: spotinst:ocean:aws:k8s:launchSpec:allowedInstanceTypesByFilters
         '400':
           description: Bad Request
@@ -8222,7 +8244,7 @@ paths:
           example: o-12345abc
           description: |
             Identifier of the Ocean cluster.
-        - *ref_104
+        - *ref_105
       requestBody:
         content:
           application/json:
@@ -8269,7 +8291,7 @@ paths:
                                 type: string
                                 description: |
                                   Set label value.
-                          example: &ref_105
+                          example: &ref_106
                             - key: env
                               value: test
                         taints:
@@ -8295,14 +8317,14 @@ paths:
                                   - NoSchedule
                                   - PreferNoSchedule
                                   - NoExecute
-                          example: &ref_106
+                          example: &ref_107
                             - key: taintKey
                               value: taintValue
                               effect: NoSchedule
                       example:
                         name: specialty.nodes.spotk8s.com
-                        labels: *ref_105
-                        taints: *ref_106
+                        labels: *ref_106
+                        taints: *ref_107
       responses:
         '200':
           description: Ocean Import ASG to Virtual Node Group Response
@@ -8346,7 +8368,7 @@ paths:
                                   type: array
                                   items:
                                     type: string
-                                    example: &ref_108
+                                    example: &ref_109
                                       - sg-03ccf232a2bf0f4ea
                                 tags:
                                   type: object
@@ -8360,17 +8382,17 @@ paths:
                                   example:
                                     tagKey: AmazonECSManaged
                                     tagValue: ''
-                                instanceMetadataOptions: *ref_107
+                                instanceMetadataOptions: *ref_108
                               example:
                                 oceanId: o-500a5d5a
                                 name: TestTeam1
                                 imageId: ami-0ce21b51cb55a48b8
                                 securityGroupIds:
-                                  - *ref_108
+                                  - *ref_109
                                 tags:
                                   tagKey: AmazonECSManaged
                                   tagValue: ''
-                                instanceMetadataOptions: *ref_93
+                                instanceMetadataOptions: *ref_94
                           kind:
                             example: spotinst:ocean:aws:k8s:launchSpec
                         example:
@@ -8379,11 +8401,11 @@ paths:
                               name: TestTeam1
                               imageId: ami-0ce21b51cb55a48b8
                               securityGroupIds:
-                                - *ref_108
+                                - *ref_109
                               tags:
                                 tagKey: AmazonECSManaged
                                 tagValue: ''
-                              instanceMetadataOptions: *ref_93
+                              instanceMetadataOptions: *ref_94
                           kind: spotinst:ocean:aws:k8s:launchSpec
         '400':
           description: Bad Request
@@ -8429,7 +8451,7 @@ paths:
           schema:
             type: string
           required: false
-        - *ref_109
+        - *ref_110
       requestBody:
         content:
           application/json:
@@ -8476,12 +8498,12 @@ paths:
                                 type: string
                                 description: |
                                   Set label value.
-                          example: &ref_110
+                          example: &ref_111
                             - key: env
                               value: test
                       example:
                         name: specialty.nodes.spotk8s.com
-                        labels: *ref_110
+                        labels: *ref_111
       responses:
         '200':
           description: Ocean Import EKS Cluster Node Group to Virtual Node Group Response
@@ -8548,7 +8570,7 @@ paths:
                                     example:
                                       tagKey: env
                                       tagValue: staging
-                                instanceMetadataOptions: *ref_107
+                                instanceMetadataOptions: *ref_108
                               example:
                                 oceanId: o-500a5d5a
                                 name: TestTeam1
@@ -8558,7 +8580,7 @@ paths:
                                 tags:
                                   - tagKey: env
                                     tagValue: staging
-                                instanceMetadataOptions: *ref_93
+                                instanceMetadataOptions: *ref_94
                           kind:
                             example: spotinst:ocean:aws:k8s:launchSpec
                         example:
@@ -8571,7 +8593,7 @@ paths:
                               tags:
                                 - tagKey: env
                                   tagValue: staging
-                              instanceMetadataOptions: *ref_93
+                              instanceMetadataOptions: *ref_94
                           kind: spotinst:ocean:aws:k8s:launchSpec
         '400':
           description: Bad Request
@@ -8585,7 +8607,7 @@ paths:
         - Ocean AWS
       parameters:
         - *ref_22
-        - *ref_97
+        - *ref_98
       requestBody:
         required: true
         content:
@@ -8709,12 +8731,12 @@ paths:
           application/json:
             schema:
               allOf:
-                - &ref_115
+                - &ref_116
                   type: object
                   required:
                     - extendedResourceDefinition
                   properties:
-                    extendedResourceDefinition: &ref_112
+                    extendedResourceDefinition: &ref_113
                       type: object
                       description: |
                         The Ocean extended resource definition.
@@ -8740,7 +8762,7 @@ paths:
                           title: AWS mapping
                           description: |
                             A mapping between AWS instanceType or `*` as default and its value for the given extended resource.
-                          example: &ref_111
+                          example: &ref_112
                             c3.large: 2Ki
                             c3.xlarge: 4Ki
                             c3.2xlarge: 8Mi
@@ -8758,10 +8780,10 @@ paths:
                           example: '2021-03-17T15:06:13.000Z'
                           description: |
                             A timestamp of the latest extended resource definition update.
-                      example: &ref_113
+                      example: &ref_114
                         id: erd-123abc
                         name: example.com/name
-                        mapping: *ref_111
+                        mapping: *ref_112
                         createdAt: '2021-03-17T08:13:08.000Z'
                         updatedAt: '2021-03-17T15:06:13.000Z'
       responses:
@@ -8789,12 +8811,12 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: *ref_112
+                            items: *ref_113
                           kind:
                             example: spotinst:ocean:k8s:extendedResourceDefinition
                         example:
                           items:
-                            - *ref_113
+                            - *ref_114
                           kind: spotinst:ocean:k8s:extendedResourceDefinition
         '400':
           description: Bad Request
@@ -8832,12 +8854,12 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: *ref_112
+                            items: *ref_113
                           kind:
                             example: spotinst:ocean:k8s:extendedResourceDefinition
                         example:
                           items:
-                            - *ref_113
+                            - *ref_114
                           kind: spotinst:ocean:k8s:extendedResourceDefinition
         '400':
           description: Bad Request
@@ -8851,7 +8873,7 @@ paths:
         - Ocean AWS
       parameters:
         - *ref_22
-        - &ref_114
+        - &ref_115
           in: path
           name: oceanExtendedResourceDefinitionId
           example: erd-12345abc
@@ -8885,12 +8907,12 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: *ref_112
+                            items: *ref_113
                           kind:
                             example: spotinst:ocean:k8s:extendedResourceDefinition
                         example:
                           items:
-                            - *ref_113
+                            - *ref_114
                           kind: spotinst:ocean:k8s:extendedResourceDefinition
         '400':
           description: Bad Request
@@ -8902,7 +8924,7 @@ paths:
       tags:
         - Ocean AWS
       parameters:
-        - *ref_114
+        - *ref_115
         - *ref_22
       requestBody:
         required: true
@@ -8910,7 +8932,7 @@ paths:
           application/json:
             schema:
               allOf:
-                - *ref_115
+                - *ref_116
       responses:
         '200':
           description: Ocean Update Extended Resource Definition Response
@@ -8936,12 +8958,12 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: *ref_112
+                            items: *ref_113
                           kind:
                             example: spotinst:ocean:k8s:extendedResourceDefinition
                         example:
                           items:
-                            - *ref_113
+                            - *ref_114
                           kind: spotinst:ocean:k8s:extendedResourceDefinition
         '400':
           description: Bad Request
@@ -8954,7 +8976,7 @@ paths:
         - Ocean AWS
       parameters:
         - *ref_22
-        - *ref_114
+        - *ref_115
       responses:
         '200':
           description: Ocean Delete Extended Resource Definition Response
@@ -9114,7 +9136,7 @@ paths:
                           items:
                             type: string
                           description: A list of instance ids that should be migrated to the Ocean cluster.
-                          example: &ref_116
+                          example: &ref_117
                             - i-a12345
                             - i-b12345
                         shouldTerminateDrainedNodes:
@@ -9141,7 +9163,7 @@ paths:
                           minimum: 1
                           maximum: 50
                       example:
-                        instanceIds: *ref_116
+                        instanceIds: *ref_117
                         shouldTerminateDrainedNodes: true
                         shouldEvictStandAlonePods: true
                         forcePodEvictionOnPdbFailure: true
@@ -9232,7 +9254,7 @@ paths:
                                   example: owm-1234567
                                   description: |
                                     The migration id.
-                                state: &ref_117
+                                state: &ref_118
                                   type: string
                                   description: |
                                     The latest state of this migration.
@@ -9289,7 +9311,7 @@ paths:
       parameters:
         - *ref_22
         - *ref_45
-        - &ref_119
+        - &ref_120
           in: path
           name: migrationId
           example: owm-6e3819ae
@@ -9337,8 +9359,8 @@ paths:
                                   example: o-abcd1234
                                   description: |
                                     The Ocean cluster identifier. Required for Virtual Node Group creation.
-                                status: *ref_117
-                                newInstances: &ref_118
+                                status: *ref_118
+                                newInstances: &ref_119
                                   type: array
                                   title: Workload migration details
                                   items:
@@ -9395,7 +9417,7 @@ paths:
                                           name: podName
                                           kind: STAND_ALONE_POD
                                       runningPods: '6'
-                                oldInstances: *ref_118
+                                oldInstances: *ref_119
                                 unscheduledPodIds:
                                   type: string
                                   example: o-abcd1234
@@ -9526,7 +9548,7 @@ paths:
       parameters:
         - *ref_22
         - *ref_45
-        - *ref_119
+        - *ref_120
       requestBody:
         required: true
         content:
