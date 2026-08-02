@@ -16,6 +16,7 @@ Spot OpenAPI Specification is a static site built using [OpenAPI][openapi] defin
 ## Requirements
 
 - [Nvm][nvm]
+- 
 - [Node.js][nodejs]
 - [Yarn][yarn]
 
