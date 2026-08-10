@@ -1,0 +1,118 @@
+type: object
+title: Ocean AKS LocalDNS Profile
+description: |
+  AKS LocalDNS profile configuration for the VNG.
+  Requires VM sizes with at least 4 vCPUs and Linux (Ubuntu 22.04+ or Azure Linux) OS.
+  See: https://learn.microsoft.com/en-us/azure/aks/localdns-custom
+example:
+  mode: Required
+  vnetDNSOverrides:
+    ".":
+      queryLogging: Error
+      protocol: PreferUDP
+      forwardDestination: VnetDNS
+      forwardPolicy: Sequential
+      maxConcurrent: 1000
+      cacheDurationInSeconds: 3600
+      serveStaleDurationInSeconds: 3600
+      serveStale: Immediate
+    "cluster.local":
+      queryLogging: Error
+      protocol: ForceTCP
+      forwardDestination: ClusterCoreDNS
+      forwardPolicy: Sequential
+      maxConcurrent: 1000
+      cacheDurationInSeconds: 3600
+      serveStaleDurationInSeconds: 3600
+      serveStale: Immediate
+  kubeDNSOverrides:
+    ".":
+      queryLogging: Error
+      protocol: PreferUDP
+      forwardDestination: ClusterCoreDNS
+      forwardPolicy: Sequential
+      maxConcurrent: 1000
+      cacheDurationInSeconds: 3600
+      serveStaleDurationInSeconds: 3600
+      serveStale: Immediate
+    "cluster.local":
+      queryLogging: Error
+      protocol: ForceTCP
+      forwardDestination: ClusterCoreDNS
+      forwardPolicy: Sequential
+      maxConcurrent: 1000
+      cacheDurationInSeconds: 3600
+      serveStaleDurationInSeconds: 3600
+      serveStale: Immediate
+properties:
+  mode:
+    type: string
+    enum: [ Required, Preferred, Disabled ]
+    description: The LocalDNS mode. Required when localDnsProfile is configured.
+    example: Required
+  vnetDNSOverrides:
+    type: object
+    description: |
+      Per-zone DNS override configuration for VNet DNS resolution.
+      Keys are DNS zone names (e.g. "." or "cluster.local").
+
+      Example:
+
+      ```json
+      {
+        ".": {
+          "queryLogging": "Error",
+          "protocol": "PreferUDP",
+          "forwardDestination": "VnetDNS",
+          "forwardPolicy": "Sequential",
+          "maxConcurrent": 1000,
+          "cacheDurationInSeconds": 3600,
+          "serveStaleDurationInSeconds": 3600,
+          "serveStale": "Immediate"
+        },
+        "cluster.local": {
+          "queryLogging": "Error",
+          "protocol": "ForceTCP",
+          "forwardDestination": "ClusterCoreDNS",
+          "forwardPolicy": "Sequential",
+          "maxConcurrent": 1000,
+          "cacheDurationInSeconds": 3600,
+          "serveStaleDurationInSeconds": 3600,
+          "serveStale": "Immediate"
+        }
+      }
+      ```
+  kubeDNSOverrides:
+    type: object
+    description: |
+      Per-zone DNS override configuration for kube-dns/CoreDNS resolution.
+      Keys are DNS zone names (e.g. "." or "cluster.local").
+
+      Example:
+
+      ```json
+      {
+        ".": {
+          "queryLogging": "Error",
+          "protocol": "PreferUDP",
+          "forwardDestination": "ClusterCoreDNS",
+          "forwardPolicy": "Sequential",
+          "maxConcurrent": 1000,
+          "cacheDurationInSeconds": 3600,
+          "serveStaleDurationInSeconds": 3600,
+          "serveStale": "Immediate"
+        },
+        "cluster.local": {
+          "queryLogging": "Error",
+          "protocol": "ForceTCP",
+          "forwardDestination": "ClusterCoreDNS",
+          "forwardPolicy": "Sequential",
+          "maxConcurrent": 1000,
+          "cacheDurationInSeconds": 3600,
+          "serveStaleDurationInSeconds": 3600,
+          "serveStale": "Immediate"
+        }
+      }
+      ```
+required:
+  - mode
