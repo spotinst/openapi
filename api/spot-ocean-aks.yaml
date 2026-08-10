@@ -82,7 +82,7 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - &ref_33
+        - &ref_34
           in: query
           name: accountId
           example: act-123456789
@@ -163,7 +163,7 @@ paths:
                             resourceGroupName: TestResourceGroup
                             region: eastus
                             infrastructureResourceGroupName: MC_TestResourceGroup_test-cluster_eastus
-                        autoScaler: &ref_12
+                        autoScaler: &ref_13
                           type: object
                           title: Ocean AKS Autoscaler
                           description: |
@@ -239,7 +239,7 @@ paths:
                               example:
                                 automatic:
                                   percentage: 5
-                          example: &ref_29
+                          example: &ref_30
                             isEnabled: true
                             resourceLimits:
                               maxVCpu: 750
@@ -250,7 +250,7 @@ paths:
                             headroom:
                               automatic:
                                 percentage: 5
-                        scheduling: &ref_13
+                        scheduling: &ref_14
                           type: object
                           description: |
                             An object used to specify times when the cluster will turn off. Once the shutdown time will be over, the cluster will return to its previous state.
@@ -353,7 +353,7 @@ paths:
                                               - vng-123456
                                             items:
                                               type: string
-                                      - &ref_99
+                                      - &ref_101
                                         type: object
                                         description: |
                                           The Configuration for scheduling automatic upgrades of your cluster to ensure it stays updated with the latest version.
@@ -454,7 +454,7 @@ paths:
                                 timeWindows:
                                   - Sat:08:00-Sun:08:00
                                 isEnabled: true
-                          example: &ref_30
+                          example: &ref_31
                             shutdownHours:
                               timeWindows:
                                 - Sat:08:00-Sun:08:00
@@ -466,7 +466,7 @@ paths:
                               timeWindows:
                                 - Sat:08:00-Sun:08:00
                               isEnabled: true
-                        logging: &ref_14
+                        logging: &ref_15
                           type: object
                           title: Ocean AKS Logging
                           description: The Ocean AKS Logging object.
@@ -499,11 +499,11 @@ paths:
                               example:
                                 azureBlob:
                                   id: di-123
-                          example: &ref_31
+                          example: &ref_32
                             export:
                               azureBlob:
                                 id: di-123
-                        health: &ref_15
+                        health: &ref_16
                           type: object
                           title: Ocean AKS Health
                           description: |
@@ -530,7 +530,7 @@ paths:
                               maximum: 3600
                               description: |
                                 The amount of time, in seconds, a node is allowed to remain unhealthy after the grace period has elapsed before Ocean automatically replaces it.
-                          example: &ref_32
+                          example: &ref_33
                             shouldReplaceUnhealthyInstances: false
                             gracePeriod: 120
                             healthCheckUnhealthyDurationBeforeReplacement: 180
@@ -548,12 +548,12 @@ paths:
                                 In case zone 0 is selected together with other availability zones, nodes of zone 0 will be scaled only for workloads that demand it.
                               items:
                                 type: string
-                              example: &ref_9
+                              example: &ref_10
                                 - '0'
                                 - '1'
                                 - '2'
                                 - '3'
-                            nodePoolProperties: &ref_16
+                            nodePoolProperties: &ref_17
                               type: object
                               title: Ocean AKS Node Pool Properties
                               description: |
@@ -633,7 +633,7 @@ paths:
                                     type: string
                                   example: &ref_3
                                     - /subscriptions/123456-1234-1234-1234-123456789/resourceGroups/ExampleResourceGroup/providers/Microsoft.Network/virtualNetworks/ExampleVirtualNetwork/subnets/default
-                                linuxOSConfig: &ref_38
+                                linuxOSConfig: &ref_39
                                   type: object
                                   title: Ocean AKS Linux OS Config
                                   description: |
@@ -652,10 +652,132 @@ paths:
                                           maximum: 262144
                                       example:
                                         vmMaxMapCount: 79550
-                                  example: &ref_41
+                                  example: &ref_43
                                     sysctls:
                                       vmMaxMapCount: 79550
-                              example: &ref_22
+                                localDnsProfile: &ref_40
+                                  type: object
+                                  title: Ocean AKS LocalDNS Profile
+                                  description: |
+                                    AKS LocalDNS profile configuration for the VNG.
+                                    Requires VM sizes with at least 4 vCPUs and Linux (Ubuntu 22.04+ or Azure Linux) OS.
+                                    See: https://learn.microsoft.com/en-us/azure/aks/localdns-custom
+                                  example: &ref_4
+                                    mode: Required
+                                    vnetDNSOverrides:
+                                      .:
+                                        queryLogging: Error
+                                        protocol: PreferUDP
+                                        forwardDestination: VnetDNS
+                                        forwardPolicy: Sequential
+                                        maxConcurrent: 1000
+                                        cacheDurationInSeconds: 3600
+                                        serveStaleDurationInSeconds: 3600
+                                        serveStale: Immediate
+                                      cluster.local:
+                                        queryLogging: Error
+                                        protocol: ForceTCP
+                                        forwardDestination: ClusterCoreDNS
+                                        forwardPolicy: Sequential
+                                        maxConcurrent: 1000
+                                        cacheDurationInSeconds: 3600
+                                        serveStaleDurationInSeconds: 3600
+                                        serveStale: Immediate
+                                    kubeDNSOverrides:
+                                      .:
+                                        queryLogging: Error
+                                        protocol: PreferUDP
+                                        forwardDestination: ClusterCoreDNS
+                                        forwardPolicy: Sequential
+                                        maxConcurrent: 1000
+                                        cacheDurationInSeconds: 3600
+                                        serveStaleDurationInSeconds: 3600
+                                        serveStale: Immediate
+                                      cluster.local:
+                                        queryLogging: Error
+                                        protocol: ForceTCP
+                                        forwardDestination: ClusterCoreDNS
+                                        forwardPolicy: Sequential
+                                        maxConcurrent: 1000
+                                        cacheDurationInSeconds: 3600
+                                        serveStaleDurationInSeconds: 3600
+                                        serveStale: Immediate
+                                  properties:
+                                    mode:
+                                      type: string
+                                      enum:
+                                        - Required
+                                        - Preferred
+                                        - Disabled
+                                      description: The LocalDNS mode. Required when localDnsProfile is configured.
+                                      example: Required
+                                    vnetDNSOverrides:
+                                      type: object
+                                      description: |
+                                        Per-zone DNS override configuration for VNet DNS resolution.
+                                        Keys are DNS zone names (e.g. "." or "cluster.local").
+
+                                        Example:
+
+                                        ```json
+                                        {
+                                          ".": {
+                                            "queryLogging": "Error",
+                                            "protocol": "PreferUDP",
+                                            "forwardDestination": "VnetDNS",
+                                            "forwardPolicy": "Sequential",
+                                            "maxConcurrent": 1000,
+                                            "cacheDurationInSeconds": 3600,
+                                            "serveStaleDurationInSeconds": 3600,
+                                            "serveStale": "Immediate"
+                                          },
+                                          "cluster.local": {
+                                            "queryLogging": "Error",
+                                            "protocol": "ForceTCP",
+                                            "forwardDestination": "ClusterCoreDNS",
+                                            "forwardPolicy": "Sequential",
+                                            "maxConcurrent": 1000,
+                                            "cacheDurationInSeconds": 3600,
+                                            "serveStaleDurationInSeconds": 3600,
+                                            "serveStale": "Immediate"
+                                          }
+                                        }
+                                        ```
+                                    kubeDNSOverrides:
+                                      type: object
+                                      description: |
+                                        Per-zone DNS override configuration for kube-dns/CoreDNS resolution.
+                                        Keys are DNS zone names (e.g. "." or "cluster.local").
+
+                                        Example:
+
+                                        ```json
+                                        {
+                                          ".": {
+                                            "queryLogging": "Error",
+                                            "protocol": "PreferUDP",
+                                            "forwardDestination": "ClusterCoreDNS",
+                                            "forwardPolicy": "Sequential",
+                                            "maxConcurrent": 1000,
+                                            "cacheDurationInSeconds": 3600,
+                                            "serveStaleDurationInSeconds": 3600,
+                                            "serveStale": "Immediate"
+                                          },
+                                          "cluster.local": {
+                                            "queryLogging": "Error",
+                                            "protocol": "ForceTCP",
+                                            "forwardDestination": "ClusterCoreDNS",
+                                            "forwardPolicy": "Sequential",
+                                            "maxConcurrent": 1000,
+                                            "cacheDurationInSeconds": 3600,
+                                            "serveStaleDurationInSeconds": 3600,
+                                            "serveStale": "Immediate"
+                                          }
+                                        }
+                                        ```
+                                  required:
+                                    - mode
+                              example: &ref_23
                                 maxPodsPerNode: 30
                                 enableNodePublicIP: true
                                 osDiskSizeGB: 64
@@ -668,7 +790,8 @@ paths:
                                 linuxOSConfig:
                                   sysctls:
                                     vmMaxMapCount: 79550
-                            nodeCountLimits: &ref_17
+                                localDnsProfile: *ref_4
+                            nodeCountLimits: &ref_18
                               type: object
                               title: Ocean AKS Node Count Limits
                               description: |
@@ -688,10 +811,10 @@ paths:
                                   minimum: 0
                                   example: 100
                                   default: 1000
-                              example: &ref_23
+                              example: &ref_24
                                 minCount: 1
                                 maxCount: 100
-                            strategy: &ref_18
+                            strategy: &ref_19
                               type: object
                               title: Ocean AKS Strategy
                               description: |
@@ -722,12 +845,12 @@ paths:
                                   example: 600
                                   minimum: 300
                                   maximum: 3600
-                              example: &ref_24
+                              example: &ref_25
                                 shouldUtilizeCommitments: true
                                 spotPercentage: 50
                                 fallbackToOd: true
                                 drainingTimeout: 600
-                            autoScale: &ref_19
+                            autoScale: &ref_20
                               type: object
                               description: |
                                 Object specifying the automatic scaling of an Ocean VNG.
@@ -777,7 +900,7 @@ paths:
                                       memoryPerUnit: 512
                                       gpuPerUnit: 0
                                       numOfUnits: 2
-                              example: &ref_25
+                              example: &ref_26
                                 autoHeadroomPercentage: 5
                                 headrooms:
                                   - cpuPerUnit: 1024
@@ -811,7 +934,7 @@ paths:
                                 * "kubernetes.azure.com/accelerator"
                                 * "kubernetes.azure.com/fips_enabled"
                                 * "kubernetes.azure.com/os-sku"
-                              example: &ref_10
+                              example: &ref_11
                                 key: value
                             taints:
                               type: array
@@ -839,7 +962,7 @@ paths:
                                       - PreferNoSchedule
                                       - NoExecute
                                       - PreferNoExecute
-                              example: &ref_11
+                              example: &ref_12
                                 - key: taintKey
                                   value: taintValue
                                   effect: NoSchedule
@@ -848,7 +971,7 @@ paths:
                               description: |
                                 A maximum of 20 unique key-value pairs for VM tags in the virtual node group.
                                 Note: Azure has a tag limit of 50 per node pool.
-                            vmSizes: &ref_20
+                            vmSizes: &ref_21
                               type: object
                               title: Ocean AKS VM Sizes
                               description: |
@@ -897,7 +1020,7 @@ paths:
                                           - INTEL64
                                           - AMD64
                                           - ARM64
-                                      example: &ref_4
+                                      example: &ref_5
                                         - x86_64
                                     series:
                                       type: array
@@ -905,7 +1028,7 @@ paths:
                                         Only vm sizes belonging to a series from the list will be available for scaling.
                                       items:
                                         type: string
-                                      example: &ref_5
+                                      example: &ref_6
                                         - D v3
                                         - F
                                         - E v4
@@ -915,7 +1038,7 @@ paths:
                                         Vm sizes belonging to a series from the list will not be available for scaling.
                                       items:
                                         type: string
-                                      example: &ref_6
+                                      example: &ref_7
                                         - Bs
                                         - Da v4
                                     minDisk:
@@ -977,7 +1100,7 @@ paths:
                                           - highPerformanceCompute
                                           - storageOptimized
                                           - GPU
-                                      example: &ref_7
+                                      example: &ref_8
                                         - memoryOptimized
                                     gpuTypes:
                                       type: array
@@ -996,44 +1119,44 @@ paths:
                                           - nvidia-tesla-p40
                                           - nvidia-tesla-t4
                                           - nvidia-tesla-h100
-                                        example: &ref_8
+                                        example: &ref_9
                                           - nvidia-tesla-t4
                                   example:
                                     minVCpu: 2
                                     maxVCpu: 16
                                     minMemoryGiB: 8
                                     maxMemoryGiB: 16
-                                    architectures: *ref_4
-                                    series: *ref_5
-                                    excludeSeries: *ref_6
+                                    architectures: *ref_5
+                                    series: *ref_6
+                                    excludeSeries: *ref_7
                                     minDisk: 1
                                     minGpu: 1
                                     maxGpu: 2
                                     diskPerformance: Standard
                                     acceleratedNetworking: Enabled
                                     minNICs: 4
-                                    vmTypes: *ref_7
+                                    vmTypes: *ref_8
                                     gpuTypes:
-                                      - *ref_8
-                              example: &ref_28
+                                      - *ref_9
+                              example: &ref_29
                                 filters:
                                   minVCpu: 2
                                   maxVCpu: 16
                                   minMemoryGiB: 8
                                   maxMemoryGiB: 16
-                                  architectures: *ref_4
-                                  series: *ref_5
-                                  excludeSeries: *ref_6
+                                  architectures: *ref_5
+                                  series: *ref_6
+                                  excludeSeries: *ref_7
                                   minDisk: 1
                                   minGpu: 1
                                   maxGpu: 2
                                   diskPerformance: Standard
                                   acceleratedNetworking: Enabled
                                   minNICs: 4
-                                  vmTypes: *ref_7
+                                  vmTypes: *ref_8
                                   gpuTypes:
-                                    - *ref_8
-                            scheduling: &ref_42
+                                    - *ref_9
+                            scheduling: &ref_44
                               type: object
                               description: |
                                 An object used to specify times when the virtual node group will turn off all its node pools. Once the shutdown time will be over, the virtual node group will return to its previous state.
@@ -1061,7 +1184,7 @@ paths:
                                     timeWindows:
                                       - Sat:08:00-Sun:08:00
                                     isEnabled: true
-                              example: &ref_46
+                              example: &ref_48
                                 shutdownHours:
                                   timeWindows:
                                     - Sat:08:00-Sun:08:00
@@ -1073,7 +1196,7 @@ paths:
                                 Therefore, Ocean will not scale nodes down unless they are empty.
                               example: false
                           example:
-                            availabilityZones: *ref_9
+                            availabilityZones: *ref_10
                             nodePoolProperties:
                               maxPodsPerNode: 30
                               enableNodePublicIP: true
@@ -1087,6 +1210,7 @@ paths:
                               linuxOSConfig:
                                 sysctls:
                                   vmMaxMapCount: 79550
+                              localDnsProfile: *ref_4
                             nodeCountLimits:
                               minCount: 1
                               maxCount: 100
@@ -1102,26 +1226,26 @@ paths:
                                   memoryPerUnit: 512
                                   gpuPerUnit: 0
                                   numOfUnits: 2
-                            labels: *ref_10
-                            taints: *ref_11
+                            labels: *ref_11
+                            taints: *ref_12
                             vmSizes:
                               filters:
                                 minVCpu: 2
                                 maxVCpu: 16
                                 minMemoryGiB: 8
                                 maxMemoryGiB: 16
-                                architectures: *ref_4
-                                series: *ref_5
-                                excludeSeries: *ref_6
+                                architectures: *ref_5
+                                series: *ref_6
+                                excludeSeries: *ref_7
                                 minDisk: 1
                                 minGpu: 1
                                 maxGpu: 2
                                 diskPerformance: Standard
                                 acceleratedNetworking: Enabled
                                 minNICs: 4
-                                vmTypes: *ref_7
+                                vmTypes: *ref_8
                                 gpuTypes:
-                                  - *ref_8
+                                  - *ref_9
                             scheduling:
                               shutdownHours:
                                 timeWindows:
@@ -1169,7 +1293,7 @@ paths:
                           gracePeriod: 120
                           healthCheckUnhealthyDurationBeforeReplacement: 180
                         virtualNodeGroupTemplate:
-                          availabilityZones: *ref_9
+                          availabilityZones: *ref_10
                           nodePoolProperties:
                             maxPodsPerNode: 30
                             enableNodePublicIP: true
@@ -1183,6 +1307,7 @@ paths:
                             linuxOSConfig:
                               sysctls:
                                 vmMaxMapCount: 79550
+                            localDnsProfile: *ref_4
                           nodeCountLimits:
                             minCount: 1
                             maxCount: 100
@@ -1198,26 +1323,26 @@ paths:
                                 memoryPerUnit: 512
                                 gpuPerUnit: 0
                                 numOfUnits: 2
-                          labels: *ref_10
-                          taints: *ref_11
+                          labels: *ref_11
+                          taints: *ref_12
                           vmSizes:
                             filters:
                               minVCpu: 2
                               maxVCpu: 16
                               minMemoryGiB: 8
                               maxMemoryGiB: 16
-                              architectures: *ref_4
-                              series: *ref_5
-                              excludeSeries: *ref_6
+                              architectures: *ref_5
+                              series: *ref_6
+                              excludeSeries: *ref_7
                               minDisk: 1
                               minGpu: 1
                               maxGpu: 2
                               diskPerformance: Standard
                               acceleratedNetworking: Enabled
                               minNICs: 4
-                              vmTypes: *ref_7
+                              vmTypes: *ref_8
                               gpuTypes:
-                                - *ref_8
+                                - *ref_9
                           scheduling:
                             shutdownHours:
                               timeWindows:
@@ -1231,10 +1356,10 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - &ref_34
+                  - &ref_35
                     type: object
                     allOf:
-                      - &ref_47
+                      - &ref_49
                         type: object
                         properties:
                           request:
@@ -1327,7 +1452,7 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: &ref_35
+                            items: &ref_36
                               type: object
                               description: |
                                 The Ocean cluster.
@@ -1384,10 +1509,10 @@ paths:
                                     resourceGroupName: TestResourceGroup
                                     region: eastus
                                     infrastructureResourceGroupName: MC_TestResourceGroup_test-cluster_eastus
-                                autoScaler: *ref_12
-                                scheduling: *ref_13
-                                logging: *ref_14
-                                health: *ref_15
+                                autoScaler: *ref_13
+                                scheduling: *ref_14
+                                logging: *ref_15
+                                health: *ref_16
                                 virtualNodeGroupTemplate:
                                   type: object
                                   title: Ocean AKS Virtual Node Group Template
@@ -1398,14 +1523,14 @@ paths:
                                         An Array holding Availability Zones, this configures the availability zones the Ocean may launch instances in per VNG.
                                       items:
                                         type: string
-                                      example: &ref_21
+                                      example: &ref_22
                                         - '1'
                                         - '2'
                                         - '3'
-                                    nodePoolProperties: *ref_16
-                                    nodeCountLimits: *ref_17
-                                    strategy: *ref_18
-                                    autoScale: *ref_19
+                                    nodePoolProperties: *ref_17
+                                    nodeCountLimits: *ref_18
+                                    strategy: *ref_19
+                                    autoScale: *ref_20
                                     labels:
                                       type: object
                                       description: |
@@ -1433,7 +1558,7 @@ paths:
                                         * "kubernetes.azure.com/accelerator"
                                         * "kubernetes.azure.com/fips_enabled"
                                         * "kubernetes.azure.com/os-sku"
-                                      example: &ref_26
+                                      example: &ref_27
                                         key: value
                                     taints:
                                       type: array
@@ -1461,7 +1586,7 @@ paths:
                                               - PreferNoSchedule
                                               - NoExecute
                                               - PreferNoExecute
-                                      example: &ref_27
+                                      example: &ref_28
                                         - key: taintKey
                                           value: taintValue
                                           effect: NoSchedule
@@ -1470,7 +1595,7 @@ paths:
                                       description: |
                                         A maximum of 20 unique key-value pairs for VM tags in the virtual node group.
                                         Note: Azure has a tag limit of 50 per node pool.
-                                    vmSizes: *ref_20
+                                    vmSizes: *ref_21
                                     restrictScaleDown:
                                       type: boolean
                                       description: |
@@ -1478,14 +1603,14 @@ paths:
                                         Therefore, Ocean will not scale nodes down unless they are empty.
                                       example: false
                                   example:
-                                    availabilityZones: *ref_21
-                                    nodePoolProperties: *ref_22
-                                    nodeCountLimits: *ref_23
-                                    strategy: *ref_24
-                                    autoScale: *ref_25
-                                    labels: *ref_26
-                                    taints: *ref_27
-                                    vmSizes: *ref_28
+                                    availabilityZones: *ref_22
+                                    nodePoolProperties: *ref_23
+                                    nodeCountLimits: *ref_24
+                                    strategy: *ref_25
+                                    autoScale: *ref_26
+                                    labels: *ref_27
+                                    taints: *ref_28
+                                    vmSizes: *ref_29
                                     restrictScaleDown: false
                                 createdAt:
                                   type: string
@@ -1501,7 +1626,7 @@ paths:
                                   example: '2021-03-17T15:06:13.000Z'
                                   description: |
                                     A timestamp of the latest Ocean update.
-                              example: &ref_36
+                              example: &ref_37
                                 id: o-134abcd
                                 name: test
                                 controllerClusterId: test-123124
@@ -1510,19 +1635,19 @@ paths:
                                   resourceGroupName: TestResourceGroup
                                   region: eastus
                                   infrastructureResourceGroupName: MC_TestResourceGroup_test-cluster_eastus
-                                autoScaler: *ref_29
-                                scheduling: *ref_30
-                                logging: *ref_31
-                                health: *ref_32
+                                autoScaler: *ref_30
+                                scheduling: *ref_31
+                                logging: *ref_32
+                                health: *ref_33
                                 virtualNodeGroupTemplate:
-                                  availabilityZones: *ref_21
-                                  nodePoolProperties: *ref_22
-                                  nodeCountLimits: *ref_23
-                                  strategy: *ref_24
-                                  autoScale: *ref_25
-                                  labels: *ref_26
-                                  taints: *ref_27
-                                  vmSizes: *ref_28
+                                  availabilityZones: *ref_22
+                                  nodePoolProperties: *ref_23
+                                  nodeCountLimits: *ref_24
+                                  strategy: *ref_25
+                                  autoScale: *ref_26
+                                  labels: *ref_27
+                                  taints: *ref_28
+                                  vmSizes: *ref_29
                                   restrictScaleDown: false
                                 createdAt: '2021-03-17T08:13:08.000Z'
                                 updatedAt: '2021-03-17T15:06:13.000Z'
@@ -1538,19 +1663,19 @@ paths:
                                 resourceGroupName: TestResourceGroup
                                 region: eastus
                                 infrastructureResourceGroupName: MC_TestResourceGroup_test-cluster_eastus
-                              autoScaler: *ref_29
-                              scheduling: *ref_30
-                              logging: *ref_31
-                              health: *ref_32
+                              autoScaler: *ref_30
+                              scheduling: *ref_31
+                              logging: *ref_32
+                              health: *ref_33
                               virtualNodeGroupTemplate:
-                                availabilityZones: *ref_21
-                                nodePoolProperties: *ref_22
-                                nodeCountLimits: *ref_23
-                                strategy: *ref_24
-                                autoScale: *ref_25
-                                labels: *ref_26
-                                taints: *ref_27
-                                vmSizes: *ref_28
+                                availabilityZones: *ref_22
+                                nodePoolProperties: *ref_23
+                                nodeCountLimits: *ref_24
+                                strategy: *ref_25
+                                autoScale: *ref_26
+                                labels: *ref_27
+                                taints: *ref_28
+                                vmSizes: *ref_29
                                 restrictScaleDown: false
                               createdAt: '2021-03-17T08:13:08.000Z'
                               updatedAt: '2021-03-17T15:06:13.000Z'
@@ -1565,7 +1690,7 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_33
+        - *ref_34
       responses:
         '200':
           description: Ocean AKS Response
@@ -1573,7 +1698,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_34
+                  - *ref_35
                   - type: object
                     properties:
                       request:
@@ -1591,12 +1716,12 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: *ref_35
+                            items: *ref_36
                           kind:
                             example: spotinst:ocean:azure:np
                         example:
                           items:
-                            - *ref_36
+                            - *ref_37
                           kind: spotinst:ocean:azure:np
         '400':
           description: Bad Request
@@ -1609,8 +1734,8 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_33
-        - &ref_37
+        - *ref_34
+        - &ref_38
           in: path
           name: oceanClusterId
           example: o-12345abc
@@ -1626,7 +1751,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_34
+                  - *ref_35
                   - type: object
                     properties:
                       request:
@@ -1644,12 +1769,12 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: *ref_35
+                            items: *ref_36
                           kind:
                             example: spotinst:ocean:azure:np
                         example:
                           items:
-                            - *ref_36
+                            - *ref_37
                           kind: spotinst:ocean:azure:np
         '400':
           description: Bad Request
@@ -1668,8 +1793,8 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_33
-        - *ref_37
+        - *ref_34
+        - *ref_38
       requestBody:
         required: true
         content:
@@ -1690,10 +1815,10 @@ paths:
                           example: test
                           description: |
                             A name for the Ocean cluster.
-                        autoScaler: *ref_12
-                        scheduling: *ref_13
-                        logging: *ref_14
-                        health: *ref_15
+                        autoScaler: *ref_13
+                        scheduling: *ref_14
+                        logging: *ref_15
+                        health: *ref_16
                         virtualNodeGroupTemplate:
                           type: object
                           title: Ocean AKS Virtual Node Group Template
@@ -1704,11 +1829,11 @@ paths:
                                 An Array holding Availability Zones, this configures the availability zones the Ocean may launch instances in per VNG.
                               items:
                                 type: string
-                              example: &ref_43
+                              example: &ref_45
                                 - '1'
                                 - '2'
                                 - '3'
-                            nodePoolProperties: &ref_62
+                            nodePoolProperties: &ref_64
                               type: object
                               title: Ocean AKS Node Pool Properties
                               description: |
@@ -1765,7 +1890,7 @@ paths:
                                     The IDs of subnets in an existing VNet into which to assign nodes in the cluster (requires azure network-plugin).
                                   items:
                                     type: string
-                                  example: &ref_39
+                                  example: &ref_41
                                     - /subscriptions/123456-1234-1234-1234-123456789/resourceGroups/ExampleResourceGroup/providers/Microsoft.Network/virtualNetworks/ExampleVirtualNetwork/subnets/default
                                 podSubnetIDs:
                                   type: array
@@ -1773,22 +1898,24 @@ paths:
                                     The IDs of subnets in an existing VNet into which to assign pods in the cluster (requires azure network-plugin).
                                   items:
                                     type: string
-                                  example: &ref_40
+                                  example: &ref_42
                                     - /subscriptions/123456-1234-1234-1234-123456789/resourceGroups/ExampleResourceGroup/providers/Microsoft.Network/virtualNetworks/ExampleVirtualNetwork/subnets/default
-                                linuxOSConfig: *ref_38
-                              example: &ref_64
+                                linuxOSConfig: *ref_39
+                                localDnsProfile: *ref_40
+                              example: &ref_66
                                 maxPodsPerNode: 30
                                 enableNodePublicIP: true
                                 osDiskSizeGB: 64
                                 osDiskType: Ephemeral
                                 osSKU: Ubuntu
                                 kubernetesVersion: 1.26
-                                vnetSubnetIDs: *ref_39
-                                podSubnetIDs: *ref_40
-                                linuxOSConfig: *ref_41
-                            nodeCountLimits: *ref_17
-                            strategy: *ref_18
-                            autoScale: *ref_19
+                                vnetSubnetIDs: *ref_41
+                                podSubnetIDs: *ref_42
+                                linuxOSConfig: *ref_43
+                                localDnsProfile: *ref_4
+                            nodeCountLimits: *ref_18
+                            strategy: *ref_19
+                            autoScale: *ref_20
                             labels:
                               type: object
                               description: |
@@ -1816,7 +1943,7 @@ paths:
                                 * "kubernetes.azure.com/accelerator"
                                 * "kubernetes.azure.com/fips_enabled"
                                 * "kubernetes.azure.com/os-sku"
-                              example: &ref_44
+                              example: &ref_46
                                 key: value
                             taints:
                               type: array
@@ -1844,7 +1971,7 @@ paths:
                                       - PreferNoSchedule
                                       - NoExecute
                                       - PreferNoExecute
-                              example: &ref_45
+                              example: &ref_47
                                 - key: taintKey
                                   value: taintValue
                                   effect: NoSchedule
@@ -1853,8 +1980,8 @@ paths:
                               description: |
                                 A maximum of 20 unique key-value pairs for VM tags in the virtual node group.
                                 Note: Azure has a tag limit of 50 per node pool.
-                            vmSizes: *ref_20
-                            scheduling: *ref_42
+                            vmSizes: *ref_21
+                            scheduling: *ref_44
                             restrictScaleDown:
                               type: boolean
                               description: |
@@ -1862,7 +1989,7 @@ paths:
                                 Therefore, Ocean will not scale nodes down unless they are empty.
                               example: false
                           example:
-                            availabilityZones: *ref_43
+                            availabilityZones: *ref_45
                             nodePoolProperties:
                               maxPodsPerNode: 30
                               enableNodePublicIP: true
@@ -1870,25 +1997,26 @@ paths:
                               osDiskType: Ephemeral
                               osSKU: Ubuntu
                               kubernetesVersion: 1.26
-                              vnetSubnetIDs: *ref_39
-                              podSubnetIDs: *ref_40
-                              linuxOSConfig: *ref_41
-                            nodeCountLimits: *ref_23
-                            strategy: *ref_24
-                            autoScale: *ref_25
-                            labels: *ref_44
-                            taints: *ref_45
-                            vmSizes: *ref_28
-                            scheduling: *ref_46
+                              vnetSubnetIDs: *ref_41
+                              podSubnetIDs: *ref_42
+                              linuxOSConfig: *ref_43
+                              localDnsProfile: *ref_4
+                            nodeCountLimits: *ref_24
+                            strategy: *ref_25
+                            autoScale: *ref_26
+                            labels: *ref_46
+                            taints: *ref_47
+                            vmSizes: *ref_29
+                            scheduling: *ref_48
                             restrictScaleDown: false
                       example:
                         name: test
-                        autoScaler: *ref_29
-                        scheduling: *ref_30
-                        logging: *ref_31
-                        health: *ref_32
+                        autoScaler: *ref_30
+                        scheduling: *ref_31
+                        logging: *ref_32
+                        health: *ref_33
                         virtualNodeGroupTemplate:
-                          availabilityZones: *ref_43
+                          availabilityZones: *ref_45
                           nodePoolProperties:
                             maxPodsPerNode: 30
                             enableNodePublicIP: true
@@ -1896,16 +2024,17 @@ paths:
                             osDiskType: Ephemeral
                             osSKU: Ubuntu
                             kubernetesVersion: 1.26
-                            vnetSubnetIDs: *ref_39
-                            podSubnetIDs: *ref_40
-                            linuxOSConfig: *ref_41
-                          nodeCountLimits: *ref_23
-                          strategy: *ref_24
-                          autoScale: *ref_25
-                          labels: *ref_44
-                          taints: *ref_45
-                          vmSizes: *ref_28
-                          scheduling: *ref_46
+                            vnetSubnetIDs: *ref_41
+                            podSubnetIDs: *ref_42
+                            linuxOSConfig: *ref_43
+                            localDnsProfile: *ref_4
+                          nodeCountLimits: *ref_24
+                          strategy: *ref_25
+                          autoScale: *ref_26
+                          labels: *ref_46
+                          taints: *ref_47
+                          vmSizes: *ref_29
+                          scheduling: *ref_48
                           restrictScaleDown: false
       responses:
         '200':
@@ -1914,7 +2043,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_34
+                  - *ref_35
                   - type: object
                     properties:
                       request:
@@ -1932,12 +2061,12 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: *ref_35
+                            items: *ref_36
                           kind:
                             example: spotinst:ocean:azure:np
                         example:
                           items:
-                            - *ref_36
+                            - *ref_37
                           kind: spotinst:ocean:azure:np
         '400':
           description: Bad Request
@@ -1949,8 +2078,8 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_33
-        - *ref_37
+        - *ref_34
+        - *ref_38
       responses:
         '200':
           description: Ocean AKS Delete Cluster Response
@@ -1958,7 +2087,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_47
+                  - *ref_49
                   - type: object
                     properties:
                       request:
@@ -1983,8 +2112,8 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_33
-        - &ref_97
+        - *ref_34
+        - &ref_99
           in: query
           name: resourceGroupName
           example: test-clust_group
@@ -1993,7 +2122,7 @@ paths:
           schema:
             type: string
           required: true
-        - &ref_98
+        - &ref_100
           in: query
           name: aksClusterName
           example: test-cluster
@@ -2009,7 +2138,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_34
+                  - *ref_35
                   - type: object
                     properties:
                       request:
@@ -2087,9 +2216,9 @@ paths:
                                         resourceGroupName: TestResourceGroup
                                         region: eastus
                                         infrastructureResourceGroupName: MC_TestResourceGroup_test-cluster_eastus
-                                    autoScaler: *ref_12
-                                    scheduling: *ref_13
-                                    health: *ref_15
+                                    autoScaler: *ref_13
+                                    scheduling: *ref_14
+                                    health: *ref_16
                                     virtualNodeGroupTemplate:
                                       type: object
                                       title: Ocean AKS Virtual Node Group Template
@@ -2100,13 +2229,13 @@ paths:
                                             An Array holding Availability Zones, this configures the availability zones the Ocean may launch instances in per VNG.
                                           items:
                                             type: string
-                                          example: &ref_48
+                                          example: &ref_50
                                             - '1'
                                             - '2'
                                             - '3'
-                                        nodePoolProperties: *ref_16
-                                        nodeCountLimits: *ref_17
-                                        strategy: *ref_18
+                                        nodePoolProperties: *ref_17
+                                        nodeCountLimits: *ref_18
+                                        strategy: *ref_19
                                         labels:
                                           type: object
                                           description: |
@@ -2134,7 +2263,7 @@ paths:
                                             * "kubernetes.azure.com/accelerator"
                                             * "kubernetes.azure.com/fips_enabled"
                                             * "kubernetes.azure.com/os-sku"
-                                          example: &ref_49
+                                          example: &ref_51
                                             key: value
                                         taints:
                                           type: array
@@ -2162,7 +2291,7 @@ paths:
                                                   - PreferNoSchedule
                                                   - NoExecute
                                                   - PreferNoExecute
-                                          example: &ref_50
+                                          example: &ref_52
                                             - key: taintKey
                                               value: taintValue
                                               effect: NoSchedule
@@ -2177,12 +2306,12 @@ paths:
                                             Therefore, Ocean will not scale nodes down unless they are empty.
                                           example: false
                                       example:
-                                        availabilityZones: *ref_48
-                                        nodePoolProperties: *ref_22
-                                        nodeCountLimits: *ref_23
-                                        strategy: *ref_24
-                                        labels: *ref_49
-                                        taints: *ref_50
+                                        availabilityZones: *ref_50
+                                        nodePoolProperties: *ref_23
+                                        nodeCountLimits: *ref_24
+                                        strategy: *ref_25
+                                        labels: *ref_51
+                                        taints: *ref_52
                                         restrictScaleDown: false
                                   example:
                                     id: o-134abcd
@@ -2193,16 +2322,16 @@ paths:
                                       resourceGroupName: TestResourceGroup
                                       region: eastus
                                       infrastructureResourceGroupName: MC_TestResourceGroup_test-cluster_eastus
-                                    autoScaler: *ref_29
-                                    scheduling: *ref_30
-                                    health: *ref_32
+                                    autoScaler: *ref_30
+                                    scheduling: *ref_31
+                                    health: *ref_33
                                     virtualNodeGroupTemplate:
-                                      availabilityZones: *ref_48
-                                      nodePoolProperties: *ref_22
-                                      nodeCountLimits: *ref_23
-                                      strategy: *ref_24
-                                      labels: *ref_49
-                                      taints: *ref_50
+                                      availabilityZones: *ref_50
+                                      nodePoolProperties: *ref_23
+                                      nodeCountLimits: *ref_24
+                                      strategy: *ref_25
+                                      labels: *ref_51
+                                      taints: *ref_52
                                       restrictScaleDown: false
                               example:
                                 cluster:
@@ -2214,16 +2343,16 @@ paths:
                                     resourceGroupName: TestResourceGroup
                                     region: eastus
                                     infrastructureResourceGroupName: MC_TestResourceGroup_test-cluster_eastus
-                                  autoScaler: *ref_29
-                                  scheduling: *ref_30
-                                  health: *ref_32
+                                  autoScaler: *ref_30
+                                  scheduling: *ref_31
+                                  health: *ref_33
                                   virtualNodeGroupTemplate:
-                                    availabilityZones: *ref_48
-                                    nodePoolProperties: *ref_22
-                                    nodeCountLimits: *ref_23
-                                    strategy: *ref_24
-                                    labels: *ref_49
-                                    taints: *ref_50
+                                    availabilityZones: *ref_50
+                                    nodePoolProperties: *ref_23
+                                    nodeCountLimits: *ref_24
+                                    strategy: *ref_25
+                                    labels: *ref_51
+                                    taints: *ref_52
                                     restrictScaleDown: false
                           kind:
                             example: spotinst:ocean:azure:np
@@ -2238,16 +2367,16 @@ paths:
                                   resourceGroupName: TestResourceGroup
                                   region: eastus
                                   infrastructureResourceGroupName: MC_TestResourceGroup_test-cluster_eastus
-                                autoScaler: *ref_29
-                                scheduling: *ref_30
-                                health: *ref_32
+                                autoScaler: *ref_30
+                                scheduling: *ref_31
+                                health: *ref_33
                                 virtualNodeGroupTemplate:
-                                  availabilityZones: *ref_48
-                                  nodePoolProperties: *ref_22
-                                  nodeCountLimits: *ref_23
-                                  strategy: *ref_24
-                                  labels: *ref_49
-                                  taints: *ref_50
+                                  availabilityZones: *ref_50
+                                  nodePoolProperties: *ref_23
+                                  nodeCountLimits: *ref_24
+                                  strategy: *ref_25
+                                  labels: *ref_51
+                                  taints: *ref_52
                                   restrictScaleDown: false
                           kind: spotinst:ocean:azure:np
         '400':
@@ -2261,7 +2390,7 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_33
+        - *ref_34
       requestBody:
         required: true
         content:
@@ -2301,7 +2430,7 @@ paths:
                     An Array holding Availability Zones, this configures the availability zones the Ocean may launch instances in per VNG.
                   items:
                     type: string
-                  example: &ref_51
+                  example: &ref_53
                     - '1'
                     - '2'
                     - '3'
@@ -2334,7 +2463,7 @@ paths:
                 vngIds:
                   - vng-12345abc
                 preferredLifecycle: Spot
-                availabilityZones: *ref_51
+                availabilityZones: *ref_53
                 adjustment: 2
                 minCoresPerNode: 2
                 minMemoryGiBPerNode: 2
@@ -2345,7 +2474,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_34
+                  - *ref_35
                   - type: object
                     properties:
                       request:
@@ -2388,7 +2517,7 @@ paths:
                                         type: array
                                         items:
                                           type: string
-                                        example: &ref_52
+                                        example: &ref_54
                                           - '1'
                                       lifeCycle:
                                         type: string
@@ -2400,7 +2529,7 @@ paths:
                                       vngId: vng-12345abc
                                       scaleNodePoolName: omnp9e26aa3e
                                       vmSizeName: standard_d2as_v5
-                                      zones: *ref_52
+                                      zones: *ref_54
                                       lifeCycle: Spot
                                       numOfNewScaleNodes: 1
                                 nodesLeftToScale:
@@ -2413,7 +2542,7 @@ paths:
                                   - vngId: vng-12345abc
                                     scaleNodePoolName: omnp9e26aa3e
                                     vmSizeName: standard_d2as_v5
-                                    zones: *ref_52
+                                    zones: *ref_54
                                     lifeCycle: Spot
                                     numOfNewScaleNodes: 1
                                 nodesLeftToScale: 0
@@ -2425,7 +2554,7 @@ paths:
                                 - vngId: vng-12345abc
                                   scaleNodePoolName: omnp9e26aa3e
                                   vmSizeName: standard_d2as_v5
-                                  zones: *ref_52
+                                  zones: *ref_54
                                   lifeCycle: Spot
                                   numOfNewScaleNodes: 1
                               nodesLeftToScale: 0
@@ -2441,7 +2570,7 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_33
+        - *ref_34
       requestBody:
         required: true
         content:
@@ -2477,7 +2606,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_34
+                  - *ref_35
                   - type: object
                     properties:
                       request:
@@ -2534,7 +2663,7 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_33
+        - *ref_34
       requestBody:
         required: true
         content:
@@ -2570,15 +2699,15 @@ paths:
                             In case zone 0 is selected together with other availability zones, nodes of zone 0 will be scaled only for workloads that demand it.
                           items:
                             type: string
-                          example: &ref_53
+                          example: &ref_55
                             - '0'
                             - '1'
                             - '2'
                             - '3'
-                        nodePoolProperties: *ref_16
-                        nodeCountLimits: *ref_17
-                        strategy: *ref_18
-                        autoScale: *ref_19
+                        nodePoolProperties: *ref_17
+                        nodeCountLimits: *ref_18
+                        strategy: *ref_19
+                        autoScale: *ref_20
                         labels:
                           type: object
                           description: |
@@ -2606,7 +2735,7 @@ paths:
                             * "kubernetes.azure.com/accelerator"
                             * "kubernetes.azure.com/fips_enabled"
                             * "kubernetes.azure.com/os-sku"
-                          example: &ref_54
+                          example: &ref_56
                             key: value
                         taints:
                           type: array
@@ -2634,7 +2763,7 @@ paths:
                                   - PreferNoSchedule
                                   - NoExecute
                                   - PreferNoExecute
-                          example: &ref_55
+                          example: &ref_57
                             - key: taintKey
                               value: taintValue
                               effect: NoSchedule
@@ -2643,8 +2772,8 @@ paths:
                           description: |
                             A maximum of 20 unique key-value pairs for VM tags in the virtual node group.
                             Note: Azure has a tag limit of 50 per node pool.
-                        vmSizes: *ref_20
-                        scheduling: *ref_42
+                        vmSizes: *ref_21
+                        scheduling: *ref_44
                         restrictScaleDown:
                           type: boolean
                           description: |
@@ -2654,15 +2783,15 @@ paths:
                       example:
                         name: testVng
                         oceanId: o-134abcd
-                        availabilityZones: *ref_53
-                        nodePoolProperties: *ref_22
-                        nodeCountLimits: *ref_23
-                        strategy: *ref_24
-                        autoScale: *ref_25
-                        labels: *ref_54
-                        taints: *ref_55
-                        vmSizes: *ref_28
-                        scheduling: *ref_46
+                        availabilityZones: *ref_55
+                        nodePoolProperties: *ref_23
+                        nodeCountLimits: *ref_24
+                        strategy: *ref_25
+                        autoScale: *ref_26
+                        labels: *ref_56
+                        taints: *ref_57
+                        vmSizes: *ref_29
+                        scheduling: *ref_48
                         restrictScaleDown: false
       responses:
         '200':
@@ -2671,7 +2800,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_34
+                  - *ref_35
                   - type: object
                     properties:
                       request:
@@ -2689,7 +2818,7 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: &ref_59
+                            items: &ref_61
                               type: object
                               title: Ocean AKS Virtual Node Group
                               properties:
@@ -2715,14 +2844,14 @@ paths:
                                     An Array holding Availability Zones, this configures the availability zones the Ocean may launch instances in per VNG.
                                   items:
                                     type: string
-                                  example: &ref_56
+                                  example: &ref_58
                                     - '1'
                                     - '2'
                                     - '3'
-                                nodePoolProperties: *ref_16
-                                nodeCountLimits: *ref_17
-                                strategy: *ref_18
-                                autoScale: *ref_19
+                                nodePoolProperties: *ref_17
+                                nodeCountLimits: *ref_18
+                                strategy: *ref_19
+                                autoScale: *ref_20
                                 labels:
                                   type: object
                                   description: |
@@ -2750,7 +2879,7 @@ paths:
                                     * "kubernetes.azure.com/accelerator"
                                     * "kubernetes.azure.com/fips_enabled"
                                     * "kubernetes.azure.com/os-sku"
-                                  example: &ref_57
+                                  example: &ref_59
                                     key: value
                                 taints:
                                   type: array
@@ -2778,7 +2907,7 @@ paths:
                                           - PreferNoSchedule
                                           - NoExecute
                                           - PreferNoExecute
-                                  example: &ref_58
+                                  example: &ref_60
                                     - key: taintKey
                                       value: taintValue
                                       effect: NoSchedule
@@ -2787,8 +2916,8 @@ paths:
                                   description: |
                                     A maximum of 20 unique key-value pairs for VM tags in the virtual node group.
                                     Note: Azure has a tag limit of 50 per node pool.
-                                vmSizes: *ref_20
-                                scheduling: *ref_42
+                                vmSizes: *ref_21
+                                scheduling: *ref_44
                                 restrictScaleDown:
                                   type: boolean
                                   description: |
@@ -2809,19 +2938,19 @@ paths:
                                   example: '2021-03-17T15:06:13.000Z'
                                   description: |
                                     A timestamp of the latest Ocean update.
-                              example: &ref_60
+                              example: &ref_62
                                 id: vng-134abcd
                                 name: testVng
                                 oceanId: o-134abcd
-                                availabilityZones: *ref_56
-                                nodePoolProperties: *ref_22
-                                nodeCountLimits: *ref_23
-                                strategy: *ref_24
-                                autoScale: *ref_25
-                                labels: *ref_57
-                                taints: *ref_58
-                                vmSizes: *ref_28
-                                scheduling: *ref_46
+                                availabilityZones: *ref_58
+                                nodePoolProperties: *ref_23
+                                nodeCountLimits: *ref_24
+                                strategy: *ref_25
+                                autoScale: *ref_26
+                                labels: *ref_59
+                                taints: *ref_60
+                                vmSizes: *ref_29
+                                scheduling: *ref_48
                                 restrictScaleDown: false
                                 createdAt: '2021-03-17T08:13:08.000Z'
                                 updatedAt: '2021-03-17T15:06:13.000Z'
@@ -2832,15 +2961,15 @@ paths:
                             - id: vng-134abcd
                               name: testVng
                               oceanId: o-134abcd
-                              availabilityZones: *ref_56
-                              nodePoolProperties: *ref_22
-                              nodeCountLimits: *ref_23
-                              strategy: *ref_24
-                              autoScale: *ref_25
-                              labels: *ref_57
-                              taints: *ref_58
-                              vmSizes: *ref_28
-                              scheduling: *ref_46
+                              availabilityZones: *ref_58
+                              nodePoolProperties: *ref_23
+                              nodeCountLimits: *ref_24
+                              strategy: *ref_25
+                              autoScale: *ref_26
+                              labels: *ref_59
+                              taints: *ref_60
+                              vmSizes: *ref_29
+                              scheduling: *ref_48
                               restrictScaleDown: false
                               createdAt: '2021-03-17T08:13:08.000Z'
                               updatedAt: '2021-03-17T15:06:13.000Z'
@@ -2855,8 +2984,8 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_33
-        - &ref_67
+        - *ref_34
+        - &ref_69
           in: query
           name: oceanId
           schema:
@@ -2872,7 +3001,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_34
+                  - *ref_35
                   - type: object
                     properties:
                       request:
@@ -2890,12 +3019,12 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: *ref_59
+                            items: *ref_61
                           kind:
                             example: spotinst:ocean:azure:np:virtualNodeGroup
                         example:
                           items:
-                            - *ref_60
+                            - *ref_62
                           kind: spotinst:ocean:azure:np:virtualNodeGroup
         '400':
           description: Bad Request
@@ -2908,8 +3037,8 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_33
-        - &ref_61
+        - *ref_34
+        - &ref_63
           in: path
           name: virtualNodeGroupId
           example: vng-12345abc
@@ -2925,7 +3054,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_34
+                  - *ref_35
                   - type: object
                     properties:
                       request:
@@ -2943,12 +3072,12 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: *ref_59
+                            items: *ref_61
                           kind:
                             example: spotinst:ocean:azure:np:virtualNodeGroup
                         example:
                           items:
-                            - *ref_60
+                            - *ref_62
                           kind: spotinst:ocean:azure:np:virtualNodeGroup
         '400':
           description: Bad Request
@@ -2966,8 +3095,8 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_33
-        - *ref_61
+        - *ref_34
+        - *ref_63
       requestBody:
         required: false
         content:
@@ -2992,14 +3121,14 @@ paths:
                         An Array holding Availability Zones, this configures the availability zones the Ocean may launch instances in per VNG.
                       items:
                         type: string
-                      example: &ref_63
+                      example: &ref_65
                         - '1'
                         - '2'
                         - '3'
-                    nodePoolProperties: *ref_62
-                    nodeCountLimits: *ref_17
-                    strategy: *ref_18
-                    autoScale: *ref_19
+                    nodePoolProperties: *ref_64
+                    nodeCountLimits: *ref_18
+                    strategy: *ref_19
+                    autoScale: *ref_20
                     labels:
                       type: object
                       description: |
@@ -3027,7 +3156,7 @@ paths:
                         * "kubernetes.azure.com/accelerator"
                         * "kubernetes.azure.com/fips_enabled"
                         * "kubernetes.azure.com/os-sku"
-                      example: &ref_65
+                      example: &ref_67
                         key: value
                     taints:
                       type: array
@@ -3055,7 +3184,7 @@ paths:
                               - PreferNoSchedule
                               - NoExecute
                               - PreferNoExecute
-                      example: &ref_66
+                      example: &ref_68
                         - key: taintKey
                           value: taintValue
                           effect: NoSchedule
@@ -3064,8 +3193,8 @@ paths:
                       description: |
                         A maximum of 20 unique key-value pairs for VM tags in the virtual node group.
                         Note: Azure has a tag limit of 50 per node pool.
-                    vmSizes: *ref_20
-                    scheduling: *ref_42
+                    vmSizes: *ref_21
+                    scheduling: *ref_44
                     restrictScaleDown:
                       type: boolean
                       description: |
@@ -3074,28 +3203,28 @@ paths:
                       example: false
                   example:
                     name: testVng
-                    availabilityZones: *ref_63
-                    nodePoolProperties: *ref_64
-                    nodeCountLimits: *ref_23
-                    strategy: *ref_24
-                    autoScale: *ref_25
-                    labels: *ref_65
-                    taints: *ref_66
-                    vmSizes: *ref_28
-                    scheduling: *ref_46
+                    availabilityZones: *ref_65
+                    nodePoolProperties: *ref_66
+                    nodeCountLimits: *ref_24
+                    strategy: *ref_25
+                    autoScale: *ref_26
+                    labels: *ref_67
+                    taints: *ref_68
+                    vmSizes: *ref_29
+                    scheduling: *ref_48
                     restrictScaleDown: false
               example:
                 virtualNodeGroup:
                   name: testVng
-                  availabilityZones: *ref_63
-                  nodePoolProperties: *ref_64
-                  nodeCountLimits: *ref_23
-                  strategy: *ref_24
-                  autoScale: *ref_25
-                  labels: *ref_65
-                  taints: *ref_66
-                  vmSizes: *ref_28
-                  scheduling: *ref_46
+                  availabilityZones: *ref_65
+                  nodePoolProperties: *ref_66
+                  nodeCountLimits: *ref_24
+                  strategy: *ref_25
+                  autoScale: *ref_26
+                  labels: *ref_67
+                  taints: *ref_68
+                  vmSizes: *ref_29
+                  scheduling: *ref_48
                   restrictScaleDown: false
       responses:
         '200':
@@ -3104,7 +3233,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_34
+                  - *ref_35
                   - type: object
                     properties:
                       request:
@@ -3122,12 +3251,12 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: *ref_59
+                            items: *ref_61
                           kind:
                             example: spotinst:ocean:azure:np:virtualNodeGroup
                         example:
                           items:
-                            - *ref_60
+                            - *ref_62
                           kind: spotinst:ocean:azure:np:virtualNodeGroup
         '400':
           description: Bad Request
@@ -3139,8 +3268,8 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_33
-        - *ref_61
+        - *ref_34
+        - *ref_63
       responses:
         '200':
           description: Ocean AKS Virtual Node Group Delete Response
@@ -3148,7 +3277,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_47
+                  - *ref_49
                   - type: object
                     properties:
                       request:
@@ -3173,8 +3302,8 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_33
-        - *ref_67
+        - *ref_34
+        - *ref_69
         - in: query
           name: nodePoolName
           description: |
@@ -3190,7 +3319,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_34
+                  - *ref_35
                   - type: object
                     properties:
                       request:
@@ -3232,13 +3361,13 @@ paths:
                                         An Array holding Availability Zones, this configures the availability zones the Ocean may launch instances in per VNG.
                                       items:
                                         type: string
-                                      example: &ref_68
+                                      example: &ref_70
                                         - '1'
                                         - '2'
                                         - '3'
-                                    nodePoolProperties: *ref_16
-                                    nodeCountLimits: *ref_17
-                                    strategy: *ref_18
+                                    nodePoolProperties: *ref_17
+                                    nodeCountLimits: *ref_18
+                                    strategy: *ref_19
                                     labels:
                                       type: object
                                       description: |
@@ -3266,7 +3395,7 @@ paths:
                                         * "kubernetes.azure.com/accelerator"
                                         * "kubernetes.azure.com/fips_enabled"
                                         * "kubernetes.azure.com/os-sku"
-                                      example: &ref_69
+                                      example: &ref_71
                                         key: value
                                     taints:
                                       type: array
@@ -3294,7 +3423,7 @@ paths:
                                               - PreferNoSchedule
                                               - NoExecute
                                               - PreferNoExecute
-                                      example: &ref_70
+                                      example: &ref_72
                                         - key: taintKey
                                           value: taintValue
                                           effect: NoSchedule
@@ -3311,23 +3440,23 @@ paths:
                                   example:
                                     name: testVng
                                     oceanId: o-134abcd
-                                    availabilityZones: *ref_68
-                                    nodePoolProperties: *ref_22
-                                    nodeCountLimits: *ref_23
-                                    strategy: *ref_24
-                                    labels: *ref_69
-                                    taints: *ref_70
+                                    availabilityZones: *ref_70
+                                    nodePoolProperties: *ref_23
+                                    nodeCountLimits: *ref_24
+                                    strategy: *ref_25
+                                    labels: *ref_71
+                                    taints: *ref_72
                                     restrictScaleDown: false
                               example:
                                 virtualNodeGroup:
                                   name: testVng
                                   oceanId: o-134abcd
-                                  availabilityZones: *ref_68
-                                  nodePoolProperties: *ref_22
-                                  nodeCountLimits: *ref_23
-                                  strategy: *ref_24
-                                  labels: *ref_69
-                                  taints: *ref_70
+                                  availabilityZones: *ref_70
+                                  nodePoolProperties: *ref_23
+                                  nodeCountLimits: *ref_24
+                                  strategy: *ref_25
+                                  labels: *ref_71
+                                  taints: *ref_72
                                   restrictScaleDown: false
                           kind:
                             example: spotinst:ocean:azure:np
@@ -3336,12 +3465,12 @@ paths:
                             - virtualNodeGroup:
                                 name: testVng
                                 oceanId: o-134abcd
-                                availabilityZones: *ref_68
-                                nodePoolProperties: *ref_22
-                                nodeCountLimits: *ref_23
-                                strategy: *ref_24
-                                labels: *ref_69
-                                taints: *ref_70
+                                availabilityZones: *ref_70
+                                nodePoolProperties: *ref_23
+                                nodeCountLimits: *ref_24
+                                strategy: *ref_25
+                                labels: *ref_71
+                                taints: *ref_72
                                 restrictScaleDown: false
                           kind: spotinst:ocean:azure:np
         '400':
@@ -3355,7 +3484,7 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_33
+        - *ref_34
         - in: query
           name: virtualNodeGroupId
           example: vng-12345abc
@@ -3371,7 +3500,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_34
+                  - *ref_35
                   - type: object
                     properties:
                       request:
@@ -3398,7 +3527,7 @@ paths:
                                     A list of the allowed VM sizes that can be launched.
                                   items:
                                     type: string
-                                  example: &ref_71
+                                  example: &ref_73
                                     - standard_d2
                                     - standard_d2_v2
                                     - standard_d2_v3
@@ -3410,13 +3539,13 @@ paths:
                                     The number of allowed VM sizes that can be launched.
                                   example: 5
                               example:
-                                allowedVmSizes: *ref_71
+                                allowedVmSizes: *ref_73
                                 numOfAllowedVmSizes: 5
                           kind:
                             example: spotinst:ocean:azure:k8s:np:virtualNodeGroup:allowedVmSizes
                         example:
                           items:
-                            - allowedVmSizes: *ref_71
+                            - allowedVmSizes: *ref_73
                               numOfAllowedVmSizes: 5
                           kind: spotinst:ocean:azure:k8s:np:virtualNodeGroup:allowedVmSizes
         '400':
@@ -3431,8 +3560,8 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_33
-        - &ref_79
+        - *ref_34
+        - &ref_81
           in: path
           name: oceanClusterId
           schema:
@@ -3450,7 +3579,7 @@ paths:
                 - type: object
                   title: Roll
                   allOf:
-                    - &ref_72
+                    - &ref_74
                       type: object
                       properties:
                         batchSizePercentage:
@@ -3458,7 +3587,7 @@ paths:
                           description: |
                             Value as a percent to set the size of a batch in a roll. Valid values are 0-100. In case of null as value, the default value in the backend will be 20%.
                           example: 25
-                    - &ref_73
+                    - &ref_75
                       type: object
                       properties:
                         comment:
@@ -3466,7 +3595,7 @@ paths:
                           description: |
                             Add a comment description for the roll. The comment is limited to 256 chars and optional.
                           example: This is why I deployed my cluster.
-                    - &ref_74
+                    - &ref_76
                       type: object
                       properties:
                         respectPdb:
@@ -3475,7 +3604,7 @@ paths:
                             During the roll, if the parameter is set to true we honor PDB during the nodes replacement.
                           example: false
                           default: true
-                    - &ref_75
+                    - &ref_77
                       type: object
                       properties:
                         respectRestrictScaleDown:
@@ -3484,7 +3613,7 @@ paths:
                             During the roll, if the parameter is set to true we honor Restrict Scale Down label during the nodes replacement.
                           example: true
                           default: false
-                    - &ref_76
+                    - &ref_78
                       type: object
                       properties:
                         batchMinHealthyPercentage:
@@ -3496,11 +3625,11 @@ paths:
                 - type: object
                   title: Roll with node names
                   allOf:
-                    - *ref_72
-                    - *ref_73
                     - *ref_74
                     - *ref_75
                     - *ref_76
+                    - *ref_77
+                    - *ref_78
                     - type: object
                       properties:
                         nodeNames:
@@ -3515,11 +3644,11 @@ paths:
                 - type: object
                   title: Roll with node pool names
                   allOf:
-                    - *ref_72
-                    - *ref_73
                     - *ref_74
                     - *ref_75
                     - *ref_76
+                    - *ref_77
+                    - *ref_78
                     - type: object
                       properties:
                         nodePoolNames:
@@ -3534,11 +3663,11 @@ paths:
                 - type: object
                   title: Roll with virtual node group ids
                   allOf:
-                    - *ref_72
-                    - *ref_73
                     - *ref_74
                     - *ref_75
                     - *ref_76
+                    - *ref_77
+                    - *ref_78
                     - type: object
                       properties:
                         vngIds:
@@ -3557,7 +3686,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_34
+                  - *ref_35
                   - type: object
                     properties:
                       request:
@@ -3577,7 +3706,7 @@ paths:
                             type: array
                             items:
                               allOf:
-                                - &ref_80
+                                - &ref_82
                                   type: object
                                   properties:
                                     id:
@@ -3661,7 +3790,7 @@ paths:
                                                       - NOT_REPLACED_DUE_TO_PDB
                                                       - DID_NOT_REPLACE
                                                       - IN_PROGRESS
-                                              example: &ref_77
+                                              example: &ref_79
                                                 - nodeName: aks-omnpbc2ebdb1-15563275-vmss00000q
                                                   status: REPLACED
                                                 - nodeName: aks-omnpbc2ebdb1-15563275-vmss000008
@@ -3675,11 +3804,11 @@ paths:
                                                 - nodeName: aks-omnp0c85c2c2-26833420-vmss000003
                                                   status: DID_NOT_REPLACE
                                           example:
-                                            rollNodes: *ref_77
-                                      example: &ref_78
+                                            rollNodes: *ref_79
+                                      example: &ref_80
                                         progressPercentage: 0
                                         detailedStatus:
-                                          rollNodes: *ref_77
+                                          rollNodes: *ref_79
                                     respectPdb:
                                       type: boolean
                                       example: true
@@ -3699,7 +3828,7 @@ paths:
                                       description: |
                                         The latest update timestamp of the roll.
                                       example: '2019-03-24T15:46:09.000Z'
-                                  example: &ref_81
+                                  example: &ref_83
                                     id: scr-12345abc
                                     oceanId: o-12e31234
                                     type: manual
@@ -3708,7 +3837,7 @@ paths:
                                     currentBatch: 1
                                     numOfBatches: 2
                                     comment: This is why I deployed my cluster.
-                                    progress: *ref_78
+                                    progress: *ref_80
                                     respectPdb: true
                                     respectRestrictScaleDown: false
                                     batchMinHealthyPercentage: 70
@@ -3750,8 +3879,8 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_33
-        - *ref_79
+        - *ref_34
+        - *ref_81
       responses:
         '200':
           description: Ocean AKS Get Cluster Roll Response
@@ -3759,7 +3888,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_34
+                  - *ref_35
                   - type: object
                     properties:
                       request:
@@ -3777,7 +3906,7 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: *ref_80
+                            items: *ref_82
                           kind:
                             example: spotinst:ocean:azure:np:roll
                         example:
@@ -3790,7 +3919,7 @@ paths:
                               currentBatch: 1
                               numOfBatches: 2
                               comment: This is why I deployed my cluster.
-                              progress: *ref_78
+                              progress: *ref_80
                               respectPdb: true
                               respectRestrictScaleDown: false
                               batchMinHealthyPercentage: 70
@@ -3809,9 +3938,9 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_33
-        - *ref_79
-        - &ref_82
+        - *ref_34
+        - *ref_81
+        - &ref_84
           in: path
           name: rollId
           schema:
@@ -3827,7 +3956,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_34
+                  - *ref_35
                   - type: object
                     properties:
                       request:
@@ -3845,12 +3974,12 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: *ref_80
+                            items: *ref_82
                           kind:
                             example: spotinst:ocean:azure:np:roll
                         example:
                           items:
-                            - *ref_81
+                            - *ref_83
                           kind: spotinst:ocean:azure:np:roll
         '400':
           description: Bad Request
@@ -3866,9 +3995,9 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_33
-        - *ref_79
-        - *ref_82
+        - *ref_34
+        - *ref_81
+        - *ref_84
       responses:
         '200':
           description: Ocean AKS STOP Cluster Roll Response
@@ -3876,7 +4005,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_34
+                  - *ref_35
                   - type: object
                     properties:
                       request:
@@ -3896,7 +4025,7 @@ paths:
                             type: array
                             items:
                               allOf:
-                                - *ref_80
+                                - *ref_82
                                 - type: object
                                   properties:
                                     status:
@@ -3933,8 +4062,8 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_33
-        - *ref_37
+        - *ref_34
+        - *ref_38
         - in: query
           name: shouldFetchPods
           example: 'true'
@@ -3949,7 +4078,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_34
+                  - *ref_35
                   - type: object
                     properties:
                       request:
@@ -4007,8 +4136,8 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_33
-        - *ref_79
+        - *ref_34
+        - *ref_81
       requestBody:
         required: true
         content:
@@ -4018,7 +4147,7 @@ paths:
                 - type: object
                   title: Migration with node names
                   allOf:
-                    - &ref_83
+                    - &ref_85
                       type: object
                       properties:
                         batchSizePercentage:
@@ -4028,7 +4157,7 @@ paths:
                           minimum: 1
                           maximum: 100
                           example: 25
-                    - &ref_84
+                    - &ref_86
                       type: object
                       properties:
                         comment:
@@ -4036,7 +4165,7 @@ paths:
                           description: |
                             Add a comment description for the migration. The comment is limited to 256 chars and optional.
                           example: This is why I deployed my cluster.
-                    - &ref_85
+                    - &ref_87
                       type: object
                       properties:
                         respectPdb:
@@ -4045,7 +4174,7 @@ paths:
                             During the migration, if the parameter is set to true we honor PDB during the nodes replacement.
                           example: false
                           default: true
-                    - &ref_86
+                    - &ref_88
                       type: object
                       properties:
                         respectRestrictScaleDown:
@@ -4054,7 +4183,7 @@ paths:
                             During the migration, if the parameter is set to true we honor Restrict Scale Down label during the nodes replacement.
                           example: true
                           default: false
-                    - &ref_87
+                    - &ref_89
                       type: object
                       properties:
                         shouldTerminateNodes:
@@ -4062,7 +4191,7 @@ paths:
                           description: |
                             If the parameter is set to true we will terminate the node after the migration has finished successfully. If the parameter is set to false we will leave the nodes.    example: true
                           default: true
-                    - &ref_88
+                    - &ref_90
                       type: object
                       properties:
                         shouldEvictStandalonePods:
@@ -4071,7 +4200,7 @@ paths:
                             If the parameter is set to true we will evict all standalone pods during the migration.
                           example: true
                           default: true
-                    - &ref_89
+                    - &ref_91
                       type: object
                       properties:
                         batchMinHealthyPercentage:
@@ -4096,13 +4225,13 @@ paths:
                 - type: object
                   title: Migration with node pool names
                   allOf:
-                    - *ref_83
-                    - *ref_84
                     - *ref_85
                     - *ref_86
                     - *ref_87
                     - *ref_88
                     - *ref_89
+                    - *ref_90
+                    - *ref_91
                     - type: object
                       properties:
                         nodePoolNames:
@@ -4121,7 +4250,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_34
+                  - *ref_35
                   - type: object
                     properties:
                       request:
@@ -4141,7 +4270,7 @@ paths:
                             type: array
                             items:
                               allOf:
-                                - &ref_93
+                                - &ref_95
                                   type: object
                                   properties:
                                     id:
@@ -4226,7 +4355,7 @@ paths:
                                                           type: string
                                                   runningPods:
                                                     type: integer
-                                              example: &ref_90
+                                              example: &ref_92
                                                 - nodeName: aks-omnpbc2ebdb1-15563275-vmss00000q
                                                   nodePoolName: omnpbc2ebdb1
                                                   status: REPLACED
@@ -4289,7 +4418,7 @@ paths:
                                                       - COMPLETED
                                                       - FAILED
                                                       - PARTIAL_SUCCESS
-                                              example: &ref_91
+                                              example: &ref_93
                                                 - nodePoolName: omnp12340
                                                   newNodes: 2
                                                   vngId: vng-1234
@@ -4301,13 +4430,13 @@ paths:
                                                   vngName: vng2
                                                   status: Completed
                                           example:
-                                            oldNodes: *ref_90
-                                            scaleNodePools: *ref_91
-                                      example: &ref_92
+                                            oldNodes: *ref_92
+                                            scaleNodePools: *ref_93
+                                      example: &ref_94
                                         progressPercentage: 0
                                         detailedStatus:
-                                          oldNodes: *ref_90
-                                          scaleNodePools: *ref_91
+                                          oldNodes: *ref_92
+                                          scaleNodePools: *ref_93
                                     respectPdb:
                                       type: boolean
                                       example: true
@@ -4343,14 +4472,14 @@ paths:
                                       description: |
                                         The completion timestamp of the migration.
                                       example: '2019-03-24T15:46:09.000Z'
-                                  example: &ref_94
+                                  example: &ref_96
                                     id: scr-12345abc
                                     oceanId: o-12e31234
                                     status: COMPLETED
                                     currentBatch: 1
                                     numOfBatches: 2
                                     comment: migration comment.
-                                    migrationProgress: *ref_92
+                                    migrationProgress: *ref_94
                                     respectPdb: true
                                     respectRestrictScaleDown: false
                                     shouldTerminateNodes: true
@@ -4374,8 +4503,8 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_33
-        - *ref_79
+        - *ref_34
+        - *ref_81
       responses:
         '200':
           description: Ocean AKS Get Migration Response
@@ -4383,7 +4512,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_34
+                  - *ref_35
                   - type: object
                     properties:
                       request:
@@ -4401,7 +4530,7 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: *ref_93
+                            items: *ref_95
                           kind:
                             example: spotinst:azure:ocean:workloadMigration
                         example:
@@ -4412,7 +4541,7 @@ paths:
                               currentBatch: 1
                               numOfBatches: 2
                               comment: migration comment.
-                              migrationProgress: *ref_92
+                              migrationProgress: *ref_94
                               respectPdb: true
                               respectRestrictScaleDown: false
                               shouldTerminateNodes: true
@@ -4435,9 +4564,9 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_33
-        - *ref_79
-        - &ref_95
+        - *ref_34
+        - *ref_81
+        - &ref_97
           in: path
           name: migrationId
           schema:
@@ -4453,7 +4582,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_34
+                  - *ref_35
                   - type: object
                     properties:
                       request:
@@ -4471,12 +4600,12 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: *ref_93
+                            items: *ref_95
                           kind:
                             example: spotinst:azure:ocean:workloadMigration
                         example:
                           items:
-                            - *ref_94
+                            - *ref_96
                           kind: spotinst:azure:ocean:workloadMigration
         '400':
           description: Bad Request
@@ -4492,9 +4621,9 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_33
-        - *ref_79
-        - *ref_95
+        - *ref_34
+        - *ref_81
+        - *ref_97
       responses:
         '200':
           description: Ocean AKS Stop Migration Response
@@ -4502,7 +4631,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_34
+                  - *ref_35
                   - type: object
                     properties:
                       request:
@@ -4522,7 +4651,7 @@ paths:
                             type: array
                             items:
                               allOf:
-                                - *ref_93
+                                - *ref_95
                                 - type: object
                                   properties:
                                     status:
@@ -4560,8 +4689,8 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_37
-        - *ref_33
+        - *ref_38
+        - *ref_34
         - in: query
           name: fromDate
           schema:
@@ -4684,7 +4813,7 @@ paths:
                               type: string
                             createdAt:
                               type: string
-                        example: &ref_96
+                        example: &ref_98
                           - message: Ocean o-e0a2bd7c successfully created.
                             severity: INFO
                             createdAt: '2020-10-07T09:51:12.000Z'
@@ -4696,7 +4825,7 @@ paths:
                         code: '200'
                         message: OK
                       kind: spotinst:ocean:azure:k8s:cluster:logs
-                      items: *ref_96
+                      items: *ref_98
                       count: '1'
                 example:
                   request:
@@ -4709,7 +4838,7 @@ paths:
                       code: '200'
                       message: OK
                     kind: spotinst:ocean:azure:k8s:cluster:logs
-                    items: *ref_96
+                    items: *ref_98
                     count: '1'
         '400':
           description: Bad Request
@@ -4723,8 +4852,8 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_33
-        - *ref_79
+        - *ref_34
+        - *ref_81
       responses:
         '200':
           description: List of auto upgrade.
@@ -4732,7 +4861,7 @@ paths:
             application/json:
               schema:
                 type: array
-                items: &ref_100
+                items: &ref_102
                   type: object
                   properties:
                     oceanId:
@@ -4810,10 +4939,10 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_33
-        - *ref_79
-        - *ref_97
-        - *ref_98
+        - *ref_34
+        - *ref_81
+        - *ref_99
+        - *ref_100
       requestBody:
         required: true
         content:
@@ -4824,7 +4953,7 @@ paths:
                   required:
                     - upgradeConfig
                   properties:
-                    upgradeConfig: *ref_99
+                    upgradeConfig: *ref_101
       responses:
         '200':
           description: Ocean AKS Create Auto Upgrade
@@ -4832,7 +4961,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_34
+                  - *ref_35
                   - type: object
                     properties:
                       request:
@@ -4852,7 +4981,7 @@ paths:
                             type: array
                             items:
                               allOf:
-                                - *ref_100
+                                - *ref_102
                           kind:
                             example: spotinst:ocean:azure:np:autoUpgrade
                         example:
@@ -4869,8 +4998,8 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_33
-        - *ref_79
+        - *ref_34
+        - *ref_81
       requestBody:
         required: true
         content:
@@ -4897,7 +5026,7 @@ paths:
                   description: List of system node pool names to be upgraded.
                   items:
                     type: string
-                    example: &ref_101
+                    example: &ref_103
                       - np1
                       - np2
                   minItems: 1
@@ -4905,15 +5034,15 @@ paths:
                 oceanId: o-12345abc
                 scope: PATCH
                 systemNodePoolNames:
-                  - *ref_101
+                  - *ref_103
       responses:
-        '200': &ref_105
+        '200': &ref_107
           description: Ocean AKS System Node Pool Upgrade Response
           content:
             application/json:
               schema:
                 allOf:
-                  - *ref_34
+                  - *ref_35
                   - type: object
                     properties:
                       request:
@@ -4945,7 +5074,7 @@ paths:
                                     List of system node pool names that were successfully upgraded.
                                   items:
                                     type: string
-                                  example: &ref_102
+                                  example: &ref_104
                                     - np1
                                     - np2
                                 inProgressNodePoolNames:
@@ -4954,7 +5083,7 @@ paths:
                                     List of system node pool names that are currently in progress of being upgraded.
                                   items:
                                     type: string
-                                  example: &ref_103
+                                  example: &ref_105
                                     - np3
                                 failedNodePoolNames:
                                   type: array
@@ -4962,7 +5091,7 @@ paths:
                                     List of system node pool names that failed to upgrade.
                                   items:
                                     type: string
-                                  example: &ref_104
+                                  example: &ref_106
                                     - np4
                                 newVersion:
                                   type: string
@@ -4971,18 +5100,18 @@ paths:
                                   example: 1.28.3
                               example:
                                 operationId: op-12345abc
-                                upgradedNodePoolNames: *ref_102
-                                inProgressNodePoolNames: *ref_103
-                                failedNodePoolNames: *ref_104
+                                upgradedNodePoolNames: *ref_104
+                                inProgressNodePoolNames: *ref_105
+                                failedNodePoolNames: *ref_106
                                 newVersion: 1.28.3
                           kind:
                             example: spotinst:ocean:azure:np:systemNodePoolUpgrade
                         example:
                           items:
                             - operationId: op-12345abc
-                              upgradedNodePoolNames: *ref_102
-                              inProgressNodePoolNames: *ref_103
-                              failedNodePoolNames: *ref_104
+                              upgradedNodePoolNames: *ref_104
+                              inProgressNodePoolNames: *ref_105
+                              failedNodePoolNames: *ref_106
                               newVersion: 1.28.3
                           kind: spotinst:ocean:azure:np:systemNodePoolUpgrade
         '400':
@@ -4997,8 +5126,8 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_33
-        - *ref_79
+        - *ref_34
+        - *ref_81
         - in: path
           name: systemNodePoolsOperationId
           schema:
@@ -5008,7 +5137,7 @@ paths:
           description: |
             System node pools operation identifier.
       responses:
-        '200': *ref_105
+        '200': *ref_107
         '400':
           description: Bad Request
   /ocean/azure/k8s/cluster/{oceanClusterId}/aggregatedCosts:
@@ -5027,8 +5156,8 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_79
-        - *ref_33
+        - *ref_81
+        - *ref_34
       requestBody:
         required: true
         content:
@@ -5130,7 +5259,7 @@ paths:
                                   allMatch:
                                     - key: env
                                       value: prod
-                              example: &ref_106
+                              example: &ref_108
                                 - allMatch:
                                     - type: label
                                       key: env
@@ -5144,10 +5273,10 @@ paths:
                                       key: meta.data
                                       operator: exists
                           example:
-                            anyMatch: *ref_106
+                            anyMatch: *ref_108
                       example:
                         conditions:
-                          anyMatch: *ref_106
+                          anyMatch: *ref_108
       responses:
         '200':
           description: Ocean Cluster Aggregated Detailed Costs Response
@@ -5155,7 +5284,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_34
+                  - *ref_35
                   - type: object
                     properties:
                       request:
@@ -6029,8 +6158,8 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_79
-        - *ref_33
+        - *ref_81
+        - *ref_34
       requestBody:
         required: true
         content:
@@ -6132,7 +6261,7 @@ paths:
                                   allMatch:
                                     - key: env
                                       value: prod
-                              example: &ref_107
+                              example: &ref_109
                                 - allMatch:
                                     - type: label
                                       key: env
@@ -6146,10 +6275,10 @@ paths:
                                       key: meta.data
                                       operator: exists
                           example:
-                            anyMatch: *ref_107
+                            anyMatch: *ref_109
                       example:
                         conditions:
-                          anyMatch: *ref_107
+                          anyMatch: *ref_109
       responses:
         '200':
           description: Ocean Cluster Aggregated Summary Costs Response
@@ -6157,7 +6286,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_34
+                  - *ref_35
                   - type: object
                     properties:
                       request:
@@ -6802,8 +6931,8 @@ paths:
       tags:
         - Ocean AKS
       parameters:
-        - *ref_37
-        - *ref_33
+        - *ref_38
+        - *ref_34
         - in: query
           name: virtualNodeGroupId
           required: false
@@ -6824,7 +6953,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_34
+                  - *ref_35
                   - type: object
                     properties:
                       request:
@@ -6953,7 +7082,7 @@ paths:
                                     type: string
                                   description: |
                                     Kubernetes labels assigned to this node.
-                                  example: &ref_108
+                                  example: &ref_110
                                     pool-type: default-pool
                                     kubernetes.io/hostname: node-abc123def456
                                 taints:
@@ -6962,7 +7091,7 @@ paths:
                                     type: string
                                   description: |
                                     Kubernetes taints assigned to this node.
-                                  example: &ref_109
+                                  example: &ref_111
                                     - CriticalAddonsOnly=true:NO_SCHEDULE
                                 workloadRequestedMilliCpu:
                                   type: number
@@ -7026,8 +7155,8 @@ paths:
                                 nodeStatus: 'TRUE'
                                 registrationStatus: Registered
                                 createdAt: '2026-01-15T10:30:45.000Z'
-                                labels: *ref_108
-                                taints: *ref_109
+                                labels: *ref_110
+                                taints: *ref_111
                                 workloadRequestedMilliCpu: 0
                                 workloadRequestedMemoryInMiB: 0
                                 workloadRequestedGpu: 0
@@ -7061,8 +7190,8 @@ paths:
                               nodeStatus: 'TRUE'
                               registrationStatus: Registered
                               createdAt: '2026-01-15T10:30:45.000Z'
-                              labels: *ref_108
-                              taints: *ref_109
+                              labels: *ref_110
+                              taints: *ref_111
                               workloadRequestedMilliCpu: 0
                               workloadRequestedMemoryInMiB: 0
                               workloadRequestedGpu: 0
