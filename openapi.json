@@ -62687,6 +62687,12 @@
                               },
                               "localDnsProfile": {
                                 "$ref": "#/paths/~1ocean~1azure~1np~1virtualNodeGroup~1%7BvirtualNodeGroupId%7D/put/requestBody/content/application~1json/schema/properties/virtualNodeGroup/properties/nodePoolProperties/properties/localDnsProfile"
+                              },
+                              "encryptionAtHost": {
+                                "type": "boolean",
+                                "description": "Whether to enable host-based encryption for nodes launched from this virtual node group.\nWhen set to true, use vmSizes.preferredVmSizes to provide compatible VM sizes.\n\nIMPORTANT: This setting is immutable at the Azure infrastructure level once nodes are launched.\nChanging this value requires a roll operation for new nodes to reflect the updated configuration.\n",
+                                "example": true,
+                                "default": false
                               }
                             }
                           },
@@ -63274,6 +63280,12 @@
                             "required": [
                               "mode"
                             ]
+                          },
+                          "encryptionAtHost": {
+                            "type": "boolean",
+                            "description": "Whether to enable host-based encryption for nodes launched from this virtual node group.\nWhen set to true, use vmSizes.preferredVmSizes to provide compatible VM sizes.\n\nIMPORTANT: This setting is immutable at the Azure infrastructure level once nodes are launched.\nChanging this value requires a roll operation for new nodes to reflect the updated configuration.\n",
+                            "example": true,
+                            "default": false
                           }
                         }
                       },
@@ -63428,6 +63440,17 @@
                         "title": "Ocean AKS VM Sizes",
                         "description": "The Ocean AKS VM Sizes object.\n",
                         "properties": {
+                          "preferredVmSizes": {
+                            "type": "array",
+                            "description": "Preferred VM sizes for this virtual node group.\nUsed when nodePoolProperties.encryptionAtHost is true to constrain launches to compatible sizes.\n",
+                            "items": {
+                              "type": "string"
+                            },
+                            "example": [
+                              "Standard_D4s_v3",
+                              "Standard_D8s_v3"
+                            ]
+                          },
                           "filters": {
                             "type": "object",
                             "description": "Filters for the VM sizes that can be launched from the virtual node group.\n",
