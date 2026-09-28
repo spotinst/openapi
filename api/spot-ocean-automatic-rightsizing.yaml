@@ -385,7 +385,7 @@ paths:
                       description: When set to 'true', only downscale recommendations will be applied.
                       default: false
       responses:
-        '200': &ref_21
+        '200':
           description: Ocean Rightsizing Rule Create Response
           content:
             application/json:
@@ -394,7 +394,7 @@ paths:
                   - &ref_17
                     type: object
                     allOf:
-                      - &ref_29
+                      - &ref_28
                         type: object
                         properties:
                           request:
@@ -717,7 +717,7 @@ paths:
         - Ocean Automatic Rightsizing
       parameters:
         - *ref_15
-        - &ref_22
+        - &ref_21
           in: path
           name: ruleName
           schema:
@@ -728,7 +728,37 @@ paths:
             Identifier of rightsizing rule.
         - *ref_16
       responses:
-        '200': *ref_21
+        '200':
+          description: Ocean Rightsizing Rule Get Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_17
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /ocean/{oceanId}/rightSizing/rule/{ruleName}
+                          method:
+                            example: GET
+                        example:
+                          url: /ocean/{oceanId}/rightSizing/rule/{ruleName}
+                          method: GET
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items: *ref_18
+                          kind:
+                            example: mcs:ocean:rightsizing:rule
+                        example:
+                          items:
+                            - *ref_19
+                          kind: mcs:ocean:rightsizing:rule
         '400':
           description: Bad Request
     put:
@@ -739,7 +769,7 @@ paths:
         - Ocean Automatic Rightsizing
       parameters:
         - *ref_15
-        - *ref_22
+        - *ref_21
         - *ref_16
       requestBody:
         required: true
@@ -855,7 +885,7 @@ paths:
         - Ocean Automatic Rightsizing
       parameters:
         - *ref_15
-        - *ref_22
+        - *ref_21
         - *ref_16
       requestBody:
         required: true
@@ -863,7 +893,7 @@ paths:
           application/json:
             schema:
               allOf:
-                - &ref_25
+                - &ref_24
                   type: object
                   properties:
                     namespaces:
@@ -897,14 +927,14 @@ paths:
                                 name: kube-proxy
                                 workloadType: Deployment
                                 regexName: spotinst*
-                            example: &ref_23
+                            example: &ref_22
                               - name: kube-proxy
                                 workloadType: DaemonSet
                               - regexName: spotinst*
                                 workloadType: Deployment
                         example:
                           namespaceName: kube-system
-                          workloads: *ref_23
+                          workloads: *ref_22
       responses:
         '200':
           description: Ocean Rightsizing Rule Attachment Response
@@ -938,7 +968,7 @@ paths:
                               properties:
                                 rulesMatchings:
                                   type: array
-                                  example: &ref_24
+                                  example: &ref_23
                                     - oceanId: o-6ea3032a
                                       clusterIdentifier: dev-cluster
                                       namespace: kube-system
@@ -972,11 +1002,11 @@ paths:
                                       ruleMatching:
                                         type: string
                               example:
-                                rulesMatchings: *ref_24
+                                rulesMatchings: *ref_23
                         example:
                           kind: mcs:ocean:rightsizing:ruleMatching
                           items:
-                            - rulesMatchings: *ref_24
+                            - rulesMatchings: *ref_23
         '400':
           description: Bad Request
   /ocean/{oceanId}/rightSizing/rule/{ruleName}/detachment:
@@ -988,7 +1018,7 @@ paths:
         - Ocean Automatic Rightsizing
       parameters:
         - *ref_15
-        - *ref_22
+        - *ref_21
         - *ref_16
       requestBody:
         required: true
@@ -996,7 +1026,7 @@ paths:
           application/json:
             schema:
               allOf:
-                - *ref_25
+                - *ref_24
       responses:
         '200':
           description: Ocean Rightsizing Rule Detached Workload Names Response
@@ -1027,18 +1057,18 @@ paths:
                               properties:
                                 workloadNames:
                                   type: array
-                                  example: &ref_26
+                                  example: &ref_25
                                     - kube-proxy
                                     - spotinst-controller
                                   items:
                                     type: string
                               example:
-                                workloadNames: *ref_26
+                                workloadNames: *ref_25
                           kind:
                             example: mcs:ocean:rightsizing:rule
                         example:
                           items:
-                            - workloadNames: *ref_26
+                            - workloadNames: *ref_25
                           kind: mcs:ocean:rightsizing:rule
         '400':
           description: Bad Request
@@ -1224,7 +1254,7 @@ paths:
                                   type: string
                                   format: date-time
                                   description: The timestamp at which the recommendation was last applied
-                            example: &ref_27
+                            example: &ref_26
                               - namespace: kube-system
                                 workloadName: redis-controller
                                 workloadType: deployment
@@ -1286,7 +1316,7 @@ paths:
                           kind:
                             example: mcs:ocean:rightSizing:recommendations
                         example:
-                          items: *ref_27
+                          items: *ref_26
                           count: 2
                           kind: mcs:ocean:rightSizing:recommendations
         '400':
@@ -1301,7 +1331,7 @@ paths:
         - Ocean Automatic Rightsizing
       parameters:
         - *ref_15
-        - &ref_32
+        - &ref_31
           in: path
           name: namespace
           schema:
@@ -1310,7 +1340,7 @@ paths:
           example: default
           description: |
             Namespace of the workload.
-        - &ref_33
+        - &ref_32
           in: path
           name: workloadType
           schema:
@@ -1324,7 +1354,7 @@ paths:
           example: deployment
           description: |
             Type of the workload.
-        - &ref_34
+        - &ref_33
           in: path
           name: workloadName
           schema:
@@ -1453,7 +1483,7 @@ paths:
                                         type: integer
                                         format: int64
                                         description: Unix epoch timestamp in milliseconds when the recommendation was generated.
-                            example: &ref_28
+                            example: &ref_27
                               - recommendations:
                                   - podCount: 1
                                     cpu:
@@ -1478,7 +1508,7 @@ paths:
                           kind:
                             example: mcs:ocean:rightSizing:clusterResourceRecommendationsHistory
                         example:
-                          items: *ref_28
+                          items: *ref_27
                           count: 1
                           kind: mcs:ocean:rightSizing:clusterResourceRecommendationsHistory
         '400':
@@ -1600,7 +1630,7 @@ paths:
         - Ocean Automatic Rightsizing
       parameters:
         - *ref_15
-        - &ref_30
+        - &ref_29
           in: query
           name: clusterIdentifier
           schema:
@@ -1646,7 +1676,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - *ref_29
+                  - *ref_28
         '400':
           description: Bad Request
   /ocean/{oceanId}/rightSizing/cluster/configuration:
@@ -1662,7 +1692,7 @@ paths:
         - Ocean Automatic Rightsizing
       parameters:
         - *ref_15
-        - *ref_30
+        - *ref_29
         - *ref_16
       requestBody:
         required: true
@@ -1799,7 +1829,7 @@ paths:
         - Ocean Automatic Rightsizing
       parameters:
         - *ref_15
-        - *ref_30
+        - *ref_29
         - *ref_16
       responses:
         '200':
@@ -2026,7 +2056,7 @@ paths:
                                         type: number
                                       workloadDeleted:
                                         type: boolean
-                            example: &ref_31
+                            example: &ref_30
                               - totalSavingsSummary:
                                   cpuWithOcean: 100,
                                   memoryWithOcean: 128,
@@ -2061,7 +2091,7 @@ paths:
                           kind:
                             example: mcs:ocean:rightSizing:savings
                         example:
-                          items: *ref_31
+                          items: *ref_30
                           count: 1
                           kind: mcs:ocean:rightSizing:savings
         '400':
@@ -2076,9 +2106,9 @@ paths:
         - Ocean Automatic Rightsizing
       parameters:
         - *ref_15
+        - *ref_31
         - *ref_32
         - *ref_33
-        - *ref_34
         - *ref_16
         - in: query
           name: offset
@@ -2162,7 +2192,7 @@ paths:
                                           - INVALID_HPA
                                           - PRELIMINARY_RESTRICTED
                                         example: APPLIED
-                                      currentResources: &ref_35
+                                      currentResources: &ref_34
                                         type: object
                                         title: Compute Resource
                                         description: |
@@ -2181,7 +2211,7 @@ paths:
                                         example:
                                           cpu: 4000
                                           memory: 16000
-                                      recommendedResources: *ref_35
+                                      recommendedResources: *ref_34
                                       occurredAt:
                                         type: integer
                                         format: int64
@@ -2214,7 +2244,7 @@ paths:
                                       memory: 16000
                                     occurredAt: 1776178797289
                                     ruleName: my-app-rule
-                            example: &ref_36
+                            example: &ref_35
                               - page:
                                   - containerName: my-app-container
                                     actionType: APPLIED
@@ -2230,7 +2260,7 @@ paths:
                             example: 1
                         example:
                           kind: mcs:ocean:rightSizing:recommendationApplicationHistory
-                          items: *ref_36
+                          items: *ref_35
                           count: 1
         '400':
           description: Invalid request provided
