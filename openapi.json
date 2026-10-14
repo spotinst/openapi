@@ -76656,7 +76656,7 @@
             "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1cluster~1configuration/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1hpaRecommendations/get/parameters/1"
           },
           {
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
@@ -76735,7 +76735,7 @@
             "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule/get/parameters/0"
           },
           {
-            "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1cluster~1configuration/get/parameters/1"
+            "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1hpaRecommendations/get/parameters/1"
           },
           {
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
@@ -76893,14 +76893,7 @@
             "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule/get/parameters/0"
           },
           {
-            "in": "query",
-            "name": "clusterIdentifier",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "example": "dev-cluster",
-            "description": "Identifier of cluster.\n"
+            "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1hpaRecommendations/get/parameters/1"
           },
           {
             "$ref": "#/paths/~1azure~1costs/get/parameters/0"
@@ -77440,6 +77433,175 @@
                             },
                             "count": {
                               "example": 1
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request provided"
+          },
+          "404": {
+            "description": "Non existent resource has been queried"
+          },
+          "422": {
+            "description": "Business rule violated"
+          }
+        }
+      }
+    },
+    "/ocean/{oceanId}/rightSizing/hpaRecommendations": {
+      "get": {
+        "summary": "Get Ocean Rightsizing HPA Recommendations",
+        "description": "Get HPA right-sizing recommendations for an Ocean cluster.\n",
+        "operationId": "oceanRightsizingHpaRecommendations",
+        "tags": [
+          "Ocean Automatic Rightsizing"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule/get/parameters/0"
+          },
+          {
+            "in": "query",
+            "name": "clusterIdentifier",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "dev-cluster",
+            "description": "Identifier of cluster.\n"
+          },
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocean Rightsizing HPA Recommendations Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/o-abcd1234/rightSizing/hpaRecommendations?accountId=act-123456789&clusterIdentifier=dev-cluster"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "title": "Ocean Rightsizing HPA Recommendation",
+                                "description": "HPA replica recommendation for a single Kubernetes workload. Contains the current and recommended min/max replica bounds, along with the timestamp of the last update.\n",
+                                "properties": {
+                                  "namespace": {
+                                    "type": "string",
+                                    "description": "Kubernetes namespace of the workload.",
+                                    "example": "prod"
+                                  },
+                                  "workloadName": {
+                                    "type": "string",
+                                    "description": "Name of the Kubernetes workload.",
+                                    "example": "checkout"
+                                  },
+                                  "workloadType": {
+                                    "type": "string",
+                                    "title": "Ocean Rightsizing K8s Workload Type",
+                                    "enum": [
+                                      "Deployment",
+                                      "ReplicaSet",
+                                      "Rollout"
+                                    ]
+                                  },
+                                  "currentReplicas": {
+                                    "type": "object",
+                                    "title": "Ocean Rightsizing Replica Bounds",
+                                    "description": "Min/max replica bounds for a workload. Used for both the currently configured and recommended replica ranges. Both bounds are always present and represent valid replica counts; they are never null or zero.\n",
+                                    "properties": {
+                                      "min": {
+                                        "type": "integer",
+                                        "format": "int32",
+                                        "minimum": 1,
+                                        "description": "Minimum replica count. Must be at least 1.",
+                                        "example": 2
+                                      },
+                                      "max": {
+                                        "type": "integer",
+                                        "format": "int32",
+                                        "minimum": 1,
+                                        "description": "Maximum replica count. Must be at least 1.",
+                                        "example": 10
+                                      }
+                                    }
+                                  },
+                                  "recommendedReplicas": {
+                                    "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1hpaRecommendations/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/currentReplicas"
+                                  },
+                                  "updatedAt": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "description": "ISO 8601 timestamp indicating when this HPA recommendation was last computed or updated.\n",
+                                    "example": "2026-04-24T04:55:22.043813"
+                                  }
+                                }
+                              },
+                              "example": [
+                                {
+                                  "namespace": "kube-system",
+                                  "workloadName": "coredns",
+                                  "workloadType": "Deployment",
+                                  "currentReplicas": {
+                                    "min": 2,
+                                    "max": 10
+                                  },
+                                  "recommendedReplicas": {
+                                    "min": 1,
+                                    "max": 12
+                                  },
+                                  "updatedAt": "2026-08-06T08:56:03.135044"
+                                },
+                                {
+                                  "namespace": "app-ns",
+                                  "workloadName": "checkout",
+                                  "workloadType": "Deployment",
+                                  "currentReplicas": {
+                                    "min": 1,
+                                    "max": 15
+                                  },
+                                  "recommendedReplicas": {
+                                    "min": 2,
+                                    "max": 9
+                                  },
+                                  "updatedAt": "2026-08-06T08:56:03.135044"
+                                }
+                              ]
+                            },
+                            "count": {
+                              "example": 2
+                            },
+                            "kind": {
+                              "example": "mcs:ocean:rightSizing:clusterHpaRecommendations"
                             }
                           }
                         }

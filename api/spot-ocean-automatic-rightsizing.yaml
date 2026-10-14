@@ -2268,3 +2268,134 @@ paths:
           description: Non existent resource has been queried
         '422':
           description: Business rule violated
+  /ocean/{oceanId}/rightSizing/hpaRecommendations:
+    get:
+      summary: Get Ocean Rightsizing HPA Recommendations
+      description: |
+        Get HPA right-sizing recommendations for an Ocean cluster.
+      operationId: oceanRightsizingHpaRecommendations
+      tags:
+        - Ocean Automatic Rightsizing
+      parameters:
+        - *ref_15
+        - *ref_29
+        - *ref_16
+      responses:
+        '200':
+          description: Ocean Rightsizing HPA Recommendations Response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - *ref_17
+                  - type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          url:
+                            example: /ocean/o-abcd1234/rightSizing/hpaRecommendations?accountId=act-123456789&clusterIdentifier=dev-cluster
+                          method:
+                            example: GET
+                        example:
+                          url: /ocean/o-abcd1234/rightSizing/hpaRecommendations?accountId=act-123456789&clusterIdentifier=dev-cluster
+                          method: GET
+                      response:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              title: Ocean Rightsizing HPA Recommendation
+                              description: |
+                                HPA replica recommendation for a single Kubernetes workload. Contains the current and recommended min/max replica bounds, along with the timestamp of the last update.
+                              properties:
+                                namespace:
+                                  type: string
+                                  description: Kubernetes namespace of the workload.
+                                  example: prod
+                                workloadName:
+                                  type: string
+                                  description: Name of the Kubernetes workload.
+                                  example: checkout
+                                workloadType:
+                                  type: string
+                                  title: Ocean Rightsizing K8s Workload Type
+                                  enum:
+                                    - Deployment
+                                    - ReplicaSet
+                                    - Rollout
+                                currentReplicas: &ref_36
+                                  type: object
+                                  title: Ocean Rightsizing Replica Bounds
+                                  description: |
+                                    Min/max replica bounds for a workload. Used for both the currently configured and recommended replica ranges. Both bounds are always present and represent valid replica counts; they are never null or zero.
+                                  properties:
+                                    min:
+                                      type: integer
+                                      format: int32
+                                      minimum: 1
+                                      description: Minimum replica count. Must be at least 1.
+                                      example: 2
+                                    max:
+                                      type: integer
+                                      format: int32
+                                      minimum: 1
+                                      description: Maximum replica count. Must be at least 1.
+                                      example: 10
+                                  example:
+                                    min: 2
+                                    max: 10
+                                recommendedReplicas: *ref_36
+                                updatedAt:
+                                  type: string
+                                  format: date-time
+                                  description: |
+                                    ISO 8601 timestamp indicating when this HPA recommendation was last computed or updated.
+                                  example: '2026-04-24T04:55:22.043813'
+                              example:
+                                namespace: prod
+                                workloadName: checkout
+                                currentReplicas:
+                                  min: 2
+                                  max: 10
+                                recommendedReplicas:
+                                  min: 2
+                                  max: 10
+                                updatedAt: '2026-04-24T04:55:22.043813'
+                            example: &ref_37
+                              - namespace: kube-system
+                                workloadName: coredns
+                                workloadType: Deployment
+                                currentReplicas:
+                                  min: 2
+                                  max: 10
+                                recommendedReplicas:
+                                  min: 1
+                                  max: 12
+                                updatedAt: '2026-08-06T08:56:03.135044'
+                              - namespace: app-ns
+                                workloadName: checkout
+                                workloadType: Deployment
+                                currentReplicas:
+                                  min: 1
+                                  max: 15
+                                recommendedReplicas:
+                                  min: 2
+                                  max: 9
+                                updatedAt: '2026-08-06T08:56:03.135044'
+                          count:
+                            example: 2
+                          kind:
+                            example: mcs:ocean:rightSizing:clusterHpaRecommendations
+                        example:
+                          items: *ref_37
+                          count: 2
+                          kind: mcs:ocean:rightSizing:clusterHpaRecommendations
+        '400':
+          description: Invalid request provided
+        '404':
+          description: Non existent resource has been queried
+        '422':
+          description: Business rule violated
