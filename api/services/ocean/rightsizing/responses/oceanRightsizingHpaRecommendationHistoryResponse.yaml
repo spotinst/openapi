@@ -1,0 +1,61 @@
+description: "Workload HPA Recommendation History Response"
+content:
+  application/json:
+    schema:
+      allOf:
+        - $ref: "../../../../commons/schemas/responseItemWrapper.yaml"
+        - type: object
+          properties:
+            request:
+              type: object
+              properties:
+                url:
+                  example: "/ocean/o-abcd1234/rightSizing/namespaces/default/deployment/checkout-service/hpaRecommendation/history?fromDate=1788998400000&toDate=1789475400000"
+                method:
+                  example: "GET"
+            response:
+              type: object
+              properties:
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      history:
+                        type: array
+                        description: HPA recommendation snapshots for the workload. May be empty.
+                        items:
+                          $ref: "../schemas/oceanRightsizingHpaRecommendationHistoryItem.yaml"
+                  example:
+                    - history:
+                        - timestamp: 1788998400000
+                          currentPodCount: 2
+                          currentReplicaRange:
+                            min: 2
+                            max: 10
+                          recommendedReplicaRange:
+                            min: 1
+                          p10:
+                            cpu: 25
+                            memory: 128
+                          p99:
+                            cpu: 180
+                            memory: 256
+                        - timestamp: 1789084800000
+                          currentPodCount: 3
+                          currentReplicaRange:
+                            min: 2
+                            max: 10
+                          recommendedReplicaRange:
+                            min: 2
+                            max: 8
+                          p10:
+                            cpu: 30
+                            memory: 128
+                          p99:
+                            cpu: 200
+                            memory: 280
+                count:
+                  example: 1
+                kind:
+                  example: "mcs:ocean:rightSizing:workloadHpaRecommendationsHistory"

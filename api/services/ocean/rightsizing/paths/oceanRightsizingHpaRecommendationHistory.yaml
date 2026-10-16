@@ -1,0 +1,54 @@
+get:
+  summary: "Get Workload HPA Recommendation History"
+  description: |
+    Get HPA right-sizing recommendation history for a specific workload in an Ocean cluster.
+
+    The accountId is resolved from the request context.
+
+    Dates are Unix timestamps in milliseconds. `fromDate` is required;
+    `toDate` defaults to the current time when omitted. Both timestamps must be
+    positive, `toDate` must be greater than or equal to `fromDate`, and the
+    requested time window must not exceed 31 days.
+  operationId: "oceanRightsizingHpaRecommendationHistory"
+  tags:
+    - "Ocean Automatic Rightsizing"
+  parameters:
+    - $ref: "../parameters/oceanId.yaml"
+    - $ref: "../parameters/namespace.yaml"
+    - $ref: "../parameters/workloadType.yaml"
+    - $ref: "../parameters/workloadName.yaml"
+    - in: query
+      name: fromDate
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+      description: Start time as a positive Unix timestamp in milliseconds.
+      example: 1788998400000
+    - in: query
+      name: toDate
+      required: false
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+      description: >
+        End time as a positive Unix timestamp in milliseconds. Defaults to the
+        current time when omitted. Must be greater than or equal to fromDate
+        and no more than 31 days after fromDate.
+      example: 1789475400000
+  responses:
+    200:
+      $ref: "../responses/oceanRightsizingHpaRecommendationHistoryResponse.yaml"
+    400:
+      description: >
+        Invalid request parameters, including missing fromDate or non-positive timestamps,
+        an unsupported workload type, toDate earlier than fromDate, or a time
+        window exceeding 31 days.
+    401:
+      description: "Missing or invalid authentication token"
+    403:
+      description: "Insufficient permissions to access the Ocean cluster"
+    422:
+      description: "Failed to resolve the workload or retrieve HPA recommendation history"
