@@ -1,0 +1,53 @@
+get:
+  summary: "Get Workload HPA Recommendation History"
+  description: |
+    Get HPA recommendation history for a workload in an Ocean cluster.
+  operationId: "oceanRightsizingHpaRecommendationHistory"
+  tags:
+    - "Ocean Automatic Rightsizing"
+  parameters:
+    - $ref: "../parameters/oceanId.yaml"
+    - $ref: "../parameters/namespace.yaml"
+    - in: path
+      name: workloadType
+      required: true
+      schema:
+        type: string
+        enum:
+          - deployment
+          - replicaSet
+          - rollout
+      description: Type of the workload supported for HPA recommendations.
+      example: deployment
+    - $ref: "../parameters/workloadName.yaml"
+    - $ref: "../../../../commons/parameters/accountId.yaml"
+    - in: query
+      name: fromDate
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+      description: Start time as a positive Unix timestamp in milliseconds.
+      example: 1788998400000
+    - in: query
+      name: toDate
+      required: false
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+      description: >
+        End time as a positive Unix timestamp in milliseconds. Defaults to the
+        current time when omitted. Must be greater than or equal to fromDate
+        and no more than 31 days after fromDate.
+      example: 1789475400000
+  responses:
+    200:
+      $ref: "../responses/oceanRightsizingHpaRecommendationHistoryResponse.yaml"
+    400:
+      description: "Invalid request provided"
+    404:
+      description: "Non existent resource has been queried"
+    422:
+      description: "Business rule violated"
