@@ -1,22 +1,26 @@
 get:
   summary: "Get Workload HPA Recommendation History"
   description: |
-    Get HPA right-sizing recommendation history for a specific workload in an Ocean cluster.
-
-    The accountId is resolved from the request context.
-
-    Dates are Unix timestamps in milliseconds. `fromDate` is required;
-    `toDate` defaults to the current time when omitted. Both timestamps must be
-    positive, `toDate` must be greater than or equal to `fromDate`, and the
-    requested time window must not exceed 31 days.
+    Get HPA recommendation history for a workload in an Ocean cluster. `accountId` is required. Dates use Unix timestamps in milliseconds; `fromDate` is required, and `toDate` defaults to the current time. Both must be positive, `toDate` must be ≥ `fromDate`, and the range cannot exceed 31 days.
   operationId: "oceanRightsizingHpaRecommendationHistory"
   tags:
     - "Ocean Automatic Rightsizing"
   parameters:
     - $ref: "../parameters/oceanId.yaml"
     - $ref: "../parameters/namespace.yaml"
-    - $ref: "../parameters/workloadType.yaml"
+    - in: path
+      name: workloadType
+      required: true
+      schema:
+        type: string
+        enum:
+          - deployment
+          - replicaSet
+          - rollout
+      description: Type of the workload supported for HPA recommendations.
+      example: deployment
     - $ref: "../parameters/workloadName.yaml"
+    - $ref: "../../../../commons/parameters/accountId.yaml"
     - in: query
       name: fromDate
       required: true
@@ -42,13 +46,8 @@ get:
     200:
       $ref: "../responses/oceanRightsizingHpaRecommendationHistoryResponse.yaml"
     400:
-      description: >
-        Invalid request parameters, including missing fromDate or non-positive timestamps,
-        an unsupported workload type, toDate earlier than fromDate, or a time
-        window exceeding 31 days.
-    401:
-      description: "Missing or invalid authentication token"
-    403:
-      description: "Insufficient permissions to access the Ocean cluster"
+      description: "Invalid request provided"
+    404:
+      description: "Non existent resource has been queried"
     422:
-      description: "Failed to resolve the workload or retrieve HPA recommendation history"
+      description: "Business rule violated"
