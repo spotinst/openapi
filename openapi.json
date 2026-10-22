@@ -77573,6 +77573,251 @@
         }
       }
     },
+    "/ocean/{oceanId}/rightSizing/namespaces/{namespace}/{workloadType}/{workloadName}/hpaRecommendation/history": {
+      "get": {
+        "summary": "Get Workload HPA Recommendation History",
+        "description": "Get HPA recommendation history for a workload in an Ocean cluster.\n",
+        "operationId": "oceanRightsizingHpaRecommendationHistory",
+        "tags": [
+          "Ocean Automatic Rightsizing"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1rule/get/parameters/0"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1namespaces~1%7Bnamespace%7D~1%7BworkloadType%7D~1%7BworkloadName%7D~1recommendation-history/get/parameters/1"
+          },
+          {
+            "in": "path",
+            "name": "workloadType",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "deployment",
+                "replicaSet",
+                "rollout"
+              ]
+            },
+            "description": "Type of the workload supported for HPA recommendations.",
+            "example": "deployment"
+          },
+          {
+            "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1namespaces~1%7Bnamespace%7D~1%7BworkloadType%7D~1%7BworkloadName%7D~1recommendation-history/get/parameters/3"
+          },
+          {
+            "$ref": "#/paths/~1azure~1costs/get/parameters/0"
+          },
+          {
+            "in": "query",
+            "name": "fromDate",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            },
+            "description": "Start time as a positive Unix timestamp in milliseconds.",
+            "example": 1788998400000
+          },
+          {
+            "in": "query",
+            "name": "toDate",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            },
+            "description": "End time as a positive Unix timestamp in milliseconds. Defaults to the current time when omitted. Must be greater than or equal to fromDate and no more than 31 days after fromDate.\n",
+            "example": 1789475400000
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Workload HPA Recommendation History Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/paths/~1healthCheck/get/responses/200/content/application~1json/schema/allOf/0"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "request": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "example": "/ocean/o-abcd1234/rightSizing/namespaces/default/deployment/checkout-service/hpaRecommendation/history?accountId=act-123456789&fromDate=1788998400000&toDate=1789475400000"
+                            },
+                            "method": {
+                              "example": "GET"
+                            }
+                          }
+                        },
+                        "response": {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "history": {
+                                    "type": "array",
+                                    "description": "HPA recommendation snapshots for the workload. May be empty.",
+                                    "items": {
+                                      "type": "object",
+                                      "title": "Ocean Rightsizing HPA Recommendation History Item",
+                                      "description": "HPA recommendation snapshot for a workload. Fields with no value are omitted.\n",
+                                      "properties": {
+                                        "timestamp": {
+                                          "type": "integer",
+                                          "format": "int64",
+                                          "description": "Unix epoch timestamp in milliseconds for this snapshot.",
+                                          "example": 1788998400000
+                                        },
+                                        "currentPodCount": {
+                                          "type": "integer",
+                                          "format": "int32",
+                                          "description": "Current number of pods in the workload.",
+                                          "example": 2
+                                        },
+                                        "currentReplicaRange": {
+                                          "type": "object",
+                                          "title": "Ocean Rightsizing HPA Replica Range",
+                                          "description": "Replica range for a workload HPA history snapshot. Either bound may be omitted when unavailable, including max in a recommended replica range.\n",
+                                          "properties": {
+                                            "min": {
+                                              "type": "integer",
+                                              "format": "int32",
+                                              "description": "Minimum replica count.",
+                                              "example": 1
+                                            },
+                                            "max": {
+                                              "type": "integer",
+                                              "format": "int32",
+                                              "description": "Maximum replica count.",
+                                              "example": 10
+                                            }
+                                          }
+                                        },
+                                        "recommendedReplicaRange": {
+                                          "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1namespaces~1%7Bnamespace%7D~1%7BworkloadType%7D~1%7BworkloadName%7D~1hpaRecommendation~1history/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/history/items/properties/currentReplicaRange"
+                                        },
+                                        "p10": {
+                                          "allOf": [
+                                            {
+                                              "type": "object",
+                                              "title": "Ocean Rightsizing HPA Percentile Metrics",
+                                              "description": "CPU and memory metrics for a workload at a given percentile. Either metric may be omitted when unavailable.\n",
+                                              "properties": {
+                                                "cpu": {
+                                                  "type": "integer",
+                                                  "format": "int32",
+                                                  "description": "CPU metric at this percentile.",
+                                                  "example": 25
+                                                },
+                                                "memory": {
+                                                  "type": "integer",
+                                                  "format": "int32",
+                                                  "description": "Memory metric at this percentile.",
+                                                  "example": 128
+                                                }
+                                              }
+                                            }
+                                          ],
+                                          "description": "CPU and memory metrics at the 10th percentile."
+                                        },
+                                        "p99": {
+                                          "allOf": [
+                                            {
+                                              "$ref": "#/paths/~1ocean~1%7BoceanId%7D~1rightSizing~1namespaces~1%7Bnamespace%7D~1%7BworkloadType%7D~1%7BworkloadName%7D~1hpaRecommendation~1history/get/responses/200/content/application~1json/schema/allOf/1/properties/response/properties/items/items/properties/history/items/properties/p10/allOf/0"
+                                            }
+                                          ],
+                                          "description": "CPU and memory metrics at the 99th percentile."
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "example": [
+                                {
+                                  "history": [
+                                    {
+                                      "timestamp": 1788998400000,
+                                      "currentPodCount": 2,
+                                      "currentReplicaRange": {
+                                        "min": 2,
+                                        "max": 10
+                                      },
+                                      "recommendedReplicaRange": {
+                                        "min": 1
+                                      },
+                                      "p10": {
+                                        "cpu": 25,
+                                        "memory": 128
+                                      },
+                                      "p99": {
+                                        "cpu": 180,
+                                        "memory": 256
+                                      }
+                                    },
+                                    {
+                                      "timestamp": 1789084800000,
+                                      "currentPodCount": 3,
+                                      "currentReplicaRange": {
+                                        "min": 2,
+                                        "max": 10
+                                      },
+                                      "recommendedReplicaRange": {
+                                        "min": 2,
+                                        "max": 8
+                                      },
+                                      "p10": {
+                                        "cpu": 30,
+                                        "memory": 128
+                                      },
+                                      "p99": {
+                                        "cpu": 200,
+                                        "memory": 280
+                                      }
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            "count": {
+                              "example": 1
+                            },
+                            "kind": {
+                              "example": "mcs:ocean:rightSizing:workloadHpaRecommendationsHistory"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request provided"
+          },
+          "404": {
+            "description": "Non existent resource has been queried"
+          },
+          "422": {
+            "description": "Business rule violated"
+          }
+        }
+      }
+    },
     "/security/v1/compliances": {
       "get": {
         "description": "A cyber security compliance determines how compliant an asset is. It checks against specific security standards.\nThis API returns list of all compliances supported in Spot.\nA compliance consists of one or more controls.",
