@@ -378,6 +378,28 @@ properties:
           Can be null. If set, value must be greater than or equal to 0.
         type: integer
         example: 2
+  capacityReservations:
+    type: object
+    description: |
+      Configure Capacity Reservations for this Virtual Node Group. When reservation IDs are configured,
+      strategy.spotPercentage must be set to 0.
+    properties:
+      ids:
+        type: array
+        description: |
+          A list of Capacity Reservation IDs to target. The IDs must be unique and match the format ^cr-[a-z0-9]+$.
+        items:
+          type: string
+          pattern: '^cr-[a-z0-9]+$'
+        uniqueItems: true
+        example: [ "cr-0bde851497a96c914", "cr-0641bcba53a7cf46c" ]
+      fallback:
+        type: boolean
+        description: |
+          Whether to continue with the normal scaling path if the configured Capacity Reservations cannot satisfy
+          the launch. Defaults to false when omitted. On update, omitting this field leaves its existing value unchanged.
+        default: false
+        example: false
   strategy:
     type: object
     description: |
