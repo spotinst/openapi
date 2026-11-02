@@ -4162,8 +4162,9 @@ paths:
       summary: Set Credentials for Azure
       description: |-
         Link a Spot account to an Azure Cloud account. 
-         Enter the expiration date of your Azure client secret. Spot can remind you to update before the credentials expire. 
-         If your client secret expires, your Azure subscription will disconnect from Spot and prevent Spot from managing your resources.
+         Provide either a client secret or a PEM-encoded certificate and matching private key. 
+         Set the expiration date when Azure secret expiration enforcement is enabled. Spot can remind you to update credentials before they expire. 
+         If your credentials expire, your Azure subscription will disconnect from Spot and prevent Spot from managing your resources.
       operationId: OrganizationsAndAccountsSetCloudCredentialsForAzure
       tags:
         - Accounts
@@ -4176,34 +4177,64 @@ paths:
             schema:
               allOf:
                 - type: object
-                  required:
-                    - clientId
-                    - clientSecret
-                    - tenantId
-                    - subscriptionId
-                    - expirationDate
-                  properties:
-                    clientId:
-                      type: string
-                      description: Set the application ID
-                      example: 111111111
-                    clientSecret:
-                      type: string
-                      description: Set the key secret
-                      example: 32431r2431434132
-                    tenantId:
-                      type: string
-                      description: Set the directory ID
-                      example: 1321e1e3123er23
-                    subscriptionId:
-                      type: string
-                      description: Set the subscription ID
-                      example: 234r3141131
-                    expirationDate:
-                      type: string
-                      format: date-time
-                      description: Set the key secret expiration date
-                      example: '2025-12-31T23:59:00.000Z'
+                  oneOf:
+                    - title: Client secret authentication
+                      type: object
+                      required:
+                        - clientId
+                        - clientSecret
+                        - tenantId
+                        - subscriptionId
+                      properties:
+                        clientId:
+                          type: string
+                          description: Set the application ID
+                          example: 111111111
+                        clientSecret:
+                          type: string
+                          description: Set the client secret. Do not provide pemCertificate.
+                          example: 32431r2431434132
+                        tenantId:
+                          type: string
+                          description: Set the directory ID
+                          example: 1321e1e3123er23
+                        subscriptionId:
+                          type: string
+                          description: Set the subscription ID
+                          example: 234r3141131
+                        expirationDate:
+                          type: string
+                          format: date-time
+                          description: Set the credentials expiration date. Required when Azure secret expiration enforcement is enabled.
+                          example: '2025-12-31T23:59:00.000Z'
+                    - title: PEM certificate authentication
+                      type: object
+                      required:
+                        - clientId
+                        - pemCertificate
+                        - tenantId
+                        - subscriptionId
+                      properties:
+                        clientId:
+                          type: string
+                          description: Set the application ID
+                          example: 111111111
+                        pemCertificate:
+                          type: string
+                          description: Provide the PEM-encoded certificate and matching private key. Do not provide clientSecret.
+                        tenantId:
+                          type: string
+                          description: Set the directory ID
+                          example: 1321e1e3123er23
+                        subscriptionId:
+                          type: string
+                          description: Set the subscription ID
+                          example: 234r3141131
+                        expirationDate:
+                          type: string
+                          format: date-time
+                          description: Set the credentials expiration date. Required when Azure secret expiration enforcement is enabled.
+                          example: '2025-12-31T23:59:00.000Z'
       responses:
         '200': &ref_23
           description: Set Cloud Credentials For Azure Response
@@ -4272,7 +4303,7 @@ paths:
           description: Bad Request
     get:
       summary: Get Credentials for Azure
-      description: Get the credentials connecting a Spot account to an Azure Cloud account.
+      description: Get Azure credential metadata. Client secrets are masked and PEM certificate contents are never returned.
       operationId: OrganizationsAndAccountsGetCloudCredentialsForAzure
       tags:
         - Accounts
@@ -4358,6 +4389,7 @@ paths:
                               Array of data objects
                             items:
                               type: object
+                              description: PEM certificate contents are never returned.
                               properties:
                                 clientId:
                                   type: string
@@ -4371,10 +4403,21 @@ paths:
                                   type: string
                                   description: The subscription ID
                                   example: 234r3141131
+                                clientSecret:
+                                  type: string
+                                  nullable: true
+                                  description: Masked client secret; null when certificate authentication is configured.
+                                  example: abc*************************************
+                                expirationDate:
+                                  type: string
+                                  format: date-time
+                                  nullable: true
+                                  description: The credentials expiration date, when set.
                               example:
                                 clientId: 111111111
                                 tenantId: 1321e1e3123er23
                                 subscriptionId: 234r3141131
+                                clientSecret: abc*************************************
                             example: &ref_22
                               - clientId: 111111111
                                 tenantId: 1321e1e3123er23
@@ -4408,23 +4451,54 @@ paths:
             schema:
               allOf:
                 - type: object
-                  properties:
-                    clientId:
-                      type: string
-                      description: Set the application ID
-                      example: '111111111'
-                    clientSecret:
-                      type: string
-                      description: Set the key secret
-                      example: 32431r2431434132
-                    tenantId:
-                      type: string
-                      description: Set the directory ID
-                      example: 1321e1e3123er23
-                    subscriptionId:
-                      type: string
-                      description: Set the subscription ID
-                      example: 234r3141131
+                  oneOf:
+                    - title: Client secret authentication
+                      type: object
+                      required:
+                        - clientId
+                        - clientSecret
+                        - tenantId
+                        - subscriptionId
+                      properties:
+                        clientId:
+                          type: string
+                          description: Set the application ID
+                          example: '111111111'
+                        clientSecret:
+                          type: string
+                          description: Set the client secret. Do not provide pemCertificate.
+                          example: 32431r2431434132
+                        tenantId:
+                          type: string
+                          description: Set the directory ID
+                          example: 1321e1e3123er23
+                        subscriptionId:
+                          type: string
+                          description: Set the subscription ID
+                          example: 234r3141131
+                    - title: PEM certificate authentication
+                      type: object
+                      required:
+                        - clientId
+                        - pemCertificate
+                        - tenantId
+                        - subscriptionId
+                      properties:
+                        clientId:
+                          type: string
+                          description: Set the application ID
+                          example: '111111111'
+                        pemCertificate:
+                          type: string
+                          description: Provide the PEM-encoded certificate and matching private key. Do not provide clientSecret.
+                        tenantId:
+                          type: string
+                          description: Set the directory ID
+                          example: 1321e1e3123er23
+                        subscriptionId:
+                          type: string
+                          description: Set the subscription ID
+                          example: 234r3141131
       responses:
         '200':
           description: Validate Cloud Credentials for Azure Response
