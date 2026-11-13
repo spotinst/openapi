@@ -1,12 +1,7 @@
 type: object
-nullable: true
 description: |
-  Calculates the boot-disk size for each candidate machine type:
-  `baseSize + (vCPU count * sizePerResourceUnit)`.
-  For example, with `baseSize` 20 and `sizePerResourceUnit` 10, a 2-vCPU
-  candidate receives a 40-GiB boot disk.
-  Configure either `rootVolumeSizeInGb` or `dynamicVolumeSize` on a launch
-  specification, not both.
+  Set dynamic volume size properties. When using this object, you cannot use `rootVolumeSizeInGb`.
+  You must use one or the other. When `dynamicVolumeSize` is configured, the `rootVolumeType` field must also be set.
 required:
   - baseSize
   - resource
@@ -14,16 +9,16 @@ required:
 properties:
   baseSize:
     type: integer
-    minimum: 1
-    description: Base boot-disk size in GiB.
-    example: 20
+    description: |
+      Initial size per volume.
+    example: 50
   resource:
     type: string
     enum: [CPU]
-    description: Resource used as the multiplier for the dynamic boot-disk size.
-    example: CPU
+    example: "CPU"
   sizePerResourceUnit:
     type: integer
-    minimum: 1
-    description: Additional boot-disk size in GiB per resource unit.
-    example: 10
+    description: |
+      Additional size per resource unit (in GB).
+      For example: if baseSize=50, and sizePerResourceUnit=20, and an instance with 2 CPU is launched, its disk size will be 90 GB.
+    example: 20
