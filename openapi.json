@@ -56244,7 +56244,7 @@
                                   },
                                   "rootVolumeSizeInGb": {
                                     "type": "integer",
-                                    "description": "Optionally set root size (GB). Value should be greater than or equal to 100.",
+                                    "description": "Optionally set the root disk size in GB. Configure either this field or dynamicVolumeSize, not both.\n",
                                     "example": 100
                                   },
                                   "rootVolumeType": {
@@ -56259,6 +56259,9 @@
                                       "hyperdisk-balanced",
                                       "hyperdisk-balanced-high-availability"
                                     ]
+                                  },
+                                  "dynamicVolumeSize": {
+                                    "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec~1%7BlaunchSpecId%7D/put/requestBody/content/application~1json/schema/properties/dynamicVolumeSize"
                                   },
                                   "shieldedInstanceConfig": {
                                     "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec~1%7BlaunchSpecId%7D/put/requestBody/content/application~1json/schema/properties/shieldedInstanceConfig"
@@ -58125,8 +58128,11 @@
                           },
                           "rootVolumeSizeInGb": {
                             "type": "integer",
-                            "description": "Set root volume size (in GB).",
+                            "description": "Set root volume size in GB. Configure either this field or dynamicVolumeSize, not both.\n",
                             "example": 8
+                          },
+                          "dynamicVolumeSize": {
+                            "$ref": "#/paths/~1ocean~1gcp~1k8s~1launchSpec~1%7BlaunchSpecId%7D/put/requestBody/content/application~1json/schema/properties/dynamicVolumeSize"
                           },
                           "rootVolumeType": {
                             "type": "string",
@@ -58908,8 +58914,38 @@
                   },
                   "rootVolumeSizeInGb": {
                     "type": "integer",
-                    "description": "Set root volume size (in GB).",
+                    "description": "Set root volume size in GB. Configure either this field or dynamicVolumeSize, not both.\n",
                     "example": 8
+                  },
+                  "dynamicVolumeSize": {
+                    "type": "object",
+                    "description": "Set dynamic volume size properties. When using this object, you cannot use `rootVolumeSizeInGb`.\nYou must use one or the other. When `dynamicVolumeSize` is configured, `rootVolumeType` is optional and defaults to `pd-standard`.\n",
+                    "required": [
+                      "baseSize",
+                      "resource",
+                      "sizePerResourceUnit"
+                    ],
+                    "properties": {
+                      "baseSize": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Initial size per volume (in GB).\nMust meet the minimum size for the selected GCP boot disk type and source image, whichever is greater.\nFor example, pd-standard, pd-ssd, and pd-balanced require at least 10 GB; pd-extreme requires 500 GB;\nand hyperdisk-balanced requires 4 GB.\n",
+                        "example": 50
+                      },
+                      "resource": {
+                        "type": "string",
+                        "enum": [
+                          "CPU"
+                        ],
+                        "example": "CPU"
+                      },
+                      "sizePerResourceUnit": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Additional size per resource unit (in GB).\nFor example: if baseSize=50, and sizePerResourceUnit=20, and an instance with 2 CPU is launched, its disk size will be 90 GB.\n",
+                        "example": 20
+                      }
+                    }
                   },
                   "rootVolumeType": {
                     "type": "string",

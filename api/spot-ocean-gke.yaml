@@ -719,14 +719,14 @@ paths:
                                       example: &ref_4
                                         - n2
                                         - c3
-                                  example: &ref_41
+                                  example: &ref_43
                                     minVcpu: 2
                                     maxVcpu: 16
                                     minMemoryGiB: 8
                                     maxMemoryGiB: 16
                                     includeFamilies: *ref_3
                                     excludeFamilies: *ref_4
-                                preferredTypes: &ref_36
+                                preferredTypes: &ref_37
                                   type: array
                                   description: |
                                     When Ocean scales up VMs, it prioritizes the preferred instance types for launching new nodes.  If launching nodes from this preferred list is not feasible, Ocean will then proceed to utilize the configured instance  types available within the cluster.  Note that the preferred types must be a subset of the instance types configured for the cluster/vng.
@@ -815,7 +815,8 @@ paths:
                                       value: test-native-vpc__default-pool
                                 rootVolumeSizeInGb:
                                   type: integer
-                                  description: Optionally set root size (GB). Value should be greater than or equal to 100.
+                                  description: |
+                                    Optionally set the root disk size in GB. Configure either this field or dynamicVolumeSize, not both.
                                   example: 100
                                 rootVolumeType:
                                   type: string
@@ -828,7 +829,42 @@ paths:
                                     - pd-extreme
                                     - hyperdisk-balanced
                                     - hyperdisk-balanced-high-availability
-                                shieldedInstanceConfig: &ref_37
+                                dynamicVolumeSize: &ref_36
+                                  type: object
+                                  description: |
+                                    Set dynamic volume size properties. When using this object, you cannot use `rootVolumeSizeInGb`.
+                                    You must use one or the other. When `dynamicVolumeSize` is configured, `rootVolumeType` is optional and defaults to `pd-standard`.
+                                  required:
+                                    - baseSize
+                                    - resource
+                                    - sizePerResourceUnit
+                                  properties:
+                                    baseSize:
+                                      type: integer
+                                      minimum: 1
+                                      description: |
+                                        Initial size per volume (in GB).
+                                        Must meet the minimum size for the selected GCP boot disk type and source image, whichever is greater.
+                                        For example, pd-standard, pd-ssd, and pd-balanced require at least 10 GB; pd-extreme requires 500 GB;
+                                        and hyperdisk-balanced requires 4 GB.
+                                      example: 50
+                                    resource:
+                                      type: string
+                                      enum:
+                                        - CPU
+                                      example: CPU
+                                    sizePerResourceUnit:
+                                      type: integer
+                                      minimum: 1
+                                      description: |
+                                        Additional size per resource unit (in GB).
+                                        For example: if baseSize=50, and sizePerResourceUnit=20, and an instance with 2 CPU is launched, its disk size will be 90 GB.
+                                      example: 20
+                                  example: &ref_40
+                                    baseSize: 50
+                                    resource: CPU
+                                    sizePerResourceUnit: 20
+                                shieldedInstanceConfig: &ref_38
                                   type: object
                                   title: shielded-instance-config
                                   description: |
@@ -844,7 +880,7 @@ paths:
                                       description: |
                                         Enable the integrity monitoring parameter on the GCP instances.
                                       example: true
-                                  example: &ref_46
+                                  example: &ref_48
                                     enableSecureBoot: true
                                     enableIntegrityMonitoring: true
                                 useAsTemplateOnly:
@@ -866,6 +902,10 @@ paths:
                                     value: test-native-vpc__default-pool
                                 rootVolumeSizeInGb: 100
                                 rootVolumeType: pd-standard
+                                dynamicVolumeSize:
+                                  baseSize: 50
+                                  resource: CPU
+                                  sizePerResourceUnit: 20
                                 shieldedInstanceConfig:
                                   enableSecureBoot: true
                                   enableIntegrityMonitoring: true
@@ -914,6 +954,10 @@ paths:
                                   value: test-native-vpc__default-pool
                               rootVolumeSizeInGb: 100
                               rootVolumeType: pd-standard
+                              dynamicVolumeSize:
+                                baseSize: 50
+                                resource: CPU
+                                sizePerResourceUnit: 20
                               shieldedInstanceConfig:
                                 enableSecureBoot: true
                                 enableIntegrityMonitoring: true
@@ -1029,6 +1073,10 @@ paths:
                                 value: test-native-vpc__default-pool
                             rootVolumeSizeInGb: 100
                             rootVolumeType: pd-standard
+                            dynamicVolumeSize:
+                              baseSize: 50
+                              resource: CPU
+                              sizePerResourceUnit: 20
                             shieldedInstanceConfig:
                               enableSecureBoot: true
                               enableIntegrityMonitoring: true
@@ -2832,7 +2880,7 @@ paths:
       tags:
         - Ocean GKE
       parameters:
-        - &ref_83
+        - &ref_85
           in: path
           name: oceanClusterId
           example: o-12345abc
@@ -2932,7 +2980,7 @@ paths:
                   required:
                     - launchSpec
                   properties:
-                    launchSpec: &ref_47
+                    launchSpec: &ref_49
                       type: object
                       description: |
                         Ocean Cluster Virtual Node Group (VNG).
@@ -2963,8 +3011,10 @@ paths:
                             The account used by applications running on the VM to call GCP APIs.
                         rootVolumeSizeInGb:
                           type: integer
-                          description: Set root volume size (in GB).
+                          description: |
+                            Set root volume size in GB. Configure either this field or dynamicVolumeSize, not both.
                           example: 8
+                        dynamicVolumeSize: *ref_36
                         rootVolumeType:
                           type: string
                           description: Set the root volume disk type.
@@ -2997,7 +3047,7 @@ paths:
                             example:
                               key: key1
                               value: value1
-                          example: &ref_39
+                          example: &ref_41
                             - key: key1
                               value: value1
                             - key: key2
@@ -3008,18 +3058,18 @@ paths:
                             An array of supported machine types for the virtual node group. Can be null.
                           items:
                             type: string
-                          example: &ref_40
+                          example: &ref_42
                             - n1-standard-1
                             - n1-standard-2
                         filters: *ref_34
-                        preferredTypes: *ref_36
+                        preferredTypes: *ref_37
                         availabilityZones:
                           type: array
                           description: |
                             An array holding availability zones, this configures the availability zones the Ocean may launch instances in per VNG. Can be null.
                           items:
                             type: string
-                          example: &ref_42
+                          example: &ref_44
                             - us-central1-a
                             - us-central1-b
                         tags:
@@ -3028,7 +3078,7 @@ paths:
                             Every node launched from this VNG will have those tags. If the value is null, the nodes will have the tags configured at the cluster level.
                           items:
                             type: string
-                          example: &ref_43
+                          example: &ref_45
                             - gke-cluster-name-12345-node
                             - network-tag-1
                         taints:
@@ -3050,7 +3100,7 @@ paths:
                               effect:
                                 type: string
                                 description: Set taint effect.
-                          example: &ref_44
+                          example: &ref_46
                             - key: taintKey
                               value: taintValue
                               effect: NoSchedule
@@ -3084,7 +3134,7 @@ paths:
                               value:
                                 type: string
                                 description: Set label value.
-                          example: &ref_45
+                          example: &ref_47
                             - key: env
                               value: test
                         autoScale:
@@ -3178,8 +3228,8 @@ paths:
                             When set to True, VNG nodes will be treated as if all pods running have the [restrict-scale-down label](https://docs.flexera.com/spot/ocean/features/labels-and-taints).
                             Therefore, Ocean will not scale nodes down unless they are empty.
                           example: false
-                        shieldedInstanceConfig: *ref_37
-                        strategy: &ref_58
+                        shieldedInstanceConfig: *ref_38
+                        strategy: &ref_60
                           type: object
                           title: strategy
                           description: |
@@ -3225,10 +3275,10 @@ paths:
                                   default: 10
                                   description: |
                                     Decide on the % of instances that will be replaced simultaneously.
-                          example: &ref_66
+                          example: &ref_68
                             preemptiblePercentage: 80
                             shouldUtilizeCommitments: true
-                        storage: &ref_50
+                        storage: &ref_52
                           type: object
                           title: storage
                           description: |
@@ -3276,11 +3326,11 @@ paths:
                                 For more information about local NVMe SSDs, it is recommended to review the GCP documentation:
                                 * [GKE local NVMe SSD block storage](https://cloud.google.com/kubernetes-engine/docs/how-to/persistent-volumes/local-ssd-raw)
                               example: 2
-                          example: &ref_56
+                          example: &ref_58
                             localSsdCount: 2
                             localSsdEphemeralStorageCount: 2
                             localNvmeSsdCount: 2
-                        scheduling: &ref_59
+                        scheduling: &ref_61
                           type: object
                           description: |
                             An object used to define scheduled tasks such as a manual headroom update or a VNG-level shutdown window.
@@ -3304,12 +3354,12 @@ paths:
                                     The times that the shutdown hours will apply.
                                   items:
                                     type: string
-                                  example: &ref_38
+                                  example: &ref_39
                                     - Mon:00:30-Mon:23:00
                                     - Tue:06:30-Tue:23:00
                               example:
                                 isEnabled: true
-                                timeWindows: *ref_38
+                                timeWindows: *ref_39
                             tasks:
                               type: array
                               items:
@@ -3377,10 +3427,10 @@ paths:
                                   isEnabled: true
                                   cronExpression: 0 1 * * *
                                   taskType: manualHeadroomUpdate
-                          example: &ref_67
+                          example: &ref_69
                             shutdownHours:
                               isEnabled: true
-                              timeWindows: *ref_38
+                              timeWindows: *ref_39
                             tasks:
                               - isEnabled: true
                                 cronExpression: 0 1 * * *
@@ -3471,21 +3521,22 @@ paths:
                               aliasIpRanges:
                                 - ipCidrRange: /24
                                   subnetworkRangeName: gke-test-native-vpc-pods-5cb557f7
-                      example: &ref_48
+                      example: &ref_50
                         oceanId: o-1fff54ed
                         name: lp_name
                         sourceImage: https://www.googleapis.com/compute/v1/projects/gke-node-images/global/images/container-v1-3-v20160517
                         serviceAccount: 265168459660-compute@developer.gserviceaccount.com
                         rootVolumeSizeInGb: 8
+                        dynamicVolumeSize: *ref_40
                         rootVolumeType: pd-standard
-                        metadata: *ref_39
-                        instanceTypes: *ref_40
-                        filters: *ref_41
+                        metadata: *ref_41
+                        instanceTypes: *ref_42
+                        filters: *ref_43
                         preferredTypes: *ref_7
-                        availabilityZones: *ref_42
-                        tags: *ref_43
-                        taints: *ref_44
-                        labels: *ref_45
+                        availabilityZones: *ref_44
+                        tags: *ref_45
+                        taints: *ref_46
+                        labels: *ref_47
                         autoScale:
                           headrooms:
                             - cpuPerUnit: 1000
@@ -3499,7 +3550,7 @@ paths:
                           maxInstanceCount: 5
                           minInstanceCount: 2
                         restrictScaleDown: false
-                        shieldedInstanceConfig: *ref_46
+                        shieldedInstanceConfig: *ref_48
                         strategy:
                           preemptiblePercentage: 80
                           shouldUtilizeCommitments: true
@@ -3510,7 +3561,7 @@ paths:
                         scheduling:
                           shutdownHours:
                             isEnabled: true
-                            timeWindows: *ref_38
+                            timeWindows: *ref_39
                           tasks:
                             - isEnabled: true
                               cronExpression: 0 1 * * *
@@ -3551,12 +3602,12 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: *ref_47
+                            items: *ref_49
                           kind:
                             example: spotinst:ocean:gcp:k8s:launchSpec
                         example:
                           items:
-                            - *ref_48
+                            - *ref_50
                           kind: spotinst:ocean:gcp:k8s:launchSpec
         '400':
           description: Bad Request
@@ -3567,7 +3618,7 @@ paths:
         - Ocean GKE
       parameters:
         - *ref_24
-        - &ref_49
+        - &ref_51
           in: query
           name: oceanId
           schema:
@@ -3601,12 +3652,12 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: *ref_47
+                            items: *ref_49
                           kind:
                             example: spotinst:ocean:gcp:k8s:launchSpec
                         example:
                           items:
-                            - *ref_48
+                            - *ref_50
                           kind: spotinst:ocean:gcp:k8s:launchSpec
         '400':
           description: Bad Request
@@ -3622,7 +3673,7 @@ paths:
         - Ocean GKE
       parameters:
         - *ref_24
-        - *ref_49
+        - *ref_51
         - in: query
           name: nodePoolName
           schema:
@@ -3656,7 +3707,7 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: &ref_91
+                            items: &ref_93
                               type: object
                               description: |
                                 Ocean Cluster Virtual Node Group (VNG).
@@ -3711,7 +3762,7 @@ paths:
                                     example:
                                       key: key1
                                       value: value1
-                                  example: &ref_51
+                                  example: &ref_53
                                     - key: key1
                                       value: value1
                                     - key: key2
@@ -3722,7 +3773,7 @@ paths:
                                     An array holding availability zones, this configures the availability zones the Ocean may launch instances in per VNG. Can be null.
                                   items:
                                     type: string
-                                  example: &ref_52
+                                  example: &ref_54
                                     - us-central1-a
                                     - us-central1-b
                                 tags:
@@ -3731,7 +3782,7 @@ paths:
                                     Every node launched from this VNG will have those tags. If the value is null, the nodes will have the tags configured at the cluster level.
                                   items:
                                     type: string
-                                  example: &ref_53
+                                  example: &ref_55
                                     - gke-cluster-name-12345-node
                                     - network-tag-1
                                 taints:
@@ -3749,7 +3800,7 @@ paths:
                                       effect:
                                         type: string
                                         description: Set taint effect.
-                                  example: &ref_54
+                                  example: &ref_56
                                     - key: taintKey
                                       value: taintValue
                                       effect: NoSchedule
@@ -3780,23 +3831,23 @@ paths:
                                       value:
                                         type: string
                                         description: Set label value.
-                                  example: &ref_55
+                                  example: &ref_57
                                     - key: env
                                       value: test
-                                shieldedInstanceConfig: *ref_37
-                                storage: *ref_50
-                              example: &ref_92
+                                shieldedInstanceConfig: *ref_38
+                                storage: *ref_52
+                              example: &ref_94
                                 oceanId: o-1fff54ed
                                 sourceImage: https://www.googleapis.com/compute/v1/projects/gke-node-images/global/images/container-v1-3-v20160517
                                 serviceAccount: 265168459660-compute@developer.gserviceaccount.com
                                 rootVolumeType: pd-standard
-                                metadata: *ref_51
-                                availabilityZones: *ref_52
-                                tags: *ref_53
-                                taints: *ref_54
-                                labels: *ref_55
-                                shieldedInstanceConfig: *ref_46
-                                storage: *ref_56
+                                metadata: *ref_53
+                                availabilityZones: *ref_54
+                                tags: *ref_55
+                                taints: *ref_56
+                                labels: *ref_57
+                                shieldedInstanceConfig: *ref_48
+                                storage: *ref_58
                           kind:
                             example: spotinst:ocean:gcp:k8s:launchSpec
                         example:
@@ -3805,13 +3856,13 @@ paths:
                               sourceImage: https://www.googleapis.com/compute/v1/projects/gke-node-images/global/images/container-v1-3-v20160517
                               serviceAccount: 265168459660-compute@developer.gserviceaccount.com
                               rootVolumeType: pd-standard
-                              metadata: *ref_51
-                              availabilityZones: *ref_52
-                              tags: *ref_53
-                              taints: *ref_54
-                              labels: *ref_55
-                              shieldedInstanceConfig: *ref_46
-                              storage: *ref_56
+                              metadata: *ref_53
+                              availabilityZones: *ref_54
+                              tags: *ref_55
+                              taints: *ref_56
+                              labels: *ref_57
+                              shieldedInstanceConfig: *ref_48
+                              storage: *ref_58
                           kind: spotinst:ocean:gcp:k8s:launchSpec
         '400':
           description: Bad Request
@@ -3826,7 +3877,7 @@ paths:
         - Ocean GKE
       parameters:
         - *ref_24
-        - &ref_57
+        - &ref_59
           in: path
           name: launchSpecId
           description: |
@@ -3873,12 +3924,12 @@ paths:
         - Ocean GKE
       parameters:
         - *ref_24
-        - *ref_57
+        - *ref_59
       requestBody:
         required: false
         content:
           application/json:
-            schema: &ref_68
+            schema: &ref_70
               type: object
               description: |
                 Ocean Cluster Virtual Node Group (VNG).
@@ -3908,8 +3959,10 @@ paths:
                     The account used by applications running on the VM to call GCP APIs.
                 rootVolumeSizeInGb:
                   type: integer
-                  description: Set root volume size (in GB).
+                  description: |
+                    Set root volume size in GB. Configure either this field or dynamicVolumeSize, not both.
                   example: 8
+                dynamicVolumeSize: *ref_36
                 rootVolumeType:
                   type: string
                   description: Set the root volume disk type.
@@ -3942,7 +3995,7 @@ paths:
                     example:
                       key: key1
                       value: value1
-                  example: &ref_60
+                  example: &ref_62
                     - key: key1
                       value: value1
                     - key: key2
@@ -3953,18 +4006,18 @@ paths:
                     An array of supported machine types for the virtual node group. Can be null.
                   items:
                     type: string
-                  example: &ref_61
+                  example: &ref_63
                     - n1-standard-1
                     - n1-standard-2
                 filters: *ref_34
-                preferredTypes: *ref_36
+                preferredTypes: *ref_37
                 availabilityZones:
                   type: array
                   description: |
                     An array holding availability zones, this configures the availability zones the Ocean may launch instances in per VNG. Can be null.
                   items:
                     type: string
-                  example: &ref_62
+                  example: &ref_64
                     - us-central1-a
                     - us-central1-b
                 tags:
@@ -3973,7 +4026,7 @@ paths:
                     Every node launched from this VNG will have those tags. If the value is null, the nodes will have the tags configured at the cluster level.
                   items:
                     type: string
-                  example: &ref_63
+                  example: &ref_65
                     - gke-cluster-name-12345-node
                     - network-tag-1
                 taints:
@@ -3995,7 +4048,7 @@ paths:
                       effect:
                         type: string
                         description: Set taint effect.
-                  example: &ref_64
+                  example: &ref_66
                     - key: taintKey
                       value: taintValue
                       effect: NoSchedule
@@ -4029,7 +4082,7 @@ paths:
                       value:
                         type: string
                         description: Set label value.
-                  example: &ref_65
+                  example: &ref_67
                     - key: env
                       value: test
                 autoScale:
@@ -4123,10 +4176,10 @@ paths:
                     When set to True, VNG nodes will be treated as if all pods running have the [restrict-scale-down label](https://docs.flexera.com/spot/ocean/features/labels-and-taints).
                     Therefore, Ocean will not scale nodes down unless they are empty.
                   example: false
-                shieldedInstanceConfig: *ref_37
-                strategy: *ref_58
-                storage: *ref_50
-                scheduling: *ref_59
+                shieldedInstanceConfig: *ref_38
+                strategy: *ref_60
+                storage: *ref_52
+                scheduling: *ref_61
                 createdAt:
                   type: string
                   readOnly: true
@@ -4137,21 +4190,22 @@ paths:
                   readOnly: true
                   format: date-time
                   example: '2019-06-10T15:06:13.000Z'
-              example: &ref_69
+              example: &ref_71
                 oceanId: o-1fff54ed
                 name: lp_name
                 sourceImage: https://www.googleapis.com/compute/v1/projects/gke-node-images/global/images/container-v1-3-v20160517
                 serviceAccount: 265168459660-compute@developer.gserviceaccount.com
                 rootVolumeSizeInGb: 8
+                dynamicVolumeSize: *ref_40
                 rootVolumeType: pd-standard
-                metadata: *ref_60
-                instanceTypes: *ref_61
-                filters: *ref_41
+                metadata: *ref_62
+                instanceTypes: *ref_63
+                filters: *ref_43
                 preferredTypes: *ref_7
-                availabilityZones: *ref_62
-                tags: *ref_63
-                taints: *ref_64
-                labels: *ref_65
+                availabilityZones: *ref_64
+                tags: *ref_65
+                taints: *ref_66
+                labels: *ref_67
                 autoScale:
                   headrooms:
                     - cpuPerUnit: 1000
@@ -4165,10 +4219,10 @@ paths:
                   maxInstanceCount: 5
                   minInstanceCount: 2
                 restrictScaleDown: false
-                shieldedInstanceConfig: *ref_46
-                strategy: *ref_66
-                storage: *ref_56
-                scheduling: *ref_67
+                shieldedInstanceConfig: *ref_48
+                strategy: *ref_68
+                storage: *ref_58
+                scheduling: *ref_69
                 createdAt: '2019-06-03T08:13:08.000Z'
                 updatedAt: '2019-06-10T15:06:13.000Z'
       responses:
@@ -4196,12 +4250,12 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: *ref_68
+                            items: *ref_70
                           kind:
                             example: spotinst:ocean:gcp:k8s:launchSpec
                         example:
                           items:
-                            - *ref_69
+                            - *ref_71
                           kind: spotinst:ocean:gcp:k8s:launchSpec
         '400':
           description: Bad Request
@@ -4212,7 +4266,7 @@ paths:
         - Ocean GKE
       parameters:
         - *ref_24
-        - *ref_57
+        - *ref_59
       responses:
         '200':
           description: Ocean Virtual Node Group Response
@@ -4238,12 +4292,12 @@ paths:
                         properties:
                           items:
                             type: array
-                            items: *ref_47
+                            items: *ref_49
                           kind:
                             example: spotinst:ocean:gcp:k8s:launchSpec
                         example:
                           items:
-                            - *ref_48
+                            - *ref_50
                           kind: spotinst:ocean:gcp:k8s:launchSpec
         '400':
           description: Bad Request
@@ -4258,7 +4312,7 @@ paths:
         - Ocean GKE
       parameters:
         - *ref_24
-        - &ref_77
+        - &ref_79
           in: path
           name: oceanId
           schema:
@@ -4278,7 +4332,7 @@ paths:
                   properties:
                     roll:
                       allOf:
-                        - &ref_70
+                        - &ref_72
                           type: object
                           properties:
                             batchSizePercentage:
@@ -4286,7 +4340,7 @@ paths:
                               description: |
                                 Value is a percentage to set the size of a batch in a roll. Valid values are 0-100.
                               example: 20
-                        - &ref_71
+                        - &ref_73
                           type: object
                           properties:
                             comment:
@@ -4294,7 +4348,7 @@ paths:
                               description: |
                                 Add a comment description for the roll. The comment is limited to 256 chars.
                               example: This is why I deployed my cluster.
-                        - &ref_72
+                        - &ref_74
                           type: object
                           properties:
                             respectPdb:
@@ -4303,7 +4357,7 @@ paths:
                                 During the roll, if the parameter is set to 'true', PDB is honored during the instance replacement.
                               example: true
                               default: false
-                        - &ref_73
+                        - &ref_75
                           type: object
                           properties:
                             batchMinHealthyPercentage:
@@ -4317,10 +4371,10 @@ paths:
                   properties:
                     roll:
                       allOf:
-                        - *ref_70
-                        - *ref_71
                         - *ref_72
                         - *ref_73
+                        - *ref_74
+                        - *ref_75
                         - type: object
                           properties:
                             instanceIds:
@@ -4337,10 +4391,10 @@ paths:
                   properties:
                     roll:
                       allOf:
-                        - *ref_70
-                        - *ref_71
                         - *ref_72
                         - *ref_73
+                        - *ref_74
+                        - *ref_75
                         - type: object
                           properties:
                             launchSpecIds:
@@ -4360,7 +4414,7 @@ paths:
                                 When set to 'true' and virtual node group identifiers are defined to roll, the specified virtual node group(s) will be blocked from scaling up. Replacements will scale up in other virtual node groups that match the displaced pods instead. This applies to migrating nodes from one virtual node group to another.
                               example: true
       responses:
-        '200': &ref_82
+        '200': &ref_84
           description: Cluster Roll Response
           content:
             application/json:
@@ -4423,7 +4477,7 @@ paths:
                                   type: string
                                 status:
                                   type: string
-                            example: &ref_74
+                            example: &ref_76
                               - instanceName: sin-0a4becc0-sig-1234abcd
                                 status: REPLACED
                               - instanceName: sin-1a4becc0-sig-1234abcd
@@ -4433,24 +4487,24 @@ paths:
                               - instanceName: sin-3a4becc0-sig-1234abcd
                                 status: NOT_REPLACED_DUE_TO_PDB
                         example:
-                          oldInstances: *ref_74
+                          oldInstances: *ref_76
                     example:
                       unit: percentage
                       value: 0
                       detailedStatus:
-                        oldInstances: *ref_74
+                        oldInstances: *ref_76
                   instanceNames:
                     type: array
                     items:
                       type: string
-                    example: &ref_75
+                    example: &ref_77
                       - sin-0a4becc0-sig-6952238d
                       - sin-0542ecc0-sig-695223r4
                   launchSpecIds:
                     type: array
                     items:
                       type: string
-                    example: &ref_76
+                    example: &ref_78
                       - ols-76694a7d
                       - ols-56694a76
                   batchMinHealthyPercentage:
@@ -4475,9 +4529,9 @@ paths:
                     unit: percentage
                     value: 0
                     detailedStatus:
-                      oldInstances: *ref_74
-                  instanceNames: *ref_75
-                  launchSpecIds: *ref_76
+                      oldInstances: *ref_76
+                  instanceNames: *ref_77
+                  launchSpecIds: *ref_78
                   batchMinHealthyPercentage: 100
                   createdAt: '2019-03-24T15:46:09.000Z'
                   updatedAt: '2019-03-24T15:46:09.000Z'
@@ -4492,7 +4546,7 @@ paths:
         - Ocean GKE
       parameters:
         - *ref_24
-        - *ref_77
+        - *ref_79
       responses:
         '200':
           description: Ocean Get List Of Rolls Response
@@ -4572,7 +4626,7 @@ paths:
                                             type: string
                                           status:
                                             type: string
-                                      example: &ref_78
+                                      example: &ref_80
                                         - instanceName: sin-0a4becc0-sig-1234abcd
                                           status: REPLACED
                                         - instanceName: sin-1a4becc0-sig-1234abcd
@@ -4582,12 +4636,12 @@ paths:
                                         - instanceName: sin-3a4becc0-sig-1234abcd
                                           status: NOT_REPLACED_DUE_TO_PDB
                                   example:
-                                    oldInstances: *ref_78
+                                    oldInstances: *ref_80
                               example:
                                 unit: percentage
                                 value: 0
                                 detailedStatus:
-                                  oldInstances: *ref_78
+                                  oldInstances: *ref_80
                             batchMinHealthyPercentage:
                               type: integer
                               example: 100
@@ -4598,7 +4652,7 @@ paths:
                               type: array
                               items:
                                 type: string
-                                example: &ref_79
+                                example: &ref_81
                                   - ols-76694a7d
                                   - ols-56694a76
                             respectPdb:
@@ -4621,11 +4675,11 @@ paths:
                               unit: percentage
                               value: 0
                               detailedStatus:
-                                oldInstances: *ref_78
+                                oldInstances: *ref_80
                             batchMinHealthyPercentage: 100
                             oceanId: o-30681b13
                             launchSpecIds:
-                              - *ref_79
+                              - *ref_81
                             respectPdb: true
                             createdAt: '2019-03-24T15:46:09.000Z'
                             updatedAt: '2019-03-24T15:46:09.000Z'
@@ -4644,8 +4698,8 @@ paths:
         - Ocean GKE
       parameters:
         - *ref_24
-        - *ref_77
-        - &ref_81
+        - *ref_79
+        - &ref_83
           in: path
           name: rollId
           example: scr-12345abc
@@ -4732,7 +4786,7 @@ paths:
                                   type: string
                                 status:
                                   type: string
-                            example: &ref_80
+                            example: &ref_82
                               - instanceName: sin-0a4becc0-sig-1234abcd
                                 status: REPLACED
                               - instanceName: sin-1a4becc0-sig-1234abcd
@@ -4742,12 +4796,12 @@ paths:
                               - instanceName: sin-3a4becc0-sig-1234abcd
                                 status: NOT_REPLACED_DUE_TO_PDB
                         example:
-                          oldInstances: *ref_80
+                          oldInstances: *ref_82
                     example:
                       unit: percentage
                       value: 0
                       detailedStatus:
-                        oldInstances: *ref_80
+                        oldInstances: *ref_82
                   batchMinHealthyPercentage:
                     type: integer
                     example: 100
@@ -4773,7 +4827,7 @@ paths:
                     unit: percentage
                     value: 0
                     detailedStatus:
-                      oldInstances: *ref_80
+                      oldInstances: *ref_82
                   batchMinHealthyPercentage: 100
                   oceanId: o-12e31234
                   respectPdb: true
@@ -4790,10 +4844,10 @@ paths:
         - Ocean GKE
       parameters:
         - *ref_24
-        - *ref_77
-        - *ref_81
+        - *ref_79
+        - *ref_83
       responses:
-        '200': *ref_82
+        '200': *ref_84
         '400':
           description: Bad Request
   /ocean/gcp/k8s/cluster/{oceanClusterId}/nodes:
@@ -4806,7 +4860,7 @@ paths:
         - Ocean GKE
       parameters:
         - *ref_24
-        - *ref_83
+        - *ref_85
         - in: query
           name: launchSpecId
           example: ols-123abc
@@ -5152,10 +5206,10 @@ paths:
                                       type: string
                                     description: |
                                       Instance types allowed in the Ocean cluster.
-                                    example: &ref_84
+                                    example: &ref_86
                                       - n1-standard-2
                                 example:
-                                  whitelist: *ref_84
+                                  whitelist: *ref_86
                               launchSpecification:
                                 type: object
                                 properties:
@@ -5186,7 +5240,7 @@ paths:
                                     description: Every node launched from this configuration will be tagged with those tags.
                                     items:
                                       type: string
-                                    example: &ref_85
+                                    example: &ref_87
                                       - gke-cluster-name-12345-node
                                   ipForwarding:
                                     type: boolean
@@ -5219,7 +5273,7 @@ paths:
                                   metadata:
                                     key: example_key1
                                     value: exmample_value1
-                                  tags: *ref_85
+                                  tags: *ref_87
                                   ipForwarding: true
                                   serviceAccount: 265168459660-compute@developer.gserviceaccount.com
                                   labels:
@@ -5230,7 +5284,7 @@ paths:
                                 type: array
                                 items:
                                   type: string
-                                  example: &ref_86
+                                  example: &ref_88
                                     - us-central1-a
                             example:
                               networkInterfaces:
@@ -5243,13 +5297,13 @@ paths:
                                   subnetworkRangeName: gke-test-native-vpc-pods-5cb557f7
                               subnetName: default
                               instanceTypes:
-                                whitelist: *ref_84
+                                whitelist: *ref_86
                               launchSpecification:
                                 sourceImage: https://www.googleapis.com/compute/v1/projects/gke-node-images/global/images/gke-1117-gke12-cos-69-10895-138-0-v190225-pre
                                 metadata:
                                   key: example_key1
                                   value: exmample_value1
-                                tags: *ref_85
+                                tags: *ref_87
                                 ipForwarding: true
                                 serviceAccount: 265168459660-compute@developer.gserviceaccount.com
                                 labels:
@@ -5257,7 +5311,7 @@ paths:
                                     value: test-native-vpc__default-pool
                                 rootVolumeSizeInGb: 100
                               availabilityZones:
-                                - *ref_86
+                                - *ref_88
                           createdAt:
                             type: string
                             example: 2018-11-05T12:55:50.000+0000
@@ -5283,13 +5337,13 @@ paths:
                                 subnetworkRangeName: gke-test-native-vpc-pods-5cb557f7
                             subnetName: default
                             instanceTypes:
-                              whitelist: *ref_84
+                              whitelist: *ref_86
                             launchSpecification:
                               sourceImage: https://www.googleapis.com/compute/v1/projects/gke-node-images/global/images/gke-1117-gke12-cos-69-10895-138-0-v190225-pre
                               metadata:
                                 key: example_key1
                                 value: exmample_value1
-                              tags: *ref_85
+                              tags: *ref_87
                               ipForwarding: true
                               serviceAccount: 265168459660-compute@developer.gserviceaccount.com
                               labels:
@@ -5297,7 +5351,7 @@ paths:
                                   value: test-native-vpc__default-pool
                               rootVolumeSizeInGb: 100
                             availabilityZones:
-                              - *ref_86
+                              - *ref_88
                           createdAt: 2018-11-05T12:55:50.000+0000
                           updatedAt: 2018-11-05T12:58:15.000+0000
                       count:
@@ -5327,13 +5381,13 @@ paths:
                               subnetworkRangeName: gke-test-native-vpc-pods-5cb557f7
                           subnetName: default
                           instanceTypes:
-                            whitelist: *ref_84
+                            whitelist: *ref_86
                           launchSpecification:
                             sourceImage: https://www.googleapis.com/compute/v1/projects/gke-node-images/global/images/gke-1117-gke12-cos-69-10895-138-0-v190225-pre
                             metadata:
                               key: example_key1
                               value: exmample_value1
-                            tags: *ref_85
+                            tags: *ref_87
                             ipForwarding: true
                             serviceAccount: 265168459660-compute@developer.gserviceaccount.com
                             labels:
@@ -5341,7 +5395,7 @@ paths:
                                 value: test-native-vpc__default-pool
                             rootVolumeSizeInGb: 100
                           availabilityZones:
-                            - *ref_86
+                            - *ref_88
                         createdAt: 2018-11-05T12:55:50.000+0000
                         updatedAt: 2018-11-05T12:58:15.000+0000
                       count: 1
@@ -5375,13 +5429,13 @@ paths:
                             subnetworkRangeName: gke-test-native-vpc-pods-5cb557f7
                         subnetName: default
                         instanceTypes:
-                          whitelist: *ref_84
+                          whitelist: *ref_86
                         launchSpecification:
                           sourceImage: https://www.googleapis.com/compute/v1/projects/gke-node-images/global/images/gke-1117-gke12-cos-69-10895-138-0-v190225-pre
                           metadata:
                             key: example_key1
                             value: exmample_value1
-                          tags: *ref_85
+                          tags: *ref_87
                           ipForwarding: true
                           serviceAccount: 265168459660-compute@developer.gserviceaccount.com
                           labels:
@@ -5389,7 +5443,7 @@ paths:
                               value: test-native-vpc__default-pool
                           rootVolumeSizeInGb: 100
                         availabilityZones:
-                          - *ref_86
+                          - *ref_88
                       createdAt: 2018-11-05T12:55:50.000+0000
                       updatedAt: 2018-11-05T12:58:15.000+0000
                     count: 1
@@ -5475,7 +5529,7 @@ paths:
                                 Instance types allowed in the Ocean cluster. Cannot be configured if a deny list is configured.
                               items:
                                 type: string
-                              example: &ref_87
+                              example: &ref_89
                                 - n1-standard-2
                             blacklist:
                               type: array
@@ -5483,11 +5537,11 @@ paths:
                                 Instance types to avoid launching in the Ocean cluster. Cannot be configured if a permit list is configured.
                               items:
                                 type: string
-                              example: &ref_88
+                              example: &ref_90
                                 - n2d-highcpu-96
                           example:
-                            whitelist: *ref_87
-                            blacklist: *ref_88
+                            whitelist: *ref_89
+                            blacklist: *ref_90
                         autoScaler: *ref_10
                         availabilityZones:
                           type: array
@@ -5495,7 +5549,7 @@ paths:
                             An array holding availability zones, this configures the availability zones the Ocean may launch instances in per VNG. Can be null.
                           items:
                             type: string
-                          example: &ref_90
+                          example: &ref_92
                             - us-central1-a
                             - us-central1-b
                         backendServices:
@@ -5535,35 +5589,35 @@ paths:
                                     type: array
                                     items:
                                       type: integer
-                                    example: &ref_89
+                                    example: &ref_91
                                       - 443
                                       - 8443
                                 example:
                                   name: https
-                                  ports: *ref_89
+                                  ports: *ref_91
                             example:
                               backendServiceName: bserv-2
                               locationType: regional
                               scheme: EXTERNAL
                               namedPorts:
                                 name: https
-                                ports: *ref_89
+                                ports: *ref_91
                       example:
                         name: test
                         controllerClusterId: test-123124
                         capacity: *ref_19
                         instanceTypes:
-                          whitelist: *ref_87
-                          blacklist: *ref_88
+                          whitelist: *ref_89
+                          blacklist: *ref_90
                         autoScaler: *ref_17
-                        availabilityZones: *ref_90
+                        availabilityZones: *ref_92
                         backendServices:
                           - backendServiceName: bserv-2
                             locationType: regional
                             scheme: EXTERNAL
                             namedPorts:
                               name: https
-                              ports: *ref_89
+                              ports: *ref_91
       responses:
         '200':
           description: Ocean CKE Cluster Import Response
@@ -5643,7 +5697,7 @@ paths:
                                     compute: *ref_23
                                 customLaunchSpecs:
                                   type: array
-                                  items: *ref_91
+                                  items: *ref_93
                               example:
                                 cluster:
                                   name: test
@@ -5656,7 +5710,7 @@ paths:
                                   capacity: *ref_19
                                   compute: *ref_23
                                 customLaunchSpecs:
-                                  - *ref_92
+                                  - *ref_94
                           kind:
                             example: spotinst:ocean:gcp:k8s
                         example:
@@ -5672,7 +5726,7 @@ paths:
                                 capacity: *ref_19
                                 compute: *ref_23
                               customLaunchSpecs:
-                                - *ref_92
+                                - *ref_94
                           kind: spotinst:ocean:gcp:k8s
         '400':
           description: Bad Request
@@ -5686,7 +5740,7 @@ paths:
         - Ocean GKE
       parameters:
         - *ref_24
-        - *ref_57
+        - *ref_59
       requestBody:
         required: true
         content:
